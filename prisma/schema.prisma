@@ -1,0 +1,211 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+model Escola {
+  id        String   @id @default(cuid())
+  nome      String
+  slug      String   @unique
+  logoUrl   String?
+  plano     Plano    @default(STARTER)
+  ativa     Boolean  @default(true)
+  asaasId   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  usuarios   UsuarioEscola[]
+  atletas    Atleta[]
+  categorias Categoria[]
+  treinos    Treino[]
+  cobrancas  Cobranca[]
+}
+
+model UsuarioEscola {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  escolaId  String
+  role      Role     @default(TREINADOR)
+  nome      String
+  email     String
+  telefone  String?
+  createdAt DateTime @default(now())
+
+  escola Escola @relation(fields: [escolaId], references: [id])
+
+  @@index([escolaId])
+  @@index([clerkId])
+}
+
+model Categoria {
+  id       String @id @default(cuid())
+  nome     String
+  escolaId String
+  cor      String @default("#16a34a")
+
+  escola  Escola   @relation(fields: [escolaId], references: [id])
+  atletas Atleta[]
+
+  @@index([escolaId])
+}
+
+model Atleta {
+  id             String   @id @default(cuid())
+  escolaId       String
+  categoriaId    String?
+  nome           String
+  dataNascimento DateTime
+  fotoUrl        String?
+  posicao        String?
+  peDominante    Pe       @default(DIREITO)
+  altura         Float?
+  peso           Float?
+  ativo          Boolean  @default(true)
+  historicoMedico String?
+  alergias       String?
+  medicamentos   String?
+  tokenPais      String   @unique @default(cuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  escola       Escola           @relation(fields: [escolaId], references: [id])
+  categoria    Categoria?       @relation(fields: [categoriaId], references: [id])
+  responsaveis Responsavel[]
+  presencas    Presenca[]
+  cobrancas    Cobranca[]
+  timeline     TimelineEvento[]
+
+  @@index([escolaId])
+  @@index([categoriaId])
+  @@index([tokenPais])
+}
+
+model Responsavel {
+  id         String  @id @default(cuid())
+  atletaId   String
+  nome       String
+  parentesco String?
+  telefone   String
+  whatsapp   String?
+  email      String?
+  principal  Boolean @default(false)
+
+  atleta Atleta @relation(fields: [atletaId], references: [id], onDelete: Cascade)
+
+  @@index([atletaId])
+}
+
+model Treino {
+  id        String     @id @default(cuid())
+  escolaId  String
+  data      DateTime
+  local     String?
+  notas     String?
+  createdAt DateTime   @default(now())
+
+  escola    Escola     @relation(fields: [escolaId], references: [id])
+  presencas Presenca[]
+
+  @@index([escolaId])
+  @@index([data])
+}
+
+model Presenca {
+  id        String         @id @default(cuid())
+  atletaId  String
+  treinoId  String
+  status    StatusPresenca @default(AUSENTE)
+  criadoEm  DateTime       @default(now())
+
+  atleta Atleta @relation(fields: [atletaId], references: [id])
+  treino Treino @relation(fields: [treinoId], references: [id])
+
+  @@unique([atletaId, treinoId])
+  @@index([treinoId])
+  @@index([atletaId])
+}
+
+model Cobranca {
+  id           String         @id @default(cuid())
+  escolaId     String
+  atletaId     String
+  valor        Float
+  vencimento   DateTime
+  status       StatusCobranca @default(PENDENTE)
+  asaasId      String?        @unique
+  pixCopiaCola String?
+  pixQrCode    String?
+  descricao    String?
+  pagoEm       DateTime?
+  createdAt    DateTime       @default(now())
+
+  escola Escola @relation(fields: [escolaId], references: [id])
+  atleta Atleta @relation(fields: [atletaId], references: [id])
+
+  @@index([escolaId])
+  @@index([atletaId])
+  @@index([status])
+  @@index([vencimento])
+}
+
+model TimelineEvento {
+  id        String     @id @default(cuid())
+  atletaId  String
+  tipo      TipoEvento
+  descricao String
+  data      DateTime   @default(now())
+  metadados Json?
+
+  atleta Atleta @relation(fields: [atletaId], references: [id], onDelete: Cascade)
+
+  @@index([atletaId])
+  @@index([data])
+}
+
+enum Plano {
+  SOCIAL
+  STARTER
+  PRO
+  ELITE
+}
+
+enum Role {
+  DONO
+  COORDENADOR
+  TREINADOR
+}
+
+enum Pe {
+  DIREITO
+  ESQUERDO
+  AMBIDESTRO
+}
+
+enum StatusPresenca {
+  PRESENTE
+  AUSENTE
+  JUSTIFICADO
+}
+
+enum StatusCobranca {
+  PENDENTE
+  PAGO
+  VENCIDO
+  CANCELADO
+}
+
+enum TipoEvento {
+  CADASTRO
+  MENSALIDADE_PAGA
+  MENSALIDADE_ATRASADA
+  PRESENCA_BAIXA
+  AVALIACAO
+  CONVOCACAO
+  GOL
+  UNIFORME
+  OBSERVACAO
+}
