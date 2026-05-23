@@ -1,4 +1,35 @@
-export default function AreaPais({ params }: { params: { token: string } }) {
+import { supabase } from '@/lib/supabase'
+
+export default async function AreaPais({ params }: { params: Promise<{ token: string }> }) {
+  const { token } = await params
+
+  const { data: atleta } = await supabase
+    .from('Atleta')
+    .select('id, nome, posicao, tokenPais')
+    .eq('tokenPais', token)
+    .single()
+
+  if (!atleta) {
+    return (
+      <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center p-6">
+        <p className="text-5xl mb-4">❌</p>
+        <h2 className="text-xl font-bold">Link inválido</h2>
+        <p className="text-gray-400 mt-2">Este link não existe ou expirou.</p>
+      </div>
+    )
+  }
+
+  const mesAtual = new Date().toISOString().slice(0, 7)
+  const { data: presencas } = await supabase
+    .from('Presenca')
+    .select('status')
+    .eq('atletaId', atleta.id)
+    .gte('criadoEm', `${mesAtual}-01`)
+
+  const total = presencas?.length || 0
+  const presentes = presencas?.filter(p => p.status === 'PRESENTE').length || 0
+  const percentual = total > 0 ? Math.round((presentes / total) * 100) : 0
+
   return (
     <div className="min-h-screen bg-gray-950 text-white p-6">
       <div className="text-center mb-8">
@@ -9,28 +40,34 @@ export default function AreaPais({ params }: { params: { token: string } }) {
 
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
         <p className="text-gray-400 text-sm mb-1">Atleta</p>
-        <p className="text-lg font-bold">Carregando...</p>
-        <p className="text-green-500 text-sm">Sub-11</p>
-      </div>
-
-      <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
-        <p className="text-gray-400 text-sm mb-3">Presença este mês</p>
-        <div className="flex gap-2 flex-wrap">
-          {Array.from({length: 12}).map((_, i) => (
-            <div key={i} className="w-8 h-8 rounded-lg bg-gray-700 flex items-center justify-center text-xs">
-              {i+1}
-            </div>
-          ))}
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-green-900 rounded-full flex items-center justify-center text-xl font-bold text-green-400">
+            {atleta.nome[0]}
+          </div>
+          <div>
+            <p className="text-lg font-bold">{atleta.nome}</p>
+            <p className="text-green-500 text-sm">{atleta.posicao || 'Sem posição'}</p>
+          </div>
         </div>
       </div>
 
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
-        <p className="text-gray-400 text-sm mb-1">Mensalidade</p>
-        <p className="text-2xl font-bold text-green-400">R$ 150,00</p>
-        <p className="text-gray-400 text-sm">Vencimento: 10/06/2026</p>
-        <button className="w-full bg-green-600 text-white py-3 rounded-lg font-bold mt-3">
-          📋 Copiar Pix
-        </button>
+        <p className="text-gray-400 text-sm mb-3">Presença este mês</p>
+        <div className="flex items-center gap-4">
+          <div className="text-3xl font-bold text-green-400">{percentual}%</div>
+          <div>
+            <p className="text-sm text-white">{presentes} de {total} treinos</p>
+            <p className="text-xs text-gray-400">
+              {percentual >= 75 ? '✅ Frequência boa' : percentual === 0 ? '📋 Sem treinos este mês' : '⚠️ Frequência baixa'}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+        <p className="text-gray-400 text-sm mb-2">Mensalidade</p>
+        <p className="text-2xl font-bold text-green-400">Em dia ✅</p>
+        <p className="text-gray-400 text-sm mt-1">Entre em contato com a escola para mais detalhes.</p>
       </div>
     </div>
   )
