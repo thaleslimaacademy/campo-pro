@@ -8,17 +8,22 @@ export default function Dashboard() {
   const [presencaHoje, setPresencaHoje] = useState({ presentes: 0, total: 0 })
   const [pendentes, setPendentes] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [receitaMes, setReceitaMes] = useState(0)
+  const [inadimplentes, setInadimplentes] = useState(0)
+  const [totalPendente, setTotalPendente] = useState(0)
+  const [cobrancasMes, setCobrancasMes] = useState(0)
 
   useEffect(() => {
     async function carregar() {
+      // Total de atletas
       const { count } = await supabase
         .from('Atleta')
         .select('*', { count: 'exact', head: true })
         .eq('escolaId', 'escola-demo')
         .eq('ativo', true)
-
       setTotalAtletas(count || 0)
 
+      // Presença de hoje
       const dataHoje = new Date().toISOString().split('T')[0]
       const { data: treino } = await supabase
         .from('Treino')
@@ -33,18 +38,41 @@ export default function Dashboard() {
           .from('Presenca')
           .select('status')
           .eq('treinoId', treino.id)
-
         const presentes = presencas?.filter(p => p.status === 'PRESENTE').length || 0
         setPresencaHoje({ presentes, total: presencas?.length || 0 })
       }
 
+      // Pré-matrículas pendentes
       const { count: countPendentes } = await supabase
         .from('Matricula')
         .select('*', { count: 'exact', head: true })
         .eq('escolaId', 'escola-demo')
         .eq('status', 'PENDENTE')
-
       setPendentes(countPendentes || 0)
+
+      // Financeiro do mês atual
+      const agora = new Date()
+      const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString().split('T')[0]
+      const fimMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0).toISOString().split('T')[0]
+
+      const { data: cobrancas } = await supabase
+        .from('Cobranca')
+        .select('valor, status, vencimento')
+        .eq('escolaId', 'escola-demo')
+        .gte('vencimento', inicioMes)
+        .lte('vencimento', fimMes)
+
+      if (cobrancas) {
+        const pagas = cobrancas.filter(c => c.status === 'PAGO')
+        const pendentesFinanceiro = cobrancas.filter(c => c.status === 'PENDENTE' || c.status === 'VENCIDO')
+        const vencidas = cobrancas.filter(c => c.status === 'VENCIDO')
+
+        setReceitaMes(pagas.reduce((sum, c) => sum + Number(c.valor), 0))
+        setTotalPendente(pendentesFinanceiro.reduce((sum, c) => sum + Number(c.valor), 0))
+        setInadimplentes(vencidas.length)
+        setCobrancasMes(cobrancas.length)
+      }
+
       setLoading(false)
     }
     carregar()
@@ -54,6 +82,8 @@ export default function Dashboard() {
     ? Math.round((presencaHoje.presentes / presencaHoje.total) * 100)
     : 0
 
+  const mesAtual = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+
   return (
     <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
       <h1 className="text-2xl font-bold text-green-500 mb-1">⚽ Campo Pro</h1>
@@ -61,6 +91,7 @@ export default function Dashboard() {
         {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
       </p>
 
+      {/* Cards principais */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
           <p className="text-gray-400 text-sm">Alunos Ativos</p>
@@ -68,7 +99,9 @@ export default function Dashboard() {
         </div>
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
           <p className="text-gray-400 text-sm">Inadimplentes</p>
-          <p className="text-3xl font-bold text-red-400">0</p>
+          <p className={`text-3xl font-bold ${inadimplentes > 0 ? 'text-red-400' : 'text-green-400'}`}>
+            {loading ? '...' : inadimplentes}
+          </p>
         </div>
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
           <p className="text-gray-400 text-sm">Presença Hoje</p>
@@ -81,7 +114,67 @@ export default function Dashboard() {
         </div>
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
           <p className="text-gray-400 text-sm">Receita do Mês</p>
-          <p className="text-3xl font-bold text-green-400">R$ 0</p>
+          <p className="text-2xl font-bold text-green-400">
+            {loading ? '...' : `R$ ${receitaMes.toFixed(0)}`}
+          </p>
+        </div>
+      </div>
+
+      {/* Relatório financeiro do mês */}
+      <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
+        <div className="flex justify-between items-center mb-4">
+          <p className="font-bold text-sm">💰 Financeiro — {mesAtual}</p>
+          <a href="/financeiro" className="text-green-400 text-xs underline">Ver tudo</a>
+        </div>
+
+        <div className="space-y-3">
+          {/* Receita */}
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <span className="text-sm text-gray-300">Recebido</span>
+            </div>
+            <span className="font-bold text-green-400">
+              R$ {loading ? '...' : receitaMes.toFixed(2)}
+            </span>
+          </div>
+
+          {/* Pendente */}
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <span className="text-sm text-gray-300">A receber</span>
+            </div>
+            <span className="font-bold text-yellow-400">
+              R$ {loading ? '...' : totalPendente.toFixed(2)}
+            </span>
+          </div>
+
+          {/* Barra de progresso */}
+          {!loading && (receitaMes + totalPendente) > 0 && (
+            <div className="mt-2">
+              <div className="w-full bg-gray-700 rounded-full h-2">
+                <div
+                  className="bg-green-500 h-2 rounded-full transition-all"
+                  style={{ width: `${Math.round((receitaMes / (receitaMes + totalPendente)) * 100)}%` }}
+                />
+              </div>
+              <div className="flex justify-between mt-1">
+                <p className="text-xs text-gray-500">
+                  {cobrancasMes} cobranças no mês
+                </p>
+                <p className="text-xs text-gray-500">
+                  {receitaMes + totalPendente > 0
+                    ? `${Math.round((receitaMes / (receitaMes + totalPendente)) * 100)}% recebido`
+                    : ''}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {!loading && cobrancasMes === 0 && (
+            <p className="text-gray-500 text-xs text-center py-2">Nenhuma cobrança este mês</p>
+          )}
         </div>
       </div>
 
@@ -102,6 +195,7 @@ export default function Dashboard() {
         </a>
       )}
 
+      {/* Ações rápidas */}
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
         <p className="text-gray-400 text-sm mb-3">Ações rápidas</p>
         <div className="grid grid-cols-2 gap-3">
