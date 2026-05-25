@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { criarClienteAsaas, criarCobrancaPix, getPixQrCode } from '@/lib/asaas'
 import { supabase } from '@/lib/supabase'
+import { enviarWhatsApp } from '@/lib/whatsapp'
 
 export async function POST(req: NextRequest) {
   try {
-    console.log('🔑 KEY:', process.env.ASAAS_API_KEY?.slice(0, 20))
-    console.log('🌍 URL:', process.env.ASAAS_URL)
-
     const body = await req.json()
-    console.log('📨 Body recebido:', JSON.stringify(body))
-
     const { atletaId, valor, vencimento, descricao } = body
 
     if (!atletaId || !valor || !vencimento) {
@@ -19,6 +15,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Busca atleta + responsável
     const { data: atleta } = await supabase
       .from('Atleta')
       .select('*')
@@ -29,6 +26,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Atleta não encontrado' }, { status: 404 })
     }
 
+    const { data: responsaveis } = await supabase
+      .from('Responsavel')
+      .select('nome, whatsapp')
+      .eq('atletaId', atletaId)
+      .eq('principal', true)
+      .limit(1)
+
+    const responsavel = responsaveis?.[0] || null
+
+    // Cria ou reutiliza cliente Asaas
     let asaasCustomerId = atleta.asaasCustomerId
 
     if (!asaasCustomerId) {
@@ -50,13 +57,10 @@ export async function POST(req: NextRequest) {
       }
 
       asaasCustomerId = cliente.id
-
-      await supabase
-        .from('Atleta')
-        .update({ asaasCustomerId })
-        .eq('id', atletaId)
+      await supabase.from('Atleta').update({ asaasCustomerId }).eq('id', atletaId)
     }
 
+    // Cria cobrança Pix
     const cobranca = await criarCobrancaPix({
       customer: asaasCustomerId,
       billingType: 'PIX',
@@ -72,8 +76,10 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Busca QR Code
     const qrCode = await getPixQrCode(cobranca.id)
 
+    // Salva no Supabase
     await supabase.from('Cobranca').insert({
       id: crypto.randomUUID(),
       escolaId: 'escola-demo',
@@ -86,6 +92,24 @@ export async function POST(req: NextRequest) {
       pixQrCode: qrCode.encodedImage || null,
       descricao,
     })
+
+    // Envia WhatsApp para o responsável
+    if (responsavel?.whatsapp && qrCode.payload) {
+      const dataVencimento = new Date(vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
+      const nomeResp = responsavel.nome.split(' ')[0]
+
+      const mensagem =
+        `Olá ${nomeResp}! 👋\n\n` +
+        `A cobrança de *${atleta.nome}* foi gerada.\n\n` +
+        `💰 *Valor:* R$ ${Number(valor).toFixed(2)}\n` +
+        `📅 *Vencimento:* ${dataVencimento}\n` +
+        `📝 *${descricao || 'Mensalidade'}*\n\n` +
+        `Use o código abaixo para pagar via Pix:\n\n` +
+        `\`${qrCode.payload}\`\n\n` +
+        `_Thales Lima Football Academy_ ⚽`
+
+      await enviarWhatsApp(responsavel.whatsapp, mensagem)
+    }
 
     return NextResponse.json({
       sucesso: true,
