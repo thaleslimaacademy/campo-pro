@@ -24,13 +24,20 @@ export default function Financeiro() {
   const [cobrancas, setCobrancas] = useState<Cobranca[]>([])
   const [loading, setLoading] = useState(true)
   const [gerando, setGerando] = useState(false)
+  const [gerandoLote, setGerandoLote] = useState(false)
   const [copiado, setCopiado] = useState<string | null>(null)
   const [atletaId, setAtletaId] = useState('')
   const [valor, setValor] = useState('150')
   const [vencimento, setVencimento] = useState('')
   const [descricao, setDescricao] = useState('Mensalidade')
   const [mostrarForm, setMostrarForm] = useState(false)
+  const [mostrarLote, setMostrarLote] = useState(false)
   const [pixAtivo, setPixAtivo] = useState<Cobranca | null>(null)
+  const [valorLote, setValorLote] = useState('150')
+  const [vencimentoLote, setVencimentoLote] = useState('')
+  const [descricaoLote, setDescricaoLote] = useState('Mensalidade')
+  const [atletasSelecionados, setAtletasSelecionados] = useState<string[]>([])
+  const [progressoLote, setProgressoLote] = useState<{ atual: number; total: number; nome: string } | null>(null)
 
   async function carregar() {
     const { data: atletasData } = await supabase
@@ -74,8 +81,6 @@ export default function Financeiro() {
     if (data.sucesso) {
       setMostrarForm(false)
       await carregar()
-      // Abre automaticamente o QR Code da cobrança recém gerada
-      const nova = cobrancas.find(c => c.pixCopiaCola === data.pixCopiaCola)
       if (data.pixCopiaCola || data.pixQrCode) {
         setPixAtivo({
           id: crypto.randomUUID(),
@@ -93,6 +98,63 @@ export default function Financeiro() {
     }
 
     setGerando(false)
+  }
+
+  function toggleAtleta(id: string) {
+    setAtletasSelecionados(prev =>
+      prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
+    )
+  }
+
+  function selecionarTodos() {
+    if (atletasSelecionados.length === atletas.length) {
+      setAtletasSelecionados([])
+    } else {
+      setAtletasSelecionados(atletas.map(a => a.id))
+    }
+  }
+
+  async function gerarCobrancaLote() {
+    if (atletasSelecionados.length === 0 || !vencimentoLote) return
+    setGerandoLote(true)
+
+    const total = atletasSelecionados.length
+    let sucesso = 0
+    let erro = 0
+
+    for (let i = 0; i < atletasSelecionados.length; i++) {
+      const id = atletasSelecionados[i]
+      const atleta = atletas.find(a => a.id === id)
+      setProgressoLote({ atual: i + 1, total, nome: atleta?.nome || '' })
+
+      try {
+        const res = await fetch('/api/cobranca', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            atletaId: id,
+            valor: parseFloat(valorLote),
+            vencimento: vencimentoLote,
+            descricao: descricaoLote,
+          }),
+        })
+        const data = await res.json()
+        if (data.sucesso) sucesso++
+        else erro++
+      } catch {
+        erro++
+      }
+
+      // Pequena pausa para não sobrecarregar a API
+      await new Promise(r => setTimeout(r, 500))
+    }
+
+    setProgressoLote(null)
+    setMostrarLote(false)
+    setAtletasSelecionados([])
+    setGerandoLote(false)
+    await carregar()
+    alert(`✅ Lote concluído!\n${sucesso} cobranças geradas${erro > 0 ? `\n❌ ${erro} erros` : ''}`)
   }
 
   function copiarPix(pix: string, id: string) {
@@ -118,15 +180,23 @@ export default function Financeiro() {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-bold">💰 Financeiro</h1>
-        <button
-          onClick={() => setMostrarForm(!mostrarForm)}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
-        >
-          + Cobrança
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => { setMostrarLote(!mostrarLote); setMostrarForm(false) }}
+            className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+          >
+            📋 Lote
+          </button>
+          <button
+            onClick={() => { setMostrarForm(!mostrarForm); setMostrarLote(false) }}
+            className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+          >
+            + Cobrança
+          </button>
+        </div>
       </div>
 
-      {/* Formulário nova cobrança */}
+      {/* Formulário cobrança individual */}
       {mostrarForm && (
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-6">
           <p className="font-bold mb-4">Nova Cobrança</p>
@@ -156,6 +226,79 @@ export default function Financeiro() {
         </div>
       )}
 
+      {/* Formulário cobrança em lote */}
+      {mostrarLote && (
+        <div className="bg-gray-900 rounded-xl p-4 border border-blue-800 mb-6">
+          <p className="font-bold mb-1">📋 Cobrança em Lote</p>
+          <p className="text-gray-400 text-xs mb-4">Gera Pix para vários atletas de uma vez</p>
+
+          <div className="space-y-3 mb-4">
+            <div>
+              <label className="text-sm text-gray-400">Valor (R$)</label>
+              <input value={valorLote} onChange={e => setValorLote(e.target.value)} type="number" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+            </div>
+            <div>
+              <label className="text-sm text-gray-400">Vencimento</label>
+              <input value={vencimentoLote} onChange={e => setVencimentoLote(e.target.value)} type="date" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+            </div>
+            <div>
+              <label className="text-sm text-gray-400">Descrição</label>
+              <input value={descricaoLote} onChange={e => setDescricaoLote(e.target.value)} type="text" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+            </div>
+          </div>
+
+          {/* Seleção de atletas */}
+          <div className="mb-4">
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-sm text-gray-400">Selecionar atletas</label>
+              <button onClick={selecionarTodos} className="text-xs text-blue-400 underline">
+                {atletasSelecionados.length === atletas.length ? 'Desmarcar todos' : 'Selecionar todos'}
+              </button>
+            </div>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {atletas.map(a => (
+                <label key={a.id} className="flex items-center gap-3 bg-gray-800 rounded-lg p-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={atletasSelecionados.includes(a.id)}
+                    onChange={() => toggleAtleta(a.id)}
+                    className="w-4 h-4 accent-blue-500"
+                  />
+                  <span className="text-sm text-white">{a.nome}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Progresso */}
+          {progressoLote && (
+            <div className="bg-blue-600/10 border border-blue-600/30 rounded-xl p-3 mb-4">
+              <p className="text-blue-400 text-sm font-bold mb-1">
+                Gerando {progressoLote.atual} de {progressoLote.total}...
+              </p>
+              <p className="text-gray-400 text-xs">{progressoLote.nome}</p>
+              <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
+                <div
+                  className="bg-blue-500 h-2 rounded-full transition-all"
+                  style={{ width: `${(progressoLote.atual / progressoLote.total) * 100}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          <button
+            onClick={gerarCobrancaLote}
+            disabled={gerandoLote || atletasSelecionados.length === 0 || !vencimentoLote}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold disabled:opacity-50"
+          >
+            {gerandoLote
+              ? `Gerando... (${progressoLote?.atual || 0}/${progressoLote?.total || 0})`
+              : `Gerar para ${atletasSelecionados.length} atleta${atletasSelecionados.length !== 1 ? 's' : ''}`
+            }
+          </button>
+        </div>
+      )}
+
       {/* Modal QR Code */}
       {pixAtivo && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-6">
@@ -164,39 +307,26 @@ export default function Financeiro() {
               <p className="font-bold text-lg">📲 Pagar com Pix</p>
               <button onClick={() => setPixAtivo(null)} className="text-gray-400 text-xl">✕</button>
             </div>
-
             <p className="text-center text-gray-400 text-sm mb-4">
               {nomeAtleta(pixAtivo.atletaId)} · R$ {Number(pixAtivo.valor).toFixed(2)}
             </p>
-
-            {/* QR Code */}
             {pixAtivo.pixQrCode ? (
               <div className="flex justify-center mb-4">
-                <img
-                  src={`data:image/png;base64,${pixAtivo.pixQrCode}`}
-                  alt="QR Code Pix"
-                  className="w-52 h-52 rounded-xl border border-gray-700"
-                />
+                <img src={`data:image/png;base64,${pixAtivo.pixQrCode}`} alt="QR Code Pix" className="w-52 h-52 rounded-xl border border-gray-700" />
               </div>
             ) : (
               <div className="w-52 h-52 mx-auto bg-gray-800 rounded-xl flex items-center justify-center mb-4">
                 <p className="text-gray-500 text-sm">QR Code indisponível</p>
               </div>
             )}
-
-            {/* Copia e cola */}
             {pixAtivo.pixCopiaCola && (
               <>
                 <p className="text-gray-400 text-xs text-center mb-2">ou use o Pix Copia e Cola</p>
-                <button
-                  onClick={() => copiarPix(pixAtivo.pixCopiaCola!, pixAtivo.id)}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold text-sm transition"
-                >
+                <button onClick={() => copiarPix(pixAtivo.pixCopiaCola!, pixAtivo.id)} className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold text-sm transition">
                   {copiado === pixAtivo.id ? '✅ Copiado!' : '📋 Copiar código Pix'}
                 </button>
               </>
             )}
-
             <p className="text-center text-gray-500 text-xs mt-4">
               Vencimento: {new Date(pixAtivo.vencimento).toLocaleDateString('pt-BR')}
             </p>
@@ -208,7 +338,7 @@ export default function Financeiro() {
       {loading && <p className="text-gray-400 text-center mt-10">Carregando...</p>}
 
       {/* Empty state */}
-      {!loading && cobrancas.length === 0 && !mostrarForm && (
+      {!loading && cobrancas.length === 0 && !mostrarForm && !mostrarLote && (
         <div className="text-center text-gray-500 mt-20">
           <p className="text-5xl mb-4">💳</p>
           <p className="text-lg">Nenhuma cobrança gerada</p>
@@ -233,23 +363,15 @@ export default function Financeiro() {
             <p className="text-gray-500 text-xs mb-3">
               Vencimento: {new Date(c.vencimento).toLocaleDateString('pt-BR')}
             </p>
-
-            {/* Botões de ação */}
             {c.status === 'PENDENTE' && (c.pixCopiaCola || c.pixQrCode) && (
               <div className="flex gap-2">
                 {c.pixQrCode && (
-                  <button
-                    onClick={() => setPixAtivo(c)}
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-medium transition"
-                  >
+                  <button onClick={() => setPixAtivo(c)} className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-medium transition">
                     📲 Ver QR Code
                   </button>
                 )}
                 {c.pixCopiaCola && (
-                  <button
-                    onClick={() => copiarPix(c.pixCopiaCola!, c.id)}
-                    className="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-2 rounded-lg text-sm font-medium transition"
-                  >
+                  <button onClick={() => copiarPix(c.pixCopiaCola!, c.id)} className="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-2 rounded-lg text-sm font-medium transition">
                     {copiado === c.id ? '✅ Copiado!' : '📋 Copiar Pix'}
                   </button>
                 )}
