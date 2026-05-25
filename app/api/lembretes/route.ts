@@ -9,19 +9,23 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
+    const hoje = new Date()
     const em3dias = new Date()
-    em3dias.setDate(em3dias.getDate() + 3)
+    em3dias.setDate(hoje.getDate() + 3)
+
+    const dataHoje = hoje.toISOString().split('T')[0]
     const data3dias = em3dias.toISOString().split('T')[0]
 
+    // Busca cobranças que vencem hoje E em 3 dias
     const { data: cobrancas } = await supabase
       .from('Cobranca')
       .select('id, valor, vencimento, descricao, atletaId')
       .eq('escolaId', 'escola-demo')
       .eq('status', 'PENDENTE')
-      .eq('vencimento', data3dias)
+      .in('vencimento', [dataHoje, data3dias])
 
     if (!cobrancas || cobrancas.length === 0) {
-      return NextResponse.json({ sucesso: true, enviados: 0, mensagem: 'Nenhuma cobrança vencendo em 3 dias' })
+      return NextResponse.json({ sucesso: true, enviados: 0, mensagem: 'Nenhum lembrete para hoje' })
     }
 
     let enviados = 0
@@ -47,15 +51,23 @@ export async function GET(req: NextRequest) {
 
         const dataVenc = new Date(cobranca.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
         const nomeResp = responsavel.nome.split(' ')[0]
+        const venceHoje = cobranca.vencimento === dataHoje
 
-        const mensagem =
-          `Olá ${nomeResp}! 📅\n\n` +
-          `Lembrete: a mensalidade de *${atleta.nome}* vence em *3 dias*.\n\n` +
-          `💰 *Valor:* R$ ${Number(cobranca.valor).toFixed(2)}\n` +
-          `📅 *Vencimento:* ${dataVenc}\n` +
-          `📝 *${cobranca.descricao || 'Mensalidade'}*\n\n` +
-          `Para evitar multa e juros, pague antes do vencimento! 🙏\n\n` +
-          `_Thales Lima Football Academy_ ⚽`
+        const mensagem = venceHoje
+          ? `Olá ${nomeResp}! ⚠️\n\n` +
+            `A mensalidade de *${atleta.nome}* vence *HOJE*!\n\n` +
+            `💰 *Valor:* R$ ${Number(cobranca.valor).toFixed(2)}\n` +
+            `📅 *Vencimento:* ${dataVenc}\n` +
+            `📝 *${cobranca.descricao || 'Mensalidade'}*\n\n` +
+            `Pague hoje para evitar multa de 2% e juros de 1% ao mês! 🙏\n\n` +
+            `_Thales Lima Football Academy_ ⚽`
+          : `Olá ${nomeResp}! 📅\n\n` +
+            `Lembrete: a mensalidade de *${atleta.nome}* vence em *3 dias*.\n\n` +
+            `💰 *Valor:* R$ ${Number(cobranca.valor).toFixed(2)}\n` +
+            `📅 *Vencimento:* ${dataVenc}\n` +
+            `📝 *${cobranca.descricao || 'Mensalidade'}*\n\n` +
+            `Para evitar multa e juros, pague antes do vencimento! 🙏\n\n` +
+            `_Thales Lima Football Academy_ ⚽`
 
         await enviarWhatsApp(responsavel.whatsapp, mensagem)
         enviados++
