@@ -6,11 +6,11 @@ import { supabase } from '@/lib/supabase'
 export default function Dashboard() {
   const [totalAtletas, setTotalAtletas] = useState(0)
   const [presencaHoje, setPresencaHoje] = useState({ presentes: 0, total: 0 })
+  const [pendentes, setPendentes] = useState(0)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function carregar() {
-      // Total de atletas
       const { count } = await supabase
         .from('Atleta')
         .select('*', { count: 'exact', head: true })
@@ -19,7 +19,6 @@ export default function Dashboard() {
 
       setTotalAtletas(count || 0)
 
-      // Presença de hoje
       const dataHoje = new Date().toISOString().split('T')[0]
       const { data: treino } = await supabase
         .from('Treino')
@@ -39,6 +38,13 @@ export default function Dashboard() {
         setPresencaHoje({ presentes, total: presencas?.length || 0 })
       }
 
+      const { count: countPendentes } = await supabase
+        .from('Matricula')
+        .select('*', { count: 'exact', head: true })
+        .eq('escolaId', 'escola-demo')
+        .eq('status', 'PENDENTE')
+
+      setPendentes(countPendentes || 0)
       setLoading(false)
     }
     carregar()
@@ -79,11 +85,31 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Card pré-matrículas pendentes */}
+      {pendentes > 0 && (
+        <a href="/matriculas" className="block bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-yellow-400 font-bold">📋 Pré-matrículas pendentes</p>
+              <p className="text-gray-400 text-sm mt-1">
+                {pendentes} {pendentes === 1 ? 'ficha aguarda' : 'fichas aguardam'} sua aprovação
+              </p>
+            </div>
+            <span className="bg-yellow-500 text-black text-lg font-bold w-10 h-10 rounded-full flex items-center justify-center">
+              {pendentes}
+            </span>
+          </div>
+        </a>
+      )}
+
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
         <p className="text-gray-400 text-sm mb-3">Ações rápidas</p>
         <div className="grid grid-cols-2 gap-3">
           <a href="/atletas/novo" className="bg-green-600 text-white p-3 rounded-lg text-center text-sm font-medium">+ Novo Atleta</a>
           <a href="/presenca" className="bg-blue-600 text-white p-3 rounded-lg text-center text-sm font-medium">✅ Fazer Chamada</a>
+          <a href="/matriculas" className="col-span-2 bg-gray-800 hover:bg-gray-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
+            📋 Pré-matrículas {pendentes > 0 ? `(${pendentes} pendentes)` : ''}
+          </a>
         </div>
       </div>
 
