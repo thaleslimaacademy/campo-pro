@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import CopiarLink from './CopiarLink'
 import GraficoPresenca from './GraficoPresenca'
+import FotoAtleta from './FotoAtleta'
 
 export default async function PerfilAtleta({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -24,7 +25,7 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
     .select('*')
     .eq('atletaId', id)
 
-  // Busca últimos 6 meses de presença
+  // Presença — últimos 6 meses
   const agora = new Date()
   const seisAtras = new Date(agora.getFullYear(), agora.getMonth() - 5, 1)
 
@@ -35,7 +36,6 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
     .gte('criadoEm', seisAtras.toISOString())
     .order('criadoEm', { ascending: true })
 
-  // Agrupa por mês
   const meses: Record<string, { presentes: number; total: number }> = {}
   for (let i = 5; i >= 0; i--) {
     const d = new Date(agora.getFullYear(), agora.getMonth() - i, 1)
@@ -59,10 +59,35 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
     percentual: dados.total > 0 ? Math.round((dados.presentes / dados.total) * 100) : 0,
   }))
 
-  // Estatísticas gerais
   const totalPresencas = presencas?.length || 0
   const totalPresentes = presencas?.filter(p => p.status === 'PRESENTE').length || 0
   const percentualGeral = totalPresencas > 0 ? Math.round((totalPresentes / totalPresencas) * 100) : 0
+
+  // Histórico financeiro
+  const { data: cobrancas } = await supabase
+    .from('Cobranca')
+    .select('id, valor, vencimento, status, descricao, pixCopiaCola')
+    .eq('atletaId', id)
+    .order('vencimento', { ascending: false })
+    .limit(12)
+
+  const totalPago = cobrancas?.filter(c => c.status === 'PAGO').reduce((s, c) => s + Number(c.valor), 0) || 0
+  const totalPendente = cobrancas?.filter(c => c.status === 'PENDENTE').reduce((s, c) => s + Number(c.valor), 0) || 0
+  const totalVencido = cobrancas?.filter(c => c.status === 'VENCIDO').reduce((s, c) => s + Number(c.valor), 0) || 0
+
+  const statusCor: Record<string, string> = {
+    PAGO: 'text-green-400',
+    PENDENTE: 'text-yellow-400',
+    VENCIDO: 'text-red-400',
+    CANCELADO: 'text-gray-400',
+  }
+
+  const statusBg: Record<string, string> = {
+    PAGO: 'bg-green-400/10',
+    PENDENTE: 'bg-yellow-400/10',
+    VENCIDO: 'bg-red-400/10',
+    CANCELADO: 'bg-gray-400/10',
+  }
 
   const linkPais = `https://campo-pro.vercel.app/pais/${atleta.tokenPais}`
 
@@ -76,9 +101,11 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
       {/* Dados pessoais */}
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-16 h-16 bg-green-900 rounded-full flex items-center justify-center text-2xl font-bold text-green-400">
-            {atleta.nome[0]}
-          </div>
+          <FotoAtleta
+            atletaId={atleta.id}
+            fotoUrl={atleta.fotoUrl || null}
+            nome={atleta.nome}
+          />
           <div>
             <p className="text-xl font-bold">{atleta.nome}</p>
             <p className="text-green-500">{atleta.posicao || 'Sem posição'}</p>
@@ -112,6 +139,47 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
         </div>
       </div>
 
+      {/* Histórico financeiro */}
+      <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
+        <p className="font-bold text-sm mb-4">💰 Histórico Financeiro</p>
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          <div className="bg-green-400/10 rounded-xl p-3 text-center">
+            <p className="text-green-400 font-bold text-sm">R$ {totalPago.toFixed(0)}</p>
+            <p className="text-gray-400 text-xs mt-1">Pago</p>
+          </div>
+          <div className="bg-yellow-400/10 rounded-xl p-3 text-center">
+            <p className="text-yellow-400 font-bold text-sm">R$ {totalPendente.toFixed(0)}</p>
+            <p className="text-gray-400 text-xs mt-1">Pendente</p>
+          </div>
+          <div className="bg-red-400/10 rounded-xl p-3 text-center">
+            <p className="text-red-400 font-bold text-sm">R$ {totalVencido.toFixed(0)}</p>
+            <p className="text-gray-400 text-xs mt-1">Vencido</p>
+          </div>
+        </div>
+        {!cobrancas || cobrancas.length === 0 ? (
+          <p className="text-gray-500 text-sm text-center py-4">Nenhuma cobrança registrada</p>
+        ) : (
+          <div className="space-y-2">
+            {cobrancas.map(c => (
+              <div key={c.id} className={`flex justify-between items-center rounded-xl p-3 ${statusBg[c.status] || 'bg-gray-800'}`}>
+                <div>
+                  <p className="text-sm font-medium">{c.descricao || 'Mensalidade'}</p>
+                  <p className="text-xs text-gray-400">
+                    {new Date(c.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-sm">R$ {Number(c.valor).toFixed(2)}</p>
+                  <p className={`text-xs font-bold ${statusCor[c.status] || 'text-gray-400'}`}>
+                    {c.status}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Gráfico de presença */}
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
         <div className="flex justify-between items-center mb-4">
@@ -123,14 +191,11 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
             <p className="text-xs text-gray-500">{totalPresentes}/{totalPresencas} treinos</p>
           </div>
         </div>
-
         {totalPresencas === 0 ? (
           <p className="text-gray-500 text-sm text-center py-4">Nenhuma presença registrada</p>
         ) : (
           <GraficoPresenca dados={dadosGrafico} />
         )}
-
-        {/* Legenda */}
         <div className="flex gap-4 mt-3 justify-center">
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 rounded bg-green-500"></div>
