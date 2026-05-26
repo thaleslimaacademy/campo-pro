@@ -58,13 +58,11 @@ export default function Configuracoes() {
 
   async function salvar() {
     setSalvando(true)
+
     const { error } = await supabase
       .from('Escola')
-      .upsert({
-        id: 'escola-demo',
+      .update({
         nome: form.nome,
-        slug: 'thales-lima',
-        ativa: true,
         telefone: form.telefone,
         whatsapp: form.whatsapp,
         email: form.email,
@@ -77,9 +75,10 @@ export default function Configuracoes() {
         instagramUrl: form.instagramUrl,
         facebookUrl: form.facebookUrl,
       })
+      .eq('id', 'escola-demo')
 
     if (error) {
-      console.error('Erro ao salvar:', error)
+      console.error('Erro ao salvar:', error.message, error.details, error.hint)
       alert('Erro: ' + error.message)
     } else {
       setSucesso(true)
@@ -109,7 +108,6 @@ export default function Configuracoes() {
         </div>
       )}
 
-      {/* Dados da escola */}
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
         <p className="text-green-500 font-bold text-sm mb-4">🏫 Dados da Escola</p>
         <div className="space-y-3">
@@ -134,7 +132,6 @@ export default function Configuracoes() {
         </div>
       </div>
 
-      {/* Endereço */}
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
         <p className="text-green-500 font-bold text-sm mb-4">📍 Endereço</p>
         <div className="space-y-3">
@@ -159,7 +156,6 @@ export default function Configuracoes() {
         </div>
       </div>
 
-      {/* Financeiro */}
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
         <p className="text-green-500 font-bold text-sm mb-4">💰 Financeiro</p>
         <div className="grid grid-cols-2 gap-3">
@@ -178,7 +174,6 @@ export default function Configuracoes() {
         </div>
       </div>
 
-      {/* Redes sociais */}
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-6">
         <p className="text-green-500 font-bold text-sm mb-4">📱 Redes Sociais</p>
         <div className="space-y-3">
