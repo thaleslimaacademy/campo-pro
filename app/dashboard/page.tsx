@@ -15,7 +15,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function carregar() {
-      // Total de atletas
       const { count } = await supabase
         .from('Atleta')
         .select('*', { count: 'exact', head: true })
@@ -23,7 +22,6 @@ export default function Dashboard() {
         .eq('ativo', true)
       setTotalAtletas(count || 0)
 
-      // Presença de hoje
       const dataHoje = new Date().toISOString().split('T')[0]
       const { data: treino } = await supabase
         .from('Treino')
@@ -42,7 +40,6 @@ export default function Dashboard() {
         setPresencaHoje({ presentes, total: presencas?.length || 0 })
       }
 
-      // Pré-matrículas pendentes
       const { count: countPendentes } = await supabase
         .from('Matricula')
         .select('*', { count: 'exact', head: true })
@@ -50,7 +47,6 @@ export default function Dashboard() {
         .eq('status', 'PENDENTE')
       setPendentes(countPendentes || 0)
 
-      // Financeiro do mês atual
       const agora = new Date()
       const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString().split('T')[0]
       const fimMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0).toISOString().split('T')[0]
@@ -66,7 +62,6 @@ export default function Dashboard() {
         const pagas = cobrancas.filter(c => c.status === 'PAGO')
         const pendentesFinanceiro = cobrancas.filter(c => c.status === 'PENDENTE' || c.status === 'VENCIDO')
         const vencidas = cobrancas.filter(c => c.status === 'VENCIDO')
-
         setReceitaMes(pagas.reduce((sum, c) => sum + Number(c.valor), 0))
         setTotalPendente(pendentesFinanceiro.reduce((sum, c) => sum + Number(c.valor), 0))
         setInadimplentes(vencidas.length)
@@ -120,37 +115,27 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Relatório financeiro do mês */}
+      {/* Relatório financeiro */}
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
         <div className="flex justify-between items-center mb-4">
           <p className="font-bold text-sm">💰 Financeiro — {mesAtual}</p>
           <a href="/financeiro" className="text-green-400 text-xs underline">Ver tudo</a>
         </div>
-
         <div className="space-y-3">
-          {/* Receita */}
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
               <span className="text-sm text-gray-300">Recebido</span>
             </div>
-            <span className="font-bold text-green-400">
-              R$ {loading ? '...' : receitaMes.toFixed(2)}
-            </span>
+            <span className="font-bold text-green-400">R$ {loading ? '...' : receitaMes.toFixed(2)}</span>
           </div>
-
-          {/* Pendente */}
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
               <span className="text-sm text-gray-300">A receber</span>
             </div>
-            <span className="font-bold text-yellow-400">
-              R$ {loading ? '...' : totalPendente.toFixed(2)}
-            </span>
+            <span className="font-bold text-yellow-400">R$ {loading ? '...' : totalPendente.toFixed(2)}</span>
           </div>
-
-          {/* Barra de progresso */}
           {!loading && (receitaMes + totalPendente) > 0 && (
             <div className="mt-2">
               <div className="w-full bg-gray-700 rounded-full h-2">
@@ -160,18 +145,13 @@ export default function Dashboard() {
                 />
               </div>
               <div className="flex justify-between mt-1">
+                <p className="text-xs text-gray-500">{cobrancasMes} cobranças no mês</p>
                 <p className="text-xs text-gray-500">
-                  {cobrancasMes} cobranças no mês
-                </p>
-                <p className="text-xs text-gray-500">
-                  {receitaMes + totalPendente > 0
-                    ? `${Math.round((receitaMes / (receitaMes + totalPendente)) * 100)}% recebido`
-                    : ''}
+                  {`${Math.round((receitaMes / (receitaMes + totalPendente)) * 100)}% recebido`}
                 </p>
               </div>
             </div>
           )}
-
           {!loading && cobrancasMes === 0 && (
             <p className="text-gray-500 text-xs text-center py-2">Nenhuma cobrança este mês</p>
           )}
@@ -203,6 +183,9 @@ export default function Dashboard() {
           <a href="/presenca" className="bg-blue-600 text-white p-3 rounded-lg text-center text-sm font-medium">✅ Fazer Chamada</a>
           <a href="/matriculas" className="col-span-2 bg-gray-800 hover:bg-gray-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
             📋 Pré-matrículas {pendentes > 0 ? `(${pendentes} pendentes)` : ''}
+          </a>
+          <a href="/configuracoes" className="col-span-2 bg-gray-800 hover:bg-gray-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
+            ⚙️ Configurações da Escola
           </a>
         </div>
       </div>

@@ -45,10 +45,49 @@ export default function Matriculas() {
 
   useEffect(() => { carregar() }, [])
 
+  async function enviarWhatsAppAprovacao(matricula: Matricula, tokenPais: string) {
+    try {
+      const instanceId = process.env.NEXT_PUBLIC_ZAPI_INSTANCE_ID
+      const token = process.env.NEXT_PUBLIC_ZAPI_TOKEN
+      const clientToken = process.env.NEXT_PUBLIC_ZAPI_CLIENT_TOKEN
+
+      if (!instanceId || !token) return
+
+      const numero = matricula.whatsappResponsavel.replace(/\D/g, '')
+      const numeroFormatado = numero.startsWith('55') ? numero : `55${numero}`
+      const nomeResp = matricula.nomeResponsavel.split(' ')[0]
+      const linkPais = `https://campo-pro.vercel.app/pais/${tokenPais}`
+
+      const mensagem =
+        `Olá ${nomeResp}! 🎉\n\n` +
+        `A matrícula de *${matricula.nomeAtleta}* foi *APROVADA*!\n\n` +
+        `✅ Seu filho(a) já está matriculado(a) na *Thales Lima Football Academy*.\n\n` +
+        `📱 Acompanhe a presença e mensalidades pelo link:\n${linkPais}\n\n` +
+        `Bem-vindo(a) à família! ⚽\n` +
+        `_Thales Lima Football Academy — Iturama/MG_`
+
+      await fetch(
+        `https://api.z-api.io/instances/${instanceId}/token/${token}/send-text`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Client-Token': clientToken || '',
+          },
+          body: JSON.stringify({
+            phone: numeroFormatado,
+            message: mensagem,
+          }),
+        }
+      )
+    } catch (err) {
+      console.error('Erro WhatsApp aprovação:', err)
+    }
+  }
+
   async function aprovar(matricula: Matricula) {
     setProcessando(true)
 
-    // Cria o atleta na tabela Atleta
     const atletaId = crypto.randomUUID()
     const tokenPais = crypto.randomUUID()
 
@@ -77,7 +116,6 @@ export default function Matriculas() {
       return
     }
 
-    // Cria o responsável
     await supabase.from('Responsavel').insert({
       id: crypto.randomUUID(),
       atletaId,
@@ -87,24 +125,60 @@ export default function Matriculas() {
       principal: true,
     })
 
-    // Atualiza status da matrícula
     await supabase
       .from('Matricula')
       .update({ status: 'APROVADO', atletaId })
       .eq('id', matricula.id)
 
+    // Envia WhatsApp de aprovação
+    await enviarWhatsAppAprovacao(matricula, tokenPais)
+
     setSelecionada(null)
     await carregar()
     setProcessando(false)
-    alert(`✅ ${matricula.nomeAtleta} aprovado e adicionado aos atletas!`)
+    alert(`✅ ${matricula.nomeAtleta} aprovado! WhatsApp enviado para ${matricula.nomeResponsavel}.`)
   }
 
   async function recusar(matricula: Matricula) {
     setProcessando(true)
+
+    try {
+      const instanceId = process.env.NEXT_PUBLIC_ZAPI_INSTANCE_ID
+      const token = process.env.NEXT_PUBLIC_ZAPI_TOKEN
+      const clientToken = process.env.NEXT_PUBLIC_ZAPI_CLIENT_TOKEN
+
+      if (instanceId && token) {
+        const numero = matricula.whatsappResponsavel.replace(/\D/g, '')
+        const numeroFormatado = numero.startsWith('55') ? numero : `55${numero}`
+        const nomeResp = matricula.nomeResponsavel.split(' ')[0]
+
+        const mensagem =
+          `Olá ${nomeResp},\n\n` +
+          `Infelizmente a pré-matrícula de *${matricula.nomeAtleta}* não foi aprovada no momento.\n\n` +
+          `Entre em contato conosco para mais informações.\n\n` +
+          `_Thales Lima Football Academy — Iturama/MG_`
+
+        await fetch(
+          `https://api.z-api.io/instances/${instanceId}/token/${token}/send-text`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Client-Token': clientToken || '',
+            },
+            body: JSON.stringify({ phone: numeroFormatado, message: mensagem }),
+          }
+        )
+      }
+    } catch (err) {
+      console.error('Erro WhatsApp recusa:', err)
+    }
+
     await supabase
       .from('Matricula')
       .update({ status: 'RECUSADO' })
       .eq('id', matricula.id)
+
     setSelecionada(null)
     await carregar()
     setProcessando(false)
@@ -119,7 +193,6 @@ export default function Matriculas() {
     RECUSADO: 'text-red-400 bg-red-400/10',
   }
 
-  // Modal de detalhes
   if (selecionada) {
     return (
       <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
@@ -128,12 +201,10 @@ export default function Matriculas() {
           <h1 className="text-xl font-bold">📋 Pré-matrícula</h1>
         </div>
 
-        {/* Status */}
         <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold mb-4 ${statusCor[selecionada.status]}`}>
           {selecionada.status}
         </div>
 
-        {/* Dados do atleta */}
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
           <p className="text-green-500 font-bold text-sm mb-3">⚽ Dados do Atleta</p>
           <div className="space-y-2 text-sm">
@@ -164,7 +235,6 @@ export default function Matriculas() {
           </div>
         </div>
 
-        {/* Endereço */}
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
           <p className="text-green-500 font-bold text-sm mb-3">📍 Endereço</p>
           <p className="text-sm text-white">
@@ -173,7 +243,6 @@ export default function Matriculas() {
           <p className="text-sm text-gray-400">{selecionada.cidade} - {selecionada.estado} · CEP {selecionada.cep}</p>
         </div>
 
-        {/* Responsável */}
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
           <p className="text-green-500 font-bold text-sm mb-3">👤 Responsável</p>
           <div className="space-y-2 text-sm">
@@ -183,9 +252,7 @@ export default function Matriculas() {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">WhatsApp</span>
-              <a href={`https://wa.me/55${selecionada.whatsappResponsavel.replace(/\D/g, '')}`}
-                target="_blank"
-                className="text-green-400 underline">
+              <a href={`https://wa.me/55${selecionada.whatsappResponsavel.replace(/\D/g, '')}`} target="_blank" className="text-green-400 underline">
                 {selecionada.whatsappResponsavel}
               </a>
             </div>
@@ -198,7 +265,6 @@ export default function Matriculas() {
           </div>
         </div>
 
-        {/* Assinatura */}
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-6">
           <p className="text-green-500 font-bold text-sm mb-3">✍️ Assinatura Digital</p>
           <div className="space-y-2 text-sm">
@@ -208,10 +274,7 @@ export default function Matriculas() {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Data/hora</span>
-              <span>{selecionada.dataAssinatura
-                ? new Date(selecionada.dataAssinatura).toLocaleString('pt-BR')
-                : '—'}
-              </span>
+              <span>{selecionada.dataAssinatura ? new Date(selecionada.dataAssinatura).toLocaleString('pt-BR') : '—'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Contrato aceito</span>
@@ -220,7 +283,6 @@ export default function Matriculas() {
           </div>
         </div>
 
-        {/* Botões de ação */}
         {selecionada.status === 'PENDENTE' && (
           <div className="space-y-3">
             <button
@@ -228,14 +290,14 @@ export default function Matriculas() {
               disabled={processando}
               className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-bold text-lg disabled:opacity-50"
             >
-              {processando ? 'Processando...' : '✅ Aprovar Matrícula'}
+              {processando ? 'Processando...' : '✅ Aprovar e notificar WhatsApp'}
             </button>
             <button
               onClick={() => recusar(selecionada)}
               disabled={processando}
               className="w-full bg-red-600/20 hover:bg-red-600/30 text-red-400 py-3 rounded-xl font-bold disabled:opacity-50"
             >
-              ❌ Recusar
+              ❌ Recusar e notificar WhatsApp
             </button>
           </div>
         )}
@@ -256,7 +318,6 @@ export default function Matriculas() {
     )
   }
 
-  // Lista principal
   return (
     <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
       <div className="flex items-center gap-3 mb-6">
@@ -267,7 +328,6 @@ export default function Matriculas() {
         )}
       </div>
 
-      {/* Filtros */}
       <div className="flex gap-2 mb-6">
         {(['PENDENTE', 'APROVADO', 'RECUSADO'] as const).map(s => (
           <button
