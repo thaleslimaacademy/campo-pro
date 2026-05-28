@@ -1,9 +1,9 @@
 function getApiKey(): string {
-  return '$aact_hmlg_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OjRjOGE3ZDljLWMxYTAtNDgwNS1hNjI1LWFjOGZlN2RkNmNiNzo6JGFhY2hfOWQxNWUwYzktY2M3Zi00YzU1LTgxYTctYTAzYTM2M2IzNTNl'
+  return '$aact_prod_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OjQyN2IwZTRiLTA3NDUtNDM5Yi05OGIwLTk2MDVmYzg0ZmM1Nzo6JGFhY2hfMThhNzYwYzMtMmMyNi00OTE1LTkxNGMtZmIzZDRmOTQwNDYz'
 }
 
 function getBaseUrl(): string {
-  return 'https://sandbox.asaas.com/api/v3'
+  return 'https://api.asaas.com/v3'
 }
 
 export async function criarClienteAsaas(dados: {
@@ -25,7 +25,6 @@ export async function criarClienteAsaas(dados: {
     body: JSON.stringify(dados),
     signal: AbortSignal.timeout(10000),
   })
-
   const text = await res.text()
   console.log('📦 Asaas cliente raw:', text)
   return JSON.parse(text)
@@ -47,7 +46,6 @@ export async function criarCobrancaPix(dados: {
     body: JSON.stringify(dados),
     signal: AbortSignal.timeout(10000),
   })
-
   const text = await res.text()
   console.log('📦 Asaas cobranca raw:', text)
   return JSON.parse(text)
@@ -60,7 +58,6 @@ export async function getPixQrCode(paymentId: string) {
     },
     signal: AbortSignal.timeout(10000),
   })
-
   const text = await res.text()
   console.log('📦 Asaas qrCode raw:', text)
   return JSON.parse(text)

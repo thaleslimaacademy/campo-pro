@@ -12,6 +12,9 @@ export default function Dashboard() {
   const [inadimplentes, setInadimplentes] = useState(0)
   const [totalPendente, setTotalPendente] = useState(0)
   const [cobrancasMes, setCobrancasMes] = useState(0)
+  const [copiado, setCopiado] = useState(false)
+
+  const linkMatricula = 'https://campo-pro.vercel.app/matricula'
 
   useEffect(() => {
     async function carregar() {
@@ -72,6 +75,23 @@ export default function Dashboard() {
     }
     carregar()
   }, [])
+
+  function copiarLink() {
+    navigator.clipboard.writeText(linkMatricula)
+    setCopiado(true)
+    setTimeout(() => setCopiado(false), 2000)
+  }
+
+  function enviarWhatsApp() {
+    const whatsapp = prompt('Digite o WhatsApp do responsável (com DDD):')
+    if (!whatsapp) return
+    const numero = whatsapp.replace(/\D/g, '')
+    const numeroFormatado = numero.startsWith('55') ? numero : `55${numero}`
+    const mensagem = encodeURIComponent(
+      `Olá! 👋\n\nAcesse o link abaixo para fazer a pré-matrícula do seu filho(a) na *Thales Lima Football Academy*:\n\n${linkMatricula}\n\n_Preencha a ficha e assine o contrato digital. Nossa equipe analisará e confirmará em breve!_ ⚽`
+    )
+    window.open(`https://wa.me/${numeroFormatado}?text=${mensagem}`, '_blank')
+  }
 
   const percentualPresenca = presencaHoje.total > 0
     ? Math.round((presencaHoje.presentes / presencaHoje.total) * 100)
@@ -175,12 +195,32 @@ export default function Dashboard() {
         </a>
       )}
 
+      {/* Link de pré-matrícula */}
+      <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
+        <p className="text-gray-400 text-sm mb-1">📲 Link de Pré-matrícula</p>
+        <p className="text-xs text-gray-500 break-all mb-3">{linkMatricula}</p>
+        <div className="flex gap-2">
+          <button onClick={copiarLink} className="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-2 rounded-lg text-sm font-medium transition">
+            {copiado ? '✅ Copiado!' : '📋 Copiar'}
+          </button>
+          <button onClick={enviarWhatsApp} className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-medium transition">
+            📲 WhatsApp
+          </button>
+        </div>
+      </div>
+
       {/* Ações rápidas */}
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
         <p className="text-gray-400 text-sm mb-3">Ações rápidas</p>
         <div className="grid grid-cols-2 gap-3">
           <a href="/atletas/novo" className="bg-green-600 text-white p-3 rounded-lg text-center text-sm font-medium">+ Novo Atleta</a>
           <a href="/presenca" className="bg-blue-600 text-white p-3 rounded-lg text-center text-sm font-medium">✅ Fazer Chamada</a>
+          <a href="/turmas" className="col-span-2 bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
+            👥 Gerenciar Turmas
+          </a>
+          <a href="/mensagens" className="col-span-2 bg-blue-700 hover:bg-blue-800 text-white p-3 rounded-lg text-center text-sm font-medium transition">
+            📲 Mensagens
+          </a>
           <a href="/matriculas" className="col-span-2 bg-gray-800 hover:bg-gray-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
             📋 Pré-matrículas {pendentes > 0 ? `(${pendentes} pendentes)` : ''}
           </a>

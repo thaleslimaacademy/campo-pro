@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase'
 import CopiarLink from './CopiarLink'
 import GraficoPresenca from './GraficoPresenca'
 import FotoAtleta from './FotoAtleta'
+import GerarCobranca from './GerarCobranca'
 
 export default async function PerfilAtleta({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -99,9 +100,14 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
           <a href="/atletas" className="text-gray-400">← Voltar</a>
           <h1 className="text-xl font-bold">Perfil do Atleta</h1>
         </div>
-        <a href={`/atletas/${atleta.id}/editar`} className="bg-gray-800 hover:bg-gray-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition">
-          ✏️ Editar
-        </a>
+        <div className="flex gap-2">
+          <a href={`/atletas/${atleta.id}/avaliacao`} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition">
+            📋 Avaliar
+          </a>
+          <a href={`/atletas/${atleta.id}/editar`} className="bg-gray-800 hover:bg-gray-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition">
+            ✏️ Editar
+          </a>
+        </div>
       </div>
 
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
@@ -116,7 +122,7 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
           {atleta.dataNascimento && (
             <div className="flex justify-between">
               <span className="text-gray-400">Nascimento</span>
-              <span>{new Date(atleta.dataNascimento).toLocaleDateString('pt-BR')}</span>
+              <span>{new Date(atleta.dataNascimento + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
             </div>
           )}
           {atleta.cpf && (
@@ -139,6 +145,8 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
           )}
         </div>
       </div>
+
+      <GerarCobranca atletaId={atleta.id} atletaNome={atleta.nome} />
 
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
         <p className="font-bold text-sm mb-4">💰 Histórico Financeiro</p>
