@@ -119,9 +119,7 @@ function PainelAssinatura({ onAssinar, disabled }: { onAssinar: (img: string) =>
     setTemAssinatura(true)
   }
 
-  function parar() {
-    desenhando.current = false
-  }
+  function parar() { desenhando.current = false }
 
   function limpar() {
     const canvas = canvasRef.current
@@ -144,9 +142,7 @@ function PainelAssinatura({ onAssinar, disabled }: { onAssinar: (img: string) =>
       <div className="flex justify-between items-center mb-2">
         <label className="text-sm text-gray-400">Assine com o dedo abaixo *</label>
         {temAssinatura && (
-          <button onClick={limpar} type="button" className="text-xs text-red-400 underline">
-            Limpar
-          </button>
+          <button onClick={limpar} type="button" className="text-xs text-red-400 underline">Limpar</button>
         )}
       </div>
       <canvas
@@ -163,16 +159,10 @@ function PainelAssinatura({ onAssinar, disabled }: { onAssinar: (img: string) =>
         onTouchMove={desenhar}
         onTouchEnd={parar}
       />
-      {!temAssinatura && (
-        <p className="text-xs text-gray-500 text-center mt-2">✍️ Use o dedo para assinar</p>
-      )}
+      {!temAssinatura && <p className="text-xs text-gray-500 text-center mt-2">Use o dedo para assinar</p>}
       {temAssinatura && (
-        <button
-          type="button"
-          onClick={confirmar}
-          className="w-full mt-3 bg-green-600 text-white py-2 rounded-lg text-sm font-bold"
-        >
-          ✅ Usar esta assinatura
+        <button type="button" onClick={confirmar} className="w-full mt-3 bg-green-600 text-white py-2 rounded-lg text-sm font-bold">
+          Usar esta assinatura
         </button>
       )}
     </div>
@@ -186,7 +176,8 @@ export default function Matricula() {
   const [aceito, setAceito] = useState(false)
   const [assinaturaImg, setAssinaturaImg] = useState<string | null>(null)
   const [nomeAssinatura, setNomeAssinatura] = useState('')
-  const [dados, setDados] = useState<any>(null)
+  const [dados, setDados] = useState<any>({})
+  const [erroCpfRg, setErroCpfRg] = useState('')
 
   async function buscarCep(cep: string) {
     if (cep.replace(/\D/g, '').length !== 8) return
@@ -207,14 +198,29 @@ export default function Matricula() {
     const { name, value } = e.target
     setDados((prev: any) => ({ ...prev, [name]: value }))
     if (name === 'cep') buscarCep(value)
+    if (name === 'cpf' || name === 'rg') setErroCpfRg('')
   }
 
   function avancarContrato(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    setErroCpfRg('')
+
+    if (!dados.cpf && !dados.rg) {
+      setErroCpfRg('Informe o CPF ou RG do atleta. Pelo menos um é obrigatório.')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+
+    if (!dados.cpfResponsavel) {
+      setErroCpfRg('CPF do responsável é obrigatório para geração de boletos.')
+      window.scrollTo({ top: 400, behavior: 'smooth' })
+      return
+    }
+
     const form = e.currentTarget
     const fd = new FormData(form)
-    const obj: any = {}
-    fd.forEach((v, k) => obj[k] = v)
+    const obj: any = { ...dados }
+    fd.forEach((v, k) => { if (!obj[k]) obj[k] = v })
     setDados(obj)
     setEtapa('contrato')
     window.scrollTo(0, 0)
@@ -228,8 +234,8 @@ export default function Matricula() {
       escolaId: 'escola-demo',
       nomeAtleta: dados.nome,
       dataNascimento: dados.nascimento,
-      cpf: dados.cpf,
-      rg: dados.rg,
+      cpf: dados.cpf || null,
+      rg: dados.rg || null,
       posicao: dados.posicao,
       telefone: dados.telefone,
       cep: dados.cep,
@@ -241,6 +247,7 @@ export default function Matricula() {
       nomeResponsavel: dados.responsavel,
       whatsappResponsavel: dados.whatsapp,
       emailResponsavel: dados.email || null,
+      cpfResponsavel: dados.cpfResponsavel,
       contratoAceito: true,
       nomeAssinatura: nomeAssinatura.trim(),
       dataAssinatura: new Date().toISOString(),
@@ -251,16 +258,15 @@ export default function Matricula() {
     setLoading(false)
   }
 
-  // ✅ Sucesso
   if (etapa === 'sucesso') {
     return (
       <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center p-6 text-center">
         <p className="text-7xl mb-4">🎉</p>
         <h2 className="text-2xl font-bold mb-2">Pré-matrícula enviada!</h2>
         <p className="text-gray-400 mb-2">Recebemos os dados do atleta.</p>
-        <p className="text-gray-400 text-sm">A equipe da <span className="text-green-400 font-bold">Thales Lima Football Academy</span> irá analisar e confirmar sua matrícula em breve.</p>
+        <p className="text-gray-400 text-sm">A equipe da <span className="text-green-400 font-bold">Thales Lima Football Academy</span> irá analisar e confirmar em breve.</p>
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mt-6 text-left w-full max-w-sm">
-          <p className="text-green-500 font-bold text-sm mb-2">📋 Próximos passos</p>
+          <p className="text-green-500 font-bold text-sm mb-2">Próximos passos</p>
           <p className="text-gray-400 text-sm">1. Nossa equipe analisa a ficha</p>
           <p className="text-gray-400 text-sm">2. Você recebe confirmação via WhatsApp</p>
           <p className="text-gray-400 text-sm">3. Atleta é incluído nos treinos</p>
@@ -269,13 +275,12 @@ export default function Matricula() {
     )
   }
 
-  // 📄 Contrato
   if (etapa === 'contrato') {
     return (
       <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => setEtapa('form')} className="text-gray-400">← Voltar</button>
-          <h1 className="text-xl font-bold">📄 Contrato</h1>
+          <h1 className="text-xl font-bold">Contrato</h1>
         </div>
 
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4 text-center">
@@ -284,7 +289,6 @@ export default function Matricula() {
           <p className="text-gray-400 text-sm">Contrato de Prestação de Serviços Esportivos</p>
         </div>
 
-        {/* Contrato rolável */}
         <div
           className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4 h-72 overflow-y-auto text-sm text-gray-300 leading-relaxed"
           onScroll={e => {
@@ -293,18 +297,15 @@ export default function Matricula() {
           }}
         >
           <pre className="whitespace-pre-wrap font-sans">{CONTRATO}</pre>
-          {contratoLido && <p className="text-green-500 text-center mt-4 font-bold">✅ Contrato lido!</p>}
+          {contratoLido && <p className="text-green-500 text-center mt-4 font-bold">Contrato lido!</p>}
         </div>
 
         {!contratoLido && (
-          <p className="text-yellow-500 text-xs text-center mb-4">⬇️ Role até o final para habilitar a assinatura</p>
+          <p className="text-yellow-500 text-xs text-center mb-4">Role até o final para habilitar a assinatura</p>
         )}
 
-        {/* Bloco assinatura */}
         <div className={`bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4 transition-opacity ${contratoLido ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
-          <p className="text-green-500 font-bold text-sm mb-4">✍️ Assinatura Digital</p>
-
-          {/* Nome do responsável */}
+          <p className="text-green-500 font-bold text-sm mb-4">Assinatura Digital</p>
           <div className="mb-4">
             <label className="text-sm text-gray-400">Nome completo do responsável *</label>
             <input
@@ -316,41 +317,25 @@ export default function Matricula() {
             />
           </div>
 
-          {/* Canvas assinatura */}
-          <PainelAssinatura
-            disabled={!contratoLido}
-            onAssinar={(img) => setAssinaturaImg(img)}
-          />
+          <PainelAssinatura disabled={!contratoLido} onAssinar={(img) => setAssinaturaImg(img)} />
 
-          {/* Preview assinatura confirmada */}
           {assinaturaImg && (
             <div className="mt-4 border border-green-600/30 rounded-xl p-3 bg-green-600/5">
-              <p className="text-xs text-green-500 mb-2">✅ Assinatura capturada</p>
+              <p className="text-xs text-green-500 mb-2">Assinatura capturada</p>
               <img src={assinaturaImg} alt="Assinatura" className="w-full rounded-lg max-h-24 object-contain bg-gray-800" />
-              <button
-                onClick={() => setAssinaturaImg(null)}
-                type="button"
-                className="text-xs text-red-400 underline mt-2"
-              >
-                Refazer assinatura
+              <button onClick={() => setAssinaturaImg(null)} type="button" className="text-xs text-red-400 underline mt-2">
+                Refazer
               </button>
             </div>
           )}
 
-          {/* Checkbox aceite */}
           <label className="flex items-start gap-3 cursor-pointer mt-4">
-            <input
-              type="checkbox"
-              checked={aceito}
-              onChange={e => setAceito(e.target.checked)}
-              className="mt-1 w-5 h-5 accent-green-500"
-            />
+            <input type="checkbox" checked={aceito} onChange={e => setAceito(e.target.checked)} className="mt-1 w-5 h-5 accent-green-500" />
             <span className="text-sm text-gray-300">
               Li e concordo com todos os termos do contrato, incluindo mensalidade, juros, direito de imagem e responsabilidade civil.
             </span>
           </label>
 
-          {/* Info data/hora */}
           {assinaturaImg && aceito && nomeAssinatura && (
             <div className="mt-4 border-t border-gray-700 pt-3">
               <p className="text-xs text-gray-500">Assinado por: <span className="text-white font-bold">{nomeAssinatura}</span></p>
@@ -364,15 +349,14 @@ export default function Matricula() {
         <button
           onClick={confirmarMatricula}
           disabled={!aceito || !assinaturaImg || !nomeAssinatura.trim() || loading}
-          className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg disabled:opacity-40"
         >
-          {loading ? 'Enviando...' : '✅ Confirmar Pré-matrícula'}
+          {loading ? 'Enviando...' : 'Confirmar Pré-matrícula'}
         </button>
       </div>
     )
   }
 
-  // 📝 Formulário
   return (
     <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
       <div className="text-center mb-6">
@@ -391,16 +375,40 @@ export default function Matricula() {
           <label className="text-sm text-gray-400">Data de nascimento *</label>
           <input name="nascimento" required type="date" onChange={handleChange} className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
         </div>
+
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-sm text-gray-400">CPF</label>
-            <input name="cpf" type="text" onChange={handleChange} className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="000.000.000-00" />
+            <label className="text-sm text-gray-400">
+              CPF do atleta <span className="text-yellow-400 text-xs">(ou RG)</span>
+            </label>
+            <input
+              name="cpf"
+              type="text"
+              onChange={handleChange}
+              className={"w-full bg-gray-900 border rounded-lg p-3 mt-1 text-white " + (erroCpfRg && !dados.cpf && !dados.rg ? 'border-red-500' : 'border-gray-700')}
+              placeholder="000.000.000-00"
+            />
           </div>
           <div>
-            <label className="text-sm text-gray-400">RG</label>
-            <input name="rg" type="text" onChange={handleChange} className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="0000000" />
+            <label className="text-sm text-gray-400">
+              RG do atleta <span className="text-yellow-400 text-xs">(ou CPF)</span>
+            </label>
+            <input
+              name="rg"
+              type="text"
+              onChange={handleChange}
+              className={"w-full bg-gray-900 border rounded-lg p-3 mt-1 text-white " + (erroCpfRg && !dados.cpf && !dados.rg ? 'border-red-500' : 'border-gray-700')}
+              placeholder="0000000"
+            />
           </div>
         </div>
+
+        {erroCpfRg && (
+          <div className="bg-red-600/20 border border-red-600/40 rounded-lg p-3">
+            <p className="text-red-400 text-sm font-bold">❌ {erroCpfRg}</p>
+          </div>
+        )}
+
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-sm text-gray-400">Posição</label>
@@ -454,6 +462,19 @@ export default function Matricula() {
         <div>
           <label className="text-sm text-gray-400">Nome do responsável *</label>
           <input name="responsavel" required type="text" onChange={handleChange} className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="Ex: Maria Silva" />
+        </div>
+        <div>
+          <label className="text-sm text-gray-400">
+            CPF do responsável * <span className="text-yellow-400 text-xs">(obrigatório para boletos)</span>
+          </label>
+          <input
+            name="cpfResponsavel"
+            required
+            type="text"
+            onChange={handleChange}
+            className={"w-full bg-gray-900 border rounded-lg p-3 mt-1 text-white " + (erroCpfRg && !dados.cpfResponsavel ? 'border-red-500' : 'border-gray-700')}
+            placeholder="000.000.000-00"
+          />
         </div>
         <div>
           <label className="text-sm text-gray-400">WhatsApp *</label>
