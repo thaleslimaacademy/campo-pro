@@ -158,6 +158,7 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
         <p className="text-gray-400 text-sm mb-3">📞 Contato</p>
         
+<a
           href="https://wa.me/5534998168467"
           target="_blank"
           rel="noreferrer"
