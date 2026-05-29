@@ -90,7 +90,8 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
     CANCELADO: 'bg-gray-400/10',
   }
 
-  const linkPais = `https://campo-pro.vercel.app/pais/${atleta.tokenPais}`
+  const linkPais = 'https://campo-pro.vercel.app/pais/' + atleta.tokenPais
+  const linkRematricula = 'https://campo-pro.vercel.app/rematricula/' + atleta.id
 
   return (
     <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
@@ -101,10 +102,10 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
           <h1 className="text-xl font-bold">Perfil do Atleta</h1>
         </div>
         <div className="flex gap-2">
-          <a href={`/atletas/${atleta.id}/avaliacao`} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition">
+          <a href={'/atletas/' + atleta.id + '/avaliacao'} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition">
             📋 Avaliar
           </a>
-          <a href={`/atletas/${atleta.id}/editar`} className="bg-gray-800 hover:bg-gray-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition">
+          <a href={'/atletas/' + atleta.id + '/editar'} className="bg-gray-800 hover:bg-gray-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition">
             ✏️ Editar
           </a>
         </div>
@@ -152,15 +153,15 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
         <p className="font-bold text-sm mb-4">💰 Histórico Financeiro</p>
         <div className="grid grid-cols-3 gap-2 mb-4">
           <div className="bg-green-400/10 rounded-xl p-3 text-center">
-            <p className="text-green-400 font-bold text-sm">R$ {totalPago.toFixed(0)}</p>
+            <p className="text-green-400 font-bold text-sm">{'R$ ' + totalPago.toFixed(0)}</p>
             <p className="text-gray-400 text-xs mt-1">Pago</p>
           </div>
           <div className="bg-yellow-400/10 rounded-xl p-3 text-center">
-            <p className="text-yellow-400 font-bold text-sm">R$ {totalPendente.toFixed(0)}</p>
+            <p className="text-yellow-400 font-bold text-sm">{'R$ ' + totalPendente.toFixed(0)}</p>
             <p className="text-gray-400 text-xs mt-1">Pendente</p>
           </div>
           <div className="bg-red-400/10 rounded-xl p-3 text-center">
-            <p className="text-red-400 font-bold text-sm">R$ {totalVencido.toFixed(0)}</p>
+            <p className="text-red-400 font-bold text-sm">{'R$ ' + totalVencido.toFixed(0)}</p>
             <p className="text-gray-400 text-xs mt-1">Vencido</p>
           </div>
         </div>
@@ -169,14 +170,14 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
         ) : (
           <div className="space-y-2">
             {cobrancas.map(c => (
-              <div key={c.id} className={`flex justify-between items-center rounded-xl p-3 ${statusBg[c.status] || 'bg-gray-800'}`}>
+              <div key={c.id} className={'flex justify-between items-center rounded-xl p-3 ' + (statusBg[c.status] || 'bg-gray-800')}>
                 <div>
                   <p className="text-sm font-medium">{c.descricao || 'Mensalidade'}</p>
                   <p className="text-xs text-gray-400">{new Date(c.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-sm">R$ {Number(c.valor).toFixed(2)}</p>
-                  <p className={`text-xs font-bold ${statusCor[c.status] || 'text-gray-400'}`}>{c.status}</p>
+                  <p className="font-bold text-sm">{'R$ ' + Number(c.valor).toFixed(2)}</p>
+                  <p className={'text-xs font-bold ' + (statusCor[c.status] || 'text-gray-400')}>{c.status}</p>
                 </div>
               </div>
             ))}
@@ -188,7 +189,7 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
         <div className="flex justify-between items-center mb-4">
           <p className="font-bold text-sm">📊 Histórico de Presença</p>
           <div className="text-right">
-            <p className={`text-lg font-bold ${percentualGeral >= 75 ? 'text-green-400' : percentualGeral >= 50 ? 'text-yellow-400' : 'text-red-400'}`}>
+            <p className={'text-lg font-bold ' + (percentualGeral >= 75 ? 'text-green-400' : percentualGeral >= 50 ? 'text-yellow-400' : 'text-red-400')}>
               {percentualGeral}%
             </p>
             <p className="text-xs text-gray-500">{totalPresentes}/{totalPresencas} treinos</p>
@@ -238,11 +239,18 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
         <CopiarLink link={linkPais} />
       </div>
 
+      <div className="bg-orange-600/10 border border-orange-600/30 rounded-xl p-4 mb-4">
+        <p className="text-orange-400 font-bold text-sm mb-1">🔄 Link de Rematrícula</p>
+        <p className="text-xs text-gray-500 mb-3">Envie para o responsável renovar a matrícula do atleta.</p>
+        <p className="text-xs text-gray-400 break-all mb-3">{linkRematricula}</p>
+        <CopiarLink link={linkRematricula} />
+      </div>
+
       <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
-        <a href="/dashboard" className="text-gray-400 text-xs text-center">🏠<br/>Início</a>
-        <a href="/atletas" className="text-green-500 text-xs text-center">👥<br/>Atletas</a>
-        <a href="/presenca" className="text-gray-400 text-xs text-center">✅<br/>Presença</a>
-        <a href="/financeiro" className="text-gray-400 text-xs text-center">💰<br/>Financeiro</a>
+        <a href="/dashboard" className="text-gray-400 text-xs text-center">🏠<br />Início</a>
+        <a href="/atletas" className="text-green-500 text-xs text-center">👥<br />Atletas</a>
+        <a href="/presenca" className="text-gray-400 text-xs text-center">✅<br />Presença</a>
+        <a href="/financeiro" className="text-gray-400 text-xs text-center">💰<br />Financeiro</a>
       </nav>
     </div>
   )
