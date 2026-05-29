@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { salvarConfiguracoes } from './actions'
 
 export default function Configuracoes() {
   const [loading, setLoading] = useState(true)
   const [salvando, setSalvando] = useState(false)
   const [sucesso, setSucesso] = useState(false)
+  const [erro, setErro] = useState('')
   const [form, setForm] = useState({
     nome: '',
     telefone: '',
@@ -23,12 +25,22 @@ export default function Configuracoes() {
   })
 
   useEffect(() => {
+    // Checa se veio de um save bem-sucedido
+    const saved = localStorage.getItem('configuracoes_saved')
+    if (saved === 'true') {
+      setSucesso(true)
+      localStorage.removeItem('configuracoes_saved')
+      setTimeout(() => setSucesso(false), 4000)
+    }
+
     async function carregar() {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('Escola')
         .select('*')
         .eq('id', 'escola-demo')
         .single()
+
+      if (error) console.error('[carregar escola]', error)
 
       if (data) {
         setForm({
@@ -58,33 +70,33 @@ export default function Configuracoes() {
 
   async function salvar() {
     setSalvando(true)
+    setErro('')
 
-    const { error } = await supabase
-      .from('Escola')
-      .update({
-        nome: form.nome,
-        telefone: form.telefone,
-        whatsapp: form.whatsapp,
-        email: form.email,
-        endereco: form.endereco,
-        cidade: form.cidade,
-        estado: form.estado,
-        cep: form.cep,
-        valorMensalidade: parseFloat(form.valorMensalidade),
-        diaVencimento: parseInt(form.diaVencimento),
-        instagramUrl: form.instagramUrl,
-        facebookUrl: form.facebookUrl,
-      })
-      .eq('id', 'escola-demo')
+    const result = await salvarConfiguracoes({
+      nome: form.nome,
+      telefone: form.telefone,
+      whatsapp: form.whatsapp,
+      email: form.email,
+      endereco: form.endereco,
+      cidade: form.cidade,
+      estado: form.estado,
+      cep: form.cep,
+      valorMensalidade: parseFloat(form.valorMensalidade) || 0,
+      diaVencimento: parseInt(form.diaVencimento) || 10,
+      instagramUrl: form.instagramUrl,
+      facebookUrl: form.facebookUrl,
+    })
 
-    if (error) {
-      console.error('Erro ao salvar:', error.message, error.details, error.hint)
-      alert('Erro: ' + error.message)
-    } else {
-      setSucesso(true)
-      setTimeout(() => setSucesso(false), 3000)
-    }
     setSalvando(false)
+
+    if (!result.ok) {
+      setErro(result.message || 'Erro ao salvar.')
+      return
+    }
+
+    // Salva flag no localStorage e recarrega a página
+    localStorage.setItem('configuracoes_saved', 'true')
+    window.location.reload()
   }
 
   if (loading) {
@@ -103,8 +115,14 @@ export default function Configuracoes() {
       </div>
 
       {sucesso && (
-        <div className="bg-green-600/20 border border-green-600/30 rounded-xl p-3 mb-4 text-center">
-          <p className="text-green-400 font-bold">✅ Configurações salvas!</p>
+        <div className="bg-green-600 rounded-xl p-4 mb-4 text-center">
+          <p className="text-white font-bold text-lg">✅ Configurações salvas com sucesso!</p>
+        </div>
+      )}
+
+      {erro && (
+        <div className="bg-red-600 rounded-xl p-4 mb-4 text-center">
+          <p className="text-white font-bold">❌ {erro}</p>
         </div>
       )}
 
@@ -166,7 +184,7 @@ export default function Configuracoes() {
           <div>
             <label className="text-sm text-gray-400">Dia de vencimento</label>
             <select name="diaVencimento" value={form.diaVencimento} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white">
-              {[1,5,10,15,20,25,30].map(d => (
+              {[1, 5, 10, 15, 20, 25, 30].map(d => (
                 <option key={d} value={d}>Dia {d}</option>
               ))}
             </select>
@@ -191,16 +209,16 @@ export default function Configuracoes() {
       <button
         onClick={salvar}
         disabled={salvando}
-        className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg disabled:opacity-50"
+        className="w-full bg-green-600 hover:bg-green-500 active:bg-green-700 text-white py-4 rounded-xl font-bold text-lg disabled:opacity-50 transition-colors"
       >
-        {salvando ? 'Salvando...' : '💾 Salvar Configurações'}
+        {salvando ? '⏳ Salvando...' : '💾 Salvar Configurações'}
       </button>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
-        <a href="/dashboard" className="text-gray-400 text-xs text-center">🏠<br/>Início</a>
-        <a href="/atletas" className="text-gray-400 text-xs text-center">👥<br/>Atletas</a>
-        <a href="/presenca" className="text-gray-400 text-xs text-center">✅<br/>Presença</a>
-        <a href="/financeiro" className="text-gray-400 text-xs text-center">💰<br/>Financeiro</a>
+        <a href="/dashboard" className="text-gray-400 text-xs text-center">🏠<br />Início</a>
+        <a href="/atletas" className="text-gray-400 text-xs text-center">👥<br />Atletas</a>
+        <a href="/presenca" className="text-gray-400 text-xs text-center">✅<br />Presença</a>
+        <a href="/financeiro" className="text-gray-400 text-xs text-center">💰<br />Financeiro</a>
       </nav>
     </div>
   )

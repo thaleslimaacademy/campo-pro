@@ -12,6 +12,7 @@ export default function EditarAtleta() {
   const [loading, setLoading] = useState(true)
   const [salvando, setSalvando] = useState(false)
   const [sucesso, setSucesso] = useState(false)
+  const [ativo, setAtivo] = useState(true)
   const [form, setForm] = useState({
     nome: '',
     dataNascimento: '',
@@ -39,6 +40,7 @@ export default function EditarAtleta() {
         .single()
 
       if (atleta) {
+        setAtivo(atleta.ativo ?? true)
         setForm(prev => ({
           ...prev,
           nome: atleta.nome || '',
@@ -100,7 +102,6 @@ export default function EditarAtleta() {
 
   async function salvar() {
     setSalvando(true)
-
     await supabase
       .from('Atleta')
       .update({
@@ -131,10 +132,28 @@ export default function EditarAtleta() {
     }
 
     setSucesso(true)
-    setTimeout(() => {
-      router.push(`/atletas/${id}`)
-    }, 1500)
+    setTimeout(() => router.push(`/atletas/${id}`), 1500)
     setSalvando(false)
+  }
+
+  async function bloquear() {
+    const novoStatus = !ativo
+    const acao = novoStatus ? 'reativar' : 'bloquear'
+    if (!confirm(`Deseja ${acao} este atleta?`)) return
+    await supabase.from('Atleta').update({ ativo: novoStatus }).eq('id', id)
+    setAtivo(novoStatus)
+    alert(`Atleta ${novoStatus ? 'reativado' : 'bloqueado'} com sucesso!`)
+  }
+
+  async function excluir() {
+    if (!confirm('Tem certeza que deseja EXCLUIR este atleta? Esta ação não pode ser desfeita.')) return
+    if (!confirm('Confirma a exclusão permanente?')) return
+    await supabase.from('Presenca').delete().eq('atletaId', id)
+    await supabase.from('Cobranca').delete().eq('atletaId', id)
+    await supabase.from('Responsavel').delete().eq('atletaId', id)
+    await supabase.from('Avaliacao').delete().eq('atletaId', id)
+    await supabase.from('Atleta').delete().eq('id', id)
+    router.push('/atletas')
   }
 
   if (loading) {
@@ -155,6 +174,13 @@ export default function EditarAtleta() {
       {sucesso && (
         <div className="bg-green-600/20 border border-green-600/30 rounded-xl p-3 mb-4 text-center">
           <p className="text-green-400 font-bold">✅ Dados salvos! Redirecionando...</p>
+        </div>
+      )}
+
+      {/* Status do atleta */}
+      {!ativo && (
+        <div className="bg-red-600/10 border border-red-600/30 rounded-xl p-3 mb-4 text-center">
+          <p className="text-red-400 font-bold">⛔ Atleta bloqueado</p>
         </div>
       )}
 
@@ -257,6 +283,25 @@ export default function EditarAtleta() {
         >
           {salvando ? 'Salvando...' : '💾 Salvar Alterações'}
         </button>
+
+        {/* Ações perigosas */}
+        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+          <p className="text-gray-400 text-sm mb-3">⚠️ Ações</p>
+          <div className="space-y-2">
+            <button
+              onClick={bloquear}
+              className={`w-full py-3 rounded-xl font-bold text-sm ${ativo ? 'bg-yellow-600/20 text-yellow-400 border border-yellow-600/30' : 'bg-green-600/20 text-green-400 border border-green-600/30'}`}
+            >
+              {ativo ? '⛔ Bloquear Atleta' : '✅ Reativar Atleta'}
+            </button>
+            <button
+              onClick={excluir}
+              className="w-full py-3 rounded-xl font-bold text-sm bg-red-600/20 text-red-400 border border-red-600/30"
+            >
+              🗑️ Excluir Atleta Permanentemente
+            </button>
+          </div>
+        </div>
       </div>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">

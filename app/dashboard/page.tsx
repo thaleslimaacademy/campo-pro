@@ -213,13 +213,26 @@ export default function Dashboard() {
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
         <p className="text-gray-400 text-sm mb-3">Ações rápidas</p>
         <div className="grid grid-cols-2 gap-3">
-          <a href="/atletas/novo" className="bg-green-600 text-white p-3 rounded-lg text-center text-sm font-medium">+ Novo Atleta</a>
-          <a href="/presenca" className="bg-blue-600 text-white p-3 rounded-lg text-center text-sm font-medium">✅ Fazer Chamada</a>
+          <a href="/atletas/novo" className="bg-green-600 hover:bg-green-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
+            ⚽ Novo Atleta
+          </a>
+          <a href="/presenca" className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
+            ✅ Fazer Chamada
+          </a>
           <a href="/turmas" className="col-span-2 bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
             👥 Gerenciar Turmas
           </a>
           <a href="/mensagens" className="col-span-2 bg-blue-700 hover:bg-blue-800 text-white p-3 rounded-lg text-center text-sm font-medium transition">
             📲 Mensagens
+          </a>
+          <a href="/comissao" className="col-span-2 bg-indigo-700 hover:bg-indigo-800 text-white p-3 rounded-lg text-center text-sm font-medium transition">
+            👨‍💼 Comissão Técnica
+          </a>
+          <a href="/convocacao" className="col-span-2 bg-orange-600 hover:bg-orange-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
+            📣 Convocações
+          </a>
+          <a href="/campeonato" className="col-span-2 bg-yellow-600 hover:bg-yellow-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
+            🏆 Campeonatos
           </a>
           <a href="/matriculas" className="col-span-2 bg-gray-800 hover:bg-gray-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
             📋 Pré-matrículas {pendentes > 0 ? `(${pendentes} pendentes)` : ''}
@@ -231,10 +244,10 @@ export default function Dashboard() {
       </div>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
-        <a href="/dashboard" className="text-green-500 text-xs text-center">🏠<br/>Início</a>
-        <a href="/atletas" className="text-gray-400 text-xs text-center">👥<br/>Atletas</a>
-        <a href="/presenca" className="text-gray-400 text-xs text-center">✅<br/>Presença</a>
-        <a href="/financeiro" className="text-gray-400 text-xs text-center">💰<br/>Financeiro</a>
+        <a href="/dashboard" className="text-green-500 text-xs text-center">🏠<br />Início</a>
+        <a href="/atletas" className="text-gray-400 text-xs text-center">👥<br />Atletas</a>
+        <a href="/presenca" className="text-gray-400 text-xs text-center">✅<br />Presença</a>
+        <a href="/financeiro" className="text-gray-400 text-xs text-center">💰<br />Financeiro</a>
       </nav>
     </div>
   )
