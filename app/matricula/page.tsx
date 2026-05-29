@@ -176,15 +176,15 @@ export default function Matricula() {
   const [aceito, setAceito] = useState(false)
   const [assinaturaImg, setAssinaturaImg] = useState<string | null>(null)
   const [nomeAssinatura, setNomeAssinatura] = useState('')
-  const [dados, setDados] = useState<any>({})
-  const [erroCpfRg, setErroCpfRg] = useState('')
+  const [dados, setDados] = useState<Record<string, string>>({})
+  const [erros, setErros] = useState<string[]>([])
 
   async function buscarCep(cep: string) {
     if (cep.replace(/\D/g, '').length !== 8) return
     const res = await fetch(`https://viacep.com.br/ws/${cep.replace(/\D/g, '')}/json/`)
     const data = await res.json()
     if (!data.erro) {
-      setDados((prev: any) => ({
+      setDados(prev => ({
         ...prev,
         endereco: data.logradouro,
         bairro: data.bairro,
@@ -196,32 +196,30 @@ export default function Matricula() {
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = e.target
-    setDados((prev: any) => ({ ...prev, [name]: value }))
+    setDados(prev => ({ ...prev, [name]: value }))
     if (name === 'cep') buscarCep(value)
-    if (name === 'cpf' || name === 'rg') setErroCpfRg('')
+    setErros([])
   }
 
   function avancarContrato(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setErroCpfRg('')
+    const novosErros: string[] = []
 
-    if (!dados.cpf && !dados.rg) {
-      setErroCpfRg('Informe o CPF ou RG do atleta. Pelo menos um é obrigatório.')
+    if (!dados.cpf?.trim() && !dados.rg?.trim()) {
+      novosErros.push('CPF ou RG do atleta é obrigatório. Informe pelo menos um.')
+    }
+
+    if (!dados.cpfResponsavel?.trim()) {
+      novosErros.push('CPF do responsável é obrigatório para geração de boletos.')
+    }
+
+    if (novosErros.length > 0) {
+      setErros(novosErros)
       window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
 
-    if (!dados.cpfResponsavel) {
-      setErroCpfRg('CPF do responsável é obrigatório para geração de boletos.')
-      window.scrollTo({ top: 400, behavior: 'smooth' })
-      return
-    }
-
-    const form = e.currentTarget
-    const fd = new FormData(form)
-    const obj: any = { ...dados }
-    fd.forEach((v, k) => { if (!obj[k]) obj[k] = v })
-    setDados(obj)
+    setErros([])
     setEtapa('contrato')
     window.scrollTo(0, 0)
   }
@@ -236,14 +234,14 @@ export default function Matricula() {
       dataNascimento: dados.nascimento,
       cpf: dados.cpf || null,
       rg: dados.rg || null,
-      posicao: dados.posicao,
-      telefone: dados.telefone,
-      cep: dados.cep,
-      endereco: dados.endereco,
-      numero: dados.numero,
-      bairro: dados.bairro,
-      cidade: dados.cidade,
-      estado: dados.estado,
+      posicao: dados.posicao || 'Goleiro',
+      telefone: dados.telefone || null,
+      cep: dados.cep || null,
+      endereco: dados.endereco || null,
+      numero: dados.numero || null,
+      bairro: dados.bairro || null,
+      cidade: dados.cidade || null,
+      estado: dados.estado || null,
       nomeResponsavel: dados.responsavel,
       whatsappResponsavel: dados.whatsapp,
       emailResponsavel: dados.email || null,
@@ -282,13 +280,11 @@ export default function Matricula() {
           <button onClick={() => setEtapa('form')} className="text-gray-400">← Voltar</button>
           <h1 className="text-xl font-bold">Contrato</h1>
         </div>
-
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4 text-center">
           <p className="text-green-500 font-bold">Associação Esportiva</p>
           <p className="text-green-400 font-bold text-lg">Thales Lima Football Academy</p>
           <p className="text-gray-400 text-sm">Contrato de Prestação de Serviços Esportivos</p>
         </div>
-
         <div
           className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4 h-72 overflow-y-auto text-sm text-gray-300 leading-relaxed"
           onScroll={e => {
@@ -299,11 +295,9 @@ export default function Matricula() {
           <pre className="whitespace-pre-wrap font-sans">{CONTRATO}</pre>
           {contratoLido && <p className="text-green-500 text-center mt-4 font-bold">Contrato lido!</p>}
         </div>
-
         {!contratoLido && (
           <p className="text-yellow-500 text-xs text-center mb-4">Role até o final para habilitar a assinatura</p>
         )}
-
         <div className={`bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4 transition-opacity ${contratoLido ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
           <p className="text-green-500 font-bold text-sm mb-4">Assinatura Digital</p>
           <div className="mb-4">
@@ -316,36 +310,27 @@ export default function Matricula() {
               className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white"
             />
           </div>
-
           <PainelAssinatura disabled={!contratoLido} onAssinar={(img) => setAssinaturaImg(img)} />
-
           {assinaturaImg && (
             <div className="mt-4 border border-green-600/30 rounded-xl p-3 bg-green-600/5">
               <p className="text-xs text-green-500 mb-2">Assinatura capturada</p>
               <img src={assinaturaImg} alt="Assinatura" className="w-full rounded-lg max-h-24 object-contain bg-gray-800" />
-              <button onClick={() => setAssinaturaImg(null)} type="button" className="text-xs text-red-400 underline mt-2">
-                Refazer
-              </button>
+              <button onClick={() => setAssinaturaImg(null)} type="button" className="text-xs text-red-400 underline mt-2">Refazer</button>
             </div>
           )}
-
           <label className="flex items-start gap-3 cursor-pointer mt-4">
             <input type="checkbox" checked={aceito} onChange={e => setAceito(e.target.checked)} className="mt-1 w-5 h-5 accent-green-500" />
             <span className="text-sm text-gray-300">
               Li e concordo com todos os termos do contrato, incluindo mensalidade, juros, direito de imagem e responsabilidade civil.
             </span>
           </label>
-
           {assinaturaImg && aceito && nomeAssinatura && (
             <div className="mt-4 border-t border-gray-700 pt-3">
               <p className="text-xs text-gray-500">Assinado por: <span className="text-white font-bold">{nomeAssinatura}</span></p>
-              <p className="text-xs text-gray-500 mt-1">
-                {new Date().toLocaleDateString('pt-BR')} às {new Date().toLocaleTimeString('pt-BR')}
-              </p>
+              <p className="text-xs text-gray-500 mt-1">{new Date().toLocaleDateString('pt-BR')} às {new Date().toLocaleTimeString('pt-BR')}</p>
             </div>
           )}
         </div>
-
         <button
           onClick={confirmarMatricula}
           disabled={!aceito || !assinaturaImg || !nomeAssinatura.trim() || loading}
@@ -365,6 +350,14 @@ export default function Matricula() {
         <p className="text-gray-400 text-sm">Ficha de Pré-matrícula</p>
       </div>
 
+      {erros.length > 0 && (
+        <div className="bg-red-600/20 border border-red-600/40 rounded-xl p-4 mb-4">
+          {erros.map((erro, i) => (
+            <p key={i} className="text-red-400 text-sm font-bold">❌ {erro}</p>
+          ))}
+        </div>
+      )}
+
       <form onSubmit={avancarContrato} className="space-y-4">
         <p className="text-green-500 font-bold text-sm uppercase">Dados do Atleta</p>
         <div>
@@ -376,38 +369,31 @@ export default function Matricula() {
           <input name="nascimento" required type="date" onChange={handleChange} className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-sm text-gray-400">
-              CPF do atleta <span className="text-yellow-400 text-xs">(ou RG)</span>
-            </label>
-            <input
-              name="cpf"
-              type="text"
-              onChange={handleChange}
-              className={"w-full bg-gray-900 border rounded-lg p-3 mt-1 text-white " + (erroCpfRg && !dados.cpf && !dados.rg ? 'border-red-500' : 'border-gray-700')}
-              placeholder="000.000.000-00"
-            />
-          </div>
-          <div>
-            <label className="text-sm text-gray-400">
-              RG do atleta <span className="text-yellow-400 text-xs">(ou CPF)</span>
-            </label>
-            <input
-              name="rg"
-              type="text"
-              onChange={handleChange}
-              className={"w-full bg-gray-900 border rounded-lg p-3 mt-1 text-white " + (erroCpfRg && !dados.cpf && !dados.rg ? 'border-red-500' : 'border-gray-700')}
-              placeholder="0000000"
-            />
+        <div className="bg-yellow-600/10 border border-yellow-600/30 rounded-xl p-3">
+          <p className="text-yellow-400 text-xs font-bold mb-2">⚠️ Pelo menos CPF ou RG do atleta é obrigatório</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-sm text-gray-400">CPF do atleta</label>
+              <input
+                name="cpf"
+                type="text"
+                onChange={handleChange}
+                className={"w-full bg-gray-900 border rounded-lg p-3 mt-1 text-white " + (erros.some(e => e.includes('CPF ou RG')) ? 'border-red-500' : 'border-gray-700')}
+                placeholder="000.000.000-00"
+              />
+            </div>
+            <div>
+              <label className="text-sm text-gray-400">RG do atleta</label>
+              <input
+                name="rg"
+                type="text"
+                onChange={handleChange}
+                className={"w-full bg-gray-900 border rounded-lg p-3 mt-1 text-white " + (erros.some(e => e.includes('CPF ou RG')) ? 'border-red-500' : 'border-gray-700')}
+                placeholder="0000000"
+              />
+            </div>
           </div>
         </div>
-
-        {erroCpfRg && (
-          <div className="bg-red-600/20 border border-red-600/40 rounded-lg p-3">
-            <p className="text-red-400 text-sm font-bold">❌ {erroCpfRg}</p>
-          </div>
-        )}
 
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -469,10 +455,9 @@ export default function Matricula() {
           </label>
           <input
             name="cpfResponsavel"
-            required
             type="text"
             onChange={handleChange}
-            className={"w-full bg-gray-900 border rounded-lg p-3 mt-1 text-white " + (erroCpfRg && !dados.cpfResponsavel ? 'border-red-500' : 'border-gray-700')}
+            className={"w-full bg-gray-900 border rounded-lg p-3 mt-1 text-white " + (erros.some(e => e.includes('CPF do responsável')) ? 'border-red-500' : 'border-gray-700')}
             placeholder="000.000.000-00"
           />
         </div>
