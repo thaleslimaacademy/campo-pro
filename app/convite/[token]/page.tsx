@@ -128,7 +128,7 @@ export default function Convite() {
             <p className="text-gray-400 text-sm text-center">
               Para ativar seu convite, faca login ou crie sua conta
             </p>
-            
+            <a
               href={loginUrl}
               className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg text-center block"
             >
