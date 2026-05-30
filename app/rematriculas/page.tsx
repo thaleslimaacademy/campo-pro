@@ -174,7 +174,7 @@ export default function Rematriculas() {
               )}
 
               {r.status === 'APROVADO' && r.atletaId_rematricula && (
-                
+                <a
                   href={"/atletas/" + r.atletaId_rematricula}
                   className="w-full bg-green-600/20 text-green-400 text-center py-2 rounded-xl text-sm font-bold block"
                 >
