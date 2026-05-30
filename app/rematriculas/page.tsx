@@ -148,14 +148,14 @@ export default function Rematriculas() {
                   <button
                     onClick={() => aprovar(r.id, r.atletaId_rematricula)}
                     disabled={processando === r.id}
-                    className="flex-1 bg-green-600 hover:bg-green-500 text-white py-2 rounded-xl font-bold text-sm disabled:opacity-50"
+                    className="flex-1 bg-green-600 text-white py-2 rounded-xl font-bold text-sm disabled:opacity-50"
                   >
                     {processando === r.id ? 'Processando...' : 'Aprovar'}
                   </button>
                   <button
                     onClick={() => rejeitar(r.id)}
                     disabled={processando === r.id}
-                    className="flex-1 bg-red-600/20 hover:bg-red-600/30 text-red-400 py-2 rounded-xl font-bold text-sm disabled:opacity-50"
+                    className="flex-1 bg-red-600/20 text-red-400 py-2 rounded-xl font-bold text-sm disabled:opacity-50"
                   >
                     Rejeitar
                   </button>
@@ -166,7 +166,7 @@ export default function Rematriculas() {
                       rel="noreferrer"
                       className="bg-gray-800 text-gray-300 px-3 py-2 rounded-xl text-sm"
                     >
-                      WhatsApp
+                      WA
                     </a>
                   )}
                 </div>
@@ -186,10 +186,10 @@ export default function Rematriculas() {
       )}
 
       <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
-        <a href="/dashboard" className="text-gray-400 text-xs text-center">🏠<br />Inicio</a>
-        <a href="/atletas" className="text-gray-400 text-xs text-center">👥<br />Atletas</a>
-        <a href="/presenca" className="text-gray-400 text-xs text-center">✅<br />Presenca</a>
-        <a href="/financeiro" className="text-gray-400 text-xs text-center">💰<br />Financeiro</a>
+        <a href="/dashboard" className="text-gray-400 text-xs text-center">inicio</a>
+        <a href="/atletas" className="text-gray-400 text-xs text-center">Atletas</a>
+        <a href="/presenca" className="text-gray-400 text-xs text-center">Presenca</a>
+        <a href="/financeiro" className="text-gray-400 text-xs text-center">Financeiro</a>
       </nav>
     </div>
   )
