@@ -1,5 +1,4 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
-import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 const isPublicRoute = createRouteMatcher([
@@ -7,6 +6,7 @@ const isPublicRoute = createRouteMatcher([
   '/onboarding(.*)',
   '/matricula(.*)',
   '/rematricula(.*)',
+  '/convite(.*)',
   '/pais(.*)',
   '/qrcode(.*)',
   '/api/webhook(.*)',

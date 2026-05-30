@@ -12,6 +12,8 @@ interface Professor {
   cargo: string
   fotoUrl: string
   ativo: boolean
+  contaCriada: boolean
+  tokenConvite: string
   createdAt: string
 }
 
@@ -21,6 +23,7 @@ export default function ComissaoTecnica() {
   const [showForm, setShowForm] = useState(false)
   const [salvando, setSalvando] = useState(false)
   const [sucesso, setSucesso] = useState(false)
+  const [copiado, setCopiado] = useState<string | null>(null)
   const [form, setForm] = useState({
     nome: '',
     email: '',
@@ -57,9 +60,10 @@ export default function ComissaoTecnica() {
       whatsapp: form.whatsapp,
       cargo: form.cargo,
       ativo: true,
+      contaCriada: false,
     })
     if (error) {
-      alert('Erro: ' + error.message)
+      alert('Erro ao salvar: ' + error.message)
     } else {
       setSucesso(true)
       setForm({ nome: '', email: '', telefone: '', whatsapp: '', cargo: 'Professor' })
@@ -81,7 +85,24 @@ export default function ComissaoTecnica() {
     carregar()
   }
 
-  const cargos = ['Professor', 'Treinador', 'Auxiliar Tecnico', 'Preparador Fisico', 'Goleiro Treinador', 'Coordenador']
+  function copiarLink(token: string, whatsapp: string, nome: string) {
+    const link = 'https://campo-pro.vercel.app/convite/' + token
+    navigator.clipboard.writeText(link)
+    setCopiado(token)
+    setTimeout(() => setCopiado(null), 3000)
+  }
+
+  function enviarWhatsApp(token: string, whatsapp: string, nome: string) {
+    const link = 'https://campo-pro.vercel.app/convite/' + token
+    const numero = whatsapp.replace(/\D/g, '')
+    const numeroFormatado = numero.startsWith('55') ? numero : '55' + numero
+    const mensagem = encodeURIComponent(
+      'Olá ' + nome + '! 👋\n\nVocê foi convidado para fazer parte da Comissão Técnica da *Thales Lima Football Academy*.\n\nAcesse o link abaixo para criar sua conta e ter acesso ao app:\n\n' + link + '\n\n_Este link é exclusivo e intransferível._'
+    )
+    window.open('https://wa.me/' + numeroFormatado + '?text=' + mensagem, '_blank')
+  }
+
+  const cargos = ['Professor', 'Treinador', 'Auxiliar Técnico', 'Preparador Físico', 'Goleiro Treinador', 'Coordenador']
 
   if (loading) {
     return (
@@ -95,17 +116,20 @@ export default function ComissaoTecnica() {
     <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <a href="/dashboard" className="text-gray-400">Voltar</a>
-          <h1 className="text-xl font-bold">Comissao Tecnica</h1>
+          <a href="/dashboard" className="text-gray-400">← Voltar</a>
+          <h1 className="text-xl font-bold">👨‍💼 Comissão Técnica</h1>
         </div>
-        <button onClick={() => setShowForm(!showForm)} className="bg-green-600 text-white px-4 py-2 rounded-xl font-bold text-sm">
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="bg-green-600 text-white px-4 py-2 rounded-xl font-bold text-sm"
+        >
           {showForm ? 'Fechar' : '+ Adicionar'}
         </button>
       </div>
 
       {sucesso && (
         <div className="bg-green-600 rounded-xl p-3 mb-4 text-center">
-          <p className="text-white font-bold">Membro adicionado!</p>
+          <p className="text-white font-bold">✅ Membro adicionado!</p>
         </div>
       )}
 
@@ -114,11 +138,11 @@ export default function ComissaoTecnica() {
           <p className="text-green-500 font-bold text-sm mb-4">Novo Membro</p>
           <div className="space-y-3">
             <div>
-              <label className="text-sm text-gray-400">Nome completo</label>
+              <label className="text-sm text-gray-400">Nome completo *</label>
               <input name="nome" value={form.nome} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="Nome do professor" />
             </div>
             <div>
-              <label className="text-sm text-gray-400">E-mail</label>
+              <label className="text-sm text-gray-400">E-mail *</label>
               <input name="email" value={form.email} onChange={handleChange} type="email" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="email@professor.com" />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -146,47 +170,65 @@ export default function ComissaoTecnica() {
 
       {professores.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-4xl mb-3">X</p>
+          <p className="text-4xl mb-3">👨‍💼</p>
           <p className="text-gray-400">Nenhum membro cadastrado ainda.</p>
         </div>
       ) : (
         <div className="space-y-3">
           {professores.map(p => (
             <div key={p.id} className="bg-gray-900 rounded-xl p-4 border border-gray-800">
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-green-600/20 rounded-full flex items-center justify-center text-xl">X</div>
+                  <div className="w-12 h-12 bg-green-600/20 rounded-full flex items-center justify-center text-xl">👤</div>
                   <div>
                     <p className="font-bold text-white">{p.nome}</p>
                     <p className="text-green-500 text-sm">{p.cargo}</p>
                     <p className="text-gray-400 text-xs">{p.email}</p>
+                    {p.whatsapp && <p className="text-gray-400 text-xs">📱 {p.whatsapp}</p>}
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 items-end">
-                  <span className={p.ativo ? 'text-xs text-green-400' : 'text-xs text-red-400'}>
+                  <span className={'text-xs px-2 py-1 rounded-full font-bold ' + (p.ativo ? 'bg-green-600/20 text-green-400' : 'bg-red-600/20 text-red-400')}>
                     {p.ativo ? 'Ativo' : 'Inativo'}
                   </span>
-                  <div className="flex gap-2">
-                    <button onClick={() => toggleAtivo(p.id, p.ativo)} className="text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded-lg">
-                      {p.ativo ? 'Bloquear' : 'Ativar'}
-                    </button>
-                    <button onClick={() => excluir(p.id)} className="text-xs bg-red-600/20 text-red-400 px-2 py-1 rounded-lg">
-                      Excluir
-                    </button>
-                  </div>
+                  <span className={'text-xs px-2 py-1 rounded-full ' + (p.contaCriada ? 'bg-blue-600/20 text-blue-400' : 'bg-gray-700 text-gray-400')}>
+                    {p.contaCriada ? '✅ Conta criada' : '⏳ Aguardando'}
+                  </span>
                 </div>
               </div>
-              <div className="mt-3 pt-3 border-t border-gray-800 flex gap-3">
-                {p.whatsapp && (
-                  <a href={"https://wa.me/" + p.whatsapp} target="_blank" rel="noreferrer" className="flex-1 bg-green-600/20 text-green-400 text-center py-2 rounded-lg text-sm font-bold">
-                    WhatsApp
-                  </a>
-                )}
-                {p.telefone && (
-                  <a href={"tel:" + p.telefone} className="flex-1 bg-gray-800 text-gray-300 text-center py-2 rounded-lg text-sm font-bold">
-                    Ligar
-                  </a>
-                )}
+
+              {!p.contaCriada && p.tokenConvite && (
+                <div className="bg-yellow-600/10 border border-yellow-600/30 rounded-xl p-3 mb-3">
+                  <p className="text-yellow-400 text-xs font-bold mb-2">🔗 Link de Convite</p>
+                  <p className="text-gray-400 text-xs break-all mb-2">
+                    {'campo-pro.vercel.app/convite/' + p.tokenConvite.slice(0, 16) + '...'}
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => copiarLink(p.tokenConvite, p.whatsapp, p.nome)}
+                      className="flex-1 bg-gray-800 text-gray-300 py-1 rounded-lg text-xs font-bold"
+                    >
+                      {copiado === p.tokenConvite ? '✅ Copiado!' : '📋 Copiar'}
+                    </button>
+                    {p.whatsapp && (
+                      <button
+                        onClick={() => enviarWhatsApp(p.tokenConvite, p.whatsapp, p.nome)}
+                        className="flex-1 bg-green-600/20 text-green-400 py-1 rounded-lg text-xs font-bold"
+                      >
+                        📲 WhatsApp
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <button onClick={() => toggleAtivo(p.id, p.ativo)} className="flex-1 text-xs bg-gray-800 text-gray-300 px-2 py-2 rounded-lg">
+                  {p.ativo ? '🔒 Bloquear' : '🔓 Ativar'}
+                </button>
+                <button onClick={() => excluir(p.id)} className="text-xs bg-red-600/20 text-red-400 px-3 py-2 rounded-lg">
+                  🗑️
+                </button>
               </div>
             </div>
           ))}
@@ -194,10 +236,10 @@ export default function ComissaoTecnica() {
       )}
 
       <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
-        <a href="/dashboard" className="text-gray-400 text-xs text-center">inicio</a>
-        <a href="/atletas" className="text-gray-400 text-xs text-center">Atletas</a>
-        <a href="/presenca" className="text-gray-400 text-xs text-center">Presenca</a>
-        <a href="/financeiro" className="text-gray-400 text-xs text-center">Financeiro</a>
+        <a href="/dashboard" className="text-gray-400 text-xs text-center">🏠<br />Início</a>
+        <a href="/atletas" className="text-gray-400 text-xs text-center">👥<br />Atletas</a>
+        <a href="/presenca" className="text-gray-400 text-xs text-center">✅<br />Presença</a>
+        <a href="/financeiro" className="text-gray-400 text-xs text-center">💰<br />Financeiro</a>
       </nav>
     </div>
   )
