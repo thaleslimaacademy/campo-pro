@@ -38,21 +38,18 @@ export default function Rematriculas() {
   useEffect(() => { carregar() }, [])
 
   async function aprovar(id: string, atletaId: string) {
-    if (!confirm('Confirmar rematrícula deste atleta?')) return
+    if (!confirm('Confirmar rematricula deste atleta?')) return
     setProcessando(id)
-
     await supabase.from('Matricula').update({ status: 'APROVADO' }).eq('id', id)
-
     if (atletaId) {
       await supabase.from('Atleta').update({ ativo: true }).eq('id', atletaId)
     }
-
     carregar()
     setProcessando(null)
   }
 
   async function rejeitar(id: string) {
-    if (!confirm('Rejeitar esta rematrícula?')) return
+    if (!confirm('Rejeitar esta rematricula?')) return
     setProcessando(id)
     await supabase.from('Matricula').update({ status: 'REJEITADO' }).eq('id', id)
     carregar()
@@ -74,8 +71,8 @@ export default function Rematriculas() {
     <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <a href="/dashboard" className="text-gray-400">← Voltar</a>
-          <h1 className="text-xl font-bold">🔄 Rematrículas</h1>
+          <a href="/dashboard" className="text-gray-400">Voltar</a>
+          <h1 className="text-xl font-bold">Rematriculas</h1>
         </div>
         {pendentes > 0 && (
           <span className="bg-yellow-500 text-black text-sm font-bold w-8 h-8 rounded-full flex items-center justify-center">
@@ -101,9 +98,9 @@ export default function Rematriculas() {
         <div className="text-center py-16">
           <p className="text-4xl mb-3">🔄</p>
           <p className="text-gray-400">
-            {filtro === 'PENDENTE' ? 'Nenhuma rematrícula pendente.' :
-             filtro === 'APROVADO' ? 'Nenhuma rematrícula aprovada.' :
-             'Nenhuma rematrícula rejeitada.'}
+            {filtro === 'PENDENTE' ? 'Nenhuma rematricula pendente.' :
+             filtro === 'APROVADO' ? 'Nenhuma rematricula aprovada.' :
+             'Nenhuma rematricula rejeitada.'}
           </p>
         </div>
       ) : (
@@ -135,7 +132,7 @@ export default function Rematriculas() {
               </div>
 
               <div className="bg-gray-800 rounded-xl p-3 mb-3">
-                <p className="text-gray-400 text-xs font-bold mb-1">Responsável</p>
+                <p className="text-gray-400 text-xs font-bold mb-1">Responsavel</p>
                 <p className="text-white text-sm font-bold">{r.nomeResponsavel}</p>
                 {r.cpfResponsavel && <p className="text-gray-400 text-xs">CPF: {r.cpfResponsavel}</p>}
                 {r.whatsappResponsavel && <p className="text-gray-400 text-xs">WhatsApp: {r.whatsappResponsavel}</p>}
@@ -143,7 +140,7 @@ export default function Rematriculas() {
               </div>
 
               <p className="text-gray-500 text-xs mb-3">
-                Enviado em: {new Date(r.criadoEm).toLocaleDateString('pt-BR')} às {new Date(r.criadoEm).toLocaleTimeString('pt-BR')}
+                {"Enviado em: " + new Date(r.criadoEm).toLocaleDateString('pt-BR') + " as " + new Date(r.criadoEm).toLocaleTimeString('pt-BR')}
               </p>
 
               {r.status === 'PENDENTE' && (
@@ -153,23 +150,23 @@ export default function Rematriculas() {
                     disabled={processando === r.id}
                     className="flex-1 bg-green-600 hover:bg-green-500 text-white py-2 rounded-xl font-bold text-sm disabled:opacity-50"
                   >
-                    {processando === r.id ? 'Processando...' : '✅ Aprovar'}
+                    {processando === r.id ? 'Processando...' : 'Aprovar'}
                   </button>
                   <button
                     onClick={() => rejeitar(r.id)}
                     disabled={processando === r.id}
                     className="flex-1 bg-red-600/20 hover:bg-red-600/30 text-red-400 py-2 rounded-xl font-bold text-sm disabled:opacity-50"
                   >
-                    ❌ Rejeitar
+                    Rejeitar
                   </button>
                   {r.whatsappResponsavel && (
                     
-                      href={"https://wa.me/" + r.whatsappResponsavel.replace(/\D/g, '')}
+                      href={"https://wa.me/" + r.whatsappResponsavel.replace(/[^0-9]/g, "")}
                       target="_blank"
                       rel="noreferrer"
                       className="bg-gray-800 text-gray-300 px-3 py-2 rounded-xl text-sm"
                     >
-                      💬
+                      WhatsApp
                     </a>
                   )}
                 </div>
@@ -189,9 +186,9 @@ export default function Rematriculas() {
       )}
 
       <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
-        <a href="/dashboard" className="text-gray-400 text-xs text-center">🏠<br />Início</a>
+        <a href="/dashboard" className="text-gray-400 text-xs text-center">🏠<br />Inicio</a>
         <a href="/atletas" className="text-gray-400 text-xs text-center">👥<br />Atletas</a>
-        <a href="/presenca" className="text-gray-400 text-xs text-center">✅<br />Presença</a>
+        <a href="/presenca" className="text-gray-400 text-xs text-center">✅<br />Presenca</a>
         <a href="/financeiro" className="text-gray-400 text-xs text-center">💰<br />Financeiro</a>
       </nav>
     </div>
