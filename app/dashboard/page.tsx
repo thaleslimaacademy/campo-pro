@@ -261,6 +261,9 @@ export default function Dashboard() {
           <a href="/rematriculas" className="col-span-2 bg-orange-700 hover:bg-orange-800 text-white p-3 rounded-lg text-center text-sm font-medium transition">
             🔄 Rematrículas {rematriculas > 0 ? '(' + rematriculas + ' pendentes)' : ''}
           </a>
+          <a href="/alteracao-massa" className="col-span-2 bg-teal-700 hover:bg-teal-800 text-white p-3 rounded-lg text-center text-sm font-medium transition">
+            ✏️ Alteração em Massa
+          </a>
           <a href="/configuracoes" className="col-span-2 bg-gray-800 hover:bg-gray-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
             ⚙️ Configurações da Escola
           </a>
