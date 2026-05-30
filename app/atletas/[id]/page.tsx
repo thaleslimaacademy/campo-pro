@@ -102,11 +102,14 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
           <h1 className="text-xl font-bold">Perfil do Atleta</h1>
         </div>
         <div className="flex gap-2">
+          <a href={'/atletas/' + atleta.id + '/carteirinha'} className="bg-green-700 hover:bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition">
+            🪪
+          </a>
           <a href={'/atletas/' + atleta.id + '/avaliacao'} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition">
-            📋 Avaliar
+            📋
           </a>
           <a href={'/atletas/' + atleta.id + '/editar'} className="bg-gray-800 hover:bg-gray-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition">
-            ✏️ Editar
+            ✏️
           </a>
         </div>
       </div>
