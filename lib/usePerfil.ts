@@ -34,7 +34,8 @@ export function usePerfil() {
         .eq('clerkUserId', user.id)
         .single()
 
-      if (data) setPerfil(data)
+      console.log('PERFIL ENCONTRADO:', data, 'ERRO:', error, 'USER ID:', user.id)
+if (data) setPerfil(data)
       setLoading(false)
       setCarregou(true)
     }
