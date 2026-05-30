@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
-import { useUser, SignIn } from '@clerk/nextjs'
+import { useParams, useRouter } from 'next/navigation'
+import { useUser } from '@clerk/nextjs'
 import { supabase } from '@/lib/supabase'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
@@ -18,6 +18,7 @@ interface Professor {
 
 export default function Convite() {
   const params = useParams()
+  const router = useRouter()
   const token = params.token as string
   const { user, isLoaded } = useUser()
 
@@ -70,10 +71,7 @@ export default function Convite() {
 
     setSucesso(true)
     setProcessando(false)
-
-    setTimeout(() => {
-      window.location.href = '/dashboard'
-    }, 2000)
+    setTimeout(() => { router.push('/dashboard') }, 2000)
   }
 
   if (loading || !isLoaded) {
@@ -89,7 +87,7 @@ export default function Convite() {
       <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center p-6 text-center">
         <p className="text-5xl mb-4">❌</p>
         <h2 className="text-xl font-bold mb-2">Link inválido</h2>
-        <p className="text-gray-400">Este link de convite não existe ou já foi utilizado.</p>
+        <p className="text-gray-400">Este link não existe ou já foi utilizado.</p>
       </div>
     )
   }
@@ -117,6 +115,8 @@ export default function Convite() {
     )
   }
 
+  const loginUrl = '/login?redirect_url=' + encodeURIComponent('/convite/' + token)
+
   return (
     <div className="min-h-screen bg-gray-950 text-white p-6 flex flex-col items-center justify-center">
       <div className="w-full max-w-sm">
@@ -139,14 +139,16 @@ export default function Convite() {
         )}
 
         {!user ? (
-          <div>
-            <p className="text-gray-400 text-sm text-center mb-4">
-              Faça login ou crie sua conta para ativar o convite
+          <div className="space-y-3">
+            <p className="text-gray-400 text-sm text-center">
+              Para ativar seu convite, faça login ou crie sua conta
             </p>
-            <SignIn
-              routing="hash"
-              forceRedirectUrl={'/convite/' + token}
-            />
+            
+              href={loginUrl}
+              className="w-full bg-green-600 hover:bg-green-500 text-white py-4 rounded-xl font-bold text-lg text-center block"
+            >
+              Fazer login / Criar conta
+            </a>
           </div>
         ) : (
           <div className="text-center">
