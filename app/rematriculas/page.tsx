@@ -159,7 +159,8 @@ export default function Rematriculas() {
                   >
                     Rejeitar
                   </button>
-                  {r.whatsappResponsavel && (
+                  {r.whatsappResponsavel                   {r.whatsappResponsavel && (                  {r.whatsappResponsavel && ( (
+                    <a
                     
                       href={"https://wa.me/" + r.whatsappResponsavel.replace(/[^0-9]/g, "")}
                       target="_blank"
