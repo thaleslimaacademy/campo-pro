@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useUser } from '@clerk/nextjs'
 import { supabase } from '@/lib/supabase'
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { ativarContaProfessor } from './actions'
 
 interface Professor {
   id: string
@@ -45,30 +45,18 @@ export default function Convite() {
     if (!user || !professor) return
     setProcessando(true)
     setErro('')
-
-    const { error: perfilError } = await supabaseAdmin
-      .from('PerfilUsuario')
-      .upsert({
-        clerkUserId: user.id,
-        escolaId: professor.escolaId,
-        nome: professor.nome,
-        email: professor.email,
-        perfil: 'professor',
-        professorId: professor.id,
-        ativo: true,
-      }, { onConflict: 'clerkUserId' })
-
-    if (perfilError) {
-      setErro('Erro ao ativar conta: ' + perfilError.message)
+    const result = await ativarContaProfessor(
+      user.id,
+      professor.id,
+      professor.escolaId,
+      professor.nome,
+      professor.email
+    )
+    if (!result.ok) {
+      setErro('Erro: ' + result.message)
       setProcessando(false)
       return
     }
-
-    await supabaseAdmin
-      .from('Professor')
-      .update({ contaCriada: true, clerkUserId: user.id })
-      .eq('id', professor.id)
-
     setSucesso(true)
     setProcessando(false)
     setTimeout(() => { router.push('/dashboard') }, 2000)
@@ -85,9 +73,9 @@ export default function Convite() {
   if (!professor) {
     return (
       <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center p-6 text-center">
-        <p className="text-5xl mb-4">❌</p>
-        <h2 className="text-xl font-bold mb-2">Link inválido</h2>
-        <p className="text-gray-400">Este link não existe ou já foi utilizado.</p>
+        <p className="text-5xl mb-4">X</p>
+        <h2 className="text-xl font-bold mb-2">Link invalido</h2>
+        <p className="text-gray-400">Este link nao existe ou ja foi utilizado.</p>
       </div>
     )
   }
@@ -95,9 +83,9 @@ export default function Convite() {
   if (professor.contaCriada) {
     return (
       <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center p-6 text-center">
-        <p className="text-5xl mb-4">✅</p>
-        <h2 className="text-xl font-bold mb-2">Conta já ativada</h2>
-        <p className="text-gray-400 mb-4">Este convite já foi utilizado.</p>
+        <p className="text-5xl mb-4">OK</p>
+        <h2 className="text-xl font-bold mb-2">Conta ja ativada</h2>
+        <p className="text-gray-400 mb-4">Este convite ja foi utilizado.</p>
         <a href="/dashboard" className="bg-green-600 text-white px-6 py-3 rounded-xl font-bold">
           Acessar o app
         </a>
@@ -108,9 +96,9 @@ export default function Convite() {
   if (sucesso) {
     return (
       <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center p-6 text-center">
-        <p className="text-5xl mb-4">🎉</p>
+        <p className="text-5xl mb-4">!</p>
         <h2 className="text-xl font-bold mb-2">Conta ativada!</h2>
-        <p className="text-gray-400">Redirecionando para o app...</p>
+        <p className="text-gray-400">Redirecionando...</p>
       </div>
     )
   }
@@ -121,33 +109,30 @@ export default function Convite() {
     <div className="min-h-screen bg-gray-950 text-white p-6 flex flex-col items-center justify-center">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <p className="text-4xl mb-3">⚽</p>
+          <p className="text-4xl mb-3">Futebol</p>
           <h1 className="text-xl font-bold text-green-500">Thales Lima Football Academy</h1>
-          <p className="text-gray-400 text-sm mt-1">Convite para Comissão Técnica</p>
+          <p className="text-gray-400 text-sm mt-1">Convite para Comissao Tecnica</p>
         </div>
-
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-6">
-          <p className="text-gray-400 text-sm mb-1">Você foi convidado como</p>
+          <p className="text-gray-400 text-sm mb-1">Voce foi convidado como</p>
           <p className="text-white font-bold text-lg">{professor.nome}</p>
           <p className="text-green-500 text-sm">{professor.cargo}</p>
         </div>
-
         {erro && (
           <div className="bg-red-600/20 border border-red-600/40 rounded-xl p-3 mb-4">
             <p className="text-red-400 text-sm">{erro}</p>
           </div>
         )}
-
         {!user ? (
           <div className="space-y-3">
             <p className="text-gray-400 text-sm text-center">
-              Para ativar seu convite, faça login ou crie sua conta
+              Para ativar seu convite, faca login ou crie sua conta
             </p>
-            <a
+            
               href={loginUrl}
-              className="w-full bg-green-600 hover:bg-green-500 text-white py-4 rounded-xl font-bold text-lg text-center block"
+              className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg text-center block"
             >
-              Fazer login / Criar conta
+              Fazer login
             </a>
           </div>
         ) : (
@@ -157,9 +142,9 @@ export default function Convite() {
             <button
               onClick={ativarConta}
               disabled={processando}
-              className="w-full bg-green-600 hover:bg-green-500 text-white py-4 rounded-xl font-bold text-lg disabled:opacity-50"
+              className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg disabled:opacity-50"
             >
-              {processando ? 'Ativando...' : '✅ Ativar minha conta'}
+              {processando ? 'Ativando...' : 'Ativar minha conta'}
             </button>
           </div>
         )}
