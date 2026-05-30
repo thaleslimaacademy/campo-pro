@@ -7,6 +7,7 @@ export default function Dashboard() {
   const [totalAtletas, setTotalAtletas] = useState(0)
   const [presencaHoje, setPresencaHoje] = useState({ presentes: 0, total: 0 })
   const [pendentes, setPendentes] = useState(0)
+  const [rematriculas, setRematriculas] = useState(0)
   const [loading, setLoading] = useState(true)
   const [receitaMes, setReceitaMes] = useState(0)
   const [inadimplentes, setInadimplentes] = useState(0)
@@ -48,7 +49,16 @@ export default function Dashboard() {
         .select('*', { count: 'exact', head: true })
         .eq('escolaId', 'escola-demo')
         .eq('status', 'PENDENTE')
+        .eq('tipo', 'matricula')
       setPendentes(countPendentes || 0)
+
+      const { count: countRematriculas } = await supabase
+        .from('Matricula')
+        .select('*', { count: 'exact', head: true })
+        .eq('escolaId', 'escola-demo')
+        .eq('status', 'PENDENTE')
+        .eq('tipo', 'rematricula')
+      setRematriculas(countRematriculas || 0)
 
       const agora = new Date()
       const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString().split('T')[0]
@@ -86,11 +96,11 @@ export default function Dashboard() {
     const whatsapp = prompt('Digite o WhatsApp do responsável (com DDD):')
     if (!whatsapp) return
     const numero = whatsapp.replace(/\D/g, '')
-    const numeroFormatado = numero.startsWith('55') ? numero : `55${numero}`
+    const numeroFormatado = numero.startsWith('55') ? numero : '55' + numero
     const mensagem = encodeURIComponent(
-      `Olá! 👋\n\nAcesse o link abaixo para fazer a pré-matrícula do seu filho(a) na *Thales Lima Football Academy*:\n\n${linkMatricula}\n\n_Preencha a ficha e assine o contrato digital. Nossa equipe analisará e confirmará em breve!_ ⚽`
+      'Olá! 👋\n\nAcesse o link abaixo para fazer a pré-matrícula do seu filho(a) na *Thales Lima Football Academy*:\n\n' + linkMatricula + '\n\n_Preencha a ficha e assine o contrato digital. Nossa equipe analisará e confirmará em breve!_ ⚽'
     )
-    window.open(`https://wa.me/${numeroFormatado}?text=${mensagem}`, '_blank')
+    window.open('https://wa.me/' + numeroFormatado + '?text=' + mensagem, '_blank')
   }
 
   const percentualPresenca = presencaHoje.total > 0
@@ -106,7 +116,6 @@ export default function Dashboard() {
         {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
       </p>
 
-      {/* Cards principais */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
           <p className="text-gray-400 text-sm">Alunos Ativos</p>
@@ -114,14 +123,14 @@ export default function Dashboard() {
         </div>
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
           <p className="text-gray-400 text-sm">Inadimplentes</p>
-          <p className={`text-3xl font-bold ${inadimplentes > 0 ? 'text-red-400' : 'text-green-400'}`}>
+          <p className={'text-3xl font-bold ' + (inadimplentes > 0 ? 'text-red-400' : 'text-green-400')}>
             {loading ? '...' : inadimplentes}
           </p>
         </div>
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
           <p className="text-gray-400 text-sm">Presença Hoje</p>
-          <p className={`text-3xl font-bold ${percentualPresenca >= 75 ? 'text-green-400' : percentualPresenca > 0 ? 'text-yellow-400' : 'text-gray-400'}`}>
-            {loading ? '...' : presencaHoje.total === 0 ? 'Sem treino' : `${percentualPresenca}%`}
+          <p className={'text-3xl font-bold ' + (percentualPresenca >= 75 ? 'text-green-400' : percentualPresenca > 0 ? 'text-yellow-400' : 'text-gray-400')}>
+            {loading ? '...' : presencaHoje.total === 0 ? 'Sem treino' : percentualPresenca + '%'}
           </p>
           {presencaHoje.total > 0 && (
             <p className="text-gray-500 text-xs mt-1">{presencaHoje.presentes} de {presencaHoje.total}</p>
@@ -130,12 +139,11 @@ export default function Dashboard() {
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
           <p className="text-gray-400 text-sm">Receita do Mês</p>
           <p className="text-2xl font-bold text-green-400">
-            {loading ? '...' : `R$ ${receitaMes.toFixed(0)}`}
+            {loading ? '...' : 'R$ ' + receitaMes.toFixed(0)}
           </p>
         </div>
       </div>
 
-      {/* Relatório financeiro */}
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
         <div className="flex justify-between items-center mb-4">
           <p className="font-bold text-sm">💰 Financeiro — {mesAtual}</p>
@@ -161,13 +169,13 @@ export default function Dashboard() {
               <div className="w-full bg-gray-700 rounded-full h-2">
                 <div
                   className="bg-green-500 h-2 rounded-full transition-all"
-                  style={{ width: `${Math.round((receitaMes / (receitaMes + totalPendente)) * 100)}%` }}
+                  style={{ width: Math.round((receitaMes / (receitaMes + totalPendente)) * 100) + '%' }}
                 />
               </div>
               <div className="flex justify-between mt-1">
                 <p className="text-xs text-gray-500">{cobrancasMes} cobranças no mês</p>
                 <p className="text-xs text-gray-500">
-                  {`${Math.round((receitaMes / (receitaMes + totalPendente)) * 100)}% recebido`}
+                  {Math.round((receitaMes / (receitaMes + totalPendente)) * 100)}% recebido
                 </p>
               </div>
             </div>
@@ -178,7 +186,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Card pré-matrículas pendentes */}
       {pendentes > 0 && (
         <a href="/matriculas" className="block bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-4">
           <div className="flex items-center justify-between">
@@ -195,7 +202,22 @@ export default function Dashboard() {
         </a>
       )}
 
-      {/* Link de pré-matrícula */}
+      {rematriculas > 0 && (
+        <a href="/rematriculas" className="block bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 mb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-orange-400 font-bold">🔄 Rematrículas pendentes</p>
+              <p className="text-gray-400 text-sm mt-1">
+                {rematriculas} {rematriculas === 1 ? 'renovação aguarda' : 'renovações aguardam'} sua aprovação
+              </p>
+            </div>
+            <span className="bg-orange-500 text-black text-lg font-bold w-10 h-10 rounded-full flex items-center justify-center">
+              {rematriculas}
+            </span>
+          </div>
+        </a>
+      )}
+
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
         <p className="text-gray-400 text-sm mb-1">📲 Link de Pré-matrícula</p>
         <p className="text-xs text-gray-500 break-all mb-3">{linkMatricula}</p>
@@ -209,7 +231,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Ações rápidas */}
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
         <p className="text-gray-400 text-sm mb-3">Ações rápidas</p>
         <div className="grid grid-cols-2 gap-3">
@@ -235,7 +256,10 @@ export default function Dashboard() {
             🏆 Campeonatos
           </a>
           <a href="/matriculas" className="col-span-2 bg-gray-800 hover:bg-gray-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
-            📋 Pré-matrículas {pendentes > 0 ? `(${pendentes} pendentes)` : ''}
+            📋 Pré-matrículas {pendentes > 0 ? '(' + pendentes + ' pendentes)' : ''}
+          </a>
+          <a href="/rematriculas" className="col-span-2 bg-orange-700 hover:bg-orange-800 text-white p-3 rounded-lg text-center text-sm font-medium transition">
+            🔄 Rematrículas {rematriculas > 0 ? '(' + rematriculas + ' pendentes)' : ''}
           </a>
           <a href="/configuracoes" className="col-span-2 bg-gray-800 hover:bg-gray-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
             ⚙️ Configurações da Escola
