@@ -145,8 +145,7 @@ export default function Convite() {
             </p>
             <SignIn
               routing="hash"
-              afterSignInUrl={'/convite/' + token}
-              afterSignUpUrl={'/convite/' + token}
+              forceRedirectUrl={'/convite/' + token}
             />
           </div>
         ) : (
