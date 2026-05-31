@@ -10,7 +10,7 @@ export async function GET() {
     .from('PerfilUsuario')
     .select('*')
     .eq('clerkUserId', userId)
-    .single()
+    .maybeSingle()
 
   return NextResponse.json({ perfil: data })
 }
