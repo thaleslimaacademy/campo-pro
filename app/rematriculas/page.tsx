@@ -1,4 +1,5 @@
 'use client'
+import AdminGuard from '@/components/AdminGuard'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -19,7 +20,7 @@ interface Rematricula {
   posicao: string
 }
 
-export default function Rematriculas() {
+function RematriculasInner() {
   const [rematriculas, setRematriculas] = useState<Rematricula[]>([])
   const [loading, setLoading] = useState(true)
   const [filtro, setFiltro] = useState<'PENDENTE' | 'APROVADO' | 'REJEITADO'>('PENDENTE')
@@ -193,5 +194,13 @@ export default function Rematriculas() {
         <a href="/financeiro" className="text-gray-400 text-xs text-center">Financeiro</a>
       </nav>
     </div>
+  )
+}
+
+export default function Rematriculas(props: any) {
+  return (
+    <AdminGuard>
+      <RematriculasInner {...props} />
+    </AdminGuard>
   )
 }

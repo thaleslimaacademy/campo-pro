@@ -1,4 +1,5 @@
 'use client'
+import AdminGuard from '@/components/AdminGuard'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -26,7 +27,7 @@ type Matricula = {
   criadoEm: string
 }
 
-export default function Matriculas() {
+function MatriculasInner() {
   const [matriculas, setMatriculas] = useState<Matricula[]>([])
   const [loading, setLoading] = useState(true)
   const [selecionada, setSelecionada] = useState<Matricula | null>(null)
@@ -388,5 +389,12 @@ export default function Matriculas() {
         <a href="/financeiro" className="text-gray-400 text-xs text-center">💰<br/>Financeiro</a>
       </nav>
     </div>
+  )
+}
+export default function Matriculas(props: any) {
+  return (
+    <AdminGuard>
+      <MatriculasInner {...props} />
+    </AdminGuard>
   )
 }

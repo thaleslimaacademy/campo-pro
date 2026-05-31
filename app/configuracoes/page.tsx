@@ -1,10 +1,11 @@
 'use client'
+import AdminGuard from '@/components/AdminGuard'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { salvarConfiguracoes } from './actions'
 
-export default function Configuracoes() {
+function ConfiguracoesInner() {
   const [loading, setLoading] = useState(true)
   const [salvando, setSalvando] = useState(false)
   const [sucesso, setSucesso] = useState(false)
@@ -221,5 +222,12 @@ export default function Configuracoes() {
         <a href="/financeiro" className="text-gray-400 text-xs text-center">💰<br />Financeiro</a>
       </nav>
     </div>
+  )
+}
+export default function Configuracoes(props: any) {
+  return (
+    <AdminGuard>
+      <ConfiguracoesInner {...props} />
+    </AdminGuard>
   )
 }

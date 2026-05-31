@@ -1,4 +1,5 @@
 'use client'
+import AdminGuard from '@/components/AdminGuard'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -26,7 +27,7 @@ type Inadimplente = {
   totalDevido: number
 }
 
-export default function Financeiro() {
+function FinanceiroInner() {
   const [atletas, setAtletas] = useState<Atleta[]>([])
   const [cobrancas, setCobrancas] = useState<Cobranca[]>([])
   const [inadimplentes, setInadimplentes] = useState<Inadimplente[]>([])
@@ -455,5 +456,12 @@ export default function Financeiro() {
         <a href="/financeiro" className="text-green-500 text-xs text-center">💰<br/>Financeiro</a>
       </nav>
     </div>
+  )
+}
+export default function Financeiro(props: any) {
+  return (
+    <AdminGuard>
+      <FinanceiroInner {...props} />
+    </AdminGuard>
   )
 }

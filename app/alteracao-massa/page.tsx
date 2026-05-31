@@ -1,4 +1,5 @@
 'use client'
+import AdminGuard from '@/components/AdminGuard'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -18,7 +19,7 @@ interface Turma {
   nome: string
 }
 
-export default function AlteracaoMassa() {
+function AlteracaoMassaInner() {
   const [atletas, setAtletas] = useState<Atleta[]>([])
   const [turmas, setTurmas] = useState<Turma[]>([])
   const [loading, setLoading] = useState(true)
@@ -314,5 +315,12 @@ export default function AlteracaoMassa() {
         <a href="/financeiro" className="text-gray-400 text-xs text-center">Financeiro</a>
       </nav>
     </div>
+  )
+}
+export default function AlteracaoMassa(props: any) {
+  return (
+    <AdminGuard>
+      <AlteracaoMassaInner {...props} />
+    </AdminGuard>
   )
 }
