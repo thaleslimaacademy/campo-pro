@@ -2,7 +2,15 @@
   "crons": [
     {
       "path": "/api/lembretes",
-      "schedule": "0 9 * * *"
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/inadimplentes",
+      "schedule": "0 8 5 * *"
+    },
+    {
+      "path": "/api/aniversariantes",
+      "schedule": "0 8 * * *"
     }
   ]
 }
