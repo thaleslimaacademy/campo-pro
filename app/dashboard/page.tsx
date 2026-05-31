@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { usePerfil } from '@/lib/usePerfil'
 
 export default function Dashboard() {
+  const { isAdmin, isProfessor, carregou, loading: loadingPerfil } = usePerfil()
   const [totalAtletas, setTotalAtletas] = useState(0)
   const [presencaHoje, setPresencaHoje] = useState({ presentes: 0, total: 0 })
   const [pendentes, setPendentes] = useState(0)
