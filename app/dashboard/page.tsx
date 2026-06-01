@@ -6,6 +6,8 @@ import { usePerfil } from '@/lib/usePerfil'
 
 export default function Dashboard() {
   const { isAdmin, isLoaded, escolaId} = usePerfil()
+  if (!isLoaded) return <div className="min-h-screen bg-gray-950 flex items-center justify-center"><p className="text-gray-400">Carregando...</p></div>
+  if (!escolaId) return <div className="min-h-screen bg-gray-950 flex items-center justify-center"><p className="text-gray-400">Configurando sessão...</p></div>
   const [totalAtletas, setTotalAtletas] = useState(0)
   const [presencaHoje, setPresencaHoje] = useState({ presentes: 0, total: 0 })
   const [pendentes, setPendentes] = useState(0)
