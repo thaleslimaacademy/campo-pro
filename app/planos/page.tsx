@@ -190,7 +190,7 @@ export default function Planos() {
           Duvidas? Fale conosco pelo WhatsApp
         </p>
         <div className="flex justify-center mb-8">
-          
+          <a
             href="https://wa.me/5534998168467"
             target="_blank"
             rel="noreferrer"
