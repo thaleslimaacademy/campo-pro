@@ -1,88 +1,75 @@
-import { getEscolaId } from '@/lib/auth/getEscolaId'
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { enviarWhatsApp } from '@/lib/whatsapp'
 
 export async function GET(req: NextRequest) {
   try {
     const authHeader = req.headers.get('authorization')
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+      return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 })
     }
 
     const hoje = new Date()
     const em3dias = new Date()
     em3dias.setDate(hoje.getDate() + 3)
-
     const dataHoje = hoje.toISOString().split('T')[0]
     const data3dias = em3dias.toISOString().split('T')[0]
 
-    // Busca cobranças que vencem hoje E em 3 dias
-    const { data: cobrancas } = await supabase
-      .from('Cobranca')
-      .select('id, valor, vencimento, descricao, atletaId')
-      .eq('escolaId', await getEscolaId())
-      .eq('status', 'PENDENTE')
-      .in('vencimento', [dataHoje, data3dias])
+    const { data: escolas } = await supabaseAdmin.from('Escola').select('id, nome').eq('ativa', true)
+    if (!escolas) return NextResponse.json({ sucesso: true, enviados: 0 })
 
-    if (!cobrancas || cobrancas.length === 0) {
-      return NextResponse.json({ sucesso: true, enviados: 0, mensagem: 'Nenhum lembrete para hoje' })
-    }
+    let totalEnviados = 0
+    let totalErros = 0
 
-    let enviados = 0
-    let erros = 0
+    for (const escola of escolas) {
+      const { data: cobrancas } = await supabaseAdmin
+        .from('Cobranca')
+        .select('id, valor, vencimento, descricao, atletaId')
+        .eq('escolaId', escola.id)
+        .eq('status', 'PENDENTE')
+        .in('vencimento', [dataHoje, data3dias])
 
-    for (const cobranca of cobrancas) {
-      try {
-        const { data: atleta } = await supabase
-          .from('Atleta')
-          .select('nome')
-          .eq('id', cobranca.atletaId)
-          .single()
+      if (!cobrancas || cobrancas.length === 0) continue
 
-        const { data: responsaveis } = await supabase
-          .from('Responsavel')
-          .select('nome, whatsapp')
-          .eq('atletaId', cobranca.atletaId)
-          .eq('principal', true)
-          .limit(1)
+      for (const cobranca of cobrancas) {
+        try {
+          const { data: atleta } = await supabaseAdmin
+            .from('Atleta').select('nome').eq('id', cobranca.atletaId).single()
 
-        const responsavel = responsaveis?.[0]
-        if (!responsavel?.whatsapp || !atleta) continue
+          const { data: responsaveis } = await supabaseAdmin
+            .from('Responsavel').select('nome, whatsapp')
+            .eq('atletaId', cobranca.atletaId).eq('principal', true).limit(1)
 
-        const dataVenc = new Date(cobranca.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
-        const nomeResp = responsavel.nome.split(' ')[0]
-        const venceHoje = cobranca.vencimento === dataHoje
+          const responsavel = responsaveis?.[0]
+          if (!responsavel?.whatsapp || !atleta) continue
 
-        const mensagem = venceHoje
-          ? `Olá ${nomeResp}! ⚠️\n\n` +
-            `A mensalidade de *${atleta.nome}* vence *HOJE*!\n\n` +
-            `💰 *Valor:* R$ ${Number(cobranca.valor).toFixed(2)}\n` +
-            `📅 *Vencimento:* ${dataVenc}\n` +
-            `📝 *${cobranca.descricao || 'Mensalidade'}*\n\n` +
-            `Pague hoje para evitar multa de 2% e juros de 1% ao mês! 🙏\n\n` +
-            `_Thales Lima Football Academy_ ⚽`
-          : `Olá ${nomeResp}! 📅\n\n` +
-            `Lembrete: a mensalidade de *${atleta.nome}* vence em *3 dias*.\n\n` +
-            `💰 *Valor:* R$ ${Number(cobranca.valor).toFixed(2)}\n` +
-            `📅 *Vencimento:* ${dataVenc}\n` +
-            `📝 *${cobranca.descricao || 'Mensalidade'}*\n\n` +
-            `Para evitar multa e juros, pague antes do vencimento! 🙏\n\n` +
-            `_Thales Lima Football Academy_ ⚽`
+          const dataVenc = new Date(cobranca.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
+          const nomeResp = responsavel.nome.split(' ')[0]
+          const venceHoje = cobranca.vencimento === dataHoje
 
-        await enviarWhatsApp(responsavel.whatsapp, mensagem)
-        enviados++
-        await new Promise(r => setTimeout(r, 500))
-      } catch {
-        erros++
+          const mensagem = venceHoje
+            ? 'Ola ' + nomeResp + '! Aviso da *' + escola.nome + '*\n\n' +
+              'A mensalidade de *' + atleta.nome + '* vence *HOJE*!\n\n' +
+              'Valor: R$ ' + Number(cobranca.valor).toFixed(2) + '\n' +
+              'Vencimento: ' + dataVenc + '\n\n' +
+              'Pague hoje para evitar multa! \n\n_' + escola.nome + '_ '
+            : 'Ola ' + nomeResp + '! Lembrete da *' + escola.nome + '*\n\n' +
+              'A mensalidade de *' + atleta.nome + '* vence em *3 dias*.\n\n' +
+              'Valor: R$ ' + Number(cobranca.valor).toFixed(2) + '\n' +
+              'Vencimento: ' + dataVenc + '\n\n' +
+              'Pague antes do vencimento para evitar multa!\n\n_' + escola.nome + '_ '
+
+          await enviarWhatsApp(responsavel.whatsapp, mensagem)
+          totalEnviados++
+          await new Promise(r => setTimeout(r, 500))
+        } catch {
+          totalErros++
+        }
       }
     }
 
-    console.log(`✅ Lembretes: ${enviados} enviados, ${erros} erros`)
-    return NextResponse.json({ sucesso: true, enviados, erros })
-
+    return NextResponse.json({ sucesso: true, enviados: totalEnviados, erros: totalErros })
   } catch (err: any) {
-    console.error('❌ Erro lembretes:', err.message)
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }

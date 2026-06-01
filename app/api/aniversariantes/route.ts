@@ -1,56 +1,57 @@
-import { getEscolaId } from '@/lib/auth/getEscolaId'
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { enviarWhatsApp } from '@/lib/whatsapp'
 
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('authorization')
-  if (authHeader !== "Bearer " + process.env.CRON_SECRET) {
+  if (authHeader !== 'Bearer ' + process.env.CRON_SECRET) {
     return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 })
   }
 
   const hoje = new Date()
-  const dia = String(hoje.getDate()).padStart(2, '0')
   const mes = String(hoje.getMonth() + 1).padStart(2, '0')
+  const dia = String(hoje.getDate()).padStart(2, '0')
 
-  const { data: atletas } = await supabaseAdmin
-    .from('Atleta')
-    .select('id, nome, dataNascimento, telefone')
-    .eq('escolaId', await getEscolaId())
-    .eq('ativo', true)
+  const { data: escolas } = await supabaseAdmin.from('Escola').select('id, nome').eq('ativa', true)
+  if (!escolas) return NextResponse.json({ sucesso: true, enviados: 0 })
 
-  if (!atletas) return NextResponse.json({ sucesso: true, enviados: 0 })
+  let totalEnviados = 0
 
-  const aniversariantes = atletas.filter(a => {
-    if (!a.dataNascimento) return false
-    const nasc = a.dataNascimento.slice(5, 10)
-    return nasc === mes + '-' + dia
-  })
+  for (const escola of escolas) {
+    const { data: atletas } = await supabaseAdmin
+      .from('Atleta')
+      .select('id, nome, dataNascimento')
+      .eq('escolaId', escola.id)
+      .eq('ativo', true)
 
-  let enviados = 0
-  for (const atleta of aniversariantes) {
-    const nascimento = new Date(atleta.dataNascimento + 'T12:00:00')
-    const idade = hoje.getFullYear() - nascimento.getFullYear()
+    if (!atletas) continue
 
-    const { data: responsaveis } = await supabaseAdmin
-      .from('Responsavel')
-      .select('whatsapp')
-      .eq('atletaId', atleta.id)
-      .limit(1)
+    const aniversariantes = atletas.filter(a => {
+      if (!a.dataNascimento) return false
+      const [, aMes, aDia] = a.dataNascimento.split('-')
+      return aMes === mes && aDia === dia
+    })
 
-    const whatsapp = responsaveis?.[0]?.whatsapp || atleta.telefone
-    if (!whatsapp) continue
+    for (const atleta of aniversariantes) {
+      const { data: responsaveis } = await supabaseAdmin
+        .from('Responsavel').select('nome, whatsapp').eq('atletaId', atleta.id).limit(1)
 
-    const mensagem = "Feliz Aniversario *" + atleta.nome + "*! " +
-      "Hoje voce completa *" + idade + " anos*!\n\n" +
-      "A equipe da *Thales Lima Football Academy* deseja um dia incrivel cheio de alegria e muitos gols!\n\n" +
-      "Que esse novo ano seja repleto de evolucao dentro e fora do campo!\n\n" +
-      "Com carinho, _Thales Lima e toda a equipe da Academy_"
+      const responsavel = responsaveis?.[0]
+      if (!responsavel?.whatsapp) continue
 
-    await enviarWhatsApp(whatsapp, mensagem)
-    enviados++
-    await new Promise(r => setTimeout(r, 1000))
+      const nomeResp = responsavel.nome.split(' ')[0]
+      const primeiroNome = atleta.nome.split(' ')[0]
+
+      const mensagem = 'Feliz aniversario, ' + primeiroNome + '! 🎂⚽\n\n' +
+        'Toda a equipe da *' + escola.nome + '* deseja um dia muito especial!\n\n' +
+        'Que voce continue evoluindo dentro e fora do campo! 🏆\n\n' +
+        '_' + escola.nome + '_'
+
+      await enviarWhatsApp(responsavel.whatsapp, mensagem)
+      totalEnviados++
+      await new Promise(r => setTimeout(r, 1000))
+    }
   }
 
-  return NextResponse.json({ sucesso: true, enviados, aniversariantes: aniversariantes.length })
+  return NextResponse.json({ sucesso: true, enviados: totalEnviados })
 }
