@@ -17,6 +17,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/perfil(.*)',
   '/api/inadimplentes(.*)',
   '/api/aniversariantes(.*)',
+  '/logout(.*)'
   '/api/notificar-convocacao(.*)',
 ])
 
