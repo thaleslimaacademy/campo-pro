@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { criarEscola } from './actions'
 
 export default function Onboarding() {
   const { user } = useUser()
@@ -17,7 +17,6 @@ export default function Onboarding() {
     estado: 'MG',
     telefone: '',
     whatsapp: '',
-    email: '',
     responsavel: '',
   })
 
@@ -30,44 +29,23 @@ export default function Onboarding() {
       setErro('Preencha os campos obrigatorios.')
       return
     }
+    if (!user) return
     setSalvando(true)
     setErro('')
 
-    const slug = form.nomeEscola.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').slice(0, 30) + '-' + Date.now().toString().slice(-4)
-    const escolaId = 'escola-' + slug
+    const result = await criarEscola(
+      user.id,
+      user.emailAddresses[0]?.emailAddress || '',
+      form.nomeEscola,
+      form.cidade,
+      form.estado,
+      form.telefone,
+      form.whatsapp,
+      form.responsavel
+    )
 
-    const { error: escolaError } = await supabaseAdmin.from('Escola').insert({
-      escolaId,
-      slug,
-      nome: form.nomeEscola,
-      cidade: form.cidade,
-      estado: form.estado,
-      telefone: form.telefone,
-      whatsapp: form.whatsapp,
-      email: form.email || user?.emailAddresses[0]?.emailAddress,
-      clerkUserId: user?.id,
-      plano: 'basico',
-      statusPlano: 'TRIAL',
-      ativo: true,
-    })
-
-    if (escolaError) {
-      setErro('Erro ao criar escola: ' + escolaError.message)
-      setSalvando(false)
-      return
-    }
-
-    const { error: perfilError } = await supabaseAdmin.from('PerfilUsuario').upsert({
-      clerkUserId: user?.id,
-      escolaId,
-      nome: form.responsavel,
-      email: user?.emailAddresses[0]?.emailAddress,
-      perfil: 'admin',
-      ativo: true,
-    }, { onConflict: 'clerkUserId' })
-
-    if (perfilError) {
-      setErro('Erro ao criar perfil: ' + perfilError.message)
+    if (!result.ok) {
+      setErro('Erro: ' + result.message)
       setSalvando(false)
       return
     }
@@ -117,7 +95,10 @@ export default function Onboarding() {
                 </select>
               </div>
             </div>
-            <button onClick={() => { if (!form.nomeEscola) { setErro('Nome da escola obrigatorio.'); return }; setErro(''); setStep(2) }} className="w-full bg-green-600 text-white py-3 rounded-xl font-bold">
+            <button
+              onClick={() => { if (!form.nomeEscola) { setErro('Nome obrigatorio.'); return }; setErro(''); setStep(2) }}
+              className="w-full bg-green-600 text-white py-3 rounded-xl font-bold"
+            >
               Continuar
             </button>
           </div>
@@ -128,7 +109,7 @@ export default function Onboarding() {
             <p className="text-green-500 font-bold">Dados do Responsavel</p>
             <div>
               <label className="text-sm text-gray-400">Seu nome completo *</label>
-              <input name="responsavel" value={form.responsavel} onChange={handleChange} className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="Nome do responsavel" />
+              <input name="responsavel" value={form.responsavel} onChange={handleChange} className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="Nome completo" />
             </div>
             <div>
               <label className="text-sm text-gray-400">WhatsApp *</label>
