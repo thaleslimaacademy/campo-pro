@@ -1,8 +1,6 @@
-import { getEscolaId } from '@/lib/auth/getEscolaId'
 'use server'
-
+import { auth } from '@clerk/nextjs/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { redirect } from 'next/navigation'
 
 export interface ConfiguracaoForm {
   nome: string
@@ -20,6 +18,10 @@ export interface ConfiguracaoForm {
 }
 
 export async function salvarConfiguracoes(form: ConfiguracaoForm): Promise<{ ok: boolean; message: string }> {
+  const { sessionClaims } = await auth()
+  const escolaId = (sessionClaims?.metadata as any)?.escolaId as string
+  if (!escolaId) return { ok: false, message: 'escolaId ausente' }
+
   const { error } = await supabaseAdmin
     .from('Escola')
     .update({
@@ -37,7 +39,7 @@ export async function salvarConfiguracoes(form: ConfiguracaoForm): Promise<{ ok:
       facebookUrl: form.facebookUrl,
       updatedAt: new Date().toISOString(),
     })
-    .eq('id', await getEscolaId())
+    .eq('id', escolaId)
 
   if (error) {
     console.error('[salvarConfiguracoes] erro:', error)
