@@ -16,7 +16,7 @@ export async function criarEscola(
   const escolaId = 'escola-' + slug
 
   const { error: escolaError } = await supabaseAdmin.from('Escola').insert({
-    escolaId,
+    id: escolaId,
     slug,
     nome: nomeEscola,
     cidade,
@@ -26,7 +26,6 @@ export async function criarEscola(
     email,
     clerkUserId,
     plano: 'basico',
-    statusPlano: 'TRIAL',
     ativo: true,
   })
 
