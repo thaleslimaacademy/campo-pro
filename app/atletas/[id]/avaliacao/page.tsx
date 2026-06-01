@@ -218,7 +218,7 @@ export default function AvaliacaoAtleta() {
   async function gerarPDF(avaliacao?: any) {
     setGerando(true)
     const av = avaliacao || { ...form, imc: imc?.imc, percentualGordura: gordura?.percentual, massaGorda, massaMagra, notaGeral }
-    const { jsPDF } = await import('jspdf')
+    const jsPDF = (await import('jspdf')).default
     const autoTable = (await import('jspdf-autotable')).default
     const doc = new jsPDF()
 

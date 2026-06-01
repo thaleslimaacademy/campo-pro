@@ -38,7 +38,7 @@ export default function Relatorios() {
     const presentes = presencas?.filter(p => p.status === 'PRESENTE').length || 0
     const ausentes = total - presentes
     const percentual = total > 0 ? Math.round((presentes / total) * 100) : 0
-    const { jsPDF } = await import('jspdf')
+    const jsPDF = (await import('jspdf')).default
     const autoTable = (await import('jspdf-autotable')).default
     const doc = new jsPDF()
     doc.setFillColor(22, 163, 74); doc.rect(0, 0, 210, 35, 'F')
@@ -78,7 +78,7 @@ export default function Relatorios() {
     const pagas = cobrancas?.filter(c => c.status === 'PAGO') || []
     const pendentes = cobrancas?.filter(c => c.status === 'PENDENTE') || []
     const vencidas = cobrancas?.filter(c => c.status === 'VENCIDO') || []
-    const { jsPDF } = await import('jspdf')
+    const jsPDF = (await import('jspdf')).default
     const autoTable = (await import('jspdf-autotable')).default
     const doc = new jsPDF()
     doc.setFillColor(22, 163, 74); doc.rect(0, 0, 210, 35, 'F')
@@ -130,7 +130,7 @@ export default function Relatorios() {
     let query = supabase.from('Atleta').select('id, nome, posicao, dataNascimento, turmaId').eq('escolaId', 'escola-demo').eq('ativo', true).order('nome')
     if (turmaSelecionada) query = query.eq('turmaId', turmaSelecionada)
     const { data: ats } = await query
-    const { jsPDF } = await import('jspdf')
+    const jsPDF = (await import('jspdf')).default
     const autoTable = (await import('jspdf-autotable')).default
     const doc = new jsPDF()
     doc.setFillColor(22, 163, 74); doc.rect(0, 0, 210, 35, 'F')
