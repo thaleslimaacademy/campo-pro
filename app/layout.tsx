@@ -1,4 +1,5 @@
 import { ClerkProvider } from '@clerk/nextjs'
+import { BrandingProvider } from '@/lib/branding'
 import type { Metadata } from 'next'
 import './globals.css'
 
@@ -23,7 +24,7 @@ export default function RootLayout({
           <meta name="apple-mobile-web-app-title" content="GestaoFC" />
           <meta name="mobile-web-app-capable" content="yes" />
         </head>
-        <body>{children}</body>
+        <body><BrandingProvider>{children}</BrandingProvider></body>
       </html>
     </ClerkProvider>
   )
