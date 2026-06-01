@@ -25,7 +25,7 @@ export async function criarEscola(
     whatsapp,
     email,
     clerkUserId,
-    plano: 'basico',
+    plano: 'STARTER',
     ativo: true,
   })
 
