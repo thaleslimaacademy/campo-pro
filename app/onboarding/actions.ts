@@ -41,7 +41,8 @@ export async function criarEscola(
   if (perfilError) return { ok: false, message: perfilError.message }
 
   // Atualiza metadata do Clerk para o token pegar escolaId e role
-  await clerkClient().users.updateUserMetadata(clerkUserId, {
+  const clerk = await clerkClient()
+  await clerk.users.updateUserMetadata(clerkUserId, {
     publicMetadata: { escolaId, role: 'admin' }
   })
 
