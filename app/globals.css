@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -127,4 +128,23 @@
   html {
     @apply font-sans;
   }
+}
+:root {
+  --brand-primary: #39FF14;
+  --brand-gold: #D4AF37;
+  --brand-black: #050505;
+  --brand-surface: #0D0D0D;
+  --brand-card: rgba(255,255,255,0.06);
+  --brand-border: rgba(255,255,255,0.08);
+  --brand-muted: rgba(255,255,255,0.45);
+  --font-syne: 'Syne', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+}
+
+body {
+  background: linear-gradient(160deg, #0a1a06 0%, #050505 35%, #111003 65%, #050505 100%) !important;
+  background-attachment: fixed !important;
+  font-family: var(--font-inter) !important;
+  color: #F0F0F0 !important;
+  min-height: 100vh;
 }
