@@ -133,7 +133,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
       <div className="flex items-center justify-between mb-1">
         <h1 className="text-2xl font-bold text-green-500">⚽ Campo Pro</h1>
-        <UserButton afterSignOutUrl="/login" />
+        <UserButton  />
       </div>
       <p className="text-gray-400 text-sm mb-6">
         {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
