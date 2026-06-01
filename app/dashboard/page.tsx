@@ -171,6 +171,7 @@ export default function Dashboard() {
           <a href="/comissao" className="col-span-2 bg-indigo-700 text-white p-3 rounded-lg text-center text-sm font-medium">Comissao Tecnica</a>
           <a href="/convocacao" className="col-span-2 bg-orange-600 text-white p-3 rounded-lg text-center text-sm font-medium">Convocacoes</a>
           <a href="/campeonato" className="col-span-2 bg-yellow-600 text-white p-3 rounded-lg text-center text-sm font-medium">Campeonatos</a>
+          <a href="/relatorios" className="col-span-2 bg-cyan-700 text-white p-3 rounded-lg text-center text-sm font-medium">Relatorios PDF</a>
           {isAdmin && (
             <>
               <a href="/matriculas" className="col-span-2 bg-gray-800 text-white p-3 rounded-lg text-center text-sm font-medium">Pre-matriculas {pendentes > 0 ? '(' + pendentes + ' pendentes)' : ''}</a>
