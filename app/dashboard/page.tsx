@@ -178,6 +178,7 @@ export default function Dashboard() {
               <a href="/rematriculas" className="col-span-2 bg-orange-700 text-white p-3 rounded-lg text-center text-sm font-medium">Rematriculas {rematriculas > 0 ? '(' + rematriculas + ' pendentes)' : ''}</a>
               <a href="/alteracao-massa" className="col-span-2 bg-teal-700 text-white p-3 rounded-lg text-center text-sm font-medium">Alteracao em Massa</a>
               <a href="/configuracoes" className="col-span-2 bg-gray-800 text-white p-3 rounded-lg text-center text-sm font-medium">Configuracoes da Escola</a>
+          <a href='/planos' target='_blank' className='col-span-2 bg-green-800 text-white p-3 rounded-lg text-center text-sm font-medium'>Planos e Precos</a>
             </>
           )}
         </div>
