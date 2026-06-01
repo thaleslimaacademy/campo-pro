@@ -4,10 +4,11 @@ import { enviarWhatsApp } from '@/lib/whatsapp'
 
 export async function GET(req: NextRequest) {
   try {
-    const authHeader = req.headers.get('authorization')
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 })
-    }
+  const authHeader = req.headers.get('authorization')
+  const isVercelCron = req.headers.get('x-vercel-cron') === '1'
+  if (!isVercelCron && authHeader !== 'Bearer ' + process.env.CRON_SECRET) {
+    return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 })
+  }
 
     const hoje = new Date()
     const em3dias = new Date()
