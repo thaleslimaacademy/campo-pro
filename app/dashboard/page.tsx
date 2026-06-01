@@ -18,8 +18,6 @@ export default function Dashboard() {
   const [copiado, setCopiado] = useState(false)
   const linkMatricula = 'https://campo-pro.vercel.app/matricula'
 
-  if (!isLoaded) return <div className="min-h-screen bg-gray-950 flex items-center justify-center"><p className="text-gray-400">Carregando...</p></div>
-  if (!escolaId) return <div className="min-h-screen bg-gray-950 flex items-center justify-center"><p className="text-gray-400">Configurando sessão...</p></div>
 
   useEffect(() => {
     async function carregar() {
@@ -80,7 +78,9 @@ export default function Dashboard() {
     )
   }
 
-  return (
+  if (!isLoaded) return <div className="min-h-screen bg-gray-950 flex items-center justify-center"><p className="text-gray-400">Carregando...</p></div>
+  if (!escolaId) return <div className="min-h-screen bg-gray-950 flex items-center justify-center"><p className="text-gray-400">Configurando sessão...</p></div>
+
     <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
       <h1 className="text-2xl font-bold text-green-500 mb-1">Campo Pro</h1>
       <p className="text-gray-400 text-sm mb-6">{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
