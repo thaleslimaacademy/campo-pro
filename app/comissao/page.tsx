@@ -1,4 +1,5 @@
 'use client'
+import { usePerfil } from '@/lib/usePerfil'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -18,6 +19,7 @@ interface Professor {
 }
 
 export default function ComissaoTecnica() {
+  const { escolaId } = usePerfil()
   const [professores, setProfessores] = useState<Professor[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -36,7 +38,7 @@ export default function ComissaoTecnica() {
     const { data } = await supabase
       .from('Professor')
       .select('*')
-      .eq('escolaId', 'escola-demo')
+      .eq('escolaId', escolaId!)
       .order('createdAt', { ascending: false })
     setProfessores(data || [])
     setLoading(false)
@@ -53,7 +55,7 @@ export default function ComissaoTecnica() {
     if (!form.nome || !form.email) return alert('Nome e e-mail são obrigatórios.')
     setSalvando(true)
     const { error } = await supabase.from('Professor').insert({
-      escolaId: 'escola-demo',
+      escolaId: escolaId!,
       nome: form.nome,
       email: form.email,
       telefone: form.telefone,

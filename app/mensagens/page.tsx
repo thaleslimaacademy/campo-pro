@@ -1,4 +1,5 @@
 'use client'
+import { usePerfil } from '@/lib/usePerfil'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -13,6 +14,7 @@ type Mensagem = {
 }
 
 export default function Mensagens() {
+  const { escolaId } = usePerfil()
   const [mensagens, setMensagens] = useState<Mensagem[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -21,7 +23,7 @@ export default function Mensagens() {
       const { data } = await supabase
         .from('Mensagem')
         .select('*')
-        .eq('escolaId', 'escola-demo')
+        .eq('escolaId', escolaId!)
         .order('criadoEm', { ascending: false })
         .limit(50)
       setMensagens(data || [])

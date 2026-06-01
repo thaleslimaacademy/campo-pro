@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { usePerfil } from '@/lib/usePerfil'
 
 export default function Dashboard() {
-  const { isAdmin, carregou } = usePerfil()
+  const { isAdmin, isLoaded, escolaId} = usePerfil()
   const [totalAtletas, setTotalAtletas] = useState(0)
   const [presencaHoje, setPresencaHoje] = useState({ presentes: 0, total: 0 })
   const [pendentes, setPendentes] = useState(0)
@@ -20,23 +20,23 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function carregar() {
-      const { count } = await supabase.from('Atleta').select('*', { count: 'exact', head: true }).eq('escolaId', 'escola-demo').eq('ativo', true)
+      const { count } = await supabase.from('Atleta').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId!).eq('ativo', true)
       setTotalAtletas(count || 0)
       const dataHoje = new Date().toISOString().split('T')[0]
-      const { data: treino } = await supabase.from('Treino').select('id').eq('escolaId', 'escola-demo').gte('data', dataHoje).limit(1).single()
+      const { data: treino } = await supabase.from('Treino').select('id').eq('escolaId', escolaId!).gte('data', dataHoje).limit(1).single()
       if (treino) {
         const { data: presencas } = await supabase.from('Presenca').select('status').eq('treinoId', treino.id)
         const presentes = presencas?.filter(p => p.status === 'PRESENTE').length || 0
         setPresencaHoje({ presentes, total: presencas?.length || 0 })
       }
-      const { count: countPendentes } = await supabase.from('Matricula').select('*', { count: 'exact', head: true }).eq('escolaId', 'escola-demo').eq('status', 'PENDENTE').eq('tipo', 'matricula')
+      const { count: countPendentes } = await supabase.from('Matricula').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId!).eq('status', 'PENDENTE').eq('tipo', 'matricula')
       setPendentes(countPendentes || 0)
-      const { count: countRematriculas } = await supabase.from('Matricula').select('*', { count: 'exact', head: true }).eq('escolaId', 'escola-demo').eq('status', 'PENDENTE').eq('tipo', 'rematricula')
+      const { count: countRematriculas } = await supabase.from('Matricula').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId!).eq('status', 'PENDENTE').eq('tipo', 'rematricula')
       setRematriculas(countRematriculas || 0)
       const agora = new Date()
       const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString().split('T')[0]
       const fimMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0).toISOString().split('T')[0]
-      const { data: cobrancas } = await supabase.from('Cobranca').select('valor, status, vencimento').eq('escolaId', 'escola-demo').gte('vencimento', inicioMes).lte('vencimento', fimMes)
+      const { data: cobrancas } = await supabase.from('Cobranca').select('valor, status, vencimento').eq('escolaId', escolaId!).gte('vencimento', inicioMes).lte('vencimento', fimMes)
       if (cobrancas) {
         const pagas = cobrancas.filter(c => c.status === 'PAGO')
         const pendentesF = cobrancas.filter(c => c.status === 'PENDENTE' || c.status === 'VENCIDO')
@@ -69,7 +69,7 @@ export default function Dashboard() {
   const percentualPresenca = presencaHoje.total > 0 ? Math.round((presencaHoje.presentes / presencaHoje.total) * 100) : 0
   const mesAtual = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
 
-  if (!carregou) {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
         <p className="text-gray-400">Carregando...</p>

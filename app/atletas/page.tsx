@@ -1,4 +1,5 @@
 'use client'
+import { usePerfil } from '@/lib/usePerfil'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -10,6 +11,7 @@ type Atleta = {
 }
 
 export default function Atletas() {
+  const { escolaId } = usePerfil()
   const [atletas, setAtletas] = useState<Atleta[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -18,7 +20,7 @@ export default function Atletas() {
       const { data } = await supabase
         .from('Atleta')
         .select('id, nome, posicao')
-        .eq('escolaId', 'escola-demo')
+        .eq('escolaId', escolaId!)
         .eq('ativo', true)
       setAtletas(data || [])
       setLoading(false)

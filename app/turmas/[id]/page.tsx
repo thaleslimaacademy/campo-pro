@@ -1,4 +1,5 @@
 'use client'
+import { usePerfil } from '@/lib/usePerfil'
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
@@ -22,6 +23,7 @@ type Turma = {
 }
 
 export default function TurmaDetalhes() {
+  const { escolaId } = usePerfil()
   const params = useParams()
   const router = useRouter()
   const id = params.id as string
@@ -47,7 +49,7 @@ export default function TurmaDetalhes() {
     const { data: semTurma } = await supabase
       .from('Atleta')
       .select('id, nome, posicao, fotoUrl, turmaId')
-      .eq('escolaId', 'escola-demo')
+      .eq('escolaId', escolaId!)
       .eq('ativo', true)
       .is('turmaId', null)
       .order('nome')

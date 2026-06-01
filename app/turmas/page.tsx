@@ -1,4 +1,5 @@
 'use client'
+import { usePerfil } from '@/lib/usePerfil'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -14,6 +15,7 @@ type Turma = {
 }
 
 export default function Turmas() {
+  const { escolaId } = usePerfil()
   const [turmas, setTurmas] = useState<Turma[]>([])
   const [loading, setLoading] = useState(true)
   const [criando, setCriando] = useState(false)
@@ -29,7 +31,7 @@ export default function Turmas() {
     const { data } = await supabase
       .from('Turma')
       .select('*')
-      .eq('escolaId', 'escola-demo')
+      .eq('escolaId', escolaId!)
       .eq('ativa', true)
       .order('nome')
 
@@ -60,7 +62,7 @@ export default function Turmas() {
     if (!form.nome) return
     setSalvando(true)
     await supabase.from('Turma').insert({
-      escolaId: 'escola-demo',
+      escolaId: escolaId!,
       nome: form.nome,
       descricao: form.descricao || null,
       diasSemana: form.diasSemana || null,

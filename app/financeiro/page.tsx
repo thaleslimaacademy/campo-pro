@@ -1,4 +1,5 @@
 'use client'
+import { usePerfil } from '@/lib/usePerfil'
 import AdminGuard from '@/components/AdminGuard'
 
 import { useEffect, useState } from 'react'
@@ -28,6 +29,7 @@ type Inadimplente = {
 }
 
 function FinanceiroInner() {
+  const { escolaId } = usePerfil()
   const [atletas, setAtletas] = useState<Atleta[]>([])
   const [cobrancas, setCobrancas] = useState<Cobranca[]>([])
   const [inadimplentes, setInadimplentes] = useState<Inadimplente[]>([])
@@ -54,7 +56,7 @@ function FinanceiroInner() {
     const { data: atletasData } = await supabase
       .from('Atleta')
       .select('id, nome')
-      .eq('escolaId', 'escola-demo')
+      .eq('escolaId', escolaId!)
       .eq('ativo', true)
 
     setAtletas(atletasData || [])
@@ -63,7 +65,7 @@ function FinanceiroInner() {
     const { data: cobrancasData } = await supabase
       .from('Cobranca')
       .select('id, valor, vencimento, status, pixCopiaCola, pixQrCode, descricao, atletaId')
-      .eq('escolaId', 'escola-demo')
+      .eq('escolaId', escolaId!)
       .order('vencimento', { ascending: false })
 
     setCobrancas(cobrancasData || [])

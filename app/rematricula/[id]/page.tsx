@@ -1,4 +1,5 @@
 'use client'
+import { usePerfil } from '@/lib/usePerfil'
 
 import { useEffect, useState, useRef } from 'react'
 import { useParams } from 'next/navigation'
@@ -142,6 +143,7 @@ function PainelAssinatura({ onAssinar, disabled }: { onAssinar: (img: string) =>
 }
 
 export default function Rematricula() {
+  const { escolaId } = usePerfil()
   const params = useParams()
   const id = params.id as string
 
@@ -218,7 +220,7 @@ export default function Rematricula() {
     setSalvando(true)
 
     await supabase.from('Matricula').insert({
-      escolaId: 'escola-demo',
+      escolaId: escolaId!,
       nomeAtleta: atleta.nome,
       dataNascimento: atleta.dataNascimento,
       cpf: atleta.cpf || null,

@@ -1,4 +1,5 @@
 'use client'
+import { usePerfil } from '@/lib/usePerfil'
 import AdminGuard from '@/components/AdminGuard'
 
 import { useEffect, useState } from 'react'
@@ -6,6 +7,7 @@ import { supabase } from '@/lib/supabase'
 import { salvarConfiguracoes } from './actions'
 
 function ConfiguracoesInner() {
+  const { escolaId } = usePerfil()
   const [loading, setLoading] = useState(true)
   const [salvando, setSalvando] = useState(false)
   const [sucesso, setSucesso] = useState(false)
@@ -38,7 +40,7 @@ function ConfiguracoesInner() {
       const { data, error } = await supabase
         .from('Escola')
         .select('*')
-        .eq('id', 'escola-demo')
+        .eq('id', escolaId!)
         .single()
 
       if (error) console.error('[carregar escola]', error)

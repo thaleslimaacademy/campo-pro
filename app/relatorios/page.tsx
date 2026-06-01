@@ -1,4 +1,5 @@
 'use client'
+import { usePerfil } from '@/lib/usePerfil'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -7,6 +8,7 @@ interface Atleta { id: string; nome: string; posicao: string; turmaId: string }
 interface Turma { id: string; nome: string }
 
 export default function Relatorios() {
+  const { escolaId } = usePerfil()
   const [atletas, setAtletas] = useState<Atleta[]>([])
   const [turmas, setTurmas] = useState<Turma[]>([])
   const [loading, setLoading] = useState(true)
@@ -20,9 +22,9 @@ export default function Relatorios() {
 
   useEffect(() => {
     async function carregar() {
-      const { data: ats } = await supabase.from('Atleta').select('id, nome, posicao, turmaId').eq('escolaId', 'escola-demo').eq('ativo', true).order('nome')
+      const { data: ats } = await supabase.from('Atleta').select('id, nome, posicao, turmaId').eq('escolaId', escolaId!).eq('ativo', true).order('nome')
       setAtletas(ats || [])
-      const { data: tms } = await supabase.from('Turma').select('id, nome').eq('escolaId', 'escola-demo').order('nome')
+      const { data: tms } = await supabase.from('Turma').select('id, nome').eq('escolaId', escolaId!).order('nome')
       setTurmas(tms || [])
       setLoading(false)
     }
@@ -74,7 +76,7 @@ export default function Relatorios() {
 
   async function gerarFinanceiro() {
     setGerando(true)
-    const { data: cobrancas } = await supabase.from('Cobranca').select('id, valor, status, descricao, vencimento, atletaId').eq('escolaId', 'escola-demo').gte('vencimento', mesFinanceiro + '-01').lte('vencimento', mesFinanceiro + '-31').order('vencimento', { ascending: true })
+    const { data: cobrancas } = await supabase.from('Cobranca').select('id, valor, status, descricao, vencimento, atletaId').eq('escolaId', escolaId!).gte('vencimento', mesFinanceiro + '-01').lte('vencimento', mesFinanceiro + '-31').order('vencimento', { ascending: true })
     const pagas = cobrancas?.filter(c => c.status === 'PAGO') || []
     const pendentes = cobrancas?.filter(c => c.status === 'PENDENTE') || []
     const vencidas = cobrancas?.filter(c => c.status === 'VENCIDO') || []
@@ -127,7 +129,7 @@ export default function Relatorios() {
 
   async function gerarAtletas() {
     setGerando(true)
-    let query = supabase.from('Atleta').select('id, nome, posicao, dataNascimento, turmaId').eq('escolaId', 'escola-demo').eq('ativo', true).order('nome')
+    let query = supabase.from('Atleta').select('id, nome, posicao, dataNascimento, turmaId').eq('escolaId', escolaId!).eq('ativo', true).order('nome')
     if (turmaSelecionada) query = query.eq('turmaId', turmaSelecionada)
     const { data: ats } = await query
     const jsPDF = (await import('jspdf')).default

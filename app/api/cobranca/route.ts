@@ -1,3 +1,4 @@
+import { getEscolaId } from '@/lib/auth/getEscolaId'
 import { NextRequest, NextResponse } from 'next/server'
 import { criarClienteAsaas, criarCobrancaPix, getPixQrCode } from '@/lib/asaas'
 import { supabase } from '@/lib/supabase'
@@ -82,7 +83,7 @@ export async function POST(req: NextRequest) {
     // Salva no Supabase
     await supabase.from('Cobranca').insert({
       id: crypto.randomUUID(),
-      escolaId: 'escola-demo',
+      escolaId: await getEscolaId(),
       atletaId,
       valor,
       vencimento,

@@ -1,3 +1,4 @@
+import { getEscolaId } from '@/lib/auth/getEscolaId'
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { enviarWhatsApp } from '@/lib/whatsapp'
@@ -11,7 +12,7 @@ export async function GET(req: NextRequest) {
   const { data: cobrancas } = await supabaseAdmin
     .from('Cobranca')
     .select('id, valor, vencimento, descricao, atletaId')
-    .eq('escolaId', 'escola-demo')
+    .eq('escolaId', await getEscolaId())
     .eq('status', 'VENCIDO')
 
   if (!cobrancas || cobrancas.length === 0) {

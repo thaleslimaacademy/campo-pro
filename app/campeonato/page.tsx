@@ -1,4 +1,5 @@
 'use client'
+import { usePerfil } from '@/lib/usePerfil'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -15,6 +16,7 @@ interface Campeonato {
 }
 
 export default function Campeonatos() {
+  const { escolaId } = usePerfil()
   const [campeonatos, setCampeonatos] = useState<Campeonato[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -32,7 +34,7 @@ export default function Campeonatos() {
     const { data } = await supabase
       .from('Campeonato')
       .select('*')
-      .eq('escolaId', 'escola-demo')
+      .eq('escolaId', escolaId!)
       .order('createdAt', { ascending: false })
     setCampeonatos(data || [])
     setLoading(false)
@@ -50,7 +52,7 @@ export default function Campeonatos() {
     setSalvando(true)
 
     const { error } = await supabase.from('Campeonato').insert({
-      escolaId: 'escola-demo',
+      escolaId: escolaId!,
       nome: form.nome,
       formato: form.formato,
       dataInicio: form.dataInicio || null,

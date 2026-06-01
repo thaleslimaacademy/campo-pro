@@ -1,4 +1,5 @@
 'use client'
+import { usePerfil } from '@/lib/usePerfil'
 import AdminGuard from '@/components/AdminGuard'
 
 import { useEffect, useState } from 'react'
@@ -20,6 +21,7 @@ interface Turma {
 }
 
 function AlteracaoMassaInner() {
+  const { escolaId } = usePerfil()
   const [atletas, setAtletas] = useState<Atleta[]>([])
   const [turmas, setTurmas] = useState<Turma[]>([])
   const [loading, setLoading] = useState(true)
@@ -39,7 +41,7 @@ function AlteracaoMassaInner() {
     const { data: ats } = await supabase
       .from('Atleta')
       .select('id, nome, turmaId, diaVencimento, valorMensalidade, dataNascimento')
-      .eq('escolaId', 'escola-demo')
+      .eq('escolaId', escolaId!)
       .eq('ativo', true)
       .order('nome')
     setAtletas(ats || [])
@@ -47,7 +49,7 @@ function AlteracaoMassaInner() {
     const { data: tms } = await supabase
       .from('Turma')
       .select('id, nome')
-      .eq('escolaId', 'escola-demo')
+      .eq('escolaId', escolaId!)
       .eq('ativa', true)
       .order('nome')
     setTurmas(tms || [])

@@ -1,4 +1,5 @@
 'use client'
+import { usePerfil } from '@/lib/usePerfil'
 
 import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
@@ -14,6 +15,7 @@ type Atleta = {
 }
 
 function NovaMensagemForm() {
+  const { escolaId } = usePerfil()
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -33,13 +35,13 @@ function NovaMensagemForm() {
 
   useEffect(() => {
     async function carregar() {
-      const { data: t } = await supabase.from('Turma').select('*').eq('escolaId', 'escola-demo').eq('ativa', true).order('nome')
+      const { data: t } = await supabase.from('Turma').select('*').eq('escolaId', escolaId!).eq('ativa', true).order('nome')
       setTurmas(t || [])
 
       const { data: a } = await supabase
         .from('Atleta')
         .select('id, nome, fotoUrl, turmaId')
-        .eq('escolaId', 'escola-demo')
+        .eq('escolaId', escolaId!)
         .eq('ativo', true)
         .order('nome')
       setAtletas(a || [])
@@ -109,7 +111,7 @@ function NovaMensagemForm() {
 
     // Salva no histórico
     await supabase.from('Mensagem').insert({
-      escolaId: 'escola-demo',
+      escolaId: escolaId!,
       titulo: titulo || null,
       conteudo,
       tipo,

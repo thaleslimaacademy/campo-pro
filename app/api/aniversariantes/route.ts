@@ -1,3 +1,4 @@
+import { getEscolaId } from '@/lib/auth/getEscolaId'
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { enviarWhatsApp } from '@/lib/whatsapp'
@@ -15,7 +16,7 @@ export async function GET(req: NextRequest) {
   const { data: atletas } = await supabaseAdmin
     .from('Atleta')
     .select('id, nome, dataNascimento, telefone')
-    .eq('escolaId', 'escola-demo')
+    .eq('escolaId', await getEscolaId())
     .eq('ativo', true)
 
   if (!atletas) return NextResponse.json({ sucesso: true, enviados: 0 })

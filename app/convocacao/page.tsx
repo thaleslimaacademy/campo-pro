@@ -1,4 +1,5 @@
 'use client'
+import { usePerfil } from '@/lib/usePerfil'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -29,6 +30,7 @@ interface Turma {
 }
 
 export default function Convocacoes() {
+  const { escolaId } = usePerfil()
   const [convocacoes, setConvocacoes] = useState<Convocacao[]>([])
   const [atletas, setAtletas] = useState<Atleta[]>([])
   const [turmas, setTurmas] = useState<Turma[]>([])
@@ -53,14 +55,14 @@ export default function Convocacoes() {
     const { data: conv } = await supabase
       .from('Convocacao')
       .select('*')
-      .eq('escolaId', 'escola-demo')
+      .eq('escolaId', escolaId!)
       .order('data', { ascending: false })
     setConvocacoes(conv || [])
 
     const { data: ats } = await supabase
       .from('Atleta')
       .select('id, nome, fotoUrl, turmaId, dataNascimento')
-      .eq('escolaId', 'escola-demo')
+      .eq('escolaId', escolaId!)
       .eq('ativo', true)
       .order('nome')
     setAtletas(ats || [])
@@ -68,7 +70,7 @@ export default function Convocacoes() {
     const { data: tms } = await supabase
       .from('Turma')
       .select('id, nome')
-      .eq('escolaId', 'escola-demo')
+      .eq('escolaId', escolaId!)
       .eq('ativa', true)
       .order('nome')
     setTurmas(tms || [])
@@ -132,7 +134,7 @@ export default function Convocacoes() {
     const { data: conv, error } = await supabase
       .from('Convocacao')
       .insert({
-        escolaId: 'escola-demo',
+        escolaId: escolaId!,
         titulo: form.titulo,
         tipo: form.tipo,
         data: form.data,

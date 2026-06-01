@@ -1,4 +1,5 @@
 'use client'
+import { usePerfil } from '@/lib/usePerfil'
 import AdminGuard from '@/components/AdminGuard'
 
 import { useEffect, useState } from 'react'
@@ -28,6 +29,7 @@ type Matricula = {
 }
 
 function MatriculasInner() {
+  const { escolaId } = usePerfil()
   const [matriculas, setMatriculas] = useState<Matricula[]>([])
   const [loading, setLoading] = useState(true)
   const [selecionada, setSelecionada] = useState<Matricula | null>(null)
@@ -38,7 +40,7 @@ function MatriculasInner() {
     const { data } = await supabase
       .from('Matricula')
       .select('*')
-      .eq('escolaId', 'escola-demo')
+      .eq('escolaId', escolaId!)
       .order('criadoEm', { ascending: false })
     setMatriculas(data || [])
     setLoading(false)
@@ -94,7 +96,7 @@ function MatriculasInner() {
 
     const { error: erroAtleta } = await supabase.from('Atleta').insert({
       id: atletaId,
-      escolaId: 'escola-demo',
+      escolaId: escolaId!,
       nome: matricula.nomeAtleta,
       dataNascimento: matricula.dataNascimento,
       cpf: matricula.cpf,

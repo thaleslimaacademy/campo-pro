@@ -1,9 +1,11 @@
 'use client'
+import { usePerfil } from '@/lib/usePerfil'
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
 export default function NovoAtleta() {
+  const { escolaId } = usePerfil()
   const [loading, setLoading] = useState(false)
   const [sucesso, setSucesso] = useState(false)
   const [cpf, setCpf] = useState('')
@@ -41,7 +43,7 @@ export default function NovoAtleta() {
 
     const { error } = await supabase.from('Atleta').insert({
       id: atletaId,
-      escolaId: 'escola-demo',
+      escolaId: escolaId!,
       nome: dados.get('nome'),
       dataNascimento: dados.get('nascimento'),
       posicao: dados.get('posicao'),

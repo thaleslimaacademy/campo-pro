@@ -1,4 +1,5 @@
 'use client'
+import { usePerfil } from '@/lib/usePerfil'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -15,6 +16,7 @@ type Presenca = {
 }
 
 export default function Presenca() {
+  const { escolaId } = usePerfil()
   const [atletas, setAtletas] = useState<Atleta[]>([])
   const [presencas, setPresencas] = useState<Record<string, 'PRESENTE' | 'AUSENTE'>>({})
   const [treinoId, setTreinoId] = useState<string | null>(null)
@@ -28,7 +30,7 @@ export default function Presenca() {
       const { data: atletasData } = await supabase
         .from('Atleta')
         .select('id, nome, posicao')
-        .eq('escolaId', 'escola-demo')
+        .eq('escolaId', escolaId!)
         .eq('ativo', true)
 
       setAtletas(atletasData || [])
@@ -37,7 +39,7 @@ export default function Presenca() {
       let { data: treino } = await supabase
         .from('Treino')
         .select('id')
-        .eq('escolaId', 'escola-demo')
+        .eq('escolaId', escolaId!)
         .gte('data', dataHoje)
         .limit(1)
         .single()
@@ -45,7 +47,7 @@ export default function Presenca() {
       if (!treino) {
         const { data: novoTreino } = await supabase
           .from('Treino')
-          .insert({ id: crypto.randomUUID(), escolaId: 'escola-demo', data: new Date().toISOString() })
+          .insert({ id: crypto.randomUUID(), escolaId: escolaId!, data: new Date().toISOString() })
           .select('id')
           .single()
         treino = novoTreino

@@ -1,4 +1,5 @@
 'use client'
+import { usePerfil } from '@/lib/usePerfil'
 
 import { useState, useRef, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -170,6 +171,7 @@ function PainelAssinatura({ onAssinar, disabled }: { onAssinar: (img: string) =>
 }
 
 export default function Matricula() {
+  const { escolaId } = usePerfil()
   const [etapa, setEtapa] = useState<'form' | 'contrato' | 'sucesso'>('form')
   const [loading, setLoading] = useState(false)
   const [contratoLido, setContratoLido] = useState(false)
@@ -229,7 +231,7 @@ export default function Matricula() {
     setLoading(true)
 
     await supabase.from('Matricula').insert({
-      escolaId: 'escola-demo',
+      escolaId: escolaId!,
       nomeAtleta: dados.nome,
       dataNascimento: dados.nascimento,
       cpf: dados.cpf || null,

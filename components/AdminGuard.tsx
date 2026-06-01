@@ -5,16 +5,16 @@ import { useRouter } from 'next/navigation'
 import { usePerfil } from '@/lib/usePerfil'
 
 export default function AdminGuard({ children }: { children: React.ReactNode }) {
-  const { isAdmin, carregou } = usePerfil()
+  const { isAdmin, isLoaded } = usePerfil()
   const router = useRouter()
 
   useEffect(() => {
-    if (carregou && !isAdmin) {
+    if (isLoaded && !isAdmin) {
       router.replace('/dashboard')
     }
-  }, [isAdmin, carregou, router])
+  }, [isAdmin, isLoaded, router])
 
-  if (!carregou) {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
         <p className="text-gray-400">Carregando...</p>

@@ -1,3 +1,4 @@
+import { getEscolaId } from '@/lib/auth/getEscolaId'
 'use server'
 
 import { supabaseAdmin } from '@/lib/supabase-admin'
@@ -36,7 +37,7 @@ export async function salvarConfiguracoes(form: ConfiguracaoForm): Promise<{ ok:
       facebookUrl: form.facebookUrl,
       updatedAt: new Date().toISOString(),
     })
-    .eq('id', 'escola-demo')
+    .eq('id', await getEscolaId())
 
   if (error) {
     console.error('[salvarConfiguracoes] erro:', error)

@@ -1,4 +1,5 @@
 'use client'
+import { usePerfil } from '@/lib/usePerfil'
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
@@ -112,6 +113,7 @@ function GraficoEvolucao({ avaliacoes }: { avaliacoes: any[] }) {
 }
 
 export default function AvaliacaoAtleta() {
+  const { escolaId } = usePerfil()
   const params = useParams()
   const router = useRouter()
   const id = params.id as string
@@ -172,7 +174,7 @@ export default function AvaliacaoAtleta() {
   async function salvar() {
     setSalvando(true)
     const { error } = await supabase.from('Avaliacao').insert({
-      atletaId: id, escolaId: 'escola-demo',
+      atletaId: id, escolaId: escolaId!,
       dataAvaliacao: form.dataAvaliacao,
       peso: form.peso ? parseFloat(form.peso) : null,
       altura: form.altura ? parseFloat(form.altura) : null,
