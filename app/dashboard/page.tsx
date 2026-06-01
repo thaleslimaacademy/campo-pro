@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { usePerfil } from '@/lib/usePerfil'
+import { UserButton } from '@clerk/nextjs'
 
 export default function Dashboard() {
   const { isAdmin, isLoaded, escolaId } = usePerfil()
@@ -130,7 +131,10 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
-      <h1 className="text-2xl font-bold text-green-500 mb-1">⚽ Campo Pro</h1>
+      <div className="flex items-center justify-between mb-1">
+        <h1 className="text-2xl font-bold text-green-500">⚽ Campo Pro</h1>
+        <UserButton afterSignOutUrl="/login" />
+      </div>
       <p className="text-gray-400 text-sm mb-6">
         {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
       </p>
