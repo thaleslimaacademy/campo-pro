@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/inadimplentes",
-      "schedule": "0 11 5 * *"
+      "schedule": "0 11 */3 * *"
     },
     {
       "path": "/api/aniversariantes",
