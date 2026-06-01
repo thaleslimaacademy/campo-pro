@@ -217,6 +217,10 @@ function ConfiguracoesInner() {
         {salvando ? '⏳ Salvando...' : '💾 Salvar Configurações'}
       </button>
 
+      <a href="/mensagens-cobranca" className="block w-full bg-blue-700 hover:bg-blue-800 text-white py-3 rounded-xl font-bold text-center mb-4">
+        📲 Personalizar Mensagens WhatsApp
+      </a>
+
       <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
         <a href="/dashboard" className="text-gray-400 text-xs text-center">🏠<br />Início</a>
         <a href="/atletas" className="text-gray-400 text-xs text-center">👥<br />Atletas</a>
