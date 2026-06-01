@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { enviarWhatsApp } from '@/lib/whatsapp'
 
+function aplicarVariaveis(template: string, vars: Record<string, string>): string {
+  let msg = template
+  for (const [key, val] of Object.entries(vars)) {
+    msg = msg.replaceAll(key, val)
+  }
+  return msg
+}
+
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('authorization')
   const isVercelCron = req.headers.get('x-vercel-cron') === '1'
@@ -13,17 +21,17 @@ export async function GET(req: NextRequest) {
   const mes = String(hoje.getMonth() + 1).padStart(2, '0')
   const dia = String(hoje.getDate()).padStart(2, '0')
 
-  const { data: escolas } = await supabaseAdmin.from('Escola').select('id, nome').eq('ativa', true)
+  const { data: escolas } = await supabaseAdmin
+    .from('Escola').select('id, nome, msgAniversario').eq('ativa', true)
+
   if (!escolas) return NextResponse.json({ sucesso: true, enviados: 0 })
 
   let totalEnviados = 0
 
   for (const escola of escolas) {
     const { data: atletas } = await supabaseAdmin
-      .from('Atleta')
-      .select('id, nome, dataNascimento')
-      .eq('escolaId', escola.id)
-      .eq('ativo', true)
+      .from('Atleta').select('id, nome, dataNascimento')
+      .eq('escolaId', escola.id).eq('ativo', true)
 
     if (!atletas) continue
 
@@ -40,13 +48,13 @@ export async function GET(req: NextRequest) {
       const responsavel = responsaveis?.[0]
       if (!responsavel?.whatsapp) continue
 
-      const nomeResp = responsavel.nome.split(' ')[0]
-      const primeiroNome = atleta.nome.split(' ')[0]
+      const template = escola.msgAniversario || 'Feliz aniversario, {nome_atleta}! Toda a equipe da *{nome_escola}* deseja um dia muito especial! _{nome_escola}_'
 
-      const mensagem = 'Feliz aniversario, ' + primeiroNome + '! 🎂⚽\n\n' +
-        'Toda a equipe da *' + escola.nome + '* deseja um dia muito especial!\n\n' +
-        'Que voce continue evoluindo dentro e fora do campo! 🏆\n\n' +
-        '_' + escola.nome + '_'
+      const mensagem = aplicarVariaveis(template, {
+        '{nome_responsavel}': responsavel.nome.split(' ')[0],
+        '{nome_atleta}': atleta.nome.split(' ')[0],
+        '{nome_escola}': escola.nome,
+      })
 
       await enviarWhatsApp(responsavel.whatsapp, mensagem)
       totalEnviados++
