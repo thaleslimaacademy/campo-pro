@@ -1,4 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 const isPublicRoute = createRouteMatcher([
@@ -9,12 +10,14 @@ const isPublicRoute = createRouteMatcher([
   '/convite(.*)',
   '/pais(.*)',
   '/qrcode(.*)',
+  '/planos(.*)',
   '/api/webhook(.*)',
   '/api/lembretes(.*)',
   '/api/cobranca(.*)',
-  '/planos(.*)',
-  '/planos(.*)',
   '/api/perfil(.*)',
+  '/api/inadimplentes(.*)',
+  '/api/aniversariantes(.*)',
+  '/api/notificar-convocacao(.*)',
 ])
 
 export default clerkMiddleware(async (auth, req) => {
