@@ -1,6 +1,6 @@
 'use server'
-
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { clerkClient } from '@clerk/nextjs/server'
 
 export async function criarEscola(
   clerkUserId: string,
@@ -28,7 +28,6 @@ export async function criarEscola(
     plano: 'STARTER',
     ativo: true,
   })
-
   if (escolaError) return { ok: false, message: escolaError.message }
 
   const { error: perfilError } = await supabaseAdmin.from('PerfilUsuario').upsert({
@@ -39,8 +38,12 @@ export async function criarEscola(
     perfil: 'admin',
     ativo: true,
   }, { onConflict: 'clerkUserId' })
-
   if (perfilError) return { ok: false, message: perfilError.message }
+
+  // Atualiza metadata do Clerk para o token pegar escolaId e role
+  await clerkClient().users.updateUserMetadata(clerkUserId, {
+    publicMetadata: { escolaId, role: 'admin' }
+  })
 
   return { ok: true, escolaId }
 }
