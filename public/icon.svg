@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="40" fill="#16a34a"/>
+  <circle cx="96" cy="96" r="55" fill="white" stroke="#15803d" stroke-width="3"/>
+  <polygon points="96,50 110,75 85,75" fill="#15803d"/>
+  <polygon points="96,142 110,117 85,117" fill="#15803d"/>
+  <polygon points="50,96 75,82 75,110" fill="#15803d"/>
+  <polygon points="142,96 117,82 117,110" fill="#15803d"/>
+  <circle cx="96" cy="96" r="12" fill="#15803d"/>
+  <text x="96" y="175" text-anchor="middle" fill="white" font-family="Arial" font-weight="bold" font-size="18">GestaoFC</text>
+</svg>
