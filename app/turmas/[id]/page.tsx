@@ -134,6 +134,39 @@ export default function TurmaDetalhes() {
         {turma.descricao && <p className="text-gray-400 text-sm mt-1">{turma.descricao}</p>}
         <p className="text-gray-500 text-xs mt-2">{atletasTurma.length} atletas nesta turma</p>
       </div>
+        {editando && (
+          <div className="bg-gray-900 rounded-xl p-4 border border-blue-800 mb-4 mt-4">
+            <p className="font-bold text-blue-400 mb-3">Editar Turma</p>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-gray-400">Nome</label>
+                <input value={formEdit.nome} onChange={e => setFormEdit(p => ({...p, nome: e.target.value}))}
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 mt-1 text-white text-sm" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-400">Dias da semana</label>
+                <input value={formEdit.diasSemana} onChange={e => setFormEdit(p => ({...p, diasSemana: e.target.value}))}
+                  placeholder="Ex: Terca e Quinta"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 mt-1 text-white text-sm" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-400">Horario</label>
+                <input value={formEdit.horario} onChange={e => setFormEdit(p => ({...p, horario: e.target.value}))}
+                  placeholder="Ex: 18:00 - 19:00"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 mt-1 text-white text-sm" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-400">Descricao</label>
+                <input value={formEdit.descricao} onChange={e => setFormEdit(p => ({...p, descricao: e.target.value}))}
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 mt-1 text-white text-sm" />
+              </div>
+              <div className="flex gap-2">
+                <button onClick={salvarEdicao} className="flex-1 bg-green-600 text-white py-2 rounded-lg text-sm font-bold">Salvar</button>
+                <button onClick={() => setEditando(false)} className="flex-1 bg-gray-800 text-gray-400 py-2 rounded-lg text-sm">Cancelar</button>
+              </div>
+            </div>
+          </div>
+        )}
 
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
         <div className="flex justify-between items-center mb-3">
