@@ -148,3 +148,34 @@ body {
   color: #F0F0F0 !important;
   min-height: 100vh;
 }
+
+.cl-formFieldInput,
+.cl-formFieldInput:focus,
+.cl-formFieldInput:active {
+  background: #1a1a1a !important;
+  color: #F0F0F0 !important;
+  border-color: rgba(255,255,255,0.15) !important;
+}
+
+.cl-formFieldLabel,
+.cl-formFieldLabelRow,
+.cl-headerTitle,
+.cl-headerSubtitle,
+.cl-dividerText,
+.cl-footerActionText,
+.cl-identityPreviewText,
+.cl-formFieldHintText,
+.cl-formFieldErrorText {
+  color: rgba(255,255,255,0.6) !important;
+}
+
+.cl-internal-b3fm6y,
+.cl-badge {
+  color: rgba(255,255,255,0.5) !important;
+  background: rgba(255,255,255,0.08) !important;
+}
+
+.cl-card {
+  background: #111111 !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+}
