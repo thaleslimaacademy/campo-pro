@@ -33,6 +33,8 @@ export default function TurmaDetalhes() {
   const [atletasSemTurma, setAtletasSemTurma] = useState<Atleta[]>([])
   const [loading, setLoading] = useState(true)
   const [adicionando, setAdicionando] = useState(false)
+  const [editando, setEditando] = useState(false)
+  const [formEdit, setFormEdit] = useState({ nome: '', diasSemana: '', horario: '', descricao: '' })
 
   async function carregar() {
     const { data: t } = await supabase.from('Turma').select('*').eq('id', id).single()
@@ -55,6 +57,12 @@ export default function TurmaDetalhes() {
       .order('nome')
     setAtletasSemTurma(semTurma || [])
 
+    if (turmaData) setFormEdit({
+        nome: turmaData.nome || '',
+        diasSemana: turmaData.diasSemana || '',
+        horario: turmaData.horario || '',
+        descricao: turmaData.descricao || '',
+      })
     setLoading(false)
   }
 
@@ -68,6 +76,17 @@ export default function TurmaDetalhes() {
   async function removerAtleta(atletaId: string) {
     await supabase.from('Atleta').update({ turmaId: null }).eq('id', atletaId)
     await carregar()
+  }
+
+  async function salvarEdicao() {
+    await supabase.from('Turma').update({
+      nome: formEdit.nome,
+      diasSemana: formEdit.diasSemana,
+      horario: formEdit.horario,
+      descricao: formEdit.descricao,
+    }).eq('id', id)
+    setTurma(prev => prev ? { ...prev, ...formEdit } : prev)
+    setEditando(false)
   }
 
   async function excluirTurma() {
@@ -102,7 +121,10 @@ export default function TurmaDetalhes() {
           <a href="/turmas" className="text-gray-400">Voltar</a>
           <h1 className="text-xl font-bold">{turma.nome}</h1>
         </div>
-        <button onClick={excluirTurma} className="text-red-400 text-xs">Excluir</button>
+        <div className="flex gap-3">
+          <button onClick={() => setEditando(!editando)} className="text-blue-400 text-xs font-bold">Editar</button>
+          <button onClick={excluirTurma} className="text-red-400 text-xs">Excluir</button>
+        </div>
       </div>
 
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
