@@ -143,7 +143,7 @@ export default function Atletas() {
 
       <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {filtrados.map((atleta, i) => (
-          
+          <a
             key={atleta.id}
             href={'/atletas/' + atleta.id}
             style={{
