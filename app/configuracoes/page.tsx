@@ -25,6 +25,8 @@ function ConfiguracoesInner() {
     diaVencimento: '10',
     instagramUrl: '',
     facebookUrl: '',
+    multaAtraso: 0,
+    jurosAoMes: 0,
   })
 
   useEffect(() => {
@@ -59,6 +61,8 @@ function ConfiguracoesInner() {
           diaVencimento: data.diaVencimento?.toString() || '10',
           instagramUrl: data.instagramUrl || '',
           facebookUrl: data.facebookUrl || '',
+          multaAtraso: Number(data.multaAtraso || 0),
+          jurosAoMes: Number(data.jurosAoMes || 0),
         })
       }
       setLoading(false)
@@ -88,6 +92,8 @@ function ConfiguracoesInner() {
       diaVencimento: parseInt(form.diaVencimento) || 10,
       instagramUrl: form.instagramUrl,
       facebookUrl: form.facebookUrl,
+      multaAtraso: form.multaAtraso,
+      jurosAoMes: form.jurosAoMes,
     })
 
     setSalvando(false)
