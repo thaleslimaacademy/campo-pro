@@ -60,7 +60,7 @@ export default function PagarPage() {
     </div>
   )
 
-  const dataVenc = new Date(cobranca.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
+  const dataVenc = new Date((cobranca.vencimento || '').includes('T') ? cobranca.vencimento : cobranca.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
   const isPago = cobranca.status === 'PAGO'
   const isVencido = cobranca.status === 'VENCIDO'
 
