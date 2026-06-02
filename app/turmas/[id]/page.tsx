@@ -57,11 +57,11 @@ export default function TurmaDetalhes() {
       .order('nome')
     setAtletasSemTurma(semTurma || [])
 
-    if (turmaData) setFormEdit({
-        nome: turmaData.nome || '',
-        diasSemana: turmaData.diasSemana || '',
-        horario: turmaData.horario || '',
-        descricao: turmaData.descricao || '',
+    if (t) setFormEdit({
+        nome: t.nome || '',
+        diasSemana: t.diasSemana || '',
+        horario: t.horario || '',
+        descricao: t.descricao || '',
       })
     setLoading(false)
   }
