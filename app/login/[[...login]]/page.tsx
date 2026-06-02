@@ -1,4 +1,5 @@
 import { SignIn } from '@clerk/nextjs'
+import { dark } from '@clerk/themes'
 
 export default function LoginPage() {
   return (
@@ -24,22 +25,31 @@ export default function LoginPage() {
 
       <SignIn
         appearance={{
+          baseTheme: dark,
           variables: {
             colorPrimary: '#39FF14',
-            colorBackground: '#0D0D0D',
+            colorBackground: '#0a0a0a',
             colorText: '#F0F0F0',
             colorTextSecondary: 'rgba(255,255,255,0.5)',
-            colorInputBackground: 'rgba(255,255,255,0.06)',
+            colorInputBackground: '#1a1a1a',
             colorInputText: '#F0F0F0',
+            colorNeutral: '#888',
             borderRadius: '12px',
           },
           elements: {
-            card: { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: 'none' },
+            card: { background: '#111111', border: '1px solid rgba(255,255,255,0.08)', boxShadow: 'none' },
             headerTitle: { display: 'none' },
             headerSubtitle: { display: 'none' },
-            socialButtonsBlockButton: { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#F0F0F0' },
+            socialButtonsBlockButton: { background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', color: '#F0F0F0' },
+            socialButtonsBlockButtonText: { color: '#F0F0F0' },
             formButtonPrimary: { background: 'linear-gradient(135deg,#39FF14,#00cc00)', color: '#000', fontWeight: 800, fontFamily: 'Syne, sans-serif', boxShadow: '0 0 16px rgba(57,255,20,0.3)' },
             footerActionLink: { color: '#39FF14' },
+            formFieldInput: { background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', color: '#F0F0F0' },
+            formFieldLabel: { color: 'rgba(255,255,255,0.5)' },
+            dividerLine: { background: 'rgba(255,255,255,0.08)' },
+            dividerText: { color: 'rgba(255,255,255,0.3)' },
+            identityPreviewText: { color: '#F0F0F0' },
+            formResendCodeLink: { color: '#39FF14' },
           }
         }}
       />
