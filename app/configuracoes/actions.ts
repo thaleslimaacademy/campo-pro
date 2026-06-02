@@ -17,6 +17,7 @@ export interface ConfiguracaoForm {
   facebookUrl: string
   multaAtraso: number
   jurosAoMes: number
+  valorDesconto: number
 }
 
 export async function salvarConfiguracoes(form: ConfiguracaoForm): Promise<{ ok: boolean; message: string }> {
@@ -41,6 +42,7 @@ export async function salvarConfiguracoes(form: ConfiguracaoForm): Promise<{ ok:
       facebookUrl: form.facebookUrl,
       multaAtraso: form.multaAtraso,
       jurosAoMes: form.jurosAoMes,
+      valorDesconto: form.valorDesconto,
       updatedAt: new Date().toISOString(),
     })
     .eq('id', escolaId)

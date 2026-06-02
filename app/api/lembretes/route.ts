@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   const data3dias = em3dias.toISOString().split('T')[0]
 
   const { data: escolas } = await supabaseAdmin
-    .from('Escola').select('id, nome, msgLembrete').eq('ativa', true)
+    .from('Escola').select('id, nome, msgLembrete, valorDesconto, valorMensalidade').eq('ativa', true)
 
   if (!escolas) return NextResponse.json({ sucesso: true, enviados: 0 })
 
@@ -58,13 +58,24 @@ export async function GET(req: NextRequest) {
 
         const template = escola.msgLembrete || 'Ola {nome_responsavel}! A mensalidade de *{nome_atleta}* vence em *{dias_para_vencer} dias*. Valor: R$ {valor}. Vencimento: {data_vencimento}. _{nome_escola}_'
 
-        const mensagem = aplicarVariaveis(template, {
+        const valorDesc = Number(escola.valorDesconto || 0)
+        const temDesconto = valorDesc > 0 && diasParaVencer > 0
+
+        const templateFinal = escola.msgLembrete || (
+          temDesconto
+            ? 'Ola {nome_responsavel}! Lembrete da *{nome_escola}*\n\nA mensalidade de *{nome_atleta}* vence em *{dias_para_vencer} dias*.\n\n💰 Pague antes do vencimento por apenas *R$ {valor_desconto}*\n⚠️ Apos o vencimento: R$ {valor}\n\nVencimento: {data_vencimento}\n\nPague agora: {link_pagamento}\n\n_{nome_escola}_'
+            : 'Ola {nome_responsavel}! Lembrete da *{nome_escola}*\n\nA mensalidade de *{nome_atleta}* vence em *{dias_para_vencer} dias*.\n\nValor: R$ {valor}\nVencimento: {data_vencimento}\n\nPague agora: {link_pagamento}\n\n_{nome_escola}_'
+        )
+
+        const mensagem = aplicarVariaveis(templateFinal, {
           '{nome_responsavel}': responsavel.nome.split(' ')[0],
           '{nome_atleta}': atleta.nome,
           '{nome_escola}': escola.nome,
           '{valor}': Number(cobranca.valor).toFixed(2),
+          '{valor_desconto}': valorDesc.toFixed(2),
           '{data_vencimento}': dataVenc,
           '{dias_para_vencer}': String(diasParaVencer),
+          '{link_pagamento}': cobranca.pixCopiaCola ? 'gestaofc.com.br/pagar/' + cobranca.id : 'Entre em contato',
         })
 
         await enviarWhatsApp(responsavel.whatsapp, mensagem)

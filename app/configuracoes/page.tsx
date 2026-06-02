@@ -27,6 +27,7 @@ function ConfiguracoesInner() {
     facebookUrl: '',
     multaAtraso: 0,
     jurosAoMes: 0,
+    valorDesconto: 0,
   })
 
   useEffect(() => {
@@ -63,6 +64,7 @@ function ConfiguracoesInner() {
           facebookUrl: data.facebookUrl || '',
           multaAtraso: Number(data.multaAtraso || 0),
           jurosAoMes: Number(data.jurosAoMes || 0),
+          valorDesconto: Number(data.valorDesconto || 0),
         })
       }
       setLoading(false)
@@ -94,6 +96,7 @@ function ConfiguracoesInner() {
       facebookUrl: form.facebookUrl,
       multaAtraso: form.multaAtraso,
       jurosAoMes: form.jurosAoMes,
+      valorDesconto: form.valorDesconto,
     })
 
     setSalvando(false)
