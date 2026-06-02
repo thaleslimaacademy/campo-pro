@@ -197,21 +197,21 @@ function FinanceiroInner() {
     : cobrancas
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
+    <div style={{ minHeight: "100vh", color: "#F0F0F0", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
 
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold">💰 Financeiro</h1>
+        <h1 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "24px", color: "#F0F0F0" }}>Financeiro</h1>
         <div className="flex gap-2">
           <button
             onClick={() => { setMostrarLote(!mostrarLote); setMostrarForm(false) }}
-            className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+            style={{ background: "rgba(59,130,246,0.15)", border: "1px solid rgba(59,130,246,0.3)", color: "#60a5fa", padding: "8px 14px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer" }}
           >
             📋 Lote
           </button>
           <button
             onClick={() => { setMostrarForm(!mostrarForm); setMostrarLote(false) }}
-            className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+            style={{ background: "linear-gradient(135deg,#39FF14,#00cc00)", color: "#000", padding: "8px 14px", borderRadius: "10px", fontSize: "12px", fontWeight: 800, fontFamily: "Syne, sans-serif", cursor: "pointer", boxShadow: "0 0 12px rgba(57,255,20,0.3)" }}
           >
             + Cobrança
           </button>
@@ -222,19 +222,19 @@ function FinanceiroInner() {
       {!loading && inadimplentes.length > 0 && (
         <button
           onClick={() => setAba(aba === 'inadimplentes' ? 'todas' : 'inadimplentes')}
-          className="w-full bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-4 text-left"
+          style={{ width: "100%", background: "rgba(255,70,70,0.07)", border: "1px solid rgba(255,70,70,0.25)", borderRadius: "16px", padding: "14px", marginBottom: "16px", textAlign: "left", cursor: "pointer" }}
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-red-400 font-bold">🚨 Inadimplentes</p>
-              <p className="text-gray-400 text-sm mt-1">
+              <p style={{ color: "#ff5555", fontWeight: 700, fontFamily: "Syne, sans-serif", fontSize: "14px" }}>Inadimplentes</p>
+              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px", marginTop: "4px" }}>
                 {inadimplentes.length} {inadimplentes.length === 1 ? 'atleta' : 'atletas'} com pagamento em atraso
               </p>
-              <p className="text-red-400 text-sm font-bold mt-1">
+              <p style={{ color: "#ff5555", fontSize: "12px", fontWeight: 700, marginTop: "4px", fontFamily: "Syne, sans-serif" }}>
                 Total: R$ {inadimplentes.reduce((s, i) => s + i.totalDevido, 0).toFixed(2)}
               </p>
             </div>
-            <span className="bg-red-500 text-white text-lg font-bold w-10 h-10 rounded-full flex items-center justify-center">
+            <span style={{ background: "#ff5555", color: "#000", fontSize: "16px", fontWeight: 800, width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Syne, sans-serif" }}>
               {inadimplentes.length}
             </span>
           </div>
@@ -286,28 +286,28 @@ function FinanceiroInner() {
 
       {/* Formulário cobrança individual */}
       {mostrarForm && (
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-6">
-          <p className="font-bold mb-4">Nova Cobrança</p>
+        <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(57,255,20,0.2)", marginBottom: "16px" }}>
+          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "16px", color: "#39FF14", marginBottom: "16px" }}>Nova Cobranca</p>
           <div className="space-y-3">
             <div>
-              <label className="text-sm text-gray-400">Atleta</label>
-              <select value={atletaId} onChange={e => setAtletaId(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white">
+              <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Atleta</label>
+              <select value={atletaId} onChange={e => setAtletaId(e.target.value)} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }}>
                 {atletas.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-sm text-gray-400">Valor (R$)</label>
-              <input value={valor} onChange={e => setValor(e.target.value)} type="number" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+              <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Valor (R$)</label>
+              <input value={valor} onChange={e => setValor(e.target.value)} type="number" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
             </div>
             <div>
-              <label className="text-sm text-gray-400">Vencimento</label>
-              <input value={vencimento} onChange={e => setVencimento(e.target.value)} type="date" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+              <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Vencimento</label>
+              <input value={vencimento} onChange={e => setVencimento(e.target.value)} type="date" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
             </div>
             <div>
-              <label className="text-sm text-gray-400">Descrição</label>
-              <input value={descricao} onChange={e => setDescricao(e.target.value)} type="text" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+              <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Descrição</label>
+              <input value={descricao} onChange={e => setDescricao(e.target.value)} type="text" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
             </div>
-            <button onClick={gerarCobranca} disabled={gerando} className="w-full bg-green-600 text-white py-3 rounded-lg font-bold disabled:opacity-50">
+            <button onClick={gerarCobranca} disabled={gerando} style={{ width: "100%", background: "linear-gradient(135deg,#39FF14,#00cc00)", color: "#000", padding: "14px", borderRadius: "12px", fontWeight: 800, fontFamily: "Syne, sans-serif", fontSize: "13px", border: "none", cursor: "pointer" }}>
               {gerando ? 'Gerando Pix...' : 'Gerar Cobrança com Pix'}
             </button>
           </div>
@@ -321,21 +321,21 @@ function FinanceiroInner() {
           <p className="text-gray-400 text-xs mb-4">Gera Pix para vários atletas de uma vez</p>
           <div className="space-y-3 mb-4">
             <div>
-              <label className="text-sm text-gray-400">Valor (R$)</label>
-              <input value={valorLote} onChange={e => setValorLote(e.target.value)} type="number" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+              <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Valor (R$)</label>
+              <input value={valorLote} onChange={e => setValorLote(e.target.value)} type="number" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
             </div>
             <div>
-              <label className="text-sm text-gray-400">Vencimento</label>
-              <input value={vencimentoLote} onChange={e => setVencimentoLote(e.target.value)} type="date" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+              <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Vencimento</label>
+              <input value={vencimentoLote} onChange={e => setVencimentoLote(e.target.value)} type="date" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
             </div>
             <div>
-              <label className="text-sm text-gray-400">Descrição</label>
-              <input value={descricaoLote} onChange={e => setDescricaoLote(e.target.value)} type="text" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+              <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Descrição</label>
+              <input value={descricaoLote} onChange={e => setDescricaoLote(e.target.value)} type="text" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
             </div>
           </div>
           <div className="mb-4">
             <div className="flex justify-between items-center mb-2">
-              <label className="text-sm text-gray-400">Selecionar atletas</label>
+              <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Selecionar atletas</label>
               <button onClick={selecionarTodos} className="text-xs text-blue-400 underline">
                 {atletasSelecionados.length === atletas.length ? 'Desmarcar todos' : 'Selecionar todos'}
               </button>
@@ -367,10 +367,10 @@ function FinanceiroInner() {
       {/* Abas filtro */}
       {!loading && cobrancas.length > 0 && (
         <div className="flex gap-2 mb-4">
-          <button onClick={() => setAba('todas')} className={`px-3 py-1 rounded-full text-xs font-bold transition ${aba === 'todas' ? 'bg-green-600 text-white' : 'bg-gray-800 text-gray-400'}`}>
+          <button onClick={() => setAba('todas')} style={{ padding: "6px 14px", borderRadius: "20px", fontSize: "11px", fontWeight: 800, fontFamily: "Syne, sans-serif", cursor: "pointer", background: aba === "todas" ? "#39FF14" : "rgba(255,255,255,0.05)", color: aba === "todas" ? "#000" : "rgba(255,255,255,0.4)", border: "none" }}>
             Todas ({cobrancas.length})
           </button>
-          <button onClick={() => setAba('inadimplentes')} className={`px-3 py-1 rounded-full text-xs font-bold transition ${aba === 'inadimplentes' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400'}`}>
+          <button onClick={() => setAba('inadimplentes')} style={{ padding: "6px 14px", borderRadius: "20px", fontSize: "11px", fontWeight: 800, fontFamily: "Syne, sans-serif", cursor: "pointer", background: aba === "inadimplentes" ? "#ff5555" : "rgba(255,255,255,0.05)", color: aba === "inadimplentes" ? "#fff" : "rgba(255,255,255,0.4)", border: "none" }}>
             🚨 Atraso ({inadimplentes.reduce((s, i) => s + i.cobrancas.length, 0)})
           </button>
         </div>
@@ -408,7 +408,7 @@ function FinanceiroInner() {
       )}
 
       {/* Loading */}
-      {loading && <p className="text-gray-400 text-center mt-10">Carregando...</p>}
+      {loading && <p style={{ color: "rgba(255,255,255,0.4)", textAlign: "center", padding: "40px 0" }}>Carregando...</p>}
 
       {/* Empty state */}
       {!loading && cobrancas.length === 0 && !mostrarForm && !mostrarLote && (
@@ -422,25 +422,25 @@ function FinanceiroInner() {
       {/* Lista de cobranças */}
       <div className="space-y-3">
         {cobrancasFiltradas.map(c => (
-          <div key={c.id} className={`bg-gray-900 rounded-xl p-4 border ${c.status === 'VENCIDO' || (c.status === 'PENDENTE' && c.vencimento < new Date().toISOString().split('T')[0]) ? 'border-red-800' : 'border-gray-800'}`}>
+          <div key={c.id} style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: c.status === "VENCIDO" || (c.status === "PENDENTE" && c.vencimento < new Date().toISOString().split("T")[0]) ? "1px solid rgba(255,70,70,0.25)" : "1px solid rgba(255,255,255,0.07)" }}>
             <div className="flex justify-between items-start mb-2">
               <div>
-                <p className="font-bold">{nomeAtleta(c.atletaId)}</p>
-                <p className="text-gray-400 text-sm">{c.descricao || 'Mensalidade'}</p>
+                <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "14px", color: "#F0F0F0" }}>{nomeAtleta(c.atletaId)}</p>
+                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginTop: "2px" }}>{c.descricao || 'Mensalidade'}</p>
               </div>
               <div className="text-right">
-                <p className="font-bold text-green-400">R$ {Number(c.valor).toFixed(2)}</p>
-                <p className={`text-xs ${statusCor[c.status] || 'text-gray-400'}`}>{c.status}</p>
+                <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, color: "#39FF14", fontSize: "14px" }}>R$ {Number(c.valor).toFixed(2)}</p>
+                <p style={{ fontSize: "10px", color: c.status === "PAGO" ? "#39FF14" : c.status === "VENCIDO" ? "#ff5555" : c.status === "PENDENTE" ? "#D4AF37" : "rgba(255,255,255,0.4)", fontFamily: "Syne, sans-serif", fontWeight: 700 }}>{c.status}</p>
               </div>
             </div>
-            <p className="text-gray-500 text-xs mb-3">Vencimento: {new Date(c.vencimento).toLocaleDateString('pt-BR')}</p>
+            <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)", marginBottom: "10px" }}>Venc: {new Date(c.vencimento).toLocaleDateString('pt-BR')}</p>
             {c.status === 'PENDENTE' && (c.pixCopiaCola || c.pixQrCode) && (
               <div className="flex gap-2">
                 {c.pixQrCode && (
-                  <button onClick={() => setPixAtivo(c)} className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-medium transition">📲 Ver QR Code</button>
+                  <button onClick={() => setPixAtivo(c)} style={{ flex: 1, background: "rgba(57,255,20,0.1)", border: "1px solid rgba(57,255,20,0.3)", color: "#39FF14", padding: "10px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer" }}>Ver QR Code</button>
                 )}
                 {c.pixCopiaCola && (
-                  <button onClick={() => copiarPix(c.pixCopiaCola!, c.id)} className="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-2 rounded-lg text-sm font-medium transition">
+                  <button onClick={() => copiarPix(c.pixCopiaCola!, c.id)} style={{ flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#F0F0F0", padding: "10px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer" }}>
                     {copiado === c.id ? '✅ Copiado!' : '📋 Copiar Pix'}
                   </button>
                 )}
@@ -451,11 +451,11 @@ function FinanceiroInner() {
       </div>
 
       {/* Nav */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
-        <a href="/dashboard" className="text-gray-400 text-xs text-center">🏠<br/>Início</a>
-        <a href="/atletas" className="text-gray-400 text-xs text-center">👥<br/>Atletas</a>
-        <a href="/presenca" className="text-gray-400 text-xs text-center">✅<br/>Presença</a>
-        <a href="/financeiro" className="text-green-500 text-xs text-center">💰<br/>Financeiro</a>
+      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
+        <a href="/dashboard" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "3px", textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Inicio</a>
+        <a href="/atletas" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "3px", textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Atletas</a>
+        <a href="/presenca" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "3px", textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Presenca</a>
+        <a href="/financeiro" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "3px", textDecoration: "none", color: "#39FF14", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif", fontWeight: 700 }}>Financeiro</a>
       </nav>
     </div>
   )
