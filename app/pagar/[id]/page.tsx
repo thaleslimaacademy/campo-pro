@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
 
 type Cobranca = {
   id: string
@@ -30,22 +29,12 @@ export default function PagarPage() {
 
   useEffect(() => {
     async function carregar() {
-      const { data: c } = await supabase
-        .from('Cobranca')
-        .select('*')
-        .eq('id', id)
-        .single()
-
-      if (c) {
-        setCobranca(c)
-        const { data: atleta } = await supabase
-          .from('Atleta').select('nome, escolaId').eq('id', c.atletaId).single()
-        if (atleta) {
-          setNomeAtleta(atleta.nome)
-          const { data: escola } = await supabase
-            .from('Escola').select('nome').eq('id', atleta.escolaId).single()
-          if (escola) setNomeEscola(escola.nome)
-        }
+      const res = await fetch('/api/pagar?id=' + id)
+      if (res.ok) {
+        const data = await res.json()
+        setCobranca(data)
+        setNomeAtleta(data.nomeAtleta)
+        setNomeEscola(data.nomeEscola)
       }
       setLoading(false)
     }
