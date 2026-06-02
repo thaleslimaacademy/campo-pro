@@ -178,14 +178,38 @@ function FinanceiroInner() {
     setTimeout(() => setCopiado(null), 2000)
   }
 
-  async function marcarComoPago(cobrancaId: string) {
+  async function marcarComoPago(cobrancaId: string, enviarRecibo = false) {
     if (!confirm('Confirmar pagamento manual desta cobrança?')) return
+    const cobranca = cobrancas.find(c => c.id === cobrancaId)
     const { error } = await supabase
       .from('Cobranca')
       .update({ status: 'PAGO' })
       .eq('id', cobrancaId)
-    if (!error) await carregar()
-    else alert('Erro: ' + error.message)
+    if (error) { alert('Erro: ' + error.message); return }
+
+    if (enviarRecibo && cobranca) {
+      const atleta = atletas.find(a => a.id === cobranca.atletaId)
+      const { data: responsaveis } = await supabase
+        .from('Responsavel').select('nome, whatsapp')
+        .eq('atletaId', cobranca.atletaId).limit(1)
+      const resp = responsaveis?.[0]
+      if (resp?.whatsapp && atleta) {
+        const dataVenc = new Date(cobranca.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
+        const msg = encodeURIComponent(
+          'Ola ' + resp.nome.split(' ')[0] + '! Recibo de pagamento\n\n' +
+          'Atleta: *' + atleta.nome + '*\n' +
+          'Descricao: ' + (cobranca.descricao || 'Mensalidade') + '\n' +
+          'Valor: *R$ ' + Number(cobranca.valor).toFixed(2) + '*\n' +
+          'Vencimento: ' + dataVenc + '\n' +
+          'Status: *PAGO*\n\n' +
+          'Obrigado pelo pagamento!'
+        )
+        const numero = resp.whatsapp.replace(/\D/g, '')
+        const numeroFmt = numero.startsWith('55') ? numero : '55' + numero
+        window.open('https://wa.me/' + numeroFmt + '?text=' + msg, '_blank')
+      }
+    }
+    await carregar()
   }
 
   const statusCor: Record<string, string> = {
@@ -454,8 +478,8 @@ function FinanceiroInner() {
                     {copiado === c.id ? 'Copiado!' : 'Copiar Pix'}
                   </button>
                 )}
-                <button onClick={() => marcarComoPago(c.id)} style={{ flex: 1, background: "rgba(212,175,55,0.1)", border: "1px solid rgba(212,175,55,0.3)", color: "#D4AF37", padding: "10px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer" }}>
-                  Baixa manual
+                <button onClick={() => marcarComoPago(c.id, true)} style={{ flex: 1, background: "rgba(212,175,55,0.1)", border: "1px solid rgba(212,175,55,0.3)", color: "#D4AF37", padding: "10px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer" }}>
+                  Pago + Recibo
                 </button>
               </div>
             )}
