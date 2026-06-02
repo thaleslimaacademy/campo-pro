@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
   for (const escola of escolas) {
     const { data: cobrancas } = await supabaseAdmin
       .from('Cobranca')
-      .select('id, valor, vencimento, atletaId')
+      .select('id, valor, vencimento, atletaId, pixCopiaCola')
       .eq('escolaId', escola.id)
       .eq('status', 'PENDENTE')
       .in('vencimento', [dataHoje, data3dias])
