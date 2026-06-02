@@ -1,5 +1,4 @@
 'use client'
-
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { usePerfil } from '@/lib/usePerfil'
@@ -17,74 +16,40 @@ export default function Dashboard() {
   const [totalPendente, setTotalPendente] = useState(0)
   const [cobrancasMes, setCobrancasMes] = useState(0)
   const [copiado, setCopiado] = useState(false)
-
+  const [nomeEscola, setNomeEscola] = useState('GestaoFC')
   const linkMatricula = 'https://gestaofc.com.br/matricula'
 
   useEffect(() => {
     if (!escolaId) return
     async function carregar() {
-      const { count } = await supabase
-        .from('Atleta')
-        .select('*', { count: 'exact', head: true })
-        .eq('escolaId', escolaId)
-        .eq('ativo', true)
+      const { data: escola } = await supabase.from('Escola').select('nome').eq('id', escolaId).single()
+      if (escola) setNomeEscola(escola.nome)
+      const { count } = await supabase.from('Atleta').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('ativo', true)
       setTotalAtletas(count || 0)
-
       const dataHoje = new Date().toISOString().split('T')[0]
-      const { data: treino } = await supabase
-        .from('Treino')
-        .select('id')
-        .eq('escolaId', escolaId)
-        .gte('data', dataHoje)
-        .limit(1)
-        .single()
-
+      const { data: treino } = await supabase.from('Treino').select('id').eq('escolaId', escolaId).gte('data', dataHoje).limit(1).single()
       if (treino) {
-        const { data: presencas } = await supabase
-          .from('Presenca')
-          .select('status')
-          .eq('treinoId', treino.id)
+        const { data: presencas } = await supabase.from('Presenca').select('status').eq('treinoId', treino.id)
         const presentes = presencas?.filter(p => p.status === 'PRESENTE').length || 0
         setPresencaHoje({ presentes, total: presencas?.length || 0 })
       }
-
-      const { count: countPendentes } = await supabase
-        .from('Matricula')
-        .select('*', { count: 'exact', head: true })
-        .eq('escolaId', escolaId)
-        .eq('status', 'PENDENTE')
-        .eq('tipo', 'matricula')
-      setPendentes(countPendentes || 0)
-
-      const { count: countRematriculas } = await supabase
-        .from('Matricula')
-        .select('*', { count: 'exact', head: true })
-        .eq('escolaId', escolaId)
-        .eq('status', 'PENDENTE')
-        .eq('tipo', 'rematricula')
-      setRematriculas(countRematriculas || 0)
-
+      const { count: cp } = await supabase.from('Matricula').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('status', 'PENDENTE').eq('tipo', 'matricula')
+      setPendentes(cp || 0)
+      const { count: cr } = await supabase.from('Matricula').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('status', 'PENDENTE').eq('tipo', 'rematricula')
+      setRematriculas(cr || 0)
       const agora = new Date()
       const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString().split('T')[0]
       const fimMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0).toISOString().split('T')[0]
-
-      const { data: cobrancas } = await supabase
-        .from('Cobranca')
-        .select('valor, status, vencimento')
-        .eq('escolaId', escolaId)
-        .gte('vencimento', inicioMes)
-        .lte('vencimento', fimMes)
-
+      const { data: cobrancas } = await supabase.from('Cobranca').select('valor, status, vencimento').eq('escolaId', escolaId).gte('vencimento', inicioMes).lte('vencimento', fimMes)
       if (cobrancas) {
         const pagas = cobrancas.filter(c => c.status === 'PAGO')
-        const pendentesFinanceiro = cobrancas.filter(c => c.status === 'PENDENTE' || c.status === 'VENCIDO')
-        const vencidas = cobrancas.filter(c => c.status === 'VENCIDO')
-        setReceitaMes(pagas.reduce((sum, c) => sum + Number(c.valor), 0))
-        setTotalPendente(pendentesFinanceiro.reduce((sum, c) => sum + Number(c.valor), 0))
-        setInadimplentes(vencidas.length)
+        const pend = cobrancas.filter(c => c.status === 'PENDENTE' || c.status === 'VENCIDO')
+        const venc = cobrancas.filter(c => c.status === 'VENCIDO')
+        setReceitaMes(pagas.reduce((s, c) => s + Number(c.valor), 0))
+        setTotalPendente(pend.reduce((s, c) => s + Number(c.valor), 0))
+        setInadimplentes(venc.length)
         setCobrancasMes(cobrancas.length)
       }
-
       setLoading(false)
     }
     carregar()
@@ -96,220 +61,192 @@ export default function Dashboard() {
     setTimeout(() => setCopiado(false), 2000)
   }
 
-  function enviarWhatsApp() {
-    const whatsapp = prompt('Digite o WhatsApp do responsável (com DDD):')
-    if (!whatsapp) return
-    const numero = whatsapp.replace(/\D/g, '')
-    const numeroFormatado = numero.startsWith('55') ? numero : '55' + numero
-    const mensagem = encodeURIComponent(
-      'Olá! 👋\n\nAcesse o link abaixo para fazer a pré-matrícula do seu filho(a) na *Thales Lima Football Academy*:\n\n' + linkMatricula + '\n\n_Preencha a ficha e assine o contrato digital. Nossa equipe analisará e confirmará em breve!_ ⚽'
-    )
-    window.open('https://wa.me/' + numeroFormatado + '?text=' + mensagem, '_blank')
-  }
+  const pct = presencaHoje.total > 0 ? Math.round((presencaHoje.presentes / presencaHoje.total) * 100) : 0
+  const mes = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+  const dia = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
+  const recTotal = receitaMes + totalPendente
+  const pctRec = recTotal > 0 ? Math.round((receitaMes / recTotal) * 100) : 0
 
-  const percentualPresenca = presencaHoje.total > 0
-    ? Math.round((presencaHoje.presentes / presencaHoje.total) * 100)
-    : 0
+  const syne = 'Syne, sans-serif'
+  const inter = 'Inter, sans-serif'
+  const neon = '#39FF14'
+  const gold = '#D4AF37'
+  const muted = 'rgba(255,255,255,0.4)'
+  const cardBg = 'rgba(255,255,255,0.05)' as const
+  const cardBorder = '1px solid rgba(255,255,255,0.07)' as const
 
-  const mesAtual = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
-
-  if (!isLoaded) {
-    return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <p className="text-gray-400">Carregando...</p>
-      </div>
-    )
-  }
-
-  if (!escolaId) {
-    return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <p className="text-gray-400">Configurando sessão...</p>
-      </div>
-    )
-  }
+  if (!isLoaded) return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p style={{ color: muted, fontFamily: inter }}>Carregando...</p></div>
+  if (!escolaId) return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p style={{ color: muted, fontFamily: inter }}>Configurando sessao...</p></div>
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
-      <div className="flex items-center justify-between mb-1">
-        <h1 className="text-2xl font-bold text-green-500">⚽ Campo Pro</h1>
-        <UserButton  />
-      </div>
-      <p className="text-gray-400 text-sm mb-6">
-        {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
-      </p>
+    <div style={{ minHeight: '100vh', paddingBottom: '80px', color: '#F0F0F0', fontFamily: inter }}>
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
-          <p className="text-gray-400 text-sm">Alunos Ativos</p>
-          <p className="text-3xl font-bold text-white">{loading ? '...' : totalAtletas}</p>
-        </div>
-        {isAdmin && (
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
-            <p className="text-gray-400 text-sm">Inadimplentes</p>
-            <p className={'text-3xl font-bold ' + (inadimplentes > 0 ? 'text-red-400' : 'text-green-400')}>
-              {loading ? '...' : inadimplentes}
-            </p>
+      {/* HEADER */}
+      <div style={{ padding: '16px 20px 12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'linear-gradient(135deg,#39FF14,#00aa00)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '17px', fontWeight: 800, color: '#000', fontFamily: syne, boxShadow: '0 0 16px rgba(57,255,20,0.4)' }}>G</div>
+            <div>
+              <div style={{ fontFamily: syne, fontWeight: 800, fontSize: '18px', color: '#F0F0F0', letterSpacing: '-0.5px' }}>{nomeEscola}</div>
+              <div style={{ fontSize: '10px', color: neon, letterSpacing: '1.5px', textTransform: 'uppercase', fontWeight: 600 }}>Pro</div>
+            </div>
           </div>
-        )}
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
-          <p className="text-gray-400 text-sm">Presença Hoje</p>
-          <p className={'text-3xl font-bold ' + (percentualPresenca >= 75 ? 'text-green-400' : percentualPresenca > 0 ? 'text-yellow-400' : 'text-gray-400')}>
-            {loading ? '...' : presencaHoje.total === 0 ? 'Sem treino' : percentualPresenca + '%'}
-          </p>
-          {presencaHoje.total > 0 && (
-            <p className="text-gray-500 text-xs mt-1">{presencaHoje.presentes} de {presencaHoje.total}</p>
-          )}
+          <UserButton />
         </div>
-        {isAdmin && (
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
-            <p className="text-gray-400 text-sm">Receita do Mês</p>
-            <p className="text-2xl font-bold text-green-400">
-              {loading ? '...' : 'R$ ' + receitaMes.toFixed(0)}
-            </p>
-          </div>
-        )}
+        <div style={{ fontSize: '11px', color: muted, marginBottom: '2px' }}>{dia}</div>
+        <div style={{ fontFamily: syne, fontSize: '22px', fontWeight: 800, color: '#F0F0F0', lineHeight: 1.1 }}>
+          Ola, <span style={{ color: neon }}>Thales</span>
+        </div>
       </div>
 
+      {/* METRICS */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', padding: '0 20px 16px' }}>
+        <div style={{ background: 'rgba(57,255,20,0.07)', borderRadius: '16px', padding: '14px', border: '1px solid rgba(57,255,20,0.2)' }}>
+          <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>Alunos ativos</div>
+          <div style={{ fontFamily: syne, fontSize: '26px', fontWeight: 800, color: neon }}>{loading ? '...' : totalAtletas}</div>
+          <div style={{ fontSize: '10px', color: muted, marginTop: '4px' }}>cadastrados</div>
+        </div>
+        {isAdmin && (
+          <div style={{ background: inadimplentes > 0 ? 'rgba(255,70,70,0.07)' : cardBg, borderRadius: '16px', padding: '14px', border: inadimplentes > 0 ? '1px solid rgba(255,70,70,0.3)' : cardBorder }}>
+            <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>Inadimplentes</div>
+            <div style={{ fontFamily: syne, fontSize: '26px', fontWeight: 800, color: inadimplentes > 0 ? '#ff5555' : neon }}>{loading ? '...' : inadimplentes}</div>
+            <div style={{ fontSize: '10px', color: muted, marginTop: '4px' }}>em atraso</div>
+          </div>
+        )}
+        <div style={{ background: cardBg, borderRadius: '16px', padding: '14px', border: cardBorder }}>
+          <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>Presenca hoje</div>
+          <div style={{ fontFamily: syne, fontSize: '26px', fontWeight: 800, color: pct >= 75 ? neon : pct > 0 ? gold : muted }}>{loading ? '...' : presencaHoje.total === 0 ? '-' : pct + '%'}</div>
+          <div style={{ fontSize: '10px', color: muted, marginTop: '4px' }}>{presencaHoje.total > 0 ? presencaHoje.presentes + ' de ' + presencaHoje.total : 'sem treino'}</div>
+        </div>
+        {isAdmin && (
+          <div style={{ background: 'rgba(212,175,55,0.07)', borderRadius: '16px', padding: '14px', border: '1px solid rgba(212,175,55,0.2)' }}>
+            <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>Receita mes</div>
+            <div style={{ fontFamily: syne, fontSize: '26px', fontWeight: 800, color: gold }}>{loading ? '...' : 'R$' + receitaMes.toFixed(0)}</div>
+            <div style={{ fontSize: '10px', color: muted, marginTop: '4px' }}>{mes}</div>
+          </div>
+        )}
+      </div>
+
+      {/* FINANCEIRO */}
       {isAdmin && (
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
-          <div className="flex justify-between items-center mb-4">
-            <p className="font-bold text-sm">💰 Financeiro — {mesAtual}</p>
-            <a href="/financeiro" className="text-green-400 text-xs underline">Ver tudo</a>
+        <div style={{ padding: '0 20px 14px' }}>
+          <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
+            <span>Financeiro</span>
+            <a href="/financeiro" style={{ color: neon, fontSize: '10px', textDecoration: 'none', textTransform: 'none', letterSpacing: 0 }}>Ver tudo</a>
           </div>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <span className="text-sm text-gray-300">Recebido</span>
+          <div style={{ background: cardBg, borderRadius: '16px', padding: '14px', border: cardBorder }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: muted }}>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: neon, boxShadow: '0 0 4px #39FF14' }}></div>Recebido
               </div>
-              <span className="font-bold text-green-400">R$ {loading ? '...' : receitaMes.toFixed(2)}</span>
+              <span style={{ fontFamily: syne, fontWeight: 700, color: neon, fontSize: '13px' }}>R$ {loading ? '...' : receitaMes.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                <span className="text-sm text-gray-300">A receber</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: muted }}>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: gold, boxShadow: '0 0 4px #D4AF37' }}></div>A receber
               </div>
-              <span className="font-bold text-yellow-400">R$ {loading ? '...' : totalPendente.toFixed(2)}</span>
+              <span style={{ fontFamily: syne, fontWeight: 700, color: gold, fontSize: '13px' }}>R$ {loading ? '...' : totalPendente.toFixed(2)}</span>
             </div>
-            {!loading && (receitaMes + totalPendente) > 0 && (
-              <div className="mt-2">
-                <div className="w-full bg-gray-700 rounded-full h-2">
-                  <div
-                    className="bg-green-500 h-2 rounded-full transition-all"
-                    style={{ width: Math.round((receitaMes / (receitaMes + totalPendente)) * 100) + '%' }}
-                  />
+            {!loading && recTotal > 0 && (
+              <div style={{ marginTop: '10px' }}>
+                <div style={{ height: '3px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', background: 'linear-gradient(90deg,#39FF14,#00cc00)', width: pctRec + '%' }}></div>
                 </div>
-                <div className="flex justify-between mt-1">
-                  <p className="text-xs text-gray-500">{cobrancasMes} cobranças no mês</p>
-                  <p className="text-xs text-gray-500">
-                    {Math.round((receitaMes / (receitaMes + totalPendente)) * 100)}% recebido
-                  </p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '5px', fontSize: '10px', color: muted }}>
+                  <span>{pctRec}% recebido</span><span>{cobrancasMes} cobrancas</span>
                 </div>
               </div>
             )}
-            {!loading && cobrancasMes === 0 && (
-              <p className="text-gray-500 text-xs text-center py-2">Nenhuma cobrança este mês</p>
-            )}
+            {!loading && cobrancasMes === 0 && <p style={{ fontSize: '11px', color: muted, textAlign: 'center', padding: '8px 0' }}>Nenhuma cobranca este mes</p>}
           </div>
         </div>
       )}
 
+      {/* PENDENTES */}
       {isAdmin && pendentes > 0 && (
-        <a href="/matriculas" className="block bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-yellow-400 font-bold">📋 Pré-matrículas pendentes</p>
-              <p className="text-gray-400 text-sm mt-1">
-                {pendentes} {pendentes === 1 ? 'ficha aguarda' : 'fichas aguardam'} sua aprovação
-              </p>
+        <div style={{ padding: '0 20px 14px' }}>
+          <a href="/matriculas" style={{ display: 'block', background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.3)', borderRadius: '16px', padding: '14px', textDecoration: 'none' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <p style={{ color: gold, fontWeight: 700, fontSize: '13px', fontFamily: syne }}>Pre-matriculas pendentes</p>
+                <p style={{ color: muted, fontSize: '11px', marginTop: '3px' }}>{pendentes} aguardam aprovacao</p>
+              </div>
+              <span style={{ background: neon, color: '#000', fontSize: '9px', fontWeight: 800, padding: '2px 7px', borderRadius: '20px', fontFamily: syne }}>{pendentes}</span>
             </div>
-            <span className="bg-yellow-500 text-black text-lg font-bold w-10 h-10 rounded-full flex items-center justify-center">
-              {pendentes}
-            </span>
-          </div>
-        </a>
-      )}
-
-      {isAdmin && rematriculas > 0 && (
-        <a href="/rematriculas" className="block bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 mb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-orange-400 font-bold">🔄 Rematrículas pendentes</p>
-              <p className="text-gray-400 text-sm mt-1">
-                {rematriculas} {rematriculas === 1 ? 'renovação aguarda' : 'renovações aguardam'} sua aprovação
-              </p>
-            </div>
-            <span className="bg-orange-500 text-black text-lg font-bold w-10 h-10 rounded-full flex items-center justify-center">
-              {rematriculas}
-            </span>
-          </div>
-        </a>
-      )}
-
-      {isAdmin && (
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
-          <p className="text-gray-400 text-sm mb-1">📲 Link de Pré-matrícula</p>
-          <p className="text-xs text-gray-500 break-all mb-3">{linkMatricula}</p>
-          <div className="flex gap-2">
-            <button onClick={copiarLink} className="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-2 rounded-lg text-sm font-medium transition">
-              {copiado ? '✅ Copiado!' : '📋 Copiar'}
-            </button>
-            <button onClick={enviarWhatsApp} className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-medium transition">
-              📲 WhatsApp
-            </button>
-          </div>
+          </a>
         </div>
       )}
 
-      <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
-        <p className="text-gray-400 text-sm mb-3">Ações rápidas</p>
-        <div className="grid grid-cols-2 gap-3">
-          <a href="/atletas/novo" className="bg-green-600 hover:bg-green-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
-            ⚽ Novo Atleta
-          </a>
-          <a href="/presenca" className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
-            ✅ Fazer Chamada
-          </a>
-          <a href="/turmas" className="col-span-2 bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
-            👥 Gerenciar Turmas
-          </a>
-          <a href="/mensagens" className="col-span-2 bg-blue-700 hover:bg-blue-800 text-white p-3 rounded-lg text-center text-sm font-medium transition">
-            📲 Mensagens
-          </a>
-          <a href="/comissao" className="col-span-2 bg-indigo-700 hover:bg-indigo-800 text-white p-3 rounded-lg text-center text-sm font-medium transition">
-            👨‍💼 Comissão Técnica
-          </a>
-          <a href="/convocacao" className="col-span-2 bg-orange-600 hover:bg-orange-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
-            📣 Convocações
-          </a>
-          <a href="/campeonato" className="col-span-2 bg-yellow-600 hover:bg-yellow-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
-            🏆 Campeonatos
-          </a>
+      {/* ACOES */}
+      <div style={{ padding: '0 20px 14px' }}>
+        <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>Acoes rapidas</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          {[
+            { href: '/atletas/novo', icon: 'soccer', label: 'Novo atleta', sub: 'Cadastrar', style: { background: 'rgba(57,255,20,0.07)', border: '1px solid rgba(57,255,20,0.25)' } },
+            { href: '/presenca', icon: 'check', label: 'Chamada', sub: 'Presenca', style: { background: cardBg, border: cardBorder } },
+            { href: '/turmas', icon: 'users', label: 'Turmas', sub: 'Gerenciar', style: { background: cardBg, border: cardBorder } },
+            { href: '/convocacao', icon: 'megaphone', label: 'Convocacoes', sub: 'Escalar', style: { background: cardBg, border: cardBorder } },
+            { href: '/campeonato', icon: 'trophy', label: 'Campeonatos', sub: 'Tabelas', style: { background: cardBg, border: cardBorder } },
+            { href: '/mensagens', icon: 'message', label: 'Mensagens', sub: 'Comunicar', style: { background: cardBg, border: cardBorder } },
+          ].map(item => (
+            <a key={item.href} href={item.href} style={{ ...item.style, borderRadius: '14px', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '5px', textDecoration: 'none', color: '#F0F0F0' }}>
+              <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: '#F0F0F0' }}>{item.label}</span>
+              <span style={{ fontSize: '10px', color: muted }}>{item.sub}</span>
+            </a>
+          ))}
           {isAdmin && (
             <>
-              <a href="/matriculas" className="col-span-2 bg-gray-800 hover:bg-gray-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
-                📋 Pré-matrículas {pendentes > 0 ? '(' + pendentes + ' pendentes)' : ''}
+              <a href="/financeiro" style={{ background: 'rgba(212,175,55,0.07)', border: '1px solid rgba(212,175,55,0.25)', borderRadius: '14px', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '5px', textDecoration: 'none', color: '#F0F0F0' }}>
+                <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: gold }}>Financeiro</span>
+                <span style={{ fontSize: '10px', color: muted }}>Cobrancas</span>
               </a>
-              <a href="/rematriculas" className="col-span-2 bg-orange-700 hover:bg-orange-800 text-white p-3 rounded-lg text-center text-sm font-medium transition">
-                🔄 Rematrículas {rematriculas > 0 ? '(' + rematriculas + ' pendentes)' : ''}
+              <a href="/matriculas" style={{ background: cardBg, border: cardBorder, borderRadius: '14px', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '5px', textDecoration: 'none', color: '#F0F0F0' }}>
+                <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px' }}>Matriculas</span>
+                {pendentes > 0 ? <span style={{ background: neon, color: '#000', fontSize: '9px', fontWeight: 800, padding: '2px 7px', borderRadius: '20px', fontFamily: syne, display: 'inline-block', width: 'fit-content' }}>{pendentes} pendentes</span> : <span style={{ fontSize: '10px', color: muted }}>Gerenciar</span>}
               </a>
-              <a href="/alteracao-massa" className="col-span-2 bg-teal-700 hover:bg-teal-800 text-white p-3 rounded-lg text-center text-sm font-medium transition">
-                ✏️ Alteração em Massa
+              <a href="/alteracao-massa" style={{ background: cardBg, border: cardBorder, borderRadius: '14px', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '5px', textDecoration: 'none', color: '#F0F0F0' }}>
+                <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px' }}>Alteracao em massa</span>
+                <span style={{ fontSize: '10px', color: muted }}>Edicao rapida</span>
               </a>
-              <a href="/configuracoes" className="col-span-2 bg-gray-800 hover:bg-gray-700 text-white p-3 rounded-lg text-center text-sm font-medium transition">
-                ⚙️ Configurações da Escola
+              <a href="/configuracoes" style={{ background: cardBg, border: cardBorder, borderRadius: '14px', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '5px', textDecoration: 'none', color: '#F0F0F0' }}>
+                <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px' }}>Configuracoes</span>
+                <span style={{ fontSize: '10px', color: muted }}>Escola e visual</span>
               </a>
             </>
           )}
         </div>
       </div>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
-        <a href="/dashboard" className="text-green-500 text-xs text-center">🏠<br />Início</a>
-        <a href="/atletas" className="text-gray-400 text-xs text-center">👥<br />Atletas</a>
-        <a href="/presenca" className="text-gray-400 text-xs text-center">✅<br />Presença</a>
-        {isAdmin && <a href="/financeiro" className="text-gray-400 text-xs text-center">💰<br />Financeiro</a>}
+      {/* LINK MATRICULA */}
+      {isAdmin && (
+        <div style={{ padding: '0 20px 24px' }}>
+          <div style={{ background: cardBg, borderRadius: '16px', padding: '14px', border: cardBorder }}>
+            <p style={{ fontSize: '11px', color: muted, marginBottom: '8px' }}>Link de pre-matricula</p>
+            <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)', wordBreak: 'break-all', marginBottom: '10px' }}>{linkMatricula}</p>
+            <button onClick={copiarLink} style={{ width: '100%', background: copiado ? 'rgba(57,255,20,0.15)' : 'rgba(255,255,255,0.05)', border: '1px solid rgba(57,255,20,0.3)', borderRadius: '10px', padding: '10px', color: neon, fontFamily: syne, fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>
+              {copiado ? 'Copiado!' : 'Copiar link de matricula'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* NAV */}
+      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-around', padding: '12px 0 20px', borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(5,5,5,0.95)', backdropFilter: 'blur(10px)' }}>
+        {[
+          { href: '/dashboard', label: 'Inicio', active: true },
+          { href: '/atletas', label: 'Atletas', active: false },
+          { href: '/presenca', label: 'Presenca', active: false },
+        ].map(item => (
+          <a key={item.href} href={item.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', textDecoration: 'none' }}>
+            <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.5px', color: item.active ? neon : muted, fontFamily: syne, fontWeight: item.active ? 700 : 400 }}>{item.label}</span>
+            {item.active && <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: neon, boxShadow: '0 0 4px #39FF14' }}></div>}
+          </a>
+        ))}
+        {isAdmin && (
+          <a href="/financeiro" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', textDecoration: 'none' }}>
+            <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.5px', color: muted, fontFamily: syne }}>Financeiro</span>
+          </a>
+        )}
       </nav>
     </div>
   )
