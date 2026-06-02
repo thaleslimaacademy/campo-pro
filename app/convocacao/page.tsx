@@ -78,7 +78,7 @@ export default function Convocacoes() {
     setLoading(false)
   }
 
-  useEffect(() => { carregar() }, [])
+  useEffect(() => { if (escolaId) carregar() }, [escolaId])
 
   const atletasFiltrados = atletas.filter(a => {
     const matchTurma = filtroTurma === '' || a.turmaId === filtroTurma

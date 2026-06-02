@@ -46,7 +46,7 @@ function MatriculasInner() {
     setLoading(false)
   }
 
-  useEffect(() => { carregar() }, [])
+  useEffect(() => { if (escolaId) carregar() }, [escolaId])
 
   async function enviarWhatsAppAprovacao(matricula: Matricula, tokenPais: string) {
     try {

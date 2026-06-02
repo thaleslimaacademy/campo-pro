@@ -44,7 +44,7 @@ export default function ComissaoTecnica() {
     setLoading(false)
   }
 
-  useEffect(() => { carregar() }, [])
+  useEffect(() => { if (escolaId) carregar() }, [escolaId])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = e.target

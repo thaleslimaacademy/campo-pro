@@ -96,7 +96,7 @@ function FinanceiroInner() {
     setLoading(false)
   }
 
-  useEffect(() => { carregar() }, [])
+  useEffect(() => { if (escolaId) carregar() }, [escolaId])
 
   async function gerarCobranca() {
     if (!atletaId || !vencimento) return
