@@ -1,6 +1,5 @@
 'use client'
 import { usePerfil } from '@/lib/usePerfil'
-
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
@@ -20,32 +19,22 @@ export default function Turmas() {
   const [loading, setLoading] = useState(true)
   const [criando, setCriando] = useState(false)
   const [salvando, setSalvando] = useState(false)
-  const [form, setForm] = useState({
-    nome: '',
-    descricao: '',
-    diasSemana: '',
-    horario: '',
-  })
+  const [form, setForm] = useState({ nome: '', descricao: '', diasSemana: '', horario: '' })
+
+  const syne = 'Syne, sans-serif'
+  const neon = '#39FF14'
+  const gold = '#D4AF37'
+  const muted = 'rgba(255,255,255,0.4)'
+  const card = 'rgba(255,255,255,0.05)'
+  const border = '1px solid rgba(255,255,255,0.07)'
 
   async function carregar() {
-    const { data } = await supabase
-      .from('Turma')
-      .select('*')
-      .eq('escolaId', escolaId!)
-      .eq('ativa', true)
-      .order('nome')
-
+    const { data } = await supabase.from('Turma').select('*').eq('escolaId', escolaId!).eq('ativa', true).order('nome')
     if (data) {
-      const turmasComTotal = await Promise.all(
-        data.map(async t => {
-          const { count } = await supabase
-            .from('Atleta')
-            .select('*', { count: 'exact', head: true })
-            .eq('turmaId', t.id)
-            .eq('ativo', true)
-          return { ...t, totalAtletas: count || 0 }
-        })
-      )
+      const turmasComTotal = await Promise.all(data.map(async t => {
+        const { count } = await supabase.from('Atleta').select('*', { count: 'exact', head: true }).eq('turmaId', t.id).eq('ativo', true)
+        return { ...t, totalAtletas: count || 0 }
+      }))
       setTurmas(turmasComTotal)
     }
     setLoading(false)
@@ -62,8 +51,7 @@ export default function Turmas() {
     if (!form.nome) return
     setSalvando(true)
     await supabase.from('Turma').insert({
-      escolaId: escolaId!,
-      nome: form.nome,
+      escolaId: escolaId!, nome: form.nome,
       descricao: form.descricao || null,
       diasSemana: form.diasSemana || null,
       horario: form.horario || null,
@@ -74,49 +62,54 @@ export default function Turmas() {
     setSalvando(false)
   }
 
-  const dias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
+  const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px', color: '#F0F0F0', fontFamily: 'Inter, sans-serif', fontSize: '13px', marginTop: '4px', boxSizing: 'border-box' as const }
+  const labelStyle = { fontSize: '10px', color: muted, textTransform: 'uppercase' as const, letterSpacing: '0.8px' }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <a href="/dashboard" className="text-gray-400">← Voltar</a>
-          <h1 className="text-xl font-bold">👥 Turmas</h1>
+    <div style={{ minHeight: '100vh', paddingBottom: '80px', color: '#F0F0F0', fontFamily: 'Inter, sans-serif' }}>
+
+      <div style={{ padding: '20px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <a href="/dashboard" style={{ color: muted, fontSize: '13px', textDecoration: 'none' }}>Voltar</a>
+            <div>
+              <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '2px' }}>Gestao</div>
+              <div style={{ fontFamily: syne, fontSize: '24px', fontWeight: 800, color: '#F0F0F0' }}>
+                Turmas <span style={{ color: neon }}>({turmas.length})</span>
+              </div>
+            </div>
+          </div>
+          <button onClick={() => setCriando(!criando)} style={{ background: 'linear-gradient(135deg,#39FF14,#00cc00)', color: '#000', padding: '10px 18px', borderRadius: '12px', fontSize: '12px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', boxShadow: '0 0 16px rgba(57,255,20,0.3)' }}>
+            + Nova
+          </button>
         </div>
-        <button
-          onClick={() => setCriando(true)}
-          className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-        >
-          + Nova
-        </button>
       </div>
 
-      {/* Formulário nova turma */}
       {criando && (
-        <div className="bg-gray-900 rounded-xl p-4 border border-green-800 mb-4">
-          <p className="text-green-500 font-bold text-sm mb-4">➕ Nova Turma</p>
-          <div className="space-y-3">
+        <div style={{ margin: '16px 20px', background: 'rgba(57,255,20,0.05)', border: '1px solid rgba(57,255,20,0.2)', borderRadius: '16px', padding: '16px' }}>
+          <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '14px', color: neon, marginBottom: '16px' }}>Nova Turma</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div>
-              <label className="text-xs text-gray-400">Nome da turma *</label>
-              <input name="nome" value={form.nome} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="Ex: Sub-10, Iniciante, Avançado..." />
+              <label style={labelStyle}>Nome da turma *</label>
+              <input name="nome" value={form.nome} onChange={handleChange} style={inputStyle} placeholder="Ex: Sub-10, Iniciante..." />
             </div>
             <div>
-              <label className="text-xs text-gray-400">Dias da semana</label>
-              <input name="diasSemana" value={form.diasSemana} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="Ex: Seg, Qua, Sex" />
+              <label style={labelStyle}>Dias da semana</label>
+              <input name="diasSemana" value={form.diasSemana} onChange={handleChange} style={inputStyle} placeholder="Ex: Seg, Qua, Sex" />
             </div>
             <div>
-              <label className="text-xs text-gray-400">Horário</label>
-              <input name="horario" value={form.horario} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="Ex: 08:00 - 09:30" />
+              <label style={labelStyle}>Horario</label>
+              <input name="horario" value={form.horario} onChange={handleChange} style={inputStyle} placeholder="Ex: 18:00 - 19:00" />
             </div>
             <div>
-              <label className="text-xs text-gray-400">Descrição</label>
-              <textarea name="descricao" value={form.descricao} onChange={handleChange} rows={2} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white resize-none" placeholder="Observações sobre a turma..." />
+              <label style={labelStyle}>Descricao</label>
+              <textarea name="descricao" value={form.descricao} onChange={handleChange} rows={2} style={{ ...inputStyle, resize: 'none' }} placeholder="Observacoes..." />
             </div>
-            <div className="flex gap-2">
-              <button onClick={salvar} disabled={salvando || !form.nome} className="flex-1 bg-green-600 text-white py-3 rounded-xl font-bold disabled:opacity-50">
-                {salvando ? 'Salvando...' : '💾 Salvar'}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button onClick={salvar} disabled={salvando || !form.nome} style={{ flex: 1, background: 'linear-gradient(135deg,#39FF14,#00cc00)', color: '#000', padding: '14px', borderRadius: '12px', fontWeight: 800, fontFamily: syne, fontSize: '13px', border: 'none', cursor: 'pointer', opacity: salvando || !form.nome ? 0.5 : 1 }}>
+                {salvando ? 'Salvando...' : 'Salvar'}
               </button>
-              <button onClick={() => setCriando(false)} className="flex-1 bg-gray-800 text-gray-400 py-3 rounded-xl font-bold">
+              <button onClick={() => setCriando(false)} style={{ flex: 1, background: 'rgba(255,255,255,0.05)', color: muted, padding: '14px', borderRadius: '12px', fontWeight: 700, fontFamily: syne, fontSize: '13px', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer' }}>
                 Cancelar
               </button>
             </div>
@@ -124,27 +117,31 @@ export default function Turmas() {
         </div>
       )}
 
-      {loading && <p className="text-gray-400 text-center mt-20">Carregando...</p>}
+      {loading && <div style={{ textAlign: 'center', padding: '60px 0', color: muted }}>Carregando...</div>}
 
-      {!loading && turmas.length === 0 && (
-        <div className="text-center text-gray-500 mt-20">
-          <p className="text-5xl mb-4">👥</p>
-          <p className="text-lg">Nenhuma turma cadastrada</p>
-          <p className="text-sm mt-2">Clique em + Nova para criar a primeira</p>
+      {!loading && turmas.length === 0 && !criando && (
+        <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+          <p style={{ fontFamily: syne, fontSize: '18px', fontWeight: 700, color: '#F0F0F0', marginBottom: '8px' }}>Nenhuma turma</p>
+          <p style={{ fontSize: '13px', color: muted }}>Clique em + Nova para criar a primeira</p>
         </div>
       )}
 
-      <div className="space-y-3">
-        {turmas.map(t => (
-          <a key={t.id} href={`/turmas/${t.id}`} className="block bg-gray-900 rounded-xl p-4 border border-gray-800">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="font-bold text-white">{t.nome}</p>
-                {t.diasSemana && <p className="text-green-500 text-sm mt-1">{t.diasSemana} {t.horario ? `· ${t.horario}` : ''}</p>}
-                {t.descricao && <p className="text-gray-400 text-xs mt-1">{t.descricao}</p>}
+      <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {turmas.map((t, i) => (
+          <a key={t.id} href={'/turmas/' + t.id} style={{ display: 'block', background: card, border: border, borderRadius: '16px', padding: '16px', textDecoration: 'none', color: '#F0F0F0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(57,255,20,0.1)', border: '1px solid rgba(57,255,20,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: syne, fontWeight: 800, fontSize: '11px', color: neon }}>
+                    {String(i + 1).padStart(2, '0')}
+                  </div>
+                  <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '15px', color: '#F0F0F0', margin: 0 }}>{t.nome}</p>
+                </div>
+                {t.diasSemana && <p style={{ fontSize: '12px', color: neon, margin: '0 0 2px', fontWeight: 600 }}>{t.diasSemana}{t.horario ? ' · ' + t.horario : ''}</p>}
+                {t.descricao && <p style={{ fontSize: '11px', color: muted, margin: 0 }}>{t.descricao}</p>}
               </div>
-              <div className="text-right">
-                <span className="bg-gray-800 text-gray-300 text-xs px-2 py-1 rounded-full">
+              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                <span style={{ background: 'rgba(57,255,20,0.08)', border: '1px solid rgba(57,255,20,0.2)', color: neon, fontSize: '11px', fontWeight: 700, fontFamily: syne, padding: '4px 10px', borderRadius: '20px' }}>
                   {t.totalAtletas} atleta{t.totalAtletas !== 1 ? 's' : ''}
                 </span>
               </div>
@@ -153,11 +150,17 @@ export default function Turmas() {
         ))}
       </div>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
-        <a href="/dashboard" className="text-gray-400 text-xs text-center">🏠<br/>Início</a>
-        <a href="/atletas" className="text-gray-400 text-xs text-center">👥<br/>Atletas</a>
-        <a href="/presenca" className="text-gray-400 text-xs text-center">✅<br/>Presença</a>
-        <a href="/financeiro" className="text-gray-400 text-xs text-center">💰<br/>Financeiro</a>
+      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-around', padding: '12px 0 20px', borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(5,5,5,0.95)', backdropFilter: 'blur(10px)' }}>
+        {[
+          { href: '/dashboard', label: 'Inicio', active: false },
+          { href: '/atletas', label: 'Atletas', active: false },
+          { href: '/presenca', label: 'Presenca', active: false },
+          { href: '/financeiro', label: 'Financeiro', active: false },
+        ].map(item => (
+          <a key={item.href} href={item.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', textDecoration: 'none' }}>
+            <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.5px', color: item.active ? neon : muted, fontFamily: syne, fontWeight: item.active ? 700 : 400 }}>{item.label}</span>
+          </a>
+        ))}
       </nav>
     </div>
   )
