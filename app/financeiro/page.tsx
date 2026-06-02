@@ -178,6 +178,16 @@ function FinanceiroInner() {
     setTimeout(() => setCopiado(null), 2000)
   }
 
+  async function marcarComoPago(cobrancaId: string) {
+    if (!confirm('Confirmar pagamento manual desta cobrança?')) return
+    const { error } = await supabase
+      .from('Cobranca')
+      .update({ status: 'PAGO' })
+      .eq('id', cobrancaId)
+    if (!error) await carregar()
+    else alert('Erro: ' + error.message)
+  }
+
   const statusCor: Record<string, string> = {
     PENDENTE: 'text-yellow-400',
     PAGO: 'text-green-400',
@@ -434,16 +444,19 @@ function FinanceiroInner() {
               </div>
             </div>
             <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)", marginBottom: "10px" }}>Venc: {new Date(c.vencimento).toLocaleDateString('pt-BR')}</p>
-            {c.status === 'PENDENTE' && (c.pixCopiaCola || c.pixQrCode) && (
-              <div className="flex gap-2">
+            {c.status === 'PENDENTE' && (
+              <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
                 {c.pixQrCode && (
                   <button onClick={() => setPixAtivo(c)} style={{ flex: 1, background: "rgba(57,255,20,0.1)", border: "1px solid rgba(57,255,20,0.3)", color: "#39FF14", padding: "10px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer" }}>Ver QR Code</button>
                 )}
                 {c.pixCopiaCola && (
                   <button onClick={() => copiarPix(c.pixCopiaCola!, c.id)} style={{ flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#F0F0F0", padding: "10px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer" }}>
-                    {copiado === c.id ? '✅ Copiado!' : '📋 Copiar Pix'}
+                    {copiado === c.id ? 'Copiado!' : 'Copiar Pix'}
                   </button>
                 )}
+                <button onClick={() => marcarComoPago(c.id)} style={{ flex: 1, background: "rgba(212,175,55,0.1)", border: "1px solid rgba(212,175,55,0.3)", color: "#D4AF37", padding: "10px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer" }}>
+                  Baixa manual
+                </button>
               </div>
             )}
           </div>
