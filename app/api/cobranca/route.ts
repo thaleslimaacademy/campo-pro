@@ -16,6 +16,12 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Busca configurações da escola
+    const escolaId = await getEscolaId()
+    const { data: escola } = await supabaseAdmin.from('Escola').select('multaAtraso, jurosAoMes').eq('id', escolaId).single()
+    const multaAtraso = Number(escola?.multaAtraso || 0)
+    const jurosAoMes = Number(escola?.jurosAoMes || 0)
+
     // Busca atleta + responsável
     const { data: atleta } = await supabase
       .from('Atleta')
@@ -68,6 +74,8 @@ export async function POST(req: NextRequest) {
       value: valor,
       dueDate: vencimento,
       description: descricao || 'Mensalidade',
+      ...(multaAtraso > 0 ? { fine: { value: multaAtraso } } : {}),
+      ...(jurosAoMes > 0 ? { interest: { value: jurosAoMes } } : {}),
     })
 
     if (cobranca.errors || !cobranca.id) {

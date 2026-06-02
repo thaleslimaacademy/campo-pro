@@ -15,6 +15,8 @@ export interface ConfiguracaoForm {
   diaVencimento: number
   instagramUrl: string
   facebookUrl: string
+  multaAtraso: number
+  jurosAoMes: number
 }
 
 export async function salvarConfiguracoes(form: ConfiguracaoForm): Promise<{ ok: boolean; message: string }> {
@@ -37,6 +39,8 @@ export async function salvarConfiguracoes(form: ConfiguracaoForm): Promise<{ ok:
       diaVencimento: form.diaVencimento,
       instagramUrl: form.instagramUrl,
       facebookUrl: form.facebookUrl,
+      multaAtraso: form.multaAtraso,
+      jurosAoMes: form.jurosAoMes,
       updatedAt: new Date().toISOString(),
     })
     .eq('id', escolaId)
