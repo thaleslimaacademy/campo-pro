@@ -1,7 +1,6 @@
 'use client'
 import { usePerfil } from '@/lib/usePerfil'
 import AdminGuard from '@/components/AdminGuard'
-
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { salvarConfiguracoes } from './actions'
@@ -13,55 +12,40 @@ function ConfiguracoesInner() {
   const [sucesso, setSucesso] = useState(false)
   const [erro, setErro] = useState('')
   const [form, setForm] = useState({
-    nome: '',
-    telefone: '',
-    whatsapp: '',
-    email: '',
-    endereco: '',
-    cidade: '',
-    estado: '',
-    cep: '',
-    valorMensalidade: '150',
-    diaVencimento: '10',
-    instagramUrl: '',
-    facebookUrl: '',
-    multaAtraso: 0,
-    jurosAoMes: 0,
-    valorDesconto: 0,
+    nome: '', telefone: '', whatsapp: '', email: '',
+    endereco: '', cidade: '', estado: '', cep: '',
+    valorMensalidade: '150', diaVencimento: '10',
+    instagramUrl: '', facebookUrl: '',
+    multaAtraso: 0, jurosAoMes: 0, valorDesconto: 0,
   })
 
+  const syne = 'Syne, sans-serif'
+  const neon = '#39FF14'
+  const gold = '#D4AF37'
+  const muted = 'rgba(255,255,255,0.4)'
+  const card = { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '16px', marginBottom: '12px' }
+  const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px', color: '#F0F0F0', fontFamily: 'Inter, sans-serif', fontSize: '13px', marginTop: '4px', boxSizing: 'border-box' as const }
+  const labelStyle = { fontSize: '10px', color: muted, textTransform: 'uppercase' as const, letterSpacing: '0.8px' }
+  const sectionTitle = { fontFamily: syne, fontWeight: 700, fontSize: '13px', color: neon, marginBottom: '14px' }
+
   useEffect(() => {
-    // Checa se veio de um save bem-sucedido
     const saved = localStorage.getItem('configuracoes_saved')
     if (saved === 'true') {
       setSucesso(true)
       localStorage.removeItem('configuracoes_saved')
       setTimeout(() => setSucesso(false), 4000)
     }
-
     async function carregar() {
-      const { data, error } = await supabase
-        .from('Escola')
-        .select('*')
-        .eq('id', escolaId!)
-        .single()
-
-      if (error) console.error('[carregar escola]', error)
-
+      const { data } = await supabase.from('Escola').select('*').eq('id', escolaId!).single()
       if (data) {
         setForm({
-          nome: data.nome || '',
-          telefone: data.telefone || '',
-          whatsapp: data.whatsapp || '',
-          email: data.email || '',
-          endereco: data.endereco || '',
-          cidade: data.cidade || '',
-          estado: data.estado || '',
-          cep: data.cep || '',
+          nome: data.nome || '', telefone: data.telefone || '',
+          whatsapp: data.whatsapp || '', email: data.email || '',
+          endereco: data.endereco || '', cidade: data.cidade || '',
+          estado: data.estado || '', cep: data.cep || '',
           valorMensalidade: data.valorMensalidade?.toString() || '150',
           diaVencimento: data.diaVencimento?.toString() || '10',
-          instagramUrl: data.instagramUrl || '',
-          facebookUrl: data.facebookUrl || '',
+          instagramUrl: data.instagramUrl || '', facebookUrl: data.facebookUrl || '',
           multaAtraso: Number(data.multaAtraso || 0),
           jurosAoMes: Number(data.jurosAoMes || 0),
           valorDesconto: Number(data.valorDesconto || 0),
@@ -80,173 +64,141 @@ function ConfiguracoesInner() {
   async function salvar() {
     setSalvando(true)
     setErro('')
-
     const result = await salvarConfiguracoes({
-      nome: form.nome,
-      telefone: form.telefone,
-      whatsapp: form.whatsapp,
-      email: form.email,
-      endereco: form.endereco,
-      cidade: form.cidade,
-      estado: form.estado,
-      cep: form.cep,
+      nome: form.nome, telefone: form.telefone, whatsapp: form.whatsapp,
+      email: form.email, endereco: form.endereco, cidade: form.cidade,
+      estado: form.estado, cep: form.cep,
       valorMensalidade: parseFloat(form.valorMensalidade) || 0,
       diaVencimento: parseInt(form.diaVencimento) || 10,
-      instagramUrl: form.instagramUrl,
-      facebookUrl: form.facebookUrl,
-      multaAtraso: form.multaAtraso,
-      jurosAoMes: form.jurosAoMes,
+      instagramUrl: form.instagramUrl, facebookUrl: form.facebookUrl,
+      multaAtraso: form.multaAtraso, jurosAoMes: form.jurosAoMes,
       valorDesconto: form.valorDesconto,
     })
-
     setSalvando(false)
-
-    if (!result.ok) {
-      setErro(result.message || 'Erro ao salvar.')
-      return
-    }
-
-    // Salva flag no localStorage e recarrega a página
+    if (!result.ok) { setErro(result.message || 'Erro ao salvar.'); return }
     localStorage.setItem('configuracoes_saved', 'true')
     window.location.reload()
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <p className="text-gray-400">Carregando...</p>
-      </div>
-    )
-  }
+  if (loading) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: muted, fontFamily: 'Inter, sans-serif' }}>Carregando...</p>
+    </div>
+  )
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
-      <div className="flex items-center gap-3 mb-6">
-        <a href="/dashboard" className="text-gray-400">← Voltar</a>
-        <h1 className="text-xl font-bold">⚙️ Configurações</h1>
+    <div style={{ minHeight: '100vh', paddingBottom: '80px', color: '#F0F0F0', fontFamily: 'Inter, sans-serif' }}>
+
+      <div style={{ padding: '20px 20px 16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
+          <a href="/dashboard" style={{ color: muted, fontSize: '13px', textDecoration: 'none' }}>Voltar</a>
+          <div>
+            <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '2px' }}>Escola</div>
+            <div style={{ fontFamily: syne, fontSize: '24px', fontWeight: 800, color: '#F0F0F0' }}>Configuracoes</div>
+          </div>
+        </div>
       </div>
 
-      {sucesso && (
-        <div className="bg-green-600 rounded-xl p-4 mb-4 text-center">
-          <p className="text-white font-bold text-lg">✅ Configurações salvas com sucesso!</p>
-        </div>
-      )}
+      <div style={{ padding: '0 20px' }}>
 
-      {erro && (
-        <div className="bg-red-600 rounded-xl p-4 mb-4 text-center">
-          <p className="text-white font-bold">❌ {erro}</p>
-        </div>
-      )}
+        {sucesso && (
+          <div style={{ background: 'rgba(57,255,20,0.1)', border: '1px solid rgba(57,255,20,0.3)', borderRadius: '12px', padding: '12px', textAlign: 'center', marginBottom: '16px' }}>
+            <p style={{ color: neon, fontFamily: syne, fontWeight: 800, margin: 0 }}>Configuracoes salvas!</p>
+          </div>
+        )}
 
-      <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
-        <p className="text-green-500 font-bold text-sm mb-4">🏫 Dados da Escola</p>
-        <div className="space-y-3">
-          <div>
-            <label className="text-sm text-gray-400">Nome da escola</label>
-            <input name="nome" value={form.nome} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+        {erro && (
+          <div style={{ background: 'rgba(255,70,70,0.1)', border: '1px solid rgba(255,70,70,0.3)', borderRadius: '12px', padding: '12px', textAlign: 'center', marginBottom: '16px' }}>
+            <p style={{ color: '#ff5555', fontFamily: syne, fontWeight: 700, margin: 0 }}>{erro}</p>
           </div>
-          <div>
-            <label className="text-sm text-gray-400">E-mail</label>
-            <input name="email" value={form.email} onChange={handleChange} type="email" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="email@escola.com" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-sm text-gray-400">Telefone</label>
-              <input name="telefone" value={form.telefone} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="(34) 9999-9999" />
-            </div>
-            <div>
-              <label className="text-sm text-gray-400">WhatsApp</label>
-              <input name="whatsapp" value={form.whatsapp} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="5534999999999" />
+        )}
+
+        {/* Dados da escola */}
+        <div style={card}>
+          <p style={sectionTitle}>Dados da Escola</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div><label style={labelStyle}>Nome da escola</label><input name="nome" value={form.nome} onChange={handleChange} style={inputStyle} /></div>
+            <div><label style={labelStyle}>E-mail</label><input name="email" value={form.email} onChange={handleChange} type="email" style={inputStyle} placeholder="email@escola.com" /></div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div><label style={labelStyle}>Telefone</label><input name="telefone" value={form.telefone} onChange={handleChange} style={inputStyle} /></div>
+              <div><label style={labelStyle}>WhatsApp</label><input name="whatsapp" value={form.whatsapp} onChange={handleChange} style={inputStyle} /></div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
-        <p className="text-green-500 font-bold text-sm mb-4">📍 Endereço</p>
-        <div className="space-y-3">
-          <div>
-            <label className="text-sm text-gray-400">CEP</label>
-            <input name="cep" value={form.cep} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="00000-000" />
-          </div>
-          <div>
-            <label className="text-sm text-gray-400">Endereço</label>
-            <input name="endereco" value={form.endereco} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="Rua, número..." />
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-2">
-              <label className="text-sm text-gray-400">Cidade</label>
-              <input name="cidade" value={form.cidade} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
-            </div>
-            <div>
-              <label className="text-sm text-gray-400">Estado</label>
-              <input name="estado" value={form.estado} onChange={handleChange} maxLength={2} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+        {/* Endereco */}
+        <div style={card}>
+          <p style={sectionTitle}>Endereco</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div><label style={labelStyle}>CEP</label><input name="cep" value={form.cep} onChange={handleChange} style={inputStyle} /></div>
+            <div><label style={labelStyle}>Endereco</label><input name="endereco" value={form.endereco} onChange={handleChange} style={inputStyle} /></div>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '10px' }}>
+              <div><label style={labelStyle}>Cidade</label><input name="cidade" value={form.cidade} onChange={handleChange} style={inputStyle} /></div>
+              <div><label style={labelStyle}>UF</label><input name="estado" value={form.estado} onChange={handleChange} maxLength={2} style={inputStyle} /></div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
-        <p className="text-green-500 font-bold text-sm mb-4">💰 Financeiro</p>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-sm text-gray-400">Mensalidade padrão (R$)</label>
-            <input name="valorMensalidade" value={form.valorMensalidade} onChange={handleChange} type="number" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
-          </div>
-          <div>
-            <label className="text-sm text-gray-400">Dia de vencimento</label>
-            <select name="diaVencimento" value={form.diaVencimento} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white">
-              {[1, 5, 10, 15, 20, 25, 30].map(d => (
-                <option key={d} value={d}>Dia {d}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-6">
-        <p className="text-green-500 font-bold text-sm mb-4">📱 Redes Sociais</p>
-        <div className="space-y-3">
-          <div>
-            <label className="text-sm text-gray-400">Instagram</label>
-            <input name="instagramUrl" value={form.instagramUrl} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="https://instagram.com/suaescola" />
-          </div>
-          <div>
-            <label className="text-sm text-gray-400">Facebook</label>
-            <input name="facebookUrl" value={form.facebookUrl} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="https://facebook.com/suaescola" />
+        {/* Financeiro */}
+        <div style={card}>
+          <p style={sectionTitle}>Financeiro</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div><label style={labelStyle}>Mensalidade (R$)</label><input name="valorMensalidade" value={form.valorMensalidade} onChange={handleChange} type="number" style={inputStyle} /></div>
+              <div>
+                <label style={labelStyle}>Dia de vencimento</label>
+                <select name="diaVencimento" value={form.diaVencimento} onChange={handleChange} style={inputStyle}>
+                  {[1, 5, 10, 15, 20, 25, 30].map(d => <option key={d} value={d}>Dia {d}</option>)}
+                </select>
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+              <div><label style={labelStyle}>Desconto antecip. (R$)</label><input name="valorDesconto" value={form.valorDesconto} onChange={e => setForm(p => ({...p, valorDesconto: Number(e.target.value)}))} type="number" style={inputStyle} /></div>
+              <div><label style={labelStyle}>Multa atraso (R$)</label><input name="multaAtraso" value={form.multaAtraso} onChange={e => setForm(p => ({...p, multaAtraso: Number(e.target.value)}))} type="number" style={inputStyle} /></div>
+              <div><label style={labelStyle}>Juros/mes (%)</label><input name="jurosAoMes" value={form.jurosAoMes} onChange={e => setForm(p => ({...p, jurosAoMes: Number(e.target.value)}))} type="number" style={inputStyle} /></div>
+            </div>
           </div>
         </div>
+
+        {/* Redes Sociais */}
+        <div style={card}>
+          <p style={sectionTitle}>Redes Sociais</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div><label style={labelStyle}>Instagram</label><input name="instagramUrl" value={form.instagramUrl} onChange={handleChange} style={inputStyle} placeholder="https://instagram.com/suaescola" /></div>
+            <div><label style={labelStyle}>Facebook</label><input name="facebookUrl" value={form.facebookUrl} onChange={handleChange} style={inputStyle} placeholder="https://facebook.com/suaescola" /></div>
+          </div>
+        </div>
+
+        {/* Botao salvar */}
+        <button onClick={salvar} disabled={salvando} style={{ width: '100%', background: 'linear-gradient(135deg,#39FF14,#00cc00)', color: '#000', padding: '16px', borderRadius: '14px', fontFamily: syne, fontWeight: 800, fontSize: '15px', border: 'none', cursor: 'pointer', boxShadow: '0 0 20px rgba(57,255,20,0.3)', marginBottom: '10px', opacity: salvando ? 0.6 : 1 }}>
+          {salvando ? 'Salvando...' : 'Salvar Configuracoes'}
+        </button>
+
+        <a href="/branding" style={{ display: 'block', background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)', color: '#a78bfa', padding: '14px', borderRadius: '14px', fontFamily: syne, fontWeight: 700, fontSize: '13px', textAlign: 'center', textDecoration: 'none', marginBottom: '10px' }}>
+          Personalizar Visual do App
+        </a>
+
+        <a href="/mensagens-cobranca" style={{ display: 'block', background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', color: '#60a5fa', padding: '14px', borderRadius: '14px', fontFamily: syne, fontWeight: 700, fontSize: '13px', textAlign: 'center', textDecoration: 'none', marginBottom: '10px' }}>
+          Personalizar Mensagens WhatsApp
+        </a>
       </div>
 
-      <button
-        onClick={salvar}
-        disabled={salvando}
-        className="w-full bg-green-600 hover:bg-green-500 active:bg-green-700 text-white py-4 rounded-xl font-bold text-lg disabled:opacity-50 transition-colors"
-      >
-        {salvando ? '⏳ Salvando...' : '💾 Salvar Configurações'}
-      </button>
-
-      <a href="/branding" className="block w-full bg-purple-700 hover:bg-purple-800 text-white py-3 rounded-xl font-bold text-center mb-4">
-        Personalizar Visual do App
-      </a>
-
-      <a href="/mensagens-cobranca" className="block w-full bg-blue-700 hover:bg-blue-800 text-white py-3 rounded-xl font-bold text-center mb-4">
-        📲 Personalizar Mensagens WhatsApp
-      </a>
-
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
-        <a href="/dashboard" className="text-gray-400 text-xs text-center">🏠<br />Início</a>
-        <a href="/atletas" className="text-gray-400 text-xs text-center">👥<br />Atletas</a>
-        <a href="/presenca" className="text-gray-400 text-xs text-center">✅<br />Presença</a>
-        <a href="/financeiro" className="text-gray-400 text-xs text-center">💰<br />Financeiro</a>
+      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-around', padding: '12px 0 20px', borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(5,5,5,0.95)', backdropFilter: 'blur(10px)' }}>
+        {[
+          { href: '/dashboard', label: 'Inicio' },
+          { href: '/atletas', label: 'Atletas' },
+          { href: '/presenca', label: 'Presenca' },
+          { href: '/financeiro', label: 'Financeiro' },
+        ].map(item => (
+          <a key={item.href} href={item.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', textDecoration: 'none' }}>
+            <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.5px', color: muted, fontFamily: syne }}>{item.label}</span>
+          </a>
+        ))}
       </nav>
     </div>
   )
 }
+
 export default function Configuracoes(props: any) {
-  return (
-    <AdminGuard>
-      <ConfiguracoesInner {...props} />
-    </AdminGuard>
-  )
+  return <AdminGuard><ConfiguracoesInner {...props} /></AdminGuard>
 }
