@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
 
     // Salva no Supabase
     const novoId = crypto.randomUUID()
-    await supabase.from('Cobranca').insert({
+    await supabaseAdmin.from('Cobranca').insert({
       id: novoId,
       escolaId: await getEscolaId(),
       atletaId,
