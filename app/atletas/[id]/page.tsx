@@ -126,7 +126,7 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
           {atleta.dataNascimento && (
             <div className="flex justify-between">
               <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>Nascimento</span>
-              <span>{new Date(atleta.dataNascimento + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
+              <span>{new Date((atleta.dataNascimento || '').includes('T') ? atleta.dataNascimento : atleta.dataNascimento + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
             </div>
           )}
           {atleta.cpf && (
@@ -176,7 +176,7 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
               <div key={c.id} className={'flex justify-between items-center rounded-xl p-3 ' + (statusBg[c.status] || 'bg-gray-800')}>
                 <div>
                   <p className="text-sm font-medium">{c.descricao || 'Mensalidade'}</p>
-                  <p className="text-xs text-gray-400">{new Date(c.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
+                  <p className="text-xs text-gray-400">{new Date((c.vencimento || '').includes('T') ? c.vencimento : c.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
                 </div>
                 <div className="text-right">
                   <p className="font-bold text-sm">{'R$ ' + Number(c.valor).toFixed(2)}</p>
