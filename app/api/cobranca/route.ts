@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     const qrCode = await getPixQrCode(cobranca.id)
 
     // Salva no Supabase
-    await supabase.from('Cobranca').insert({
+    const { data: cobrancaDb } = await supabase.from('Cobranca').insert({
       id: crypto.randomUUID(),
       escolaId: await getEscolaId(),
       atletaId,
@@ -108,14 +108,16 @@ export async function POST(req: NextRequest) {
       const dataVencimento = new Date(vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
       const nomeResp = responsavel.nome.split(' ')[0]
 
+      const cobrancaId = cobrancaDb?.id || ''
+      const linkPagamento = `https://gestaofc.com.br/pagar/${cobrancaId}`
       const mensagem =
         `Olá ${nomeResp}! 👋\n\n` +
         `A cobrança de *${atleta.nome}* foi gerada.\n\n` +
         `💰 *Valor:* R$ ${Number(valor).toFixed(2)}\n` +
         `📅 *Vencimento:* ${dataVencimento}\n` +
-        `📝 *${descricao || 'Mensalidade'}*\n\n` +
-        `Use o código abaixo para pagar via Pix:\n\n` +
-        `\`${qrCode.payload}\`\n\n` +
+        `📝 ${descricao || 'Mensalidade'}\n\n` +
+        `Acesse o link abaixo para ver o QR Code e pagar com Pix:\n` +
+        `👉 ${linkPagamento}\n\n` +
         `_Thales Lima Football Academy_ ⚽`
 
       await enviarWhatsApp(responsavel.whatsapp, mensagem)
