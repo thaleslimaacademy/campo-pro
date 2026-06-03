@@ -104,6 +104,7 @@ export async function POST(req: NextRequest) {
       descricao,
     })
 
+    console.log('✅ Cobranca inserida com ID:', novoId)
     // Envia WhatsApp para o responsável
     if (responsavel?.whatsapp && qrCode.payload) {
       const dataVencimento = new Date(vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
