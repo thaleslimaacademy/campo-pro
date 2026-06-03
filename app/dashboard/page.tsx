@@ -109,19 +109,19 @@ export default function Dashboard() {
         {isAdmin && (
           <div style={{ background: inadimplentes > 0 ? 'rgba(255,70,70,0.07)' : cardBg, borderRadius: '16px', padding: '14px', border: inadimplentes > 0 ? '1px solid rgba(255,70,70,0.3)' : cardBorder }}>
             <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>Inadimplentes</div>
-            <div style={{ fontFamily: syne, fontSize: '26px', fontWeight: 800, color: inadimplentes > 0 ? '#ff5555' : neon }}>{loading ? '...' : inadimplentes}</div>
+            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '26px', fontWeight: 800, color: inadimplentes > 0 ? '#ff5555' : neon }}>{loading ? '...' : inadimplentes}</div>
             <div style={{ fontSize: '10px', color: muted, marginTop: '4px' }}>em atraso</div>
           </div>
         )}
         <div style={{ background: cardBg, borderRadius: '16px', padding: '14px', border: cardBorder }}>
           <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>Presenca hoje</div>
-          <div style={{ fontFamily: syne, fontSize: '26px', fontWeight: 800, color: pct >= 75 ? neon : pct > 0 ? gold : muted }}>{loading ? '...' : presencaHoje.total === 0 ? '-' : pct + '%'}</div>
+          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '26px', fontWeight: 800, color: pct >= 75 ? neon : pct > 0 ? gold : muted }}>{loading ? '...' : presencaHoje.total === 0 ? '-' : pct + '%'}</div>
           <div style={{ fontSize: '10px', color: muted, marginTop: '4px' }}>{presencaHoje.total > 0 ? presencaHoje.presentes + ' de ' + presencaHoje.total : 'sem treino'}</div>
         </div>
         {isAdmin && (
           <div style={{ background: 'rgba(212,175,55,0.07)', borderRadius: '16px', padding: '14px', border: '1px solid rgba(212,175,55,0.2)' }}>
             <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>Receita mes</div>
-            <div style={{ fontFamily: syne, fontSize: '26px', fontWeight: 800, color: gold }}>{loading ? '...' : 'R$' + receitaMes.toFixed(0)}</div>
+            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '26px', fontWeight: 800, color: gold }}>{loading ? '...' : 'R$' + receitaMes.toFixed(0)}</div>
             <div style={{ fontSize: '10px', color: muted, marginTop: '4px' }}>{mes}</div>
           </div>
         )}
