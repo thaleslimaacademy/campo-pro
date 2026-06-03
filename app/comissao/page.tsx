@@ -108,62 +108,62 @@ export default function ComissaoTecnica() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <p className="text-gray-400">Carregando...</p>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <p style={{ color: "rgba(255,255,255,0.4)", fontFamily: "Inter, sans-serif" }}>Carregando...</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <a href="/dashboard" className="text-gray-400">← Voltar</a>
-          <h1 className="text-xl font-bold">👨‍💼 Comissão Técnica</h1>
+    <div style={{ minHeight: "100vh", color: "#F0F0F0", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <a href="/dashboard" style={{ color: "rgba(255,255,255,0.4)", textDecoration: "none", fontSize: "13px" }}>Voltar</a>
+          <h1 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "22px", color: "#F0F0F0" }}>Comissao Tecnica</h1>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-green-600 text-white px-4 py-2 rounded-xl font-bold text-sm"
+          style={{ background: "linear-gradient(135deg,#39FF14,#00cc00)", color: "#000", padding: "10px 18px", borderRadius: "12px", fontSize: "12px", fontWeight: 800, fontFamily: "Syne, sans-serif", border: "none", cursor: "pointer" }}
         >
           {showForm ? 'Fechar' : '+ Adicionar'}
         </button>
       </div>
 
       {sucesso && (
-        <div className="bg-green-600 rounded-xl p-3 mb-4 text-center">
-          <p className="text-white font-bold">✅ Membro adicionado!</p>
+        <div style={{ background: "rgba(57,255,20,0.1)", border: "1px solid rgba(57,255,20,0.3)", borderRadius: "12px", padding: "12px", textAlign: "center", marginBottom: "16px" }}>
+          <p style={{ color: "#39FF14", fontFamily: "Syne, sans-serif", fontWeight: 700, margin: 0 }}>Membro adicionado!</p>
         </div>
       )}
 
       {showForm && (
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-6">
-          <p className="text-green-500 font-bold text-sm mb-4">Novo Membro</p>
+        <div style={{ background: "rgba(57,255,20,0.04)", border: "1px solid rgba(57,255,20,0.15)", borderRadius: "16px", padding: "16px", marginBottom: "20px" }}>
+          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", color: "#39FF14", marginBottom: "16px" }}>Novo Membro</p>
           <div className="space-y-3">
             <div>
-              <label className="text-sm text-gray-400">Nome completo *</label>
-              <input name="nome" value={form.nome} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="Nome do professor" />
+              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Nome completo *</label>
+              <input name="nome" value={form.nome} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="Nome do professor" />
             </div>
             <div>
-              <label className="text-sm text-gray-400">E-mail *</label>
-              <input name="email" value={form.email} onChange={handleChange} type="email" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="email@professor.com" />
+              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>E-mail *</label>
+              <input name="email" value={form.email} onChange={handleChange} type="email" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="email@professor.com" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-sm text-gray-400">Telefone</label>
-                <input name="telefone" value={form.telefone} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="(34) 9999-9999" />
+                <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Telefone</label>
+                <input name="telefone" value={form.telefone} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="(34) 9999-9999" />
               </div>
               <div>
-                <label className="text-sm text-gray-400">WhatsApp</label>
-                <input name="whatsapp" value={form.whatsapp} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="5534999999999" />
+                <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>WhatsApp</label>
+                <input name="whatsapp" value={form.whatsapp} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="5534999999999" />
               </div>
             </div>
             <div>
-              <label className="text-sm text-gray-400">Cargo</label>
-              <select name="cargo" value={form.cargo} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white">
+              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Cargo</label>
+              <select name="cargo" value={form.cargo} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }}>
                 {cargos.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
-            <button onClick={salvar} disabled={salvando} className="w-full bg-green-600 text-white py-3 rounded-xl font-bold disabled:opacity-50">
+            <button onClick={salvar} disabled={salvando} style={{ width: "100%", background: "linear-gradient(135deg,#39FF14,#00cc00)", color: "#000", padding: "14px", borderRadius: "12px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "13px", border: "none", cursor: "pointer" }}>
               {salvando ? 'Salvando...' : 'Salvar'}
             </button>
           </div>
@@ -171,51 +171,51 @@ export default function ComissaoTecnica() {
       )}
 
       {professores.length === 0 ? (
-        <div className="text-center py-16">
+        <div style={{ textAlign: "center", padding: "60px 0" }}>
           <p className="text-4xl mb-3">👨‍💼</p>
-          <p className="text-gray-400">Nenhum membro cadastrado ainda.</p>
+          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "16px", color: "#F0F0F0" }}>Nenhum membro cadastrado.</p>
         </div>
       ) : (
         <div className="space-y-3">
           {professores.map(p => (
-            <div key={p.id} className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+            <div key={p.id} style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "10px" }}>
               <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-green-600/20 rounded-full flex items-center justify-center text-xl">👤</div>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <div style={{ width: "44px", height: "44px", background: "rgba(57,255,20,0.1)", border: "1px solid rgba(57,255,20,0.2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px", flexShrink: 0 }}>T</div>
                   <div>
-                    <p className="font-bold text-white">{p.nome}</p>
-                    <p className="text-green-500 text-sm">{p.cargo}</p>
-                    <p className="text-gray-400 text-xs">{p.email}</p>
-                    {p.whatsapp && <p className="text-gray-400 text-xs">📱 {p.whatsapp}</p>}
+                    <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "14px", color: "#F0F0F0", margin: "0 0 2px" }}>{p.nome}</p>
+                    <p style={{ color: "#39FF14", fontSize: "12px", fontWeight: 600, margin: "0 0 2px" }}>{p.cargo}</p>
+                    <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "11px", margin: 0 }}>{p.email}</p>
+                    {p.whatsapp && <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "11px", margin: "2px 0 0" }}>{p.whatsapp}</p>}
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 items-end">
-                  <span className={'text-xs px-2 py-1 rounded-full font-bold ' + (p.ativo ? 'bg-green-600/20 text-green-400' : 'bg-red-600/20 text-red-400')}>
+                  <span style={{ fontSize: '10px', padding: '3px 8px', borderRadius: '20px', fontWeight: 700, fontFamily: 'Syne, sans-serif', background: p.ativo ? 'rgba(57,255,20,0.1)' : 'rgba(255,70,70,0.1)', color: p.ativo ? '#39FF14' : '#ff5555', border: p.ativo ? '1px solid rgba(57,255,20,0.2)' : '1px solid rgba(255,70,70,0.2)' }}>
                     {p.ativo ? 'Ativo' : 'Inativo'}
                   </span>
-                  <span className={'text-xs px-2 py-1 rounded-full ' + (p.contaCriada ? 'bg-blue-600/20 text-blue-400' : 'bg-gray-700 text-gray-400')}>
+                  <span style={{ fontSize: '10px', padding: '3px 8px', borderRadius: '20px', background: p.contaCriada ? 'rgba(59,130,246,0.1)' : 'rgba(255,255,255,0.05)', color: p.contaCriada ? '#60a5fa' : 'rgba(255,255,255,0.4)', border: p.contaCriada ? '1px solid rgba(59,130,246,0.2)' : '1px solid rgba(255,255,255,0.07)' }}>
                     {p.contaCriada ? '✅ Conta criada' : '⏳ Aguardando'}
                   </span>
                 </div>
               </div>
 
               {!p.contaCriada && p.tokenConvite && (
-                <div className="bg-yellow-600/10 border border-yellow-600/30 rounded-xl p-3 mb-3">
-                  <p className="text-yellow-400 text-xs font-bold mb-2">🔗 Link de Convite</p>
+                <div style={{ background: "rgba(212,175,55,0.07)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: "12px", padding: "12px", marginBottom: "10px" }}>
+                  <p style={{ color: "#D4AF37", fontSize: "10px", fontWeight: 700, fontFamily: "Syne, sans-serif", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.8px" }}>Link de Convite</p>
                   <p className="text-gray-400 text-xs break-all mb-2">
                     {'campo-pro.vercel.app/convite/' + p.tokenConvite.slice(0, 16) + '...'}
                   </p>
                   <div className="flex gap-2">
                     <button
                       onClick={() => copiarLink(p.tokenConvite, p.whatsapp, p.nome)}
-                      className="flex-1 bg-gray-800 text-gray-300 py-1 rounded-lg text-xs font-bold"
+                      style={{ flex: 1, background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.6)", padding: "8px", borderRadius: "8px", fontSize: "11px", fontWeight: 700, border: "none", cursor: "pointer" }}
                     >
                       {copiado === p.tokenConvite ? '✅ Copiado!' : '📋 Copiar'}
                     </button>
                     {p.whatsapp && (
                       <button
                         onClick={() => enviarWhatsApp(p.tokenConvite, p.whatsapp, p.nome)}
-                        className="flex-1 bg-green-600/20 text-green-400 py-1 rounded-lg text-xs font-bold"
+                        style={{ flex: 1, background: "rgba(57,255,20,0.08)", color: "#39FF14", padding: "8px", borderRadius: "8px", fontSize: "11px", fontWeight: 700, border: "none", cursor: "pointer" }}
                       >
                         📲 WhatsApp
                       </button>
@@ -225,10 +225,10 @@ export default function ComissaoTecnica() {
               )}
 
               <div className="flex gap-2">
-                <button onClick={() => toggleAtivo(p.id, p.ativo)} className="flex-1 text-xs bg-gray-800 text-gray-300 px-2 py-2 rounded-lg">
+                <button onClick={() => toggleAtivo(p.id, p.ativo)} style={{ flex: 1, background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.5)", padding: "10px", borderRadius: "10px", fontSize: "11px", border: "none", cursor: "pointer" }}>
                   {p.ativo ? '🔒 Bloquear' : '🔓 Ativar'}
                 </button>
-                <button onClick={() => excluir(p.id)} className="text-xs bg-red-600/20 text-red-400 px-3 py-2 rounded-lg">
+                <button onClick={() => excluir(p.id)} style={{ background: "rgba(255,70,70,0.08)", color: "#ff5555", padding: "10px 14px", borderRadius: "10px", fontSize: "11px", border: "none", cursor: "pointer" }}>
                   🗑️
                 </button>
               </div>
@@ -237,11 +237,11 @@ export default function ComissaoTecnica() {
         </div>
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
-        <a href="/dashboard" className="text-gray-400 text-xs text-center">🏠<br />Início</a>
-        <a href="/atletas" className="text-gray-400 text-xs text-center">👥<br />Atletas</a>
-        <a href="/presenca" className="text-gray-400 text-xs text-center">✅<br />Presença</a>
-        <a href="/financeiro" className="text-gray-400 text-xs text-center">💰<br />Financeiro</a>
+      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
+        <a href="/dashboard" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Inicio</a>
+        <a href="/atletas" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Atletas</a>
+        <a href="/presenca" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Presenca</a>
+        <a href="/financeiro" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Financeiro</a>
       </nav>
     </div>
   )
