@@ -200,44 +200,44 @@ export default function Convocacoes() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <p className="text-gray-400">Carregando...</p>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <p style={{ color: "rgba(255,255,255,0.4)", fontFamily: "Inter, sans-serif" }}>Carregando...</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <a href="/dashboard" className="text-gray-400">Voltar</a>
-          <h1 className="text-xl font-bold">📣 Convocacoes</h1>
+    <div style={{ minHeight: "100vh", color: "#F0F0F0", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <a href="/dashboard" style={{ color: "rgba(255,255,255,0.4)", textDecoration: "none", fontSize: "13px" }}>Voltar</a>
+          <h1 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "22px", color: "#F0F0F0" }}>Convocacoes</h1>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-green-600 text-white px-4 py-2 rounded-xl font-bold text-sm"
+          style={{ background: "linear-gradient(135deg,#39FF14,#00cc00)", color: "#000", padding: "10px 18px", borderRadius: "12px", fontSize: "12px", fontWeight: 800, fontFamily: "Syne, sans-serif", border: "none", cursor: "pointer" }}
         >
           {showForm ? 'Fechar' : '+ Nova'}
         </button>
       </div>
 
       {sucesso && (
-        <div className="bg-green-600 rounded-xl p-3 mb-4 text-center">
-          <p className="text-white font-bold">Convocacao criada com sucesso!</p>
+        <div style={{ background: "rgba(57,255,20,0.1)", border: "1px solid rgba(57,255,20,0.3)", borderRadius: "12px", padding: "12px", textAlign: "center", marginBottom: "16px" }}>
+          <p style={{ color: "#39FF14", fontFamily: "Syne, sans-serif", fontWeight: 700, margin: 0 }}>Convocacao criada!</p>
         </div>
       )}
 
       {showForm && (
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-6">
-          <p className="text-green-500 font-bold text-sm mb-4">Nova Convocacao</p>
+        <div style={{ background: "rgba(57,255,20,0.04)", border: "1px solid rgba(57,255,20,0.15)", borderRadius: "16px", padding: "16px", marginBottom: "20px" }}>
+          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", color: "#39FF14", marginBottom: "16px" }}>Nova Convocacao</p>
           <div className="space-y-3">
             <div>
-              <label className="text-sm text-gray-400">Titulo *</label>
-              <input name="titulo" value={form.titulo} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="Ex: Jogo contra Rivais FC" />
+              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Titulo *</label>
+              <input name="titulo" value={form.titulo} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="Ex: Jogo contra Rivais FC" />
             </div>
             <div>
-              <label className="text-sm text-gray-400">Tipo</label>
-              <select name="tipo" value={form.tipo} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white">
+              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Tipo</label>
+              <select name="tipo" value={form.tipo} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }}>
                 <option value="amistoso">Amistoso</option>
                 <option value="jogo-treino">Jogo-Treino</option>
                 <option value="campeonato">Campeonato</option>
@@ -246,27 +246,27 @@ export default function Convocacoes() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-sm text-gray-400">Data *</label>
-                <input name="data" value={form.data} onChange={handleChange} type="date" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+                <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Data *</label>
+                <input name="data" value={form.data} onChange={handleChange} type="date" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label className="text-sm text-gray-400">Horario *</label>
-                <input name="horario" value={form.horario} onChange={handleChange} type="time" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+                <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Horario *</label>
+                <input name="horario" value={form.horario} onChange={handleChange} type="time" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
               </div>
             </div>
             <div>
-              <label className="text-sm text-gray-400">Local</label>
-              <input name="local" value={form.local} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="Ex: Campo Municipal" />
+              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Local</label>
+              <input name="local" value={form.local} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="Ex: Campo Municipal" />
             </div>
             <div>
-              <label className="text-sm text-gray-400">Descricao</label>
-              <textarea name="descricao" value={form.descricao} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" rows={2} placeholder="Informacoes adicionais..." />
+              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Descricao</label>
+              <textarea name="descricao" value={form.descricao} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} rows={2} placeholder="Informacoes adicionais..." />
             </div>
 
-            <div className="border border-gray-700 rounded-xl p-3">
+            <div style={{ border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", padding: "12px" }}>
               <div className="flex justify-between items-center mb-3">
-                <label className="text-sm text-gray-400 font-bold">Atletas convocados *</label>
-                <button onClick={selecionarTodos} className="text-xs text-green-400 font-bold">
+                <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px", fontWeight: 700 }}>Atletas *</label>
+                <button onClick={selecionarTodos} style={{ fontSize: "11px", color: "#39FF14", fontWeight: 700, background: "none", border: "none", cursor: "pointer" }}>
                   {atletasSelecionados.length === atletas.length ? 'Desmarcar todos' : 'Todos'}
                 </button>
               </div>
@@ -275,14 +275,14 @@ export default function Convocacoes() {
                 <input
                   value={filtroNome}
                   onChange={e => setFiltroNome(e.target.value)}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm"
+                  style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "8px 10px", color: "#F0F0F0", fontSize: "12px", marginBottom: "6px" }}
                   placeholder="Buscar por nome..."
                 />
                 <div className="grid grid-cols-2 gap-2">
                   <select
                     value={filtroTurma}
                     onChange={e => setFiltroTurma(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm"
+                    style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "8px 10px", color: "#F0F0F0", fontSize: "12px", marginBottom: "6px" }}
                   >
                     <option value="">Todas as turmas</option>
                     {turmas.map(t => (
@@ -292,7 +292,7 @@ export default function Convocacoes() {
                   <select
                     value={filtroAno}
                     onChange={e => setFiltroAno(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm"
+                    style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "8px 10px", color: "#F0F0F0", fontSize: "12px", marginBottom: "6px" }}
                   >
                     <option value="">Todos os anos</option>
                     {anosDisponiveis.map(ano => (
@@ -302,7 +302,7 @@ export default function Convocacoes() {
                 </div>
                 <div className="flex justify-between items-center">
                   <p className="text-xs text-gray-500">{atletasFiltrados.length} atleta(s) no filtro</p>
-                  <button onClick={selecionarFiltrados} className="text-xs text-blue-400 font-bold">
+                  <button onClick={selecionarFiltrados} style={{ fontSize: "11px", color: "#60a5fa", fontWeight: 700, background: "none", border: "none", cursor: "pointer" }}>
                     Selecionar filtrados
                   </button>
                 </div>
@@ -338,7 +338,7 @@ export default function Convocacoes() {
               <p className="text-xs text-gray-500 mt-2">{atletasSelecionados.length} atleta(s) selecionado(s)</p>
             </div>
 
-            <button onClick={salvar} disabled={salvando} className="w-full bg-green-600 text-white py-3 rounded-xl font-bold disabled:opacity-50">
+            <button onClick={salvar} disabled={salvando} style={{ width: "100%", background: "linear-gradient(135deg,#39FF14,#00cc00)", color: "#000", padding: "14px", borderRadius: "12px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "13px", border: "none", cursor: "pointer" }}>
               {salvando ? 'Salvando...' : 'Criar Convocacao'}
             </button>
           </div>
@@ -346,18 +346,18 @@ export default function Convocacoes() {
       )}
 
       {convocacoes.length === 0 ? (
-        <div className="text-center py-16">
+        <div style={{ textAlign: "center", padding: "60px 0" }}>
           <p className="text-4xl mb-3">📣</p>
-          <p className="text-gray-400">Nenhuma convocacao ainda.</p>
-          <p className="text-gray-500 text-sm mt-1">Clique em + Nova para criar.</p>
+          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "16px", color: "#F0F0F0", marginBottom: "8px" }}>Nenhuma convocacao ainda.</p>
+          <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)" }}>Clique em + Nova para criar.</p>
         </div>
       ) : (
         <div className="space-y-3">
           {convocacoes.map(c => (
-            <div key={c.id} className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+            <div key={c.id} style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "10px" }}>
               <div className="flex items-start justify-between mb-2">
                 <div>
-                  <p className="font-bold text-white">{c.titulo}</p>
+                  <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "15px", color: "#F0F0F0" }}>{c.titulo}</p>
                   <span className={"text-xs px-2 py-1 rounded-full font-bold mt-1 inline-block " + (tipoColor[c.tipo] || 'bg-gray-700 text-gray-300')}>
                     {tipoLabel[c.tipo] || c.tipo}
                   </span>
@@ -367,20 +367,20 @@ export default function Convocacoes() {
                 </span>
               </div>
               <div className="space-y-1 mb-3">
-                <p className="text-gray-400 text-sm">{"📅 " + new Date(c.data + 'T00:00:00').toLocaleDateString('pt-BR') + " - " + c.horario}</p>
-                {c.local && <p className="text-gray-400 text-sm">{"📍 " + c.local}</p>}
-                {c.descricao && <p className="text-gray-500 text-xs">{c.descricao}</p>}
+                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginBottom: "2px" }}>{"📅 " + new Date(c.data + 'T00:00:00').toLocaleDateString('pt-BR') + " - " + c.horario}</p>
+                {c.local && <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginBottom: "2px" }}>{"📍 " + c.local}</p>}
+                {c.descricao && <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>{c.descricao}</p>}
               </div>
               <div className="flex gap-2">
-                <a href={"/convocacao/" + c.id} className="flex-1 bg-green-600/20 text-green-400 text-center py-2 rounded-lg text-sm font-bold">
+                <a href={"/convocacao/" + c.id} style={{ flex: 1, background: "rgba(57,255,20,0.08)", border: "1px solid rgba(57,255,20,0.2)", color: "#39FF14", textAlign: "center", padding: "10px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", textDecoration: "none" }}>
                   Ver detalhes
                 </a>
                 {c.status === 'aberta' && (
-                  <button onClick={() => encerrar(c.id)} className="bg-gray-800 text-gray-300 px-3 py-2 rounded-lg text-sm">
+                  <button onClick={() => encerrar(c.id)} style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.5)", padding: "10px 12px", borderRadius: "10px", fontSize: "12px", border: "none", cursor: "pointer" }}>
                     Encerrar
                   </button>
                 )}
-                <button onClick={() => excluir(c.id)} className="bg-red-600/20 text-red-400 px-3 py-2 rounded-lg text-sm">
+                <button onClick={() => excluir(c.id)} style={{ background: "rgba(255,70,70,0.08)", color: "#ff5555", padding: "10px 12px", borderRadius: "10px", fontSize: "12px", border: "none", cursor: "pointer" }}>
                   Excluir
                 </button>
               </div>
@@ -389,11 +389,11 @@ export default function Convocacoes() {
         </div>
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
-        <a href="/dashboard" className="text-gray-400 text-xs text-center">🏠<br />Inicio</a>
-        <a href="/atletas" className="text-gray-400 text-xs text-center">👥<br />Atletas</a>
-        <a href="/presenca" className="text-gray-400 text-xs text-center">✅<br />Presenca</a>
-        <a href="/financeiro" className="text-gray-400 text-xs text-center">💰<br />Financeiro</a>
+      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
+        <a href="/dashboard" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Inicio</a>
+        <a href="/atletas" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Atletas</a>
+        <a href="/presenca" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Presenca</a>
+        <a href="/financeiro" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Financeiro</a>
       </nav>
     </div>
   )
