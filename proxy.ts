@@ -21,6 +21,7 @@ const isPublicRoute = createRouteMatcher([
   '/pagar(.*)',
   '/api/notificar-convocacao(.*)',
   '/api/pagar(.*)',
+  '/api/whatsapp-aprovacao(.*)',
 ])
 
 export default clerkMiddleware(async (auth, req) => {

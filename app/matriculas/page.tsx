@@ -146,33 +146,17 @@ function MatriculasInner() {
     setProcessando(true)
 
     try {
-      const instanceId = process.env.NEXT_PUBLIC_ZAPI_INSTANCE_ID
-      const token = process.env.NEXT_PUBLIC_ZAPI_TOKEN
-      const clientToken = process.env.NEXT_PUBLIC_ZAPI_CLIENT_TOKEN
-
-      if (instanceId && token) {
-        const numero = matricula.whatsappResponsavel.replace(/\D/g, '')
-        const numeroFormatado = numero.startsWith('55') ? numero : `55${numero}`
-        const nomeResp = matricula.nomeResponsavel.split(' ')[0]
-
-        const mensagem =
-          `Olá ${nomeResp},\n\n` +
-          `Infelizmente a pré-matrícula de *${matricula.nomeAtleta}* não foi aprovada no momento.\n\n` +
-          `Entre em contato conosco para mais informações.\n\n` +
-          `_Thales Lima Football Academy — Iturama/MG_`
-
-        await fetch(
-          `https://api.z-api.io/instances/${instanceId}/token/${token}/send-text`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Client-Token': clientToken || '',
-            },
-            body: JSON.stringify({ phone: numeroFormatado, message: mensagem }),
-          }
-        )
-      }
+      await fetch('/api/whatsapp-aprovacao', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          whatsapp: matricula.whatsappResponsavel,
+          nomeResponsavel: matricula.nomeResponsavel,
+          nomeAtleta: matricula.nomeAtleta,
+          tokenPais: '',
+          tipo: 'recusa',
+        }),
+      })
     } catch (err) {
       console.error('Erro WhatsApp recusa:', err)
     }
