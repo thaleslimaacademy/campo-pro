@@ -85,7 +85,7 @@ export default function Dashboard() {
       <div style={{ padding: '16px 20px 12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'linear-gradient(135deg,#39FF14,#00aa00)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '17px', fontWeight: 800, color: '#000', fontFamily: syne, boxShadow: '0 0 16px rgba(57,255,20,0.4)' }}>G</div>
+            <img src="/logo-icon.png" style={{ width: '38px', height: '38px', borderRadius: '8px', objectFit: 'cover' }} alt="GestaoFC" />
             <div>
               <div style={{ fontFamily: syne, fontWeight: 800, fontSize: '18px', color: '#F0F0F0', letterSpacing: '-0.5px' }}>{nomeEscola}</div>
               <div style={{ fontSize: '10px', color: neon, letterSpacing: '1.5px', textTransform: 'uppercase', fontWeight: 600 }}>Pro</div>
