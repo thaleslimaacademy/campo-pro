@@ -162,12 +162,12 @@ export default function Relatorios() {
   if (loading) return <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center"><p className="text-gray-400">Carregando...</p></div>
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
-      <div className="flex items-center gap-3 mb-6">
+    <div style={{ minHeight: "100vh", color: "#F0F0F0", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
         <a href="/dashboard" className="text-gray-400">Voltar</a>
         <h1 className="text-xl font-bold">Relatorios</h1>
       </div>
-      <div className="flex gap-2 mb-6">
+      <div style={{ display: "flex", gap: "8px", marginBottom: "20px" }}>
         {(['presenca', 'financeiro', 'atletas'] as const).map(a => (
           <button key={a} onClick={() => setAba(a)} className={"px-4 py-2 rounded-xl text-sm font-bold " + (aba === a ? 'bg-green-600 text-white' : 'bg-gray-800 text-gray-400')}>
             {a === 'presenca' ? 'Presenca' : a === 'financeiro' ? 'Financeiro' : 'Atletas'}
@@ -226,7 +226,7 @@ export default function Relatorios() {
           </button>
         </div>
       )}
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
+      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
         <a href="/dashboard" className="text-gray-400 text-xs text-center">Inicio</a>
         <a href="/atletas" className="text-gray-400 text-xs text-center">Atletas</a>
         <a href="/presenca" className="text-gray-400 text-xs text-center">Presenca</a>
