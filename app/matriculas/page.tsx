@@ -34,6 +34,7 @@ function MatriculasInner() {
   const [loading, setLoading] = useState(true)
   const [selecionada, setSelecionada] = useState<Matricula | null>(null)
   const [processando, setProcessando] = useState(false)
+  const [gerandoCobranca, setGerandoCobranca] = useState(false)
   const [filtro, setFiltro] = useState<'PENDENTE' | 'APROVADO' | 'RECUSADO'>('PENDENTE')
 
   async function carregar() {
@@ -47,6 +48,33 @@ function MatriculasInner() {
   }
 
   useEffect(() => { if (escolaId) carregar() }, [escolaId])
+
+  async function gerarCobrancaAtleta(atletaId: string, nomeAtleta: string) {
+    setGerandoCobranca(true)
+    try {
+      const hoje = new Date()
+      const vencimento = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 10).toISOString().split('T')[0]
+      const res = await fetch('/api/cobranca', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          atletaId,
+          valor: 100,
+          vencimento,
+          descricao: 'Mensalidade',
+        }),
+      })
+      const data = await res.json()
+      if (data.sucesso) {
+        alert('Cobranca gerada para ' + nomeAtleta + '!')
+      } else {
+        alert('Erro: ' + JSON.stringify(data))
+      }
+    } catch (err) {
+      alert('Erro ao gerar cobranca')
+    }
+    setGerandoCobranca(false)
+  }
 
   async function enviarWhatsAppAprovacao(matricula: Matricula, tokenPais: string) {
     try {
@@ -290,9 +318,16 @@ function MatriculasInner() {
         )}
 
         {selecionada.status === 'APROVADO' && (
-          <div style={{ background: "rgba(57,255,20,0.07)", border: "1px solid rgba(57,255,20,0.2)", borderRadius: "16px", padding: "16px", textAlign: "center" }}>
-            <p style={{ color: "#39FF14", fontFamily: "Syne, sans-serif", fontWeight: 700, margin: 0 }}>Matricula aprovada</p>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px", margin: "4px 0 0" }}>Atleta ja esta na lista</p>
+          <div style={{ background: "rgba(57,255,20,0.07)", border: "1px solid rgba(57,255,20,0.2)", borderRadius: "16px", padding: "16px", textAlign: "center", marginBottom: "12px" }}>
+            <p style={{ color: "#39FF14", fontFamily: "Syne, sans-serif", fontWeight: 700, margin: "0 0 4px" }}>Matricula aprovada</p>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px", margin: "0 0 14px" }}>Atleta ja esta na lista</p>
+            <button
+              onClick={() => gerarCobrancaAtleta(selecionada.atletaId || '', selecionada.nomeAtleta)}
+              disabled={gerandoCobranca || !selecionada.atletaId}
+              style={{ width: "100%", background: "linear-gradient(135deg,#D4AF37,#b8960c)", color: "#000", padding: "14px", borderRadius: "12px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "13px", border: "none", cursor: "pointer", opacity: gerandoCobranca ? 0.6 : 1 }}
+            >
+              {gerandoCobranca ? 'Gerando...' : 'Gerar Cobranca Pix'}
+            </button>
           </div>
         )}
 
