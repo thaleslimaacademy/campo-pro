@@ -90,8 +90,9 @@ export async function POST(req: NextRequest) {
     const qrCode = await getPixQrCode(cobranca.id)
 
     // Salva no Supabase
-    const { data: cobrancaDb } = await supabase.from('Cobranca').insert({
-      id: crypto.randomUUID(),
+    const novoId = crypto.randomUUID()
+    await supabase.from('Cobranca').insert({
+      id: novoId,
       escolaId: await getEscolaId(),
       atletaId,
       valor,
@@ -108,7 +109,7 @@ export async function POST(req: NextRequest) {
       const dataVencimento = new Date(vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
       const nomeResp = responsavel.nome.split(' ')[0]
 
-      const cobrancaId = (cobrancaDb as any)?.id || ''
+      const cobrancaId = novoId
       const linkPagamento = `https://gestaofc.com.br/pagar/${cobrancaId}`
       const mensagem =
         `Olá ${nomeResp}! 👋\n\n` +
