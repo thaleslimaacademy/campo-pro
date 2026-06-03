@@ -51,8 +51,8 @@ function GraficoEvolucao({ avaliacoes }: { avaliacoes: any[] }) {
   const minPeso = Math.min(...dados.filter(a => a.peso).map(a => a.peso))
 
   return (
-    <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mt-4">
-      <p className="text-green-500 font-bold text-sm mb-4">Evolucao do Atleta</p>
+    <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginTop: "16px" }}>
+      <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Evolucao do Atleta</p>
       <div className="space-y-4">
         {dados[0]?.peso && (
           <div>
@@ -304,22 +304,22 @@ export default function AvaliacaoAtleta() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <a href={"/atletas/" + id} className="text-gray-400">Voltar</a>
-          <h1 className="text-xl font-bold">Avaliacao</h1>
+    <div style={{ minHeight: "100vh", color: "#F0F0F0", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <a href={"/atletas/" + id} style={{ color: "rgba(255,255,255,0.4)", textDecoration: "none", fontSize: "13px" }}>Voltar</a>
+          <h1 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "22px", color: "#F0F0F0" }}>Avaliacao</h1>
         </div>
         {notaGeral > 0 && (
-          <div className={"w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg " + (notaGeral >= 7 ? 'bg-green-600' : notaGeral >= 5 ? 'bg-yellow-500 text-black' : 'bg-red-600')}>
+          <div style={{ width: "48px", height: "48px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "18px", background: notaGeral >= 7 ? "linear-gradient(135deg,#39FF14,#00cc00)" : notaGeral >= 5 ? "#D4AF37" : "#ff5555", color: notaGeral >= 5 ? "#000" : "#fff" }}>
             {notaGeral}
           </div>
         )}
       </div>
 
       <div className="flex gap-2 mb-4">
-        <button onClick={() => setAba('form')} className={"flex-1 py-2 rounded-xl text-sm font-bold " + (aba === 'form' ? 'bg-green-600 text-white' : 'bg-gray-800 text-gray-400')}>Nova Avaliacao</button>
-        <button onClick={() => setAba('historico')} className={"flex-1 py-2 rounded-xl text-sm font-bold " + (aba === 'historico' ? 'bg-green-600 text-white' : 'bg-gray-800 text-gray-400')}>
+        <button onClick={() => setAba('form')} style={{ flex: 1, padding: "10px", borderRadius: "12px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer", border: "none", background: aba === "form" ? "#39FF14" : "rgba(255,255,255,0.05)", color: aba === "form" ? "#000" : "rgba(255,255,255,0.4)" }}>Nova Avaliacao</button>
+        <button onClick={() => setAba('historico')} style={{ flex: 1, padding: "10px", borderRadius: "12px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer", border: "none", background: aba === "historico" ? "#39FF14" : "rgba(255,255,255,0.05)", color: aba === "historico" ? "#000" : "rgba(255,255,255,0.4)" }}>
           Historico {avaliacoes.length > 0 ? '(' + avaliacoes.length + ')' : ''}
         </button>
       </div>
@@ -328,11 +328,11 @@ export default function AvaliacaoAtleta() {
         <div>
           <GraficoEvolucao avaliacoes={avaliacoes} />
           {avaliacoes.length === 0 ? (
-            <div className="text-center py-12"><p className="text-gray-400">Nenhuma avaliacao registrada.</p></div>
+            <div style={{ textAlign: "center", padding: "48px 0", color: "rgba(255,255,255,0.4)", fontFamily: "Inter, sans-serif" }}>Nenhuma avaliacao registrada.</div>
           ) : (
             <div className="space-y-3 mt-4">
               {avaliacoes.map(a => (
-                <div key={a.id} className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+                <div key={a.id} style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)" }}>
                   <div className="flex justify-between items-center mb-2">
                     <p className="font-bold">{new Date(a.dataAvaliacao + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
                     <div className="flex items-center gap-2">
@@ -365,33 +365,33 @@ export default function AvaliacaoAtleta() {
 
       {aba === 'form' && (
         <div>
-          <div className="bg-gray-900 rounded-xl p-3 border border-gray-800 mb-4 flex justify-between items-center">
-            <p className="font-bold text-green-400">{atletaNome}</p>
-            <input name="dataAvaliacao" value={form.dataAvaliacao} onChange={handleChange} type="date" className="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm" />
+          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "14px", padding: "12px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "14px", color: "#39FF14" }}>{atletaNome}</p>
+            <input name="dataAvaliacao" value={form.dataAvaliacao} onChange={handleChange} type="date" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "8px 12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px" }} />
           </div>
 
           {sucesso && (
-            <div className="bg-green-600/20 border border-green-600/30 rounded-xl p-3 mb-4 text-center">
-              <p className="text-green-400 font-bold">Avaliacao salva!</p>
+            <div style={{ background: "rgba(57,255,20,0.08)", border: "1px solid rgba(57,255,20,0.25)", borderRadius: "12px", padding: "12px", textAlign: "center", marginBottom: "12px" }}>
+              <p style={{ color: "#39FF14", fontFamily: "Syne, sans-serif", fontWeight: 700, margin: 0 }}>Avaliacao salva!</p>
             </div>
           )}
 
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
-            <p className="text-green-500 font-bold text-sm mb-4">Dados Antropometricos</p>
+          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Dados Antropometricos</p>
             <div className="grid grid-cols-2 gap-3 mb-3">
-              <div><label className="text-xs text-gray-400">Peso (kg)</label><input name="peso" value={form.peso} onChange={handleChange} type="number" step="0.1" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="70.5" /></div>
-              <div><label className="text-xs text-gray-400">Altura (cm)</label><input name="altura" value={form.altura} onChange={handleChange} type="number" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="175" /></div>
+              <div><label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Peso (kg)</label><input name="peso" value={form.peso} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="70.5" /></div>
+              <div><label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Altura (cm)</label><input name="altura" value={form.altura} onChange={handleChange} type="number" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="175" /></div>
             </div>
-            {imc && <div className="bg-gray-800 rounded-xl p-3 mb-3"><div className="flex justify-between"><span className="text-sm text-gray-400">IMC</span><span className="font-bold">{imc.imc} - {imc.classificacao}</span></div></div>}
-            <p className="text-xs text-gray-400 mb-2 mt-3">Dobras Cutaneas (mm)</p>
+            {imc && <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: "12px", padding: "12px", marginBottom: "12px" }}><div className="flex justify-between"><span className="text-sm text-gray-400">IMC</span><span className="font-bold">{imc.imc} - {imc.classificacao}</span></div></div>}
+            <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: "8px", marginTop: "12px" }}>Dobras Cutaneas (mm)</p>
             <div className="grid grid-cols-2 gap-3">
               {[{name:'dobraTricipal',label:'Triceps'},{name:'dobraSubescapular',label:'Subescapular'},{name:'dobraSuprailiaca',label:'Suprailiaca'},{name:'dobraAbdominal',label:'Abdominal'},{name:'dobraPeitoral',label:'Peitoral'},{name:'dobraCoxa',label:'Coxa'}].map(d => (
-                <div key={d.name}><label className="text-xs text-gray-400">{d.label}</label><input name={d.name} value={(form as any)[d.name]} onChange={handleChange} type="number" step="0.1" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 mt-1 text-white text-sm" placeholder="mm" /></div>
+                <div key={d.name}><label className="text-xs text-gray-400">{d.label}</label><input name={d.name} value={(form as any)[d.name]} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "10px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="mm" /></div>
               ))}
             </div>
             {gordura && (
-              <div className="bg-blue-600/10 border border-blue-600/30 rounded-xl p-4 mt-4">
-                <p className="text-blue-400 font-bold text-sm mb-2">Composicao Corporal (Faulkner)</p>
+              <div style={{ background: "rgba(57,255,20,0.06)", border: "1px solid rgba(57,255,20,0.2)", borderRadius: "14px", padding: "14px", marginTop: "14px" }}>
+                <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "10px", textTransform: "uppercase", letterSpacing: "1px" }}>Composicao Corporal (Faulkner)</p>
                 <div className="space-y-2">
                   <div className="flex justify-between"><span className="text-sm text-gray-300">% Gordura</span><span className="font-bold">{gordura.percentual}% - {gordura.classificacao}</span></div>
                   {massaGorda && <div className="flex justify-between"><span className="text-sm text-gray-300">Massa Gorda</span><span className="font-bold text-red-400">{massaGorda} kg</span></div>}
@@ -401,18 +401,18 @@ export default function AvaliacaoAtleta() {
             )}
           </div>
 
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
-            <p className="text-green-500 font-bold text-sm mb-4">Testes Fisicos</p>
+          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Testes Fisicos</p>
             <div className="grid grid-cols-2 gap-3">
-              <div><label className="text-xs text-gray-400">Velocidade 40m (seg)</label><input name="velocidade40m" value={form.velocidade40m} onChange={handleChange} type="number" step="0.01" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="5.20" /></div>
-              <div><label className="text-xs text-gray-400">Cooper (metros)</label><input name="cooper" value={form.cooper} onChange={handleChange} type="number" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="2800" /></div>
-              <div><label className="text-xs text-gray-400">Salto Vertical (cm)</label><input name="saltoVertical" value={form.saltoVertical} onChange={handleChange} type="number" step="0.1" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="45" /></div>
-              <div><label className="text-xs text-gray-400">Salto Horizontal (cm)</label><input name="saltoHorizontal" value={form.saltoHorizontal} onChange={handleChange} type="number" step="0.1" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="180" /></div>
+              <div><label className="text-xs text-gray-400">Velocidade 40m (seg)</label><input name="velocidade40m" value={form.velocidade40m} onChange={handleChange} type="number" step="0.01" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="5.20" /></div>
+              <div><label className="text-xs text-gray-400">Cooper (metros)</label><input name="cooper" value={form.cooper} onChange={handleChange} type="number" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="2800" /></div>
+              <div><label className="text-xs text-gray-400">Salto Vertical (cm)</label><input name="saltoVertical" value={form.saltoVertical} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="45" /></div>
+              <div><label className="text-xs text-gray-400">Salto Horizontal (cm)</label><input name="saltoHorizontal" value={form.saltoHorizontal} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="180" /></div>
             </div>
           </div>
 
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
-            <p className="text-green-500 font-bold text-sm mb-3">Tecnica</p>
+          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Tecnica</p>
             <NotaSelector label="Passe" name="notaPasse" value={form.notaPasse} onChange={handleNota} />
             <NotaSelector label="Chute" name="notaChute" value={form.notaChute} onChange={handleNota} />
             <NotaSelector label="Drible" name="notaDrible" value={form.notaDrible} onChange={handleNota} />
@@ -420,8 +420,8 @@ export default function AvaliacaoAtleta() {
             <NotaSelector label="Cabecio" name="notaCabecio" value={form.notaCabecio} onChange={handleNota} />
           </div>
 
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
-            <p className="text-green-500 font-bold text-sm mb-3">Fisico</p>
+          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Fisico</p>
             <NotaSelector label="Velocidade" name="notaVelocidade" value={form.notaVelocidade} onChange={handleNota} />
             <NotaSelector label="Resistencia" name="notaResistencia" value={form.notaResistencia} onChange={handleNota} />
             <NotaSelector label="Forca" name="notaForca" value={form.notaForca} onChange={handleNota} />
@@ -429,8 +429,8 @@ export default function AvaliacaoAtleta() {
             <NotaSelector label="Saltabilidade" name="notaSaltabilidade" value={form.notaSaltabilidade} onChange={handleNota} />
           </div>
 
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
-            <p className="text-green-500 font-bold text-sm mb-3">Tatico</p>
+          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Tatico</p>
             <NotaSelector label="Posicionamento" name="notaPosicionamento" value={form.notaPosicionamento} onChange={handleNota} />
             <NotaSelector label="Visao de jogo" name="notaVisaoJogo" value={form.notaVisaoJogo} onChange={handleNota} />
             <NotaSelector label="Marcacao" name="notaMarcacao" value={form.notaMarcacao} onChange={handleNota} />
@@ -438,32 +438,32 @@ export default function AvaliacaoAtleta() {
             <NotaSelector label="Concentracao" name="notaConcentracao" value={form.notaConcentracao} onChange={handleNota} />
           </div>
 
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-6">
-            <p className="text-green-500 font-bold text-sm mb-3">Anamnese</p>
+          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Anamnese</p>
             {[{name:'historicoCirurgias',label:'Historico de cirurgias'},{name:'historicoLesoes',label:'Historico de lesoes'},{name:'medicamentosUso',label:'Medicamentos em uso'},{name:'doencasCronicas',label:'Doencas cronicas'},{name:'praticaOutroEsporte',label:'Pratica outro esporte?'},{name:'observacoes',label:'Observacoes gerais'}].map(f => (
               <div key={f.name} className="mb-3">
                 <label className="text-xs text-gray-400">{f.label}</label>
-                <textarea name={f.name} value={(form as any)[f.name]} onChange={handleChange} rows={2} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 mt-1 text-white text-sm resize-none" placeholder="Digite aqui..." />
+                <textarea name={f.name} value={(form as any)[f.name]} onChange={handleChange} rows={2} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "10px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", resize: "none", boxSizing: "border-box" }} placeholder="Digite aqui..." />
               </div>
             ))}
           </div>
 
           <div className="flex gap-3">
-            <button onClick={salvar} disabled={salvando} className="flex-1 bg-green-600 text-white py-4 rounded-xl font-bold text-lg disabled:opacity-50">
+            <button onClick={salvar} disabled={salvando} style={{ flex: 1, background: "linear-gradient(135deg,#39FF14,#00cc00)", color: "#000", padding: "16px", borderRadius: "14px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", border: "none", cursor: "pointer", boxShadow: "0 0 16px rgba(57,255,20,0.3)" }}>
               {salvando ? 'Salvando...' : 'Salvar Avaliacao'}
             </button>
-            <button onClick={() => gerarPDF()} disabled={gerando} className="bg-blue-600 text-white px-4 py-4 rounded-xl font-bold disabled:opacity-50">
+            <button onClick={() => gerarPDF()} disabled={gerando} style={{ background: "rgba(59,130,246,0.15)", border: "1px solid rgba(59,130,246,0.3)", color: "#60a5fa", padding: "16px 20px", borderRadius: "14px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", cursor: "pointer" }}>
               {gerando ? '...' : 'PDF'}
             </button>
           </div>
         </div>
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
-        <a href="/dashboard" className="text-gray-400 text-xs text-center">Inicio</a>
-        <a href="/atletas" className="text-green-500 text-xs text-center">Atletas</a>
-        <a href="/presenca" className="text-gray-400 text-xs text-center">Presenca</a>
-        <a href="/financeiro" className="text-gray-400 text-xs text-center">Financeiro</a>
+      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
+        <a href="/dashboard" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Inicio</a>
+        <a href="/atletas" style={{ textDecoration: "none", color: "#39FF14", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif", fontWeight: 700 }}>Atletas</a>
+        <a href="/presenca" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Presenca</a>
+        <a href="/financeiro" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Financeiro</a>
       </nav>
     </div>
   )
