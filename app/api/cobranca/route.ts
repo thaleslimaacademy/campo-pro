@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
       const dataVencimento = new Date(vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
       const nomeResp = responsavel.nome.split(' ')[0]
 
-      const cobrancaId = cobrancaDb?.id || ''
+      const cobrancaId = (cobrancaDb as any)?.id || ''
       const linkPagamento = `https://gestaofc.com.br/pagar/${cobrancaId}`
       const mensagem =
         `Olá ${nomeResp}! 👋\n\n` +
