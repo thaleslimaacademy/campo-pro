@@ -90,9 +90,9 @@ export default function NovoAtleta() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
-      <div className="flex items-center gap-3 mb-6">
-        <a href="/atletas" className="text-gray-400">← Voltar</a>
+    <div style={{ minHeight: "100vh", color: "#F0F0F0", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
+        <a href="/atletas" style={{ color: "rgba(255,255,255,0.4)", textDecoration: "none", fontSize: "13px" }}>Voltar</a>
         <h1 className="text-xl font-bold">Novo Atleta</h1>
       </div>
 
