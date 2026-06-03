@@ -178,6 +178,12 @@ function FinanceiroInner() {
     setTimeout(() => setCopiado(null), 2000)
   }
 
+  async function excluirCobranca(cobrancaId: string) {
+    if (!confirm('Excluir esta cobranca?')) return
+    await supabase.from('Cobranca').delete().eq('id', cobrancaId)
+    await carregar()
+  }
+
   async function marcarComoPago(cobrancaId: string, enviarRecibo = false) {
     if (!confirm('Confirmar pagamento manual desta cobrança?')) return
     const cobranca = cobrancas.find(c => c.id === cobrancaId)
@@ -480,6 +486,9 @@ function FinanceiroInner() {
                 )}
                 <button onClick={() => marcarComoPago(c.id, true)} style={{ flex: 1, background: "rgba(212,175,55,0.1)", border: "1px solid rgba(212,175,55,0.3)", color: "#D4AF37", padding: "10px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer" }}>
                   Pago + Recibo
+                </button>
+                <button onClick={() => excluirCobranca(c.id)} style={{ background: "rgba(255,70,70,0.08)", border: "1px solid rgba(255,70,70,0.2)", color: "#ff5555", padding: "10px 12px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}>
+                  Excluir
                 </button>
               </div>
             )}
