@@ -25,6 +25,7 @@ type Matricula = {
   nomeAssinatura: string | null
   dataAssinatura: string | null
   status: string
+  atletaId: string | null
   criadoEm: string
 }
 
