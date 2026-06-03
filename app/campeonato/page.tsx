@@ -107,44 +107,44 @@ export default function Campeonatos() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <p className="text-gray-400">Carregando...</p>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <p style={{ color: "rgba(255,255,255,0.4)", fontFamily: "Inter, sans-serif" }}>Carregando...</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <a href="/dashboard" className="text-gray-400">Voltar</a>
-          <h1 className="text-xl font-bold">🏆 Campeonatos</h1>
+    <div style={{ minHeight: "100vh", color: "#F0F0F0", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <a href="/dashboard" style={{ color: "rgba(255,255,255,0.4)", textDecoration: "none", fontSize: "13px" }}>Voltar</a>
+          <h1 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "22px", color: "#F0F0F0" }}>Campeonatos</h1>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-green-600 text-white px-4 py-2 rounded-xl font-bold text-sm"
+          style={{ background: "linear-gradient(135deg,#39FF14,#00cc00)", color: "#000", padding: "10px 18px", borderRadius: "12px", fontSize: "12px", fontWeight: 800, fontFamily: "Syne, sans-serif", border: "none", cursor: "pointer" }}
         >
           {showForm ? 'Fechar' : '+ Novo'}
         </button>
       </div>
 
       {sucesso && (
-        <div className="bg-green-600 rounded-xl p-3 mb-4 text-center">
-          <p className="text-white font-bold">Campeonato criado!</p>
+        <div style={{ background: "rgba(57,255,20,0.1)", border: "1px solid rgba(57,255,20,0.3)", borderRadius: "12px", padding: "12px", textAlign: "center", marginBottom: "16px" }}>
+          <p style={{ color: "#39FF14", fontFamily: "Syne, sans-serif", fontWeight: 700, margin: 0 }}>Campeonato criado!</p>
         </div>
       )}
 
       {showForm && (
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-6">
-          <p className="text-green-500 font-bold text-sm mb-4">Novo Campeonato</p>
+        <div style={{ background: "rgba(212,175,55,0.04)", border: "1px solid rgba(212,175,55,0.15)", borderRadius: "16px", padding: "16px", marginBottom: "20px" }}>
+          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", color: "#D4AF37", marginBottom: "16px" }}>Novo Campeonato</p>
           <div className="space-y-3">
             <div>
-              <label className="text-sm text-gray-400">Nome *</label>
-              <input name="nome" value={form.nome} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="Ex: Copa Verao 2026" />
+              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Nome *</label>
+              <input name="nome" value={form.nome} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="Ex: Copa Verao 2026" />
             </div>
             <div>
-              <label className="text-sm text-gray-400">Formato</label>
-              <select name="formato" value={form.formato} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white">
+              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Formato</label>
+              <select name="formato" value={form.formato} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }}>
                 <option value="grupos">Fase de Grupos</option>
                 <option value="mata-mata">Mata-Mata</option>
                 <option value="misto">Grupos + Mata-Mata</option>
@@ -152,19 +152,19 @@ export default function Campeonatos() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-sm text-gray-400">Data inicio</label>
-                <input name="dataInicio" value={form.dataInicio} onChange={handleChange} type="date" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+                <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Data inicio</label>
+                <input name="dataInicio" value={form.dataInicio} onChange={handleChange} type="date" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label className="text-sm text-gray-400">Data fim</label>
-                <input name="dataFim" value={form.dataFim} onChange={handleChange} type="date" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+                <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Data fim</label>
+                <input name="dataFim" value={form.dataFim} onChange={handleChange} type="date" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
               </div>
             </div>
             <div>
-              <label className="text-sm text-gray-400">Descricao</label>
-              <textarea name="descricao" value={form.descricao} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" rows={2} placeholder="Detalhes do campeonato..." />
+              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Descricao</label>
+              <textarea name="descricao" value={form.descricao} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} rows={2} placeholder="Detalhes do campeonato..." />
             </div>
-            <button onClick={salvar} disabled={salvando} className="w-full bg-green-600 text-white py-3 rounded-xl font-bold disabled:opacity-50">
+            <button onClick={salvar} disabled={salvando} style={{ width: "100%", background: "linear-gradient(135deg,#39FF14,#00cc00)", color: "#000", padding: "14px", borderRadius: "12px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "13px", border: "none", cursor: "pointer" }}>
               {salvando ? 'Salvando...' : 'Criar Campeonato'}
             </button>
           </div>
@@ -172,35 +172,35 @@ export default function Campeonatos() {
       )}
 
       {campeonatos.length === 0 ? (
-        <div className="text-center py-16">
+        <div style={{ textAlign: "center", padding: "60px 0" }}>
           <p className="text-4xl mb-3">🏆</p>
-          <p className="text-gray-400">Nenhum campeonato ainda.</p>
-          <p className="text-gray-500 text-sm mt-1">Clique em + Novo para criar.</p>
+          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "16px", color: "#F0F0F0", marginBottom: "8px" }}>Nenhum campeonato ainda.</p>
+          <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)" }}>Clique em + Novo para criar.</p>
         </div>
       ) : (
         <div className="space-y-3">
           {campeonatos.map(c => (
-            <div key={c.id} className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+            <div key={c.id} style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "10px" }}>
               <div className="flex items-start justify-between mb-2">
                 <div>
-                  <p className="font-bold text-white text-lg">{c.nome}</p>
-                  <p className="text-gray-400 text-sm">{formatoLabel[c.formato]}</p>
+                  <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "16px", color: "#F0F0F0", margin: "0 0 4px" }}>{c.nome}</p>
+                  <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", margin: 0 }}>{formatoLabel[c.formato]}</p>
                 </div>
                 <span className={"text-xs px-2 py-1 rounded-full font-bold " + statusColor[c.status]}>
                   {statusLabel[c.status]}
                 </span>
               </div>
               {(c.dataInicio || c.dataFim) && (
-                <p className="text-gray-500 text-xs mb-3">
+                <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginBottom: "10px" }}>
                   {"📅 " + (c.dataInicio ? new Date(c.dataInicio + 'T00:00:00').toLocaleDateString('pt-BR') : '') + (c.dataFim ? " ate " + new Date(c.dataFim + 'T00:00:00').toLocaleDateString('pt-BR') : '')}
                 </p>
               )}
-              {c.descricao && <p className="text-gray-500 text-xs mb-3">{c.descricao}</p>}
+              {c.descricao && <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginBottom: "10px" }}>{c.descricao}</p>}
               <div className="flex gap-2">
-                <a href={"/campeonato/" + c.id} className="flex-1 bg-yellow-600/20 text-yellow-400 text-center py-2 rounded-lg text-sm font-bold">
+                <a href={"/campeonato/" + c.id} style={{ flex: 1, background: "rgba(212,175,55,0.1)", border: "1px solid rgba(212,175,55,0.25)", color: "#D4AF37", textAlign: "center", padding: "10px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", textDecoration: "none" }}>
                   Gerenciar
                 </a>
-                <button onClick={() => excluir(c.id)} className="bg-red-600/20 text-red-400 px-3 py-2 rounded-lg text-sm">
+                <button onClick={() => excluir(c.id)} style={{ background: "rgba(255,70,70,0.08)", color: "#ff5555", padding: "10px 12px", borderRadius: "10px", fontSize: "12px", border: "none", cursor: "pointer" }}>
                   Excluir
                 </button>
               </div>
@@ -209,11 +209,11 @@ export default function Campeonatos() {
         </div>
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
-        <a href="/dashboard" className="text-gray-400 text-xs text-center">🏠<br />Inicio</a>
-        <a href="/atletas" className="text-gray-400 text-xs text-center">👥<br />Atletas</a>
-        <a href="/presenca" className="text-gray-400 text-xs text-center">✅<br />Presenca</a>
-        <a href="/financeiro" className="text-gray-400 text-xs text-center">💰<br />Financeiro</a>
+      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
+        <a href="/dashboard" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Inicio</a>
+        <a href="/atletas" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Atletas</a>
+        <a href="/presenca" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Presenca</a>
+        <a href="/financeiro" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Financeiro</a>
       </nav>
     </div>
   )
