@@ -8,6 +8,7 @@ type Atleta = {
   nome: string
   posicao: string | null
   turmaId: string | null
+  Responsavel: { nome: string }[]
 }
 
 export default function Atletas() {
@@ -28,7 +29,7 @@ export default function Atletas() {
     async function carregar() {
       const { data } = await supabase
         .from('Atleta')
-        .select('id, nome, posicao, turmaId')
+        .select('id, nome, posicao, turmaId, Responsavel(nome)')
         .eq('escolaId', escolaId!)
         .eq('ativo', true)
         .order('nome')
@@ -40,7 +41,8 @@ export default function Atletas() {
 
   const filtrados = atletas.filter(a =>
     a.nome.toLowerCase().includes(busca.toLowerCase()) ||
-    (a.posicao || '').toLowerCase().includes(busca.toLowerCase())
+    (a.posicao || '').toLowerCase().includes(busca.toLowerCase()) ||
+    (a.Responsavel || []).some(r => r.nome.toLowerCase().includes(busca.toLowerCase()))
   )
 
   const iniciais = (nome: string) => nome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
@@ -91,7 +93,7 @@ export default function Atletas() {
       <div style={{ padding: '16px 20px' }}>
         <input
           type="text"
-          placeholder="Buscar atleta ou posicao..."
+          placeholder="Buscar por atleta, posição ou responsável..."
           value={busca}
           onChange={e => setBusca(e.target.value)}
           style={{
@@ -178,7 +180,12 @@ export default function Atletas() {
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '14px', color: '#F0F0F0', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{atleta.nome}</p>
-              <p style={{ fontSize: '11px', color: corPosicao(atleta.posicao), margin: '2px 0 0', fontWeight: 500 }}>{atleta.posicao || 'Sem posicao'}</p>
+              <p style={{ fontSize: '11px', color: corPosicao(atleta.posicao), margin: '2px 0 0', fontWeight: 500 }}>{atleta.posicao || 'Sem posição'}</p>
+              {atleta.Responsavel?.[0] && (
+                <p style={{ fontSize: '10px', color: 'rgba(212,175,55,0.7)', margin: '1px 0 0' }}>
+                  {'👤 ' + atleta.Responsavel[0].nome}
+                </p>
+              )}
             </div>
             <div style={{ fontSize: '10px', fontFamily: syne, fontWeight: 800, color: neon, padding: '4px 10px', background: 'rgba(57,255,20,0.08)', borderRadius: '20px', flexShrink: 0 }}>
               #{String(i + 1).padStart(2, '0')}
