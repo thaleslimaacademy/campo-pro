@@ -79,38 +79,23 @@ function MatriculasInner() {
 
   async function enviarWhatsAppAprovacao(matricula: Matricula, tokenPais: string) {
     try {
-      const instanceId = process.env.NEXT_PUBLIC_ZAPI_INSTANCE_ID
-      const token = process.env.NEXT_PUBLIC_ZAPI_TOKEN
-      const clientToken = process.env.NEXT_PUBLIC_ZAPI_CLIENT_TOKEN
-
-      if (!instanceId || !token) return
-
-      const numero = matricula.whatsappResponsavel.replace(/\D/g, '')
-      const numeroFormatado = numero.startsWith('55') ? numero : `55${numero}`
-      const nomeResp = matricula.nomeResponsavel.split(' ')[0]
-      const linkPais = `https://campo-pro.vercel.app/pais/${tokenPais}`
-
-      const mensagem =
-        `Olá ${nomeResp}! 🎉\n\n` +
-        `A matrícula de *${matricula.nomeAtleta}* foi *APROVADA*!\n\n` +
-        `✅ Seu filho(a) já está matriculado(a) na *Thales Lima Football Academy*.\n\n` +
-        `📱 Acompanhe a presença e mensalidades pelo link:\n${linkPais}\n\n` +
-        `Bem-vindo(a) à família! ⚽\n` +
-        `_Thales Lima Football Academy — Iturama/MG_`
-
-      await fetch(
-        `https://api.z-api.io/instances/${instanceId}/token/${token}/send-text`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Client-Token': clientToken || '',
-          },
-          body: JSON.stringify({
-            phone: numeroFormatado,
-            message: mensagem,
-          }),
-        }
+      const res = await fetch('/api/whatsapp-aprovacao', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          whatsapp: matricula.whatsappResponsavel,
+          nomeResponsavel: matricula.nomeResponsavel,
+          nomeAtleta: matricula.nomeAtleta,
+          tokenPais,
+          tipo: 'aprovacao',
+        }),
+      })
+      const data = await res.json()
+      console.log('WhatsApp aprovacao:', data)
+    } catch (err) {
+      console.error('Erro WhatsApp aprovacao:', err)
+    }
+  }
       )
     } catch (err) {
       console.error('Erro WhatsApp aprovação:', err)
