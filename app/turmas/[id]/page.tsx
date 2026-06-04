@@ -11,6 +11,7 @@ type Atleta = {
   posicao: string | null
   fotoUrl: string | null
   turmaId: string | null
+  dataNascimento: string | null
 }
 
 type Turma = {
@@ -42,7 +43,7 @@ export default function TurmaDetalhes() {
 
     const { data: comTurma } = await supabase
       .from('Atleta')
-      .select('id, nome, posicao, fotoUrl, turmaId')
+      .select('id, nome, posicao, fotoUrl, turmaId, dataNascimento')
       .eq('turmaId', id)
       .eq('ativo', true)
       .order('nome')
@@ -50,7 +51,7 @@ export default function TurmaDetalhes() {
 
     const { data: semTurma } = await supabase
       .from('Atleta')
-      .select('id, nome, posicao, fotoUrl, turmaId')
+      .select('id, nome, posicao, fotoUrl, turmaId, dataNascimento')
       .eq('escolaId', escolaId!)
       .eq('ativo', true)
       .is('turmaId', null)
@@ -194,6 +195,7 @@ export default function TurmaDetalhes() {
                   )}
                   <div>
                     <p className="text-sm font-medium">{a.nome}</p>
+                    <p style={{ fontSize: '12px', color: '#D4AF37', fontWeight: 800, margin: '1px 0 0' }}>{a.dataNascimento ? String(new Date(a.dataNascimento.includes('T') ? a.dataNascimento : a.dataNascimento + 'T12:00:00').getFullYear()) : ''}</p>
                     <p className="text-xs text-gray-400">{a.posicao || 'Sem posicao'}</p>
                   </div>
                 </div>
@@ -218,6 +220,7 @@ export default function TurmaDetalhes() {
                       </div>
                     )}
                     <p className="text-sm">{a.nome}</p>
+                    <p style={{ fontSize: '12px', color: '#D4AF37', fontWeight: 800, margin: '1px 0 0' }}>{a.dataNascimento ? String(new Date(a.dataNascimento.includes('T') ? a.dataNascimento : a.dataNascimento + 'T12:00:00').getFullYear()) : ''}</p>
                   </div>
                   <button onClick={() => adicionarAtleta(a.id)} className="text-green-400 text-xs font-bold">+ Adicionar</button>
                 </div>
