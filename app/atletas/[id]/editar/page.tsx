@@ -28,6 +28,7 @@ export default function EditarAtleta() {
     estado: '',
     nomeResponsavel: '',
     whatsappResponsavel: '',
+    planoMensalidade: 'STANDARD',
   })
   const [responsavelId, setResponsavelId] = useState<string | null>(null)
 
@@ -55,6 +56,7 @@ export default function EditarAtleta() {
           bairro: atleta.bairro || '',
           cidade: atleta.cidade || '',
           estado: atleta.estado || '',
+          planoMensalidade: atleta.planoMensalidade || 'STANDARD',
         }))
       }
 
@@ -117,6 +119,7 @@ export default function EditarAtleta() {
         bairro: form.bairro,
         cidade: form.cidade,
         estado: form.estado,
+        planoMensalidade: form.planoMensalidade,
       })
       .eq('id', id)
 
@@ -208,7 +211,18 @@ export default function EditarAtleta() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-sm text-gray-400">Posição</label>
+                <label className="text-sm text-gray-400">Plano de Mensalidade</label>
+            <select
+              name="planoMensalidade"
+              value={form.planoMensalidade}
+              onChange={handleChange}
+              style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px', color: '#F0F0F0', fontFamily: 'Inter, sans-serif', fontSize: '13px', marginTop: '4px' }}
+            >
+              <option value="AMIGO">Amigo - R$ 80,00</option>
+              <option value="STANDARD">Standard - R$ 85,00</option>
+              <option value="BABYFUT">BabyFut - R$ 100,00</option>
+            </select>
+            <label className="text-sm text-gray-400">Posição</label>
                 <select name="posicao" value={form.posicao} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white">
                   <option value="">Selecione</option>
                   <option>Goleiro</option>
