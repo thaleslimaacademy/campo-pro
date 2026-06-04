@@ -168,7 +168,7 @@ export default function EditarAtleta() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
+    <div style={{ minHeight: "100vh", color: "#F0F0F0", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
       <div className="flex items-center gap-3 mb-6">
         <a href={`/atletas/${id}`} className="text-gray-400">← Voltar</a>
         <h1 className="text-xl font-bold">✏️ Editar Atleta</h1>
@@ -188,30 +188,30 @@ export default function EditarAtleta() {
       )}
 
       <div className="space-y-4">
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)" }}>
           <p className="text-green-500 font-bold text-sm mb-4">⚽ Dados do Atleta</p>
           <div className="space-y-3">
             <div>
-              <label className="text-sm text-gray-400">Nome completo *</label>
-              <input name="nome" value={form.nome} onChange={handleChange} required className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Nome completo *</label>
+              <input name="nome" value={form.nome} onChange={handleChange} required style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
             </div>
             <div>
-              <label className="text-sm text-gray-400">Data de nascimento</label>
-              <input name="dataNascimento" value={form.dataNascimento} onChange={handleChange} type="date" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Data de nascimento</label>
+              <input name="dataNascimento" value={form.dataNascimento} onChange={handleChange} type="date" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-sm text-gray-400">CPF</label>
-                <input name="cpf" value={form.cpf} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="000.000.000-00" />
+                <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>CPF</label>
+                <input name="cpf" value={form.cpf} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="000.000.000-00" />
               </div>
               <div>
-                <label className="text-sm text-gray-400">RG</label>
-                <input name="rg" value={form.rg} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+                <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>RG</label>
+                <input name="rg" value={form.rg} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-sm text-gray-400">Plano de Mensalidade</label>
+                <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Plano de Mensalidade</label>
             <select
               name="planoMensalidade"
               value={form.planoMensalidade}
@@ -222,8 +222,8 @@ export default function EditarAtleta() {
               <option value="STANDARD">Standard - R$ 85,00</option>
               <option value="BABYFUT">BabyFut - R$ 100,00</option>
             </select>
-            <label className="text-sm text-gray-400">Posição</label>
-                <select name="posicao" value={form.posicao} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white">
+            <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Posição</label>
+                <select name="posicao" value={form.posicao} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }}>
                   <option value="">Selecione</option>
                   <option>Goleiro</option>
                   <option>Zagueiro</option>
@@ -234,58 +234,58 @@ export default function EditarAtleta() {
                 </select>
               </div>
               <div>
-                <label className="text-sm text-gray-400">Telefone</label>
-                <input name="telefone" value={form.telefone} onChange={handleChange} type="tel" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+                <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Telefone</label>
+                <input name="telefone" value={form.telefone} onChange={handleChange} type="tel" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)" }}>
           <p className="text-green-500 font-bold text-sm mb-4">📍 Endereço</p>
           <div className="space-y-3">
             <div>
-              <label className="text-sm text-gray-400">CEP</label>
-              <input name="cep" value={form.cep} onChange={handleChange} maxLength={9} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="00000-000" />
+              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>CEP</label>
+              <input name="cep" value={form.cep} onChange={handleChange} maxLength={9} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="00000-000" />
               <p className="text-xs text-gray-500 mt-1">Digite o CEP para preencher automaticamente</p>
             </div>
             <div>
-              <label className="text-sm text-gray-400">Endereço</label>
-              <input name="endereco" value={form.endereco} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Endereço</label>
+              <input name="endereco" value={form.endereco} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="text-sm text-gray-400">Número</label>
-                <input name="numero" value={form.numero} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+                <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Número</label>
+                <input name="numero" value={form.numero} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
               </div>
               <div className="col-span-2">
-                <label className="text-sm text-gray-400">Bairro</label>
-                <input name="bairro" value={form.bairro} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+                <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Bairro</label>
+                <input name="bairro" value={form.bairro} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
               </div>
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div className="col-span-2">
-                <label className="text-sm text-gray-400">Cidade</label>
-                <input name="cidade" value={form.cidade} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+                <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Cidade</label>
+                <input name="cidade" value={form.cidade} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label className="text-sm text-gray-400">Estado</label>
-                <input name="estado" value={form.estado} onChange={handleChange} maxLength={2} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+                <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Estado</label>
+                <input name="estado" value={form.estado} onChange={handleChange} maxLength={2} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)" }}>
           <p className="text-green-500 font-bold text-sm mb-4">👤 Responsável</p>
           <div className="space-y-3">
             <div>
-              <label className="text-sm text-gray-400">Nome do responsável</label>
-              <input name="nomeResponsavel" value={form.nomeResponsavel} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Nome do responsável</label>
+              <input name="nomeResponsavel" value={form.nomeResponsavel} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
             </div>
             <div>
-              <label className="text-sm text-gray-400">WhatsApp</label>
-              <input name="whatsappResponsavel" value={form.whatsappResponsavel} onChange={handleChange} type="tel" className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>WhatsApp</label>
+              <input name="whatsappResponsavel" value={form.whatsappResponsavel} onChange={handleChange} type="tel" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
             </div>
           </div>
         </div>
@@ -293,13 +293,13 @@ export default function EditarAtleta() {
         <button
           onClick={salvar}
           disabled={salvando}
-          className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg disabled:opacity-50"
+          style={{ width: "100%", background: "linear-gradient(135deg,#39FF14,#00cc00)", color: "#000", padding: "16px", borderRadius: "14px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", border: "none", cursor: "pointer" }}
         >
           {salvando ? 'Salvando...' : '💾 Salvar Alterações'}
         </button>
 
         {/* Ações perigosas */}
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)" }}>
           <p className="text-gray-400 text-sm mb-3">⚠️ Ações</p>
           <div className="space-y-2">
             <button
@@ -318,11 +318,11 @@ export default function EditarAtleta() {
         </div>
       </div>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
-        <a href="/dashboard" className="text-gray-400 text-xs text-center">🏠<br/>Início</a>
-        <a href="/atletas" className="text-green-500 text-xs text-center">👥<br/>Atletas</a>
-        <a href="/presenca" className="text-gray-400 text-xs text-center">✅<br/>Presença</a>
-        <a href="/financeiro" className="text-gray-400 text-xs text-center">💰<br/>Financeiro</a>
+      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
+        <a href="/dashboard" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", fontFamily: "Syne, sans-serif" }}>Inicio</a>
+        <a href="/atletas" style={{ textDecoration: "none", color: "#39FF14", fontSize: "9px", textTransform: "uppercase", fontFamily: "Syne, sans-serif", fontWeight: 700 }}>Atletas</a>
+        <a href="/presenca" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", fontFamily: "Syne, sans-serif" }}>Presenca</a>
+        <a href="/financeiro" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", fontFamily: "Syne, sans-serif" }}>Financeiro</a>
       </nav>
     </div>
   )

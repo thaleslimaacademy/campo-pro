@@ -141,7 +141,7 @@ function AlteracaoMassaInner() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
+    <div style={{ minHeight: "100vh", color: "#F0F0F0", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
       <div className="flex items-center gap-3 mb-6">
         <a href="/dashboard" className="text-gray-400">Voltar</a>
         <h1 className="text-xl font-bold">Alteracao em Massa</h1>
@@ -178,7 +178,7 @@ function AlteracaoMassaInner() {
 
       {aba === 'aniversario' ? (
         <div>
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
+          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
             <p className="text-green-500 font-bold text-sm mb-1">Aniversariantes de {mesAtual}</p>
             <p className="text-gray-500 text-xs">{aniversariantes.length} atleta(s)</p>
           </div>
@@ -219,7 +219,7 @@ function AlteracaoMassaInner() {
         </div>
       ) : (
         <div>
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
+          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
             <p className="text-green-500 font-bold text-sm mb-3">
               {aba === 'vencimento' ? 'Novo dia de vencimento' :
                aba === 'mensalidade' ? 'Novo valor de mensalidade' :
@@ -227,7 +227,7 @@ function AlteracaoMassaInner() {
             </p>
 
             {aba === 'vencimento' && (
-              <select value={novoVencimento} onChange={e => setNovoVencimento(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white">
+              <select value={novoVencimento} onChange={e => setNovoVencimento(e.target.value)} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", boxSizing: "border-box" }}>
                 {[1, 5, 10, 15, 20, 25, 30].map(d => (
                   <option key={d} value={d}>Dia {d}</option>
                 ))}
@@ -239,13 +239,13 @@ function AlteracaoMassaInner() {
                 type="number"
                 value={novaMensalidade}
                 onChange={e => setNovaMensalidade(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white"
+                style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", boxSizing: "border-box" }}
                 placeholder="Ex: 150.00"
               />
             )}
 
             {aba === 'turma' && (
-              <select value={novaTurma} onChange={e => setNovaTurma(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white">
+              <select value={novaTurma} onChange={e => setNovaTurma(e.target.value)} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", boxSizing: "border-box" }}>
                 <option value="">Selecione uma turma</option>
                 {turmas.map(t => (
                   <option key={t.id} value={t.id}>{t.nome}</option>
@@ -254,7 +254,7 @@ function AlteracaoMassaInner() {
             )}
           </div>
 
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
+          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
             <div className="flex justify-between items-center mb-3">
               <p className="text-green-500 font-bold text-sm">Selecionar atletas</p>
               <button onClick={selecionarTodos} className="text-xs text-blue-400 font-bold">
@@ -310,7 +310,7 @@ function AlteracaoMassaInner() {
         </div>
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
+      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
         <a href="/dashboard" className="text-gray-400 text-xs text-center">Inicio</a>
         <a href="/atletas" className="text-gray-400 text-xs text-center">Atletas</a>
         <a href="/presenca" className="text-gray-400 text-xs text-center">Presenca</a>

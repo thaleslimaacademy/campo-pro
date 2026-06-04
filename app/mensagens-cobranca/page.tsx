@@ -54,7 +54,7 @@ export default function MensagensCobranca() {
   if (!isAdmin) return <div className="min-h-screen bg-gray-950 flex items-center justify-center"><p className="text-gray-400">Acesso negado</p></div>
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
+    <div style={{ minHeight: "100vh", color: "#F0F0F0", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
       <div className="flex items-center gap-2 mb-6">
         <a href="/configuracoes" className="text-gray-400 text-sm">← Configurações</a>
       </div>
@@ -62,7 +62,7 @@ export default function MensagensCobranca() {
       <h1 className="text-xl font-bold text-green-500 mb-1">📲 Mensagens WhatsApp</h1>
       <p className="text-gray-400 text-sm mb-6">Personalize as mensagens enviadas automaticamente</p>
 
-      <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
+      <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
         <p className="text-xs text-gray-400 mb-2 font-bold">Variáveis disponíveis:</p>
         <div className="flex flex-wrap gap-2">
           {VARIAVEIS.map(v => (
@@ -77,7 +77,7 @@ export default function MensagensCobranca() {
         <p className="text-gray-400 text-center py-8">Carregando mensagens...</p>
       ) : (
         <div className="space-y-6">
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)" }}>
             <p className="font-bold text-red-400 mb-1">🔴 Mensagem de Inadimplência</p>
             <p className="text-gray-500 text-xs mb-3">Enviada a cada 3 dias para cobranças vencidas</p>
             <textarea
@@ -89,7 +89,7 @@ export default function MensagensCobranca() {
             />
           </div>
 
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)" }}>
             <p className="font-bold text-yellow-400 mb-1">⚠️ Mensagem de Lembrete</p>
             <p className="text-gray-500 text-xs mb-3">Enviada quando falta 3 dias ou no dia do vencimento</p>
             <textarea
@@ -101,7 +101,7 @@ export default function MensagensCobranca() {
             />
           </div>
 
-          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)" }}>
             <p className="font-bold text-green-400 mb-1">🎂 Mensagem de Aniversário</p>
             <p className="text-gray-500 text-xs mb-3">Enviada no dia do aniversário do atleta</p>
             <textarea
@@ -127,7 +127,7 @@ export default function MensagensCobranca() {
         </div>
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
+      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
         <a href="/dashboard" className="text-gray-400 text-xs text-center">🏠 Início</a>
         <a href="/atletas" className="text-gray-400 text-xs text-center">👥 Atletas</a>
         <a href="/presenca" className="text-gray-400 text-xs text-center">✅ Presença</a>

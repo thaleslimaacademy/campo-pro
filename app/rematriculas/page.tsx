@@ -69,7 +69,7 @@ function RematriculasInner() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
+    <div style={{ minHeight: "100vh", color: "#F0F0F0", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <a href="/dashboard" className="text-gray-400">Voltar</a>
@@ -107,7 +107,7 @@ function RematriculasInner() {
       ) : (
         <div className="space-y-4">
           {filtradas.map(r => (
-            <div key={r.id} className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+            <div key={r.id} style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)" }}>
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <p className="font-bold text-white text-lg">{r.nomeAtleta}</p>
@@ -187,7 +187,7 @@ function RematriculasInner() {
         </div>
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around p-4">
+      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
         <a href="/dashboard" className="text-gray-400 text-xs text-center">inicio</a>
         <a href="/atletas" className="text-gray-400 text-xs text-center">Atletas</a>
         <a href="/presenca" className="text-gray-400 text-xs text-center">Presenca</a>
