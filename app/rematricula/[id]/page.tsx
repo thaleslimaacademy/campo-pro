@@ -1,6 +1,5 @@
 'use client'
 import { usePerfil } from '@/lib/usePerfil'
-
 import { useEffect, useState, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
@@ -40,19 +39,24 @@ As partes elegem o foro da Comarca de Iturama - MG para dirimir quaisquer dúvid
 CLÁUSULA 7 — DA ASSINATURA DIGITAL
 Este contrato é celebrado em meio digital, tendo plena validade jurídica nos termos da MP nº 2.200-2/2001 e do Marco Civil da Internet (Lei nº 12.965/2014).`
 
+// ── Painel de Assinatura ──
 function PainelAssinatura({ onAssinar, disabled }: { onAssinar: (img: string) => void, disabled: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const desenhando = useRef(false)
   const [temAssinatura, setTemAssinatura] = useState(false)
+
+  const syne = 'Syne, sans-serif'
+  const neon = '#39FF14'
+  const gold = '#D4AF37'
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
-    ctx.fillStyle = '#1f2937'
+    ctx.fillStyle = '#0a1206'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
-    ctx.strokeStyle = '#ffffff'
+    ctx.strokeStyle = '#39FF14'
     ctx.lineWidth = 2.5
     ctx.lineCap = 'round'
     ctx.lineJoin = 'round'
@@ -101,7 +105,7 @@ function PainelAssinatura({ onAssinar, disabled }: { onAssinar: (img: string) =>
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
-    ctx.fillStyle = '#1f2937'
+    ctx.fillStyle = '#0a1206'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
     setTemAssinatura(false)
   }
@@ -114,16 +118,17 @@ function PainelAssinatura({ onAssinar, disabled }: { onAssinar: (img: string) =>
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-2">
-        <label className="text-sm text-gray-400">Assine com o dedo *</label>
-        {temAssinatura && <button onClick={limpar} type="button" className="text-xs text-red-400 underline">Limpar</button>}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <label style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Assine com o dedo *</label>
+        {temAssinatura && (
+          <button onClick={limpar} type="button" style={{ fontSize: '11px', color: '#ff5555', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>Limpar</button>
+        )}
       </div>
       <canvas
         ref={canvasRef}
         width={600}
         height={180}
-        className="w-full rounded-xl border-2 border-dashed border-gray-600 touch-none"
-        style={{ background: '#1f2937' }}
+        style={{ width: '100%', borderRadius: '12px', border: '1.5px dashed rgba(57,255,20,0.4)', touchAction: 'none', display: 'block', background: '#0a1206' }}
         onMouseDown={iniciar}
         onMouseMove={desenhar}
         onMouseUp={parar}
@@ -132,16 +137,25 @@ function PainelAssinatura({ onAssinar, disabled }: { onAssinar: (img: string) =>
         onTouchMove={desenhar}
         onTouchEnd={parar}
       />
-      {!temAssinatura && <p className="text-xs text-gray-500 text-center mt-2">Use o dedo para assinar</p>}
+      {!temAssinatura && (
+        <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', textAlign: 'center', marginTop: '8px' }}>
+          ✍️ Use o dedo para assinar
+        </p>
+      )}
       {temAssinatura && (
-        <button type="button" onClick={confirmar} className="w-full mt-3 bg-green-600 text-white py-2 rounded-lg text-sm font-bold">
-          Usar esta assinatura
+        <button
+          type="button"
+          onClick={confirmar}
+          style={{ width: '100%', marginTop: '12px', background: 'linear-gradient(135deg,#39FF14,#2bcc0f)', color: '#050505', padding: '10px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer' }}
+        >
+          Usar esta assinatura ✓
         </button>
       )}
     </div>
   )
 }
 
+// ── Página principal ──
 export default function Rematricula() {
   const { escolaId } = usePerfil()
   const params = useParams()
@@ -166,21 +180,20 @@ export default function Rematricula() {
     posicao: '',
   })
 
+  // Tokens visuais
+  const syne = 'Syne, sans-serif'
+  const neon = '#39FF14'
+  const gold = '#D4AF37'
+  const cardBg = 'rgba(255,255,255,0.03)'
+  const cardBorder = '1px solid rgba(255,255,255,0.07)'
+  const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 14px', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '4px', outline: 'none', boxSizing: 'border-box' as const }
+
   useEffect(() => {
     async function carregar() {
-      const { data: at } = await supabase
-        .from('Atleta')
-        .select('*')
-        .eq('id', id)
-        .single()
+      const { data: at } = await supabase.from('Atleta').select('*').eq('id', id).single()
       setAtleta(at)
-
       if (at) {
-        const { data: resp } = await supabase
-          .from('Responsavel')
-          .select('*')
-          .eq('atletaId', id)
-          .single()
+        const { data: resp } = await supabase.from('Responsavel').select('*').eq('atletaId', id).single()
         setResponsavel(resp)
         setForm({
           nomeResponsavel: resp?.nome || '',
@@ -218,7 +231,6 @@ export default function Rematricula() {
   async function confirmarRematricula() {
     if (!aceito || !assinaturaImg || !nomeAssinatura.trim()) return
     setSalvando(true)
-
     await supabase.from('Matricula').insert({
       escolaId: escolaId!,
       nomeAtleta: atleta.nome,
@@ -238,196 +250,229 @@ export default function Rematricula() {
       tipo: 'rematricula',
       atletaId_rematricula: atleta.id,
     })
-
     setEtapa('sucesso')
     setSalvando(false)
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <p className="text-gray-400">Carregando...</p>
-      </div>
-    )
-  }
+  // ── Loading ──
+  if (loading) return (
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0a1a06,#050505,#111003)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter,sans-serif' }}>Carregando...</p>
+    </div>
+  )
 
-  if (!atleta) {
-    return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <p>Atleta não encontrado.</p>
-      </div>
-    )
-  }
+  if (!atleta) return (
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0a1a06,#050505,#111003)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: 'rgba(255,255,255,0.4)' }}>Atleta não encontrado.</p>
+    </div>
+  )
 
-  if (etapa === 'sucesso') {
-    return (
-      <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center p-6 text-center">
-        <p className="text-7xl mb-4">🎉</p>
-        <h2 className="text-2xl font-bold mb-2">Rematrícula enviada!</h2>
-        <p className="text-gray-400 mb-2">Recebemos a solicitação de renovação.</p>
-        <p className="text-gray-400 text-sm">A equipe da <span className="text-green-400 font-bold">Thales Lima Football Academy</span> irá confirmar em breve.</p>
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mt-6 text-left w-full max-w-sm">
-          <p className="text-green-500 font-bold text-sm mb-2">Próximos passos</p>
-          <p className="text-gray-400 text-sm">1. Nossa equipe analisa a renovação</p>
-          <p className="text-gray-400 text-sm">2. Você recebe confirmação via WhatsApp</p>
-          <p className="text-gray-400 text-sm">3. Matrícula renovada para próximo período</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (etapa === 'contrato') {
-    return (
-      <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
-        <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setEtapa('form')} className="text-gray-400">← Voltar</button>
-          <h1 className="text-xl font-bold">Contrato de Renovação</h1>
-        </div>
-
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4 text-center">
-          <p className="text-green-500 font-bold">Renovação de Matrícula</p>
-          <p className="text-white font-bold text-lg">{atleta.nome}</p>
-          <p className="text-gray-400 text-sm">Thales Lima Football Academy</p>
-        </div>
-
-        <div
-          className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4 h-72 overflow-y-auto text-sm text-gray-300 leading-relaxed"
-          onScroll={e => {
-            const el = e.currentTarget
-            if (el.scrollHeight - el.scrollTop <= el.clientHeight + 50) setContratoLido(true)
-          }}
-        >
-          <pre className="whitespace-pre-wrap font-sans">{CONTRATO}</pre>
-          {contratoLido && <p className="text-green-500 text-center mt-4 font-bold">Contrato lido!</p>}
-        </div>
-
-        {!contratoLido && <p className="text-yellow-500 text-xs text-center mb-4">Role até o final para habilitar a assinatura</p>}
-
-        <div className={`bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4 transition-opacity ${contratoLido ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
-          <p className="text-green-500 font-bold text-sm mb-4">Assinatura Digital</p>
-          <div className="mb-4">
-            <label className="text-sm text-gray-400">Nome completo do responsável *</label>
-            <input
-              value={nomeAssinatura}
-              onChange={e => setNomeAssinatura(e.target.value)}
-              type="text"
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white"
-            />
+  // ── Etapa: Sucesso ──
+  if (etapa === 'sucesso') return (
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0a1a06,#050505,#111003)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center', color: '#F0F0F0' }}>
+      <div style={{ fontSize: '64px', marginBottom: '16px' }}>🎉</div>
+      <h2 style={{ fontFamily: syne, fontWeight: 800, fontSize: '26px', color: neon, margin: '0 0 8px' }}>Rematrícula enviada!</h2>
+      <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>Recebemos a solicitação de renovação.</p>
+      <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', marginBottom: '24px' }}>
+        A equipe da <span style={{ color: neon, fontWeight: 700 }}>Thales Lima Football Academy</span> irá confirmar em breve.
+      </p>
+      <div style={{ background: cardBg, border: '1px solid rgba(57,255,20,0.2)', borderRadius: '16px', padding: '20px', width: '100%', maxWidth: '360px', textAlign: 'left' }}>
+        <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: neon, marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>Próximos passos</p>
+        {['Nossa equipe analisa a renovação', 'Você recebe confirmação via WhatsApp', 'Matrícula renovada para o próximo período'].map((step, i) => (
+          <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
+            <span style={{ fontFamily: syne, fontWeight: 800, fontSize: '12px', color: gold, minWidth: '18px' }}>{i + 1}.</span>
+            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px', margin: 0 }}>{step}</p>
           </div>
-          <PainelAssinatura disabled={!contratoLido} onAssinar={(img) => setAssinaturaImg(img)} />
-          {assinaturaImg && (
-            <div className="mt-4 border border-green-600/30 rounded-xl p-3 bg-green-600/5">
-              <p className="text-xs text-green-500 mb-2">Assinatura capturada</p>
-              <img src={assinaturaImg} alt="Assinatura" className="w-full rounded-lg max-h-24 object-contain bg-gray-800" />
-              <button onClick={() => setAssinaturaImg(null)} type="button" className="text-xs text-red-400 underline mt-2">Refazer</button>
-            </div>
-          )}
-          <label className="flex items-start gap-3 cursor-pointer mt-4">
-            <input type="checkbox" checked={aceito} onChange={e => setAceito(e.target.checked)} className="mt-1 w-5 h-5 accent-green-500" />
-            <span className="text-sm text-gray-300">Li e concordo com todos os termos do contrato de renovação.</span>
-          </label>
-          {assinaturaImg && aceito && nomeAssinatura && (
-            <div className="mt-4 border-t border-gray-700 pt-3">
-              <p className="text-xs text-gray-500">Assinado por: <span className="text-white font-bold">{nomeAssinatura}</span></p>
-              <p className="text-xs text-gray-500 mt-1">{new Date().toLocaleDateString('pt-BR')} às {new Date().toLocaleTimeString('pt-BR')}</p>
-            </div>
-          )}
-        </div>
-
-        <button
-          onClick={confirmarRematricula}
-          disabled={!aceito || !assinaturaImg || !nomeAssinatura.trim() || salvando}
-          className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg disabled:opacity-40"
-        >
-          {salvando ? 'Enviando...' : 'Confirmar Rematrícula'}
-        </button>
+        ))}
       </div>
-    )
-  }
+    </div>
+  )
 
-  return (
-    <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
-      <div className="text-center mb-6">
-        <p className="text-4xl mb-2">🔄</p>
-        <h1 className="text-xl font-bold text-green-500">Thales Lima Football Academy</h1>
-        <p className="text-gray-400 text-sm">Renovação de Matrícula</p>
+  // ── Etapa: Contrato ──
+  if (etapa === 'contrato') return (
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0a1a06,#050505,#111003)', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', padding: '20px', paddingBottom: '40px' }}>
+
+      {/* Header contrato */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+        <button onClick={() => setEtapa('form')} style={{ color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px' }}>← Voltar</button>
+        <h1 style={{ fontFamily: syne, fontWeight: 800, fontSize: '20px', margin: 0 }}>Contrato de Renovação</h1>
       </div>
 
-      <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
-        <p className="text-gray-400 text-sm mb-1">Atleta</p>
-        <p className="text-white font-bold text-lg">{atleta.nome}</p>
-        {atleta.dataNascimento && (
-          <p className="text-gray-400 text-sm">
-            {new Date(atleta.dataNascimento + 'T12:00:00').toLocaleDateString('pt-BR')}
-          </p>
+      {/* Card atleta */}
+      <div style={{ background: 'rgba(57,255,20,0.05)', border: '1px solid rgba(57,255,20,0.2)', borderRadius: '14px', padding: '14px', marginBottom: '14px', textAlign: 'center' }}>
+        <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '4px' }}>Renovação de Matrícula</p>
+        <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '18px', color: '#F0F0F0', margin: '0 0 2px' }}>{atleta.nome}</p>
+        <p style={{ fontSize: '12px', color: gold, margin: 0 }}>Thales Lima Football Academy</p>
+      </div>
+
+      {/* Texto do contrato */}
+      <div
+        style={{ background: 'rgba(255,255,255,0.02)', border: cardBorder, borderRadius: '14px', padding: '16px', marginBottom: '14px', height: '280px', overflowY: 'auto' }}
+        onScroll={e => {
+          const el = e.currentTarget
+          if (el.scrollHeight - el.scrollTop <= el.clientHeight + 50) setContratoLido(true)
+        }}
+      >
+        <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'Inter,sans-serif', fontSize: '12px', color: 'rgba(255,255,255,0.6)', lineHeight: '1.7', margin: 0 }}>{CONTRATO}</pre>
+        {contratoLido && (
+          <p style={{ color: neon, textAlign: 'center', marginTop: '16px', fontWeight: 700, fontSize: '13px' }}>✓ Contrato lido!</p>
         )}
-        {atleta.cpf && <p className="text-gray-400 text-xs">CPF: {atleta.cpf}</p>}
-        {atleta.rg && <p className="text-gray-400 text-xs">RG: {atleta.rg}</p>}
       </div>
 
-      {erros.length > 0 && (
-        <div className="bg-red-600/20 border border-red-600/40 rounded-xl p-4 mb-4">
-          {erros.map((erro, i) => (
-            <p key={i} className="text-red-400 text-sm font-bold">❌ {erro}</p>
-          ))}
-        </div>
+      {!contratoLido && (
+        <p style={{ color: gold, fontSize: '11px', textAlign: 'center', marginBottom: '12px' }}>
+          ↓ Role até o final para habilitar a assinatura
+        </p>
       )}
 
-      <form onSubmit={avancarContrato} className="space-y-4">
-        <p className="text-green-500 font-bold text-sm uppercase">Confirme os dados</p>
+      {/* Painel de assinatura */}
+      <div style={{ background: cardBg, border: contratoLido ? '1px solid rgba(57,255,20,0.2)' : cardBorder, borderRadius: '14px', padding: '16px', marginBottom: '14px', opacity: contratoLido ? 1 : 0.4, pointerEvents: contratoLido ? 'auto' : 'none', transition: 'opacity 0.3s' }}>
+        <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: neon, marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '1px' }}>✍️ Assinatura Digital</p>
 
-        <div>
-          <label className="text-sm text-gray-400">Posição</label>
-          <select name="posicao" value={form.posicao} onChange={handleChange} className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 mt-1 text-white">
-            <option>Goleiro</option>
-            <option>Zagueiro</option>
-            <option>Lateral</option>
-            <option>Volante</option>
-            <option>Meia</option>
-            <option>Atacante</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="text-sm text-gray-400">Telefone do atleta</label>
-          <input name="telefoneAtleta" value={form.telefoneAtleta} onChange={handleChange} type="tel" className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="(34) 99999-9999" />
-        </div>
-
-        <p className="text-green-500 font-bold text-sm uppercase pt-2">Responsável</p>
-
-        <div>
-          <label className="text-sm text-gray-400">Nome do responsável *</label>
-          <input name="nomeResponsavel" value={form.nomeResponsavel} onChange={handleChange} type="text" className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="Nome completo" />
-        </div>
-
-        <div>
-          <label className="text-sm text-gray-400">
-            CPF do responsável * <span className="text-yellow-400 text-xs">(obrigatório para boletos)</span>
-          </label>
+        <div style={{ marginBottom: '14px' }}>
+          <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Nome completo do responsável *</label>
           <input
-            name="cpfResponsavel"
-            value={form.cpfResponsavel}
-            onChange={handleChange}
+            value={nomeAssinatura}
+            onChange={e => setNomeAssinatura(e.target.value)}
             type="text"
-            className={"w-full bg-gray-900 border rounded-lg p-3 mt-1 text-white " + (erros.some(e => e.includes('CPF')) ? 'border-red-500' : 'border-gray-700')}
-            placeholder="000.000.000-00"
+            style={inputStyle}
           />
         </div>
 
-        <div>
-          <label className="text-sm text-gray-400">WhatsApp *</label>
-          <input name="whatsapp" value={form.whatsapp} onChange={handleChange} type="tel" className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="(34) 99999-9999" />
+        <PainelAssinatura disabled={!contratoLido} onAssinar={(img) => setAssinaturaImg(img)} />
+
+        {assinaturaImg && (
+          <div style={{ marginTop: '14px', border: '1px solid rgba(57,255,20,0.25)', borderRadius: '12px', padding: '12px', background: 'rgba(57,255,20,0.04)' }}>
+            <p style={{ fontSize: '11px', color: neon, marginBottom: '8px' }}>✓ Assinatura capturada</p>
+            <img src={assinaturaImg} alt="Assinatura" style={{ width: '100%', borderRadius: '8px', maxHeight: '96px', objectFit: 'contain', background: '#0a1206', display: 'block' }} />
+            <button onClick={() => setAssinaturaImg(null)} type="button" style={{ fontSize: '11px', color: '#ff5555', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', marginTop: '8px' }}>Refazer assinatura</button>
+          </div>
+        )}
+
+        <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer', marginTop: '16px' }}>
+          <input type="checkbox" checked={aceito} onChange={e => setAceito(e.target.checked)} style={{ marginTop: '2px', width: '18px', height: '18px', accentColor: neon }} />
+          <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', lineHeight: '1.5' }}>Li e concordo com todos os termos do contrato de renovação.</span>
+        </label>
+
+        {assinaturaImg && aceito && nomeAssinatura && (
+          <div style={{ marginTop: '14px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px' }}>
+            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>Assinado por: <span style={{ color: '#F0F0F0', fontWeight: 700 }}>{nomeAssinatura}</span></p>
+            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>{new Date().toLocaleDateString('pt-BR')} às {new Date().toLocaleTimeString('pt-BR')}</p>
+          </div>
+        )}
+      </div>
+
+      <button
+        onClick={confirmarRematricula}
+        disabled={!aceito || !assinaturaImg || !nomeAssinatura.trim() || salvando}
+        style={{ width: '100%', background: (!aceito || !assinaturaImg || !nomeAssinatura.trim() || salvando) ? 'rgba(255,255,255,0.08)' : 'linear-gradient(135deg,#39FF14,#2bcc0f)', color: (!aceito || !assinaturaImg || !nomeAssinatura.trim() || salvando) ? 'rgba(255,255,255,0.3)' : '#050505', padding: '16px', borderRadius: '14px', fontWeight: 800, fontSize: '15px', fontFamily: syne, border: 'none', cursor: (!aceito || !assinaturaImg || !nomeAssinatura.trim() || salvando) ? 'not-allowed' : 'pointer', transition: 'all 0.3s' }}
+      >
+        {salvando ? 'Enviando...' : 'Confirmar Rematrícula →'}
+      </button>
+    </div>
+  )
+
+  // ── Etapa: Form ──
+  return (
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0a1a06,#050505,#111003)', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', paddingBottom: '48px' }}>
+
+      {/* Header */}
+      <div style={{ position: 'relative', overflow: 'hidden', padding: '32px 20px 24px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+          <div style={{ width: '240px', height: '80px', borderRadius: '50%', filter: 'blur(40px)', opacity: 0.12, background: neon }} />
+        </div>
+        <div style={{ position: 'relative' }}>
+          <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(57,255,20,0.08)', border: '1px solid rgba(57,255,20,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', margin: '0 auto 10px' }}>🔄</div>
+          <h1 style={{ fontFamily: syne, fontWeight: 800, fontSize: '18px', color: neon, margin: '0 0 4px' }}>Thales Lima Football Academy</h1>
+          <span style={{ display: 'inline-block', fontSize: '11px', color: gold, background: 'rgba(212,175,55,0.1)', border: '1px solid rgba(212,175,55,0.25)', borderRadius: '20px', padding: '2px 10px', letterSpacing: '0.05em' }}>Renovação de Matrícula</span>
+        </div>
+      </div>
+
+      <div style={{ padding: '20px' }}>
+
+        {/* Card atleta */}
+        <div style={{ background: cardBg, border: '1px solid rgba(212,175,55,0.2)', borderRadius: '14px', padding: '14px', marginBottom: '16px' }}>
+          <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>Atleta</p>
+          <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '17px', color: '#F0F0F0', margin: '0 0 4px' }}>{atleta.nome}</p>
+          {atleta.dataNascimento && (
+            <p style={{ fontSize: '12px', color: gold, margin: '0 0 2px' }}>
+              {new Date(atleta.dataNascimento + 'T12:00:00').toLocaleDateString('pt-BR')}
+            </p>
+          )}
+          {atleta.cpf && <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: '1px 0' }}>CPF: {atleta.cpf}</p>}
+          {atleta.rg && <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: '1px 0' }}>RG: {atleta.rg}</p>}
         </div>
 
-        <div>
-          <label className="text-sm text-gray-400">E-mail</label>
-          <input name="email" value={form.email} onChange={handleChange} type="email" className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="email@exemplo.com" />
-        </div>
+        {/* Erros */}
+        {erros.length > 0 && (
+          <div style={{ background: 'rgba(255,60,60,0.07)', border: '1px solid rgba(255,60,60,0.25)', borderRadius: '12px', padding: '14px', marginBottom: '14px' }}>
+            {erros.map((erro, i) => (
+              <p key={i} style={{ color: '#ff5555', fontSize: '13px', fontWeight: 700, margin: i > 0 ? '6px 0 0' : '0' }}>❌ {erro}</p>
+            ))}
+          </div>
+        )}
 
-        <button type="submit" className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg mt-4">
-          Avançar para o Contrato →
-        </button>
-      </form>
+        {/* Form */}
+        <form onSubmit={avancarContrato} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+
+          <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '11px', color: neon, textTransform: 'uppercase', letterSpacing: '1px', margin: 0 }}>Dados do Atleta</p>
+
+          <div>
+            <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Posição</label>
+            <select name="posicao" value={form.posicao} onChange={handleChange} style={{ ...inputStyle, appearance: 'none' as const }}>
+              <option>Goleiro</option>
+              <option>Zagueiro</option>
+              <option>Lateral</option>
+              <option>Volante</option>
+              <option>Meia</option>
+              <option>Atacante</option>
+            </select>
+          </div>
+
+          <div>
+            <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Telefone do atleta</label>
+            <input name="telefoneAtleta" value={form.telefoneAtleta} onChange={handleChange} type="tel" placeholder="(34) 99999-9999" style={inputStyle} />
+          </div>
+
+          <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '11px', color: neon, textTransform: 'uppercase', letterSpacing: '1px', margin: '4px 0 0' }}>Responsável</p>
+
+          <div>
+            <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Nome do responsável *</label>
+            <input name="nomeResponsavel" value={form.nomeResponsavel} onChange={handleChange} type="text" placeholder="Nome completo" style={inputStyle} />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+              CPF do responsável * <span style={{ color: gold, fontSize: '10px' }}>(obrigatório para boletos)</span>
+            </label>
+            <input
+              name="cpfResponsavel"
+              value={form.cpfResponsavel}
+              onChange={handleChange}
+              type="text"
+              placeholder="000.000.000-00"
+              style={{ ...inputStyle, borderColor: erros.some(e => e.includes('CPF')) ? 'rgba(255,60,60,0.6)' : 'rgba(255,255,255,0.1)' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>WhatsApp *</label>
+            <input name="whatsapp" value={form.whatsapp} onChange={handleChange} type="tel" placeholder="(34) 99999-9999" style={inputStyle} />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>E-mail</label>
+            <input name="email" value={form.email} onChange={handleChange} type="email" placeholder="email@exemplo.com" style={inputStyle} />
+          </div>
+
+          <button
+            type="submit"
+            style={{ width: '100%', background: 'linear-gradient(135deg,#39FF14,#2bcc0f)', color: '#050505', padding: '16px', borderRadius: '14px', fontWeight: 800, fontSize: '15px', fontFamily: syne, border: 'none', cursor: 'pointer', marginTop: '8px', boxShadow: '0 0 24px rgba(57,255,20,0.25)' }}
+          >
+            Avançar para o Contrato →
+          </button>
+        </form>
+      </div>
     </div>
   )
 }
