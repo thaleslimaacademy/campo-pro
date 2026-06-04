@@ -97,11 +97,6 @@ function MatriculasInner() {
     }
   }
       )
-    } catch (err) {
-      console.error('Erro WhatsApp aprovação:', err)
-    }
-  }
-
   async function aprovar(matricula: Matricula) {
     setProcessando(true)
 
