@@ -8,6 +8,8 @@ type Atleta = {
   nome: string
   posicao: string | null
   turmaId: string | null
+  fotoUrl: string | null
+  dataNascimento: string | null
   Responsavel: { nome: string }[]
 }
 
@@ -29,7 +31,7 @@ export default function Atletas() {
     async function carregar() {
       const { data } = await supabase
         .from('Atleta')
-        .select('id, nome, posicao, turmaId, Responsavel(nome)')
+        .select('id, nome, posicao, turmaId, fotoUrl, dataNascimento, Responsavel(nome)')
         .eq('escolaId', escolaId!)
         .eq('ativo', true)
         .order('nome')
@@ -55,6 +57,13 @@ export default function Atletas() {
     if (p.includes('meio') || p.includes('volante')) return gold
     if (p.includes('atacante') || p.includes('centroavante') || p.includes('ponta')) return neon
     return muted
+  }
+
+  const calcularIdade = (d: string | null) => {
+    if (!d) return ''
+    const n = new Date(d.includes('T') ? d : d + 'T12:00:00')
+    const h = new Date()
+    return (h.getFullYear() - n.getFullYear() - (h < new Date(h.getFullYear(), n.getMonth(), n.getDate()) ? 1 : 0)) + ' anos'
   }
 
   if (!isLoaded || !escolaId) return (
@@ -165,8 +174,11 @@ export default function Atletas() {
               width: '44px',
               height: '44px',
               borderRadius: '50%',
-              background: 'linear-gradient(135deg,rgba(57,255,20,0.2),rgba(57,255,20,0.05))',
-              border: '1px solid rgba(57,255,20,0.3)',
+              background: atleta.fotoUrl ? 'none' : 'linear-gradient(135deg,rgba(57,255,20,0.2),rgba(57,255,20,0.05))',
+              border: atleta.fotoUrl ? '2px solid rgba(57,255,20,0.5)' : '1px solid rgba(57,255,20,0.3)',
+              backgroundImage: atleta.fotoUrl ? 'url(' + atleta.fotoUrl + ')' : 'none',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -176,11 +188,11 @@ export default function Atletas() {
               color: neon,
               flexShrink: 0,
             }}>
-              {iniciais(atleta.nome)}
+              {!atleta.fotoUrl && iniciais(atleta.nome)}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '14px', color: '#F0F0F0', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{atleta.nome}</p>
-              <p style={{ fontSize: '11px', color: corPosicao(atleta.posicao), margin: '2px 0 0', fontWeight: 500 }}>{atleta.posicao || 'Sem posição'}</p>
+              <p style={{ fontSize: '11px', color: corPosicao(atleta.posicao), margin: '2px 0 0', fontWeight: 500 }}>{atleta.posicao || 'Sem posição'}{atleta.dataNascimento ? ' · ' + calcularIdade(atleta.dataNascimento) : ''}</p>
               {atleta.Responsavel?.[0] && (
                 <p style={{ fontSize: '10px', color: 'rgba(212,175,55,0.7)', margin: '1px 0 0' }}>
                   {'👤 ' + atleta.Responsavel[0].nome}
