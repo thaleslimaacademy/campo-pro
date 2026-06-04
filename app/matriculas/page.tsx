@@ -96,7 +96,6 @@ function MatriculasInner() {
       console.error('Erro WhatsApp aprovacao:', err)
     }
   }
-      )
   async function aprovar(matricula: Matricula) {
     setProcessando(true)
 
