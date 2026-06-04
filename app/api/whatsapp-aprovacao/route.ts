@@ -17,22 +17,25 @@ export async function POST(req: NextRequest) {
     const nomeResp = nomeResponsavel.split(' ')[0]
     const linkPais = 'https://gestaofc.com.br/pais/' + tokenPais
 
+    console.log('Enviando WhatsApp para:', numeroFormatado, 'tipo:', tipo)
+
     let mensagem = ''
 
     if (tipo === 'aprovacao') {
       mensagem =
-        'Ola ' + nomeResp + '! \n\n' +
-        'A matricula de *' + nomeAtleta + '* foi *APROVADA*!\n\n' +
-        'Seu filho(a) ja esta matriculado(a) na *Thales Lima Football Academy*.\n\n' +
-        'Acompanhe a presenca e mensalidades pelo link:\n' +
+        'Ola ' + nomeResp + '!\n\n' +
+        'A pre-matricula de *' + nomeAtleta + '* foi *APROVADA*!\n\n' +
+        'Seu filho(a) ja esta matriculado(a) na *Thales Lima Football Academy - Alexandrita*.\n\n' +
+        'Acesse o link abaixo para acompanhar presenca e mensalidades:\n' +
         linkPais + '\n\n' +
-        'Bem-vindo(a) a familia!\n' +
+        'Bem-vindo(a) a familia TLFA!\n' +
         '_Thales Lima Football Academy - Iturama/MG_'
     } else {
       mensagem =
         'Ola ' + nomeResp + ',\n\n' +
-        'Infelizmente a pre-matricula de *' + nomeAtleta + '* nao foi aprovada no momento.\n\n' +
-        'Entre em contato conosco para mais informacoes.\n\n' +
+        'Informamos que a pre-matricula de *' + nomeAtleta + '* nao foi aprovada no momento.\n\n' +
+        'Entre em contato conosco para mais informacoes:\n' +
+        'WhatsApp: (34) 9xxxx-xxxx\n\n' +
         '_Thales Lima Football Academy - Iturama/MG_'
     }
 
@@ -49,8 +52,8 @@ export async function POST(req: NextRequest) {
     )
 
     const data = await res.json()
-    console.log('WhatsApp aprovacao:', data)
-    return NextResponse.json({ ok: true, data })
+    console.log('WhatsApp resultado:', JSON.stringify(data))
+    return NextResponse.json({ ok: true, data, numeroEnviado: numeroFormatado })
   } catch (err: any) {
     console.error('Erro WhatsApp aprovacao:', err)
     return NextResponse.json({ error: err.message }, { status: 500 })
