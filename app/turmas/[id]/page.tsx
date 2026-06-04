@@ -66,7 +66,7 @@ export default function TurmaDetalhes() {
     setLoading(false)
   }
 
-  useEffect(() => { carregar() }, [id])
+  useEffect(() => { if (escolaId) carregar() }, [id, escolaId])
 
   async function adicionarAtleta(atletaId: string) {
     await supabase.from('Atleta').update({ turmaId: id }).eq('id', atletaId)
