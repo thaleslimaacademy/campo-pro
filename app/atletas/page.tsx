@@ -192,7 +192,7 @@ export default function Atletas() {
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '14px', color: '#F0F0F0', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{atleta.nome}</p>
-              <p style={{ fontSize: '11px', color: corPosicao(atleta.posicao), margin: '2px 0 0', fontWeight: 500 }}>{atleta.posicao || 'Sem posição'}{atleta.dataNascimento ? ' · ' + calcularIdade(atleta.dataNascimento) : ''}</p>
+              <p style={{ fontSize: '11px', color: corPosicao(atleta.posicao), margin: '2px 0 0', fontWeight: 500 }}>{atleta.posicao || 'Sem posição'}</p>
               {atleta.Responsavel?.[0] && (
                 <p style={{ fontSize: '10px', color: 'rgba(212,175,55,0.7)', margin: '1px 0 0' }}>
                   {'👤 ' + atleta.Responsavel[0].nome}
