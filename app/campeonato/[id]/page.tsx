@@ -116,11 +116,28 @@ export default function CampeonatoDetalhes() {
   }
 
   async function excluirTime(timeId: string) {
-    if (!confirm('Excluir este time?')) return
-    const { error: err1 } = await supabase.from('CampeonatoAtleta').delete().eq('timeId', timeId)
-    if (err1) { alert('Erro ao excluir atletas do time: ' + err1.message); return }
-    const { error: err2 } = await supabase.from('CampeonatoTime').delete().eq('id', timeId)
-    if (err2) { alert('Erro ao excluir time: ' + err2.message); return }
+    if (!confirm('Excluir este time? Os jogos relacionados tambem serao removidos.')) return
+
+    // 1. Remove eventos de sumula dos jogos que envolvem este time
+    const jogosDoTime = jogos.filter(j => j.timeAId === timeId || j.timeBId === timeId)
+    for (const j of jogosDoTime) {
+      await supabase.from('SumulaEvento').delete().eq('jogoId', j.id)
+    }
+
+    // 2. Remove os jogos que envolvem este time (FK: CampeonatoJogo_timebid_fkey)
+    const { error: errJogosA } = await supabase.from('CampeonatoJogo').delete().eq('timeAId', timeId)
+    if (errJogosA) { alert('Erro ao excluir jogos (A): ' + errJogosA.message); return }
+    const { error: errJogosB } = await supabase.from('CampeonatoJogo').delete().eq('timeBId', timeId)
+    if (errJogosB) { alert('Erro ao excluir jogos (B): ' + errJogosB.message); return }
+
+    // 3. Remove atletas do time
+    const { error: errAtletas } = await supabase.from('CampeonatoAtleta').delete().eq('timeId', timeId)
+    if (errAtletas) { alert('Erro ao excluir atletas: ' + errAtletas.message); return }
+
+    // 4. Remove o time
+    const { error: errTime } = await supabase.from('CampeonatoTime').delete().eq('id', timeId)
+    if (errTime) { alert('Erro ao excluir time: ' + errTime.message); return }
+
     carregar()
   }
 
