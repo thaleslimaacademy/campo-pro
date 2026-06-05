@@ -117,8 +117,10 @@ export default function CampeonatoDetalhes() {
 
   async function excluirTime(timeId: string) {
     if (!confirm('Excluir este time?')) return
-    await supabase.from('CampeonatoAtleta').delete().eq('timeId', timeId)
-    await supabase.from('CampeonatoTime').delete().eq('id', timeId)
+    const { error: err1 } = await supabase.from('CampeonatoAtleta').delete().eq('timeId', timeId)
+    if (err1) { alert('Erro ao excluir atletas do time: ' + err1.message); return }
+    const { error: err2 } = await supabase.from('CampeonatoTime').delete().eq('id', timeId)
+    if (err2) { alert('Erro ao excluir time: ' + err2.message); return }
     carregar()
   }
 
