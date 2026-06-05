@@ -6,14 +6,13 @@ const planos = [
   {
     id: 'basico',
     nome: 'Básico',
-    cor: 'border-gray-600',
-    corBtn: 'bg-gray-700 hover:bg-gray-600',
-    corBadge: 'bg-gray-700',
+    popular: false,
     precoMensal: 49,
     precoAnual: 39,
     atletasMax: 30,
-    turmasMax: 2,
-    usuarios: 1,
+    acento: 'rgba(255,255,255,0.5)',
+    acentoBg: 'rgba(255,255,255,0.04)',
+    acentoBorder: 'rgba(255,255,255,0.1)',
     recursos: [
       { nome: 'Até 30 atletas', ok: true },
       { nome: '2 turmas', ok: true },
@@ -33,15 +32,13 @@ const planos = [
   {
     id: 'pro',
     nome: 'Pro',
-    cor: 'border-green-500',
-    corBtn: 'bg-green-600 hover:bg-green-500',
-    corBadge: 'bg-green-600',
     popular: true,
     precoMensal: 99,
     precoAnual: 79,
     atletasMax: 100,
-    turmasMax: 5,
-    usuarios: 3,
+    acento: '#39FF14',
+    acentoBg: 'rgba(57,255,20,0.06)',
+    acentoBorder: 'rgba(57,255,20,0.3)',
     recursos: [
       { nome: 'Até 100 atletas', ok: true },
       { nome: '5 turmas', ok: true },
@@ -61,14 +58,13 @@ const planos = [
   {
     id: 'elite',
     nome: 'Elite',
-    cor: 'border-yellow-500',
-    corBtn: 'bg-yellow-600 hover:bg-yellow-500',
-    corBadge: 'bg-yellow-600',
+    popular: false,
     precoMensal: 197,
     precoAnual: 157,
     atletasMax: 999,
-    turmasMax: 999,
-    usuarios: 999,
+    acento: '#D4AF37',
+    acentoBg: 'rgba(212,175,55,0.06)',
+    acentoBorder: 'rgba(212,175,55,0.3)',
     recursos: [
       { nome: 'Atletas ilimitados', ok: true },
       { nome: 'Turmas ilimitadas', ok: true },
@@ -90,115 +86,143 @@ const planos = [
 export default function Planos() {
   const [periodo, setPeriodo] = useState<'mensal' | 'anual'>('mensal')
 
+  const syne = 'Syne, sans-serif'
+  const neon = '#39FF14'
+  const gold = '#D4AF37'
+  const bg = 'linear-gradient(160deg,#0a1a06,#050505,#111003)'
+
   function assinar(planoId: string) {
-    const numero = '5534998168467'
-    const preco = planos.find(p => p.id === planoId)
-    const valor = periodo === 'mensal' ? preco?.precoMensal : preco?.precoAnual
+    const plano = planos.find(p => p.id === planoId)
+    const valor = periodo === 'mensal' ? plano?.precoMensal : plano?.precoAnual
     const msg = encodeURIComponent(
-      'Ola! Quero assinar o plano ' + preco?.nome + ' do GestaoFC.\n\n' +
-      'Plano: ' + preco?.nome + '\n' +
-      'Periodo: ' + (periodo === 'mensal' ? 'Mensal' : 'Anual') + '\n' +
-      'Valor: R$ ' + valor + (periodo === 'mensal' ? '/mes' : '/mes (cobrado anualmente)') + '\n\n' +
-      'Aguardo as instrucoes de pagamento!'
+      'Olá! Quero assinar o plano ' + plano?.nome + ' do GestaoFC.\n\n' +
+      'Plano: ' + plano?.nome + '\n' +
+      'Período: ' + (periodo === 'mensal' ? 'Mensal' : 'Anual') + '\n' +
+      'Valor: R$ ' + valor + (periodo === 'mensal' ? '/mês' : '/mês (cobrado anualmente)') + '\n\n' +
+      'Aguardo as instruções de pagamento!'
     )
-    window.open('https://wa.me/' + numero + '?text=' + msg, '_blank')
+    window.open('https://wa.me/5534998168467?text=' + msg, '_blank')
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <div className="bg-green-700 py-12 px-6 text-center">
-        <p className="text-4xl mb-3">⚽</p>
-        <h1 className="text-3xl font-bold mb-2">GestaoFC</h1>
-        <p className="text-green-200 text-lg">Gerencie sua escolinha de futebol com profissionalismo</p>
+    <div style={{ minHeight: '100vh', background: bg, color: '#F0F0F0', fontFamily: 'Inter,sans-serif' }}>
+
+      {/* ── HERO ── */}
+      <div style={{ position: 'relative', overflow: 'hidden', padding: '48px 24px 40px', textAlign: 'center' }}>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+          <div style={{ width: '300px', height: '150px', borderRadius: '50%', filter: 'blur(60px)', opacity: 0.15, background: neon }} />
+        </div>
+        <div style={{ position: 'relative' }}>
+          <div style={{ width: '64px', height: '64px', borderRadius: '20px', background: 'rgba(57,255,20,0.08)', border: '1px solid rgba(57,255,20,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '30px', margin: '0 auto 14px', boxShadow: '0 0 30px rgba(57,255,20,0.15)' }}>
+            ⚽
+          </div>
+          <h1 style={{ fontFamily: syne, fontWeight: 900, fontSize: '32px', color: neon, margin: '0 0 6px', letterSpacing: '-0.5px' }}>GestaoFC</h1>
+          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '15px', margin: 0 }}>Gerencie sua escolinha com profissionalismo</p>
+        </div>
       </div>
 
-      <div className="p-6">
-        <div className="flex justify-center mb-8">
-          <div className="bg-gray-900 rounded-xl p-1 flex gap-1">
+      <div style={{ padding: '0 20px 40px', maxWidth: '440px', margin: '0 auto' }}>
+
+        {/* ── TOGGLE MENSAL/ANUAL ── */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '28px' }}>
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '14px', padding: '4px', display: 'flex', gap: '4px', border: '1px solid rgba(255,255,255,0.07)' }}>
             <button
               onClick={() => setPeriodo('mensal')}
-              className={"px-6 py-2 rounded-lg text-sm font-bold transition " + (periodo === 'mensal' ? 'bg-green-600 text-white' : 'text-gray-400')}
+              style={{ padding: '8px 20px', borderRadius: '10px', fontSize: '13px', fontWeight: 700, fontFamily: syne, border: 'none', cursor: 'pointer', background: periodo === 'mensal' ? 'linear-gradient(135deg,#39FF14,#2bcc0f)' : 'transparent', color: periodo === 'mensal' ? '#050505' : 'rgba(255,255,255,0.4)', transition: 'all 0.2s' }}
             >
               Mensal
             </button>
             <button
               onClick={() => setPeriodo('anual')}
-              className={"px-6 py-2 rounded-lg text-sm font-bold transition " + (periodo === 'anual' ? 'bg-green-600 text-white' : 'text-gray-400')}
+              style={{ padding: '8px 20px', borderRadius: '10px', fontSize: '13px', fontWeight: 700, fontFamily: syne, border: 'none', cursor: 'pointer', background: periodo === 'anual' ? 'linear-gradient(135deg,#39FF14,#2bcc0f)' : 'transparent', color: periodo === 'anual' ? '#050505' : 'rgba(255,255,255,0.4)', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px' }}
             >
-              Anual <span className="text-green-400 text-xs ml-1">-20%</span>
+              Anual
+              <span style={{ background: 'rgba(57,255,20,0.15)', color: neon, fontSize: '10px', padding: '1px 6px', borderRadius: '20px', fontWeight: 800 }}>-20%</span>
             </button>
           </div>
         </div>
 
-        <div className="space-y-4 max-w-sm mx-auto">
+        {/* ── CARDS DE PLANO ── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {planos.map(p => (
-            <div key={p.id} className={"bg-gray-900 rounded-2xl p-5 border-2 relative " + p.cor}>
+            <div
+              key={p.id}
+              style={{ position: 'relative', background: p.acentoBg, border: '1px solid ' + p.acentoBorder, borderRadius: '20px', padding: '24px', boxShadow: p.popular ? '0 0 30px ' + p.acento + '20' : 'none' }}
+            >
+              {/* Badge mais popular */}
               {p.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="bg-green-600 text-white text-xs font-bold px-4 py-1 rounded-full">MAIS POPULAR</span>
+                <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)' }}>
+                  <span style={{ background: 'linear-gradient(135deg,#39FF14,#2bcc0f)', color: '#050505', fontSize: '10px', fontWeight: 900, fontFamily: syne, padding: '4px 14px', borderRadius: '20px', whiteSpace: 'nowrap', boxShadow: '0 0 16px rgba(57,255,20,0.4)' }}>
+                    MAIS POPULAR
+                  </span>
                 </div>
               )}
 
-              <div className="flex justify-between items-start mb-4">
+              {/* Nome + Preço */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
                 <div>
-                  <h2 className="text-xl font-bold">{p.nome}</h2>
-                  <p className="text-gray-400 text-sm">
-                    {p.atletasMax >= 999 ? 'Atletas ilimitados' : 'Ate ' + p.atletasMax + ' atletas'}
+                  <h2 style={{ fontFamily: syne, fontWeight: 800, fontSize: '22px', color: p.acento, margin: '0 0 4px' }}>{p.nome}</h2>
+                  <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', margin: 0 }}>
+                    {p.atletasMax >= 999 ? 'Atletas ilimitados' : 'Até ' + p.atletasMax + ' atletas'}
                   </p>
                 </div>
-                <div className="text-right">
-                  <p className="text-3xl font-bold text-green-400">
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ fontFamily: syne, fontWeight: 900, fontSize: '32px', color: p.acento, margin: 0, lineHeight: 1 }}>
                     R$ {periodo === 'mensal' ? p.precoMensal : p.precoAnual}
                   </p>
-                  <p className="text-gray-400 text-xs">/mes</p>
+                  <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: '2px 0 0' }}>/mês</p>
                   {periodo === 'anual' && (
-                    <p className="text-green-400 text-xs">R$ {p.precoAnual * 12}/ano</p>
+                    <p style={{ fontSize: '11px', color: p.acento, margin: '2px 0 0', fontWeight: 600 }}>R$ {(p.precoAnual * 12).toLocaleString('pt-BR')}/ano</p>
                   )}
                 </div>
               </div>
 
-              <div className="space-y-2 mb-5">
+              {/* Lista de recursos */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
                 {p.recursos.map((r, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <span className={r.ok ? 'text-green-400' : 'text-gray-600'}>{r.ok ? '✓' : '✗'}</span>
-                    <span className={"text-sm " + (r.ok ? 'text-gray-300' : 'text-gray-600')}>{r.nome}</span>
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '13px', color: r.ok ? p.acento : 'rgba(255,255,255,0.2)', fontWeight: 700, flexShrink: 0, width: '16px' }}>{r.ok ? '✓' : '✗'}</span>
+                    <span style={{ fontSize: '12px', color: r.ok ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.25)' }}>{r.nome}</span>
                   </div>
                 ))}
               </div>
 
+              {/* Botão assinar */}
               <button
                 onClick={() => assinar(p.id)}
-                className={"w-full py-3 rounded-xl font-bold text-white transition " + p.corBtn}
+                style={{ width: '100%', padding: '13px', borderRadius: '12px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', background: p.popular ? 'linear-gradient(135deg,#39FF14,#2bcc0f)' : 'rgba(255,255,255,0.07)', color: p.popular ? '#050505' : p.acento, boxShadow: p.popular ? '0 0 20px rgba(57,255,20,0.25)' : 'none', transition: 'all 0.2s' }}
               >
-                Assinar via WhatsApp
+                📲 Assinar via WhatsApp
               </button>
             </div>
           ))}
         </div>
 
-        <div className="mt-8 bg-gray-900 rounded-xl p-4 border border-gray-800 max-w-sm mx-auto">
-          <p className="text-green-500 font-bold text-sm mb-2">Pagamento seguro</p>
-          <div className="space-y-1">
-            <p className="text-gray-400 text-xs">✅ Pix ou cartao de credito</p>
-            <p className="text-gray-400 text-xs">✅ Cancele quando quiser</p>
-            <p className="text-gray-400 text-xs">✅ Suporte em portugues</p>
-            <p className="text-gray-400 text-xs">✅ Dados seguros e criptografados</p>
+        {/* ── TRUST BADGES ── */}
+        <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '20px', marginTop: '20px' }}>
+          <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '13px', color: neon, marginBottom: '12px' }}>✅ Pagamento seguro</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {['Pix ou cartão de crédito', 'Cancele quando quiser', 'Suporte em português', 'Dados seguros e criptografados'].map((item, i) => (
+              <p key={i} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', margin: 0 }}>✅ {item}</p>
+            ))}
           </div>
         </div>
 
-        <p className="text-center text-gray-500 text-xs mt-6 mb-4">
-          Duvidas? Fale conosco pelo WhatsApp
+        {/* ── SUPORTE ── */}
+        <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.3)', fontSize: '12px', marginTop: '20px', marginBottom: '12px' }}>
+          Dúvidas? Fale conosco pelo WhatsApp
         </p>
-        <div className="flex justify-center mb-8">
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
           <a
             href="https://wa.me/5534998168467"
             target="_blank"
             rel="noreferrer"
-            className="bg-green-600 text-white px-8 py-3 rounded-xl font-bold"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(57,255,20,0.08)', border: '1px solid rgba(57,255,20,0.25)', color: neon, padding: '12px 28px', borderRadius: '12px', fontWeight: 700, fontSize: '14px', fontFamily: syne, textDecoration: 'none' }}
           >
-            Falar com suporte
+            💬 Falar com suporte
           </a>
         </div>
+
       </div>
     </div>
   )
