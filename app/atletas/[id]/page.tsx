@@ -90,8 +90,8 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
     CANCELADO: 'bg-gray-400/10',
   }
 
-  const linkPais = 'https://campo-pro.vercel.app/pais/' + atleta.tokenPais
-  const linkRematricula = 'https://campo-pro.vercel.app/rematricula/' + atleta.id
+  const linkPais = 'https://gestaofc.com.br/pais/' + atleta.tokenPais
+  const linkRematricula = 'https://gestaofc.com.br/rematricula/' + atleta.id
 
   return (
     <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
