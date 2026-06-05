@@ -179,8 +179,18 @@ function FinanceiroInner() {
   }
 
   async function excluirCobranca(cobrancaId: string) {
-    if (!confirm('Excluir esta cobranca?')) return
-    await supabase.from('Cobranca').delete().eq('id', cobrancaId)
+    if (!confirm('Cancelar esta cobranca? Ela tambem sera cancelada no Asaas.')) return
+    try {
+      const res = await fetch('/api/cobranca/cancelar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cobrancaId }),
+      })
+      const data = await res.json()
+      if (!data.sucesso) alert('Erro ao cancelar: ' + (data.error || 'desconhecido'))
+    } catch (err: any) {
+      alert('Erro: ' + err.message)
+    }
     await carregar()
   }
 

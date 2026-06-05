@@ -62,3 +62,16 @@ export async function getPixQrCode(paymentId: string) {
   console.log('📦 Asaas qrCode raw:', text)
   return JSON.parse(text)
 }
+export async function cancelarCobrancaAsaas(asaasId: string) {
+  const res = await fetch(`${getBaseUrl()}/payments/${asaasId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'access_token': getApiKey(),
+    },
+    signal: AbortSignal.timeout(10000),
+  })
+  const text = await res.text()
+  console.log('📦 Asaas cancelar raw:', text)
+  try { return JSON.parse(text) } catch { return { raw: text } }
+}
