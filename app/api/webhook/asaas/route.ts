@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { enviarWhatsApp } from '@/lib/whatsapp'
 
 const STATUS_MAP: Record<string, string> = {
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── 1. Dá baixa na cobrança ──
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('Cobranca')
       .update({ status: novoStatus })
       .eq('asaasId', pagamento.id)
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     if (novoStatus === 'PAGO') {
       try {
         // Busca dados da cobrança pelo asaasId
-        const { data: cobranca } = await supabase
+        const { data: cobranca } = await supabaseAdmin
           .from('Cobranca')
           .select('valor, descricao, vencimento, atletaId')
           .eq('asaasId', pagamento.id)
@@ -60,14 +60,14 @@ export async function POST(req: NextRequest) {
 
         if (cobranca?.atletaId) {
           // Busca nome do atleta
-          const { data: atleta } = await supabase
+          const { data: atleta } = await supabaseAdmin
             .from('Atleta')
             .select('nome')
             .eq('id', cobranca.atletaId)
             .single()
 
           // Busca WhatsApp do responsável
-          const { data: responsavel } = await supabase
+          const { data: responsavel } = await supabaseAdmin
             .from('Responsavel')
             .select('nome, whatsapp')
             .eq('atletaId', cobranca.atletaId)
