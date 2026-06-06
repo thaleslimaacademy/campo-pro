@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
       (convocacao.local ? "Local: " + convocacao.local + "\n" : '') +
       (convocacao.horario ? "Horario: " + convocacao.horario + "\n" : '') +
       "\nConfirme a presenca pelo link:\n" +
-      "https://campo-pro.vercel.app/pais/" + (atleta as any).tokenPais + "\n\n" +
+      "https://gestaofc.com.br/pais/" + (atleta as any).tokenPais + "\n\n" +
       "_Thales Lima Football Academy_"
 
     await enviarWhatsApp(whatsapp, mensagem)

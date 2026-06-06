@@ -19,7 +19,8 @@ const isPublicRoute = createRouteMatcher([
   '/api/aniversariantes(.*)',
   '/logout(.*)',
   '/pagar(.*)',
-  '/api/notificar-convocacao(.*)',
+  '/convocacao(.*)',
+  '/api/notificar-convocacao(.*)' ,
   '/api/pagar(.*)',
   '/api/whatsapp-aprovacao(.*)',
 ])
