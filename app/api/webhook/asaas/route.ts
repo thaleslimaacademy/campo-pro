@@ -12,43 +12,38 @@ const STATUS_MAP: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   try {
-    // Token recebido do Asaas (logado para diagnóstico)
-    const token = req.headers.get('asaas-access-token')
-    console.log('🔑 Token recebido:', token)
-
     const body = await req.json()
-    console.log('📩 Webhook recebido:', JSON.stringify(body))
+    console.log('Webhook Asaas recebido:', JSON.stringify(body))
 
     const evento = body.event
     const pagamento = body.payment
 
     if (!evento || !pagamento?.id) {
-      return NextResponse.json({ error: 'Payload inválido' }, { status: 400 })
+      return NextResponse.json({ error: 'Payload invalido' }, { status: 400 })
     }
 
     const novoStatus = STATUS_MAP[evento]
     if (!novoStatus) {
-      console.log(`⏭️ Evento ignorado: ${evento}`)
+      console.log('Evento ignorado:', evento)
       return NextResponse.json({ ignorado: true })
     }
 
-    // ── 1. Dá baixa na cobrança ──
+    // Baixa no Supabase
     const { error } = await supabaseAdmin
       .from('Cobranca')
       .update({ status: novoStatus })
       .eq('asaasId', pagamento.id)
 
     if (error) {
-      console.error('❌ Erro ao atualizar:', error)
+      console.error('Erro ao atualizar Cobranca:', error)
       return NextResponse.json({ error: 'Erro ao atualizar' }, { status: 500 })
     }
 
-    console.log(`✅ ${pagamento.id} → ${novoStatus}`)
+    console.log('Cobranca atualizada:', pagamento.id, '->', novoStatus)
 
-    // ── 2. Envia recibo via WhatsApp se pagamento confirmado ──
+    // Envia recibo WhatsApp se pagamento confirmado
     if (novoStatus === 'PAGO') {
       try {
-        // Busca dados da cobrança pelo asaasId
         const { data: cobranca } = await supabaseAdmin
           .from('Cobranca')
           .select('valor, descricao, vencimento, atletaId')
@@ -56,52 +51,39 @@ export async function POST(req: NextRequest) {
           .single()
 
         if (cobranca?.atletaId) {
-          // Busca nome do atleta
           const { data: atleta } = await supabaseAdmin
-            .from('Atleta')
-            .select('nome')
-            .eq('id', cobranca.atletaId)
-            .single()
+            .from('Atleta').select('nome').eq('id', cobranca.atletaId).single()
 
-          // Busca WhatsApp do responsável
           const { data: responsavel } = await supabaseAdmin
-            .from('Responsavel')
-            .select('nome, whatsapp')
-            .eq('atletaId', cobranca.atletaId)
-            .single()
+            .from('Responsavel').select('nome, whatsapp').eq('atletaId', cobranca.atletaId).single()
 
           if (responsavel?.whatsapp) {
-            // Formata data corretamente (evita Invalid Date por fuso)
             const dataVenc = cobranca.vencimento
               ? new Date(cobranca.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
               : '-'
 
             const msg =
-              `✅ *Recibo de pagamento*\n\n` +
-              `Olá ${responsavel.nome}!\n\n` +
-              `Atleta: *${atleta?.nome || '-'}*\n` +
-              `Descrição: ${cobranca.descricao || 'Mensalidade'}\n` +
-              `Valor: R$ ${Number(cobranca.valor).toFixed(2)}\n` +
-              `Vencimento: ${dataVenc}\n` +
-              `Status: *PAGO* ✅\n\n` +
-              `Obrigado pelo pagamento! 🎉\n` +
-              `_Thales Lima Football Academy_`
+              'Ola ' + (responsavel.nome?.split(' ')[0] || '') + '! Recibo de pagamento:\n\n' +
+              'Atleta: *' + (atleta?.nome || '-') + '*\n' +
+              'Descricao: ' + (cobranca.descricao || 'Mensalidade') + '\n' +
+              'Valor: R$ ' + Number(cobranca.valor).toFixed(2) + '\n' +
+              'Vencimento: ' + dataVenc + '\n' +
+              'Status: *PAGO* \n\n' +
+              'Obrigado pelo pagamento!\n' +
+              '_Thales Lima Football Academy_'
 
             await enviarWhatsApp(responsavel.whatsapp, msg)
-            console.log('📲 Recibo enviado para:', responsavel.whatsapp)
-          } else {
-            console.warn('⚠️ Responsável sem WhatsApp para atletaId:', cobranca.atletaId)
+            console.log('Recibo WhatsApp enviado para:', responsavel.whatsapp)
           }
         }
       } catch (wzErr: any) {
-        // Erro de WhatsApp NÃO deve falhar o webhook
-        console.error('⚠️ Erro ao enviar WhatsApp pós-pagamento:', wzErr.message)
+        console.error('Erro WhatsApp pos-pagamento:', wzErr.message)
       }
     }
 
     return NextResponse.json({ sucesso: true, status: novoStatus })
   } catch (err: any) {
-    console.error('❌ Erro webhook:', err.message)
+    console.error('Erro webhook:', err.message)
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }
