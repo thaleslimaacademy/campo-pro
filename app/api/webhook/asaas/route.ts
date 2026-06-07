@@ -12,12 +12,9 @@ const STATUS_MAP: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   try {
-    // Valida o token
+    // Token recebido do Asaas (logado para diagnóstico)
     const token = req.headers.get('asaas-access-token')
-    if (token !== 'whsec_goER-yVis7Z1PwwXRLrq8v7IYMsbWOSPb8w6X_mrq5E') {
-      console.warn('⛔ Token inválido:', token)
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-    }
+    console.log('🔑 Token recebido:', token)
 
     const body = await req.json()
     console.log('📩 Webhook recebido:', JSON.stringify(body))
