@@ -51,4 +51,15 @@ export async function gerarBoleto(params: {
     invoiceUrl: boleto.invoiceUrl as string,
     id: boleto.id as string,
   }
+}export async function getCpfResponsavel(atletaId: string) {
+  const { data } = await supabaseAdmin.from('Responsavel')
+    .select('cpf').eq('atletaId', atletaId).eq('principal', true).limit(1)
+  return data?.[0]?.cpf ?? null
+}
+
+export async function salvarCpfResponsavel(atletaId: string, cpf: string) {
+  await supabaseAdmin.from('Responsavel')
+    .update({ cpf: cpf.replace(/\D/g, '') })
+    .eq('atletaId', atletaId).eq('principal', true)
+  return { ok: true }
 }

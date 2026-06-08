@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { FileText, ExternalLink, Copy, CheckCircle, Loader2 } from 'lucide-react'
-import { listarAtletasBoleto, gerarBoleto } from './actions'
+import { listarAtletasBoleto, gerarBoleto, getCpfResponsavel, salvarCpfResponsavel } from './actions'
 import { gerarRecibo } from '@/lib/gerarRecibo'
 
 type Estado = 'form' | 'loading' | 'resultado'
@@ -24,6 +24,12 @@ export default function BoletoPage() {
 
   useEffect(() => { listarAtletasBoleto().then(setAtletas).catch(() => {}) }, [])
 
+  useEffect(() => {
+    if (!atletaId) return
+    setCpf('')
+    getCpfResponsavel(atletaId).then(c => { if (c) setCpf(c) }).catch(() => {})
+  }, [atletaId])
+
   const atletaNome = atletas.find(a => a.id === atletaId)?.nome ?? ''
 
   const gerar = async () => {
@@ -31,7 +37,10 @@ export default function BoletoPage() {
     setErro(''); setEstado('loading')
     try {
       const r = await gerarBoleto({ atletaId, cpf, valor: Number(valor), vencimento, descricao })
-      setResultado(r); setEstado('resultado')
+      setResultado(r)
+      setEstado('resultado')
+      const salvar = confirm('Salvar CPF para próximas cobranças deste atleta?')
+      if (salvar) await salvarCpfResponsavel(atletaId, cpf)
     } catch (e) { setErro((e as Error).message); setEstado('form') }
   }
 
@@ -63,7 +72,8 @@ export default function BoletoPage() {
                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'transparent', border: '1px solid #D4AF37', color: '#D4AF37', borderRadius: 12, padding: '12px 20px', fontWeight: 600, cursor: 'pointer' }}>
                 {copiado ? <><CheckCircle size={16} /> Copiado!</> : <><Copy size={16} /> Copiar link</>}
               </button>
-              <button onClick={() => gerarRecibo({ tipo: 'MENSALIDADE', nome: atletaNome, valor: Number(valor), descricao, data: new Date().toISOString().slice(0, 10) })}
+              <button
+                onClick={() => gerarRecibo({ tipo: 'MENSALIDADE', nome: atletaNome, valor: Number(valor), descricao, data: new Date().toISOString().slice(0, 10) })}
                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'transparent', border: '1px solid #2a3a22', color: '#cdd', borderRadius: 12, padding: '12px 20px', cursor: 'pointer' }}>
                 <FileText size={16} /> Gerar recibo PDF
               </button>
@@ -82,7 +92,12 @@ export default function BoletoPage() {
               </select>
             </Campo>
             <Campo label="CPF ou CNPJ do responsável *">
-              <input value={cpf} onChange={e => setCpf(e.target.value)} placeholder="000.000.000-00" style={inp} />
+              <input
+                value={cpf}
+                onChange={e => setCpf(e.target.value)}
+                placeholder="000.000.000-00"
+                style={inp}
+              />
             </Campo>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <Campo label="Valor (R$) *">
@@ -101,7 +116,7 @@ export default function BoletoPage() {
               {estado === 'loading' ? <><Loader2 size={18} className="spin" /> Gerando…</> : 'Gerar Boleto'}
             </button>
             <p style={{ color: '#9aa', fontSize: 11, marginTop: 12, textAlign: 'center' }}>
-              O CPF é usado apenas para geração do boleto e não fica salvo no sistema.
+              {cpf ? '✅ CPF encontrado — pré-preenchido do cadastro.' : 'O CPF será salvo opcionalmente após gerar o boleto.'}
             </p>
           </div>
         )}

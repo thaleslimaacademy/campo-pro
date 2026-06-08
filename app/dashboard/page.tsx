@@ -212,7 +212,22 @@ export default function Dashboard() {
                 <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px' }}>Configuracoes</span>
                 <span style={{ fontSize: '10px', color: muted }}>Escola e visual</span>
               </a>
-            </>
+            <a href="/financeiro/mensalidades" style={{ background: 'rgba(212,175,55,0.07)', border: '1px solid rgba(212,175,55,0.25)', borderRadius: '14px', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '5px', textDecoration: 'none', color: '#F0F0F0' }}>
+                <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: gold }}>Mensalidades</span>
+                <span style={{ fontSize: '10px', color: muted }}>Mês a mês</span>
+              </a>
+              <a href="/financeiro/caixa" style={{ background: 'rgba(57,255,20,0.07)', border: '1px solid rgba(57,255,20,0.2)', borderRadius: '14px', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '5px', textDecoration: 'none', color: '#F0F0F0' }}>
+                <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: neon }}>Caixa</span>
+                <span style={{ fontSize: '10px', color: muted }}>Entradas e saídas</span>
+              </a>
+              <a href="/financeiro/patrocinadores" style={{ background: cardBg, border: cardBorder, borderRadius: '14px', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '5px', textDecoration: 'none', color: '#F0F0F0' }}>
+                <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px' }}>Patrocinadores</span>
+                <span style={{ fontSize: '10px', color: muted }}>Gestão e recibos</span>
+              </a>
+              <a href="/financeiro/boleto" style={{ background: cardBg, border: cardBorder, borderRadius: '14px', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '5px', textDecoration: 'none', color: '#F0F0F0' }}>
+                <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px' }}>Boleto</span>
+                <span style={{ fontSize: '10px', color: muted }}>Gerar cobrança</span>
+              </a></>
           )}
         </div>
       </div>
