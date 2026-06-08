@@ -75,3 +75,26 @@ export async function cancelarCobrancaAsaas(asaasId: string) {
   console.log('📦 Asaas cancelar raw:', text)
   try { return JSON.parse(text) } catch { return { raw: text } }
 }
+export async function buscarClienteAsaas(cpfCnpj: string) {
+  const cpf = cpfCnpj.replace(/\D/g, '')
+  const res = await fetch(`${getBaseUrl()}/customers?cpfCnpj=${cpf}`, {
+    headers: { 'access_token': getApiKey() },
+    signal: AbortSignal.timeout(10000),
+  })
+  const data = JSON.parse(await res.text())
+  return data.data?.[0] || null
+}
+
+export async function criarCobrancaBoleto(dados: {
+  customer: string; billingType: 'BOLETO'; value: number; dueDate: string; description: string
+}) {
+  const res = await fetch(`${getBaseUrl()}/payments`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'access_token': getApiKey() },
+    body: JSON.stringify(dados),
+    signal: AbortSignal.timeout(10000),
+  })
+  const text = await res.text()
+  console.log('📦 Asaas boleto raw:', text)
+  return JSON.parse(text)
+}
