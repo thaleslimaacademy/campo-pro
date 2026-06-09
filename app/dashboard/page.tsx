@@ -1,268 +1,272 @@
 'use client'
+
 import { useEffect, useState } from 'react'
+import { UserButton } from '@clerk/nextjs'
 import { supabase } from '@/lib/supabase'
 import { usePerfil } from '@/lib/usePerfil'
-import { UserButton } from '@clerk/nextjs'
+
+const S = 'Syne, sans-serif'
+const I = 'Inter, sans-serif'
+const N = '#39FF14'
+const G = '#D4AF37'
+const M = 'rgba(255,255,255,0.4)'
+const SW = 210
+
+const NAV = [
+  { href: '/dashboard', label: 'Início', e: '🏠' },
+  { href: '/atletas', label: 'Atletas', e: '👥' },
+  { href: '/presenca', label: 'Presença', e: '✅' },
+  { href: '/turmas', label: 'Turmas', e: '🏃' },
+  { href: '/campeonato', label: 'Campeonatos', e: '🏆' },
+  { href: '/convocacao', label: 'Convocações', e: '📣' },
+  { href: '/mensagens', label: 'Mensagens', e: '💬' },
+  { href: '/financeiro', label: 'Financeiro', e: '💰' },
+  { href: '/matriculas', label: 'Matrículas', e: '📝' },
+  { href: '/configuracoes', label: 'Config', e: '⚙️' },
+]
+
+const MODS = [
+  { href: '/atletas', label: 'Atletas', e: '👥' },
+  { href: '/financeiro/mensalidades', label: 'Mensalidades', e: '💳' },
+  { href: '/financeiro/caixa', label: 'Caixa', e: '💰' },
+  { href: '/mensagens', label: 'WhatsApp', e: '📱' },
+  { href: '/financeiro/patrocinadores', label: 'Patrocinadores', e: '🏅' },
+  { href: '/financeiro/boleto', label: 'Boleto', e: '📄' },
+  { href: '/campeonato', label: 'Campeonatos', e: '🏆' },
+  { href: '/convocacao', label: 'Convocações', e: '📣' },
+  { href: '/matriculas', label: 'Matrículas', e: '📝' },
+  { href: '/presenca', label: 'Presença', e: '✅' },
+  { href: '/configuracoes', label: 'Config', e: '⚙️' },
+]
+
+const brl = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n || 0)
 
 export default function Dashboard() {
   const { isAdmin, isLoaded, escolaId } = usePerfil()
+  const [nomeEscola, setNomeEscola] = useState('GestaoFC')
   const [totalAtletas, setTotalAtletas] = useState(0)
-  const [presencaHoje, setPresencaHoje] = useState({ presentes: 0, total: 0 })
+  const [inadimplentes, setInadimplentes] = useState(0)
   const [pendentes, setPendentes] = useState(0)
   const [rematriculas, setRematriculas] = useState(0)
+  const [presenca, setPresenca] = useState({ presentes: 0, total: 0 })
   const [loading, setLoading] = useState(true)
-  const [receitaMes, setReceitaMes] = useState(0)
-  const [inadimplentes, setInadimplentes] = useState(0)
-  const [totalPendente, setTotalPendente] = useState(0)
-  const [cobrancasMes, setCobrancasMes] = useState(0)
-  const [copiado, setCopiado] = useState(false)
-  const [nomeEscola, setNomeEscola] = useState('GestaoFC')
-  const linkMatricula = 'https://gestaofc.com.br/matricula'
+  const [mob, setMob] = useState(false)
+
+  const hoje = new Date()
+  const [di, setDi] = useState(new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString().slice(0, 10))
+  const [df, setDf] = useState(new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).toISOString().slice(0, 10))
+  const [cob, setCob] = useState<{ valor: number; status: string }[]>([])
+  const [recs, setRecs] = useState<{ valor: number }[]>([])
+  const [desps, setDesps] = useState<{ valor: number }[]>([])
 
   useEffect(() => {
     if (!escolaId) return
-    async function carregar() {
-      const { data: escola } = await supabase.from('Escola').select('nome').eq('id', escolaId).single()
-      if (escola) setNomeEscola(escola.nome)
-      const { count } = await supabase.from('Atleta').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('ativo', true)
-      setTotalAtletas(count || 0)
-      const dataHoje = new Date().toISOString().split('T')[0]
-      const { data: treino } = await supabase.from('Treino').select('id').eq('escolaId', escolaId).gte('data', dataHoje).limit(1).single()
-      if (treino) {
-        const { data: presencas } = await supabase.from('Presenca').select('status').eq('treinoId', treino.id)
-        const presentes = presencas?.filter(p => p.status === 'PRESENTE').length || 0
-        setPresencaHoje({ presentes, total: presencas?.length || 0 })
-      }
-      const { count: cp } = await supabase.from('Matricula').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('status', 'PENDENTE').eq('tipo', 'matricula')
-      setPendentes(cp || 0)
-      const { count: cr } = await supabase.from('Matricula').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('status', 'PENDENTE').eq('tipo', 'rematricula')
-      setRematriculas(cr || 0)
-      const agora = new Date()
-      const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString().split('T')[0]
-      const fimMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0).toISOString().split('T')[0]
-      const { data: cobrancas } = await supabase.from('Cobranca').select('valor, status, vencimento').eq('escolaId', escolaId).gte('vencimento', inicioMes).lte('vencimento', fimMes)
-      if (cobrancas) {
-        const pagas = cobrancas.filter(c => c.status === 'PAGO')
-        const pend = cobrancas.filter(c => c.status === 'PENDENTE' || c.status === 'VENCIDO')
-        const venc = cobrancas.filter(c => c.status === 'VENCIDO')
-        setReceitaMes(pagas.reduce((s, c) => s + Number(c.valor), 0))
-        setTotalPendente(pend.reduce((s, c) => s + Number(c.valor), 0))
-        setInadimplentes(venc.length)
-        setCobrancasMes(cobrancas.length)
-      }
-      setLoading(false)
-    }
-    carregar()
+    supabase.from('Escola').select('nome').eq('id', escolaId).single().then(({ data }) => { if (data) setNomeEscola(data.nome) })
+    supabase.from('Atleta').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('ativo', true).then(({ count }) => setTotalAtletas(count || 0))
+    supabase.from('Matricula').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('status', 'PENDENTE').eq('tipo', 'matricula').then(({ count }) => setPendentes(count || 0))
+    supabase.from('Matricula').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('status', 'PENDENTE').eq('tipo', 'rematricula').then(({ count }) => setRematriculas(count || 0))
+    supabase.from('Treino').select('id').eq('escolaId', escolaId).gte('data', hoje.toISOString().split('T')[0]).limit(1).single().then(({ data: t }) => {
+      if (t) supabase.from('Presenca').select('status').eq('treinoId', t.id).then(({ data: p }) => {
+        setPresenca({ presentes: p?.filter(x => x.status === 'PRESENTE').length || 0, total: p?.length || 0 })
+      })
+    })
+    setLoading(false)
   }, [escolaId])
 
-  function copiarLink() {
-    navigator.clipboard.writeText(linkMatricula)
-    setCopiado(true)
-    setTimeout(() => setCopiado(false), 2000)
-  }
+  useEffect(() => {
+    if (!escolaId) return
+    supabase.from('Cobranca').select('valor, status').eq('escolaId', escolaId).gte('vencimento', di).lte('vencimento', df).then(({ data }) => {
+      setCob(data || [])
+      setInadimplentes((data || []).filter(c => c.status === 'VENCIDO').length)
+    })
+    supabase.from('Receita').select('valor').eq('escolaId', escolaId).gte('data', di).lte('data', df).then(({ data }) => setRecs(data || []))
+    supabase.from('Despesa').select('valor').eq('escolaId', escolaId).gte('data', di).lte('data', df).then(({ data }) => setDesps(data || []))
+  }, [escolaId, di, df])
 
-  const pct = presencaHoje.total > 0 ? Math.round((presencaHoje.presentes / presencaHoje.total) * 100) : 0
-  const mes = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
-  const dia = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
-  const recTotal = receitaMes + totalPendente
-  const pctRec = recTotal > 0 ? Math.round((receitaMes / recTotal) * 100) : 0
+  const pct = presenca.total > 0 ? Math.round((presenca.presentes / presenca.total) * 100) : 0
+  const pagas = cob.filter(c => c.status === 'PAGO')
+  const pagasV = pagas.reduce((s, c) => s + Number(c.valor), 0)
+  const pendV = cob.filter(c => c.status === 'PENDENTE').reduce((s, c) => s + Number(c.valor), 0)
+  const vencV = cob.filter(c => c.status === 'VENCIDO').reduce((s, c) => s + Number(c.valor), 0)
+  const cancV = cob.filter(c => c.status === 'CANCELADO').reduce((s, c) => s + Number(c.valor), 0)
+  const totalPer = cob.reduce((s, c) => s + Number(c.valor), 0)
+  const recV = recs.reduce((s, r) => s + Number(r.valor), 0)
+  const despV = desps.reduce((s, d) => s + Number(d.valor), 0)
+  const saldo = pagasV + recV - despV
 
-  const syne = 'Syne, sans-serif'
-  const inter = 'Inter, sans-serif'
-  const neon = '#39FF14'
-  const gold = '#D4AF37'
-  const muted = 'rgba(255,255,255,0.4)'
-  const cardBg = 'rgba(255,255,255,0.05)' as const
-  const cardBorder = '1px solid rgba(255,255,255,0.07)' as const
+  if (!isLoaded) return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#050505' }}><p style={{ color: M }}>Carregando...</p></div>
 
-  if (!isLoaded) return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p style={{ color: muted, fontFamily: inter }}>Carregando...</p></div>
-  if (!escolaId) return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p style={{ color: muted, fontFamily: inter }}>Configurando sessao...</p></div>
+  const statsCards = [
+    { label: 'Alunos ativos', val: loading ? '...' : totalAtletas, cor: N, bg: 'rgba(57,255,20,0.08)', bd: 'rgba(57,255,20,0.25)' },
+    { label: 'Inadimplentes', val: loading ? '...' : inadimplentes, cor: inadimplentes > 0 ? '#ff5555' : N, bg: inadimplentes > 0 ? 'rgba(255,50,50,0.08)' : 'rgba(255,255,255,0.03)', bd: inadimplentes > 0 ? 'rgba(255,50,50,0.3)' : 'rgba(255,255,255,0.08)' },
+    { label: 'Pré-matrículas', val: loading ? '...' : pendentes, cor: '#ff9f43', bg: 'rgba(255,159,67,0.08)', bd: 'rgba(255,159,67,0.25)' },
+    { label: 'Ré-matrículas', val: loading ? '...' : rematriculas, cor: '#54a0ff', bg: 'rgba(84,160,255,0.08)', bd: 'rgba(84,160,255,0.25)' },
+    { label: 'Presença hoje', val: loading ? '...' : presenca.total === 0 ? '-' : pct + '%', cor: pct >= 75 ? N : G, bg: 'rgba(255,255,255,0.03)', bd: 'rgba(255,255,255,0.08)' },
+    { label: 'Receita do mês', val: loading ? '...' : brl(pagasV), cor: G, bg: 'rgba(212,175,55,0.08)', bd: 'rgba(212,175,55,0.25)' },
+  ]
+
+  const quadroMens = [
+    { label: 'Valor total no período', count: cob.length, val: totalPer, cor: '#fff' },
+    { label: 'A vencer (Pendente)', count: cob.filter(c => c.status === 'PENDENTE').length, val: pendV, cor: G },
+    { label: 'Recebido', count: pagas.length, val: pagasV, cor: N },
+    { label: 'Vencido', count: cob.filter(c => c.status === 'VENCIDO').length, val: vencV, cor: '#ff5555' },
+    { label: 'Cancelado', count: cob.filter(c => c.status === 'CANCELADO').length, val: cancV, cor: M },
+  ]
+
+  const quadroCaixa = [
+    { label: 'Mensalidades pagas', count: pagas.length, val: pagasV, cor: N },
+    { label: 'Outras entradas (bar, etc)', count: recs.length, val: recV, cor: N },
+    { label: 'Despesas', count: desps.length, val: despV, cor: '#ff5555' },
+  ]
 
   return (
-    <div style={{ minHeight: '100vh', paddingBottom: '80px', color: '#F0F0F0', fontFamily: inter }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'linear-gradient(160deg, #0a1a06, #050505, #111003)', color: '#fff', fontFamily: I }}>
 
-      {/* HEADER */}
-      <div style={{ padding: '16px 20px 12px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <img src="/logo-icon.png" style={{ width: '38px', height: '38px', borderRadius: '8px', objectFit: 'cover' }} alt="GestaoFC" />
+      {mob && <div onClick={() => setMob(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 99 }} />}
+
+      {/* SIDEBAR */}
+      <aside className={mob ? 'sidebar open' : 'sidebar'} style={{ width: SW, background: '#060d04', borderRight: '1px solid #1a2a14', display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, height: '100vh', zIndex: 100, overflowY: 'auto' }}>
+        <div style={{ padding: '18px 14px 14px', borderBottom: '1px solid #1a2a14' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+            <img src="/logo-icon.png" style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'cover' }} alt="logo" onError={e => (e.currentTarget.style.display = 'none')} />
             <div>
-              <div style={{ fontFamily: syne, fontWeight: 800, fontSize: '18px', color: '#F0F0F0', letterSpacing: '-0.5px' }}>{nomeEscola}</div>
-              <div style={{ fontSize: '10px', color: neon, letterSpacing: '1.5px', textTransform: 'uppercase', fontWeight: 600 }}>Pro</div>
+              <div style={{ fontFamily: S, fontWeight: 800, fontSize: 12, color: '#F0F0F0', lineHeight: 1.2 }}>{nomeEscola}</div>
+              <div style={{ fontSize: 9, color: N, letterSpacing: 1.5, textTransform: 'uppercase', fontWeight: 600 }}>Pro</div>
             </div>
           </div>
           <UserButton />
         </div>
-        <div style={{ fontSize: '11px', color: muted, marginBottom: '2px' }}>{dia}</div>
-        <div style={{ fontFamily: syne, fontSize: '22px', fontWeight: 800, color: '#F0F0F0', lineHeight: 1.1 }}>
-          Ola, <span style={{ color: neon }}>Thales</span>
-        </div>
-      </div>
 
-      {/* METRICS */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', padding: '0 20px 16px' }}>
-        <div style={{ background: 'rgba(57,255,20,0.07)', borderRadius: '16px', padding: '14px', border: '1px solid rgba(57,255,20,0.2)' }}>
-          <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>Alunos ativos</div>
-          <div style={{ fontFamily: syne, fontSize: '26px', fontWeight: 800, color: neon }}>{loading ? '...' : totalAtletas}</div>
-          <div style={{ fontSize: '10px', color: muted, marginTop: '4px' }}>cadastrados</div>
-        </div>
-        {isAdmin && (
-          <div style={{ background: inadimplentes > 0 ? 'rgba(255,70,70,0.07)' : cardBg, borderRadius: '16px', padding: '14px', border: inadimplentes > 0 ? '1px solid rgba(255,70,70,0.3)' : cardBorder }}>
-            <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>Inadimplentes</div>
-            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '26px', fontWeight: 800, color: inadimplentes > 0 ? '#ff5555' : neon }}>{loading ? '...' : inadimplentes}</div>
-            <div style={{ fontSize: '10px', color: muted, marginTop: '4px' }}>em atraso</div>
-          </div>
-        )}
-        <div style={{ background: cardBg, borderRadius: '16px', padding: '14px', border: cardBorder }}>
-          <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>Presenca hoje</div>
-          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '26px', fontWeight: 800, color: pct >= 75 ? neon : pct > 0 ? gold : muted }}>{loading ? '...' : presencaHoje.total === 0 ? '-' : pct + '%'}</div>
-          <div style={{ fontSize: '10px', color: muted, marginTop: '4px' }}>{presencaHoje.total > 0 ? presencaHoje.presentes + ' de ' + presencaHoje.total : 'sem treino'}</div>
-        </div>
-        {isAdmin && (
-          <div style={{ background: 'rgba(212,175,55,0.07)', borderRadius: '16px', padding: '14px', border: '1px solid rgba(212,175,55,0.2)' }}>
-            <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>Receita mes</div>
-            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '26px', fontWeight: 800, color: gold }}>{loading ? '...' : 'R$' + receitaMes.toFixed(0)}</div>
-            <div style={{ fontSize: '10px', color: muted, marginTop: '4px' }}>{mes}</div>
-          </div>
-        )}
-      </div>
-
-      {/* FINANCEIRO */}
-      {isAdmin && (
-        <div style={{ padding: '0 20px 14px' }}>
-          <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
-            <span>Financeiro</span>
-            <a href="/financeiro" style={{ color: neon, fontSize: '10px', textDecoration: 'none', textTransform: 'none', letterSpacing: 0 }}>Ver tudo</a>
-          </div>
-          <div style={{ background: cardBg, borderRadius: '16px', padding: '14px', border: cardBorder }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: muted }}>
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: neon, boxShadow: '0 0 4px #39FF14' }}></div>Recebido
-              </div>
-              <span style={{ fontFamily: syne, fontWeight: 700, color: neon, fontSize: '13px' }}>R$ {loading ? '...' : receitaMes.toFixed(2)}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: muted }}>
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: gold, boxShadow: '0 0 4px #D4AF37' }}></div>A receber
-              </div>
-              <span style={{ fontFamily: syne, fontWeight: 700, color: gold, fontSize: '13px' }}>R$ {loading ? '...' : totalPendente.toFixed(2)}</span>
-            </div>
-            {!loading && recTotal > 0 && (
-              <div style={{ marginTop: '10px' }}>
-                <div style={{ height: '3px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', background: 'linear-gradient(90deg,#39FF14,#00cc00)', width: pctRec + '%' }}></div>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '5px', fontSize: '10px', color: muted }}>
-                  <span>{pctRec}% recebido</span><span>{cobrancasMes} cobrancas</span>
-                </div>
-              </div>
-            )}
-            {!loading && cobrancasMes === 0 && <p style={{ fontSize: '11px', color: muted, textAlign: 'center', padding: '8px 0' }}>Nenhuma cobranca este mes</p>}
-          </div>
-        </div>
-      )}
-
-      {/* PENDENTES */}
-      {isAdmin && pendentes > 0 && (
-        <div style={{ padding: '0 20px 14px' }}>
-          <a href="/matriculas" style={{ display: 'block', background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.3)', borderRadius: '16px', padding: '14px', textDecoration: 'none' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <p style={{ color: gold, fontWeight: 700, fontSize: '13px', fontFamily: syne }}>Pre-matriculas pendentes</p>
-                <p style={{ color: muted, fontSize: '11px', marginTop: '3px' }}>{pendentes} aguardam aprovacao</p>
-              </div>
-              <span style={{ background: neon, color: '#000', fontSize: '9px', fontWeight: 800, padding: '2px 7px', borderRadius: '20px', fontFamily: syne }}>{pendentes}</span>
-            </div>
-          </a>
-        </div>
-      )}
-
-      {/* ACOES */}
-      <div style={{ padding: '0 20px 14px' }}>
-        <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>Acoes rapidas</div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-          {[
-            { href: '/atletas/novo', icon: 'soccer', label: 'Novo atleta', sub: 'Cadastrar', style: { background: 'rgba(57,255,20,0.07)', border: '1px solid rgba(57,255,20,0.25)' } },
-            { href: '/presenca', icon: 'check', label: 'Chamada', sub: 'Presenca', style: { background: cardBg, border: cardBorder } },
-            { href: '/turmas', icon: 'users', label: 'Turmas', sub: 'Gerenciar', style: { background: cardBg, border: cardBorder } },
-            { href: '/convocacao', icon: 'megaphone', label: 'Convocacoes', sub: 'Escalar', style: { background: cardBg, border: cardBorder } },
-            { href: '/campeonato', icon: 'trophy', label: 'Campeonatos', sub: 'Tabelas', style: { background: cardBg, border: cardBorder } },
-            { href: '/mensagens', icon: 'message', label: 'Mensagens', sub: 'Comunicar', style: { background: cardBg, border: cardBorder } },
-          ].map(item => (
-            <a key={item.href} href={item.href} style={{ ...item.style, borderRadius: '14px', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '5px', textDecoration: 'none', color: '#F0F0F0' }}>
-              <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: '#F0F0F0' }}>{item.label}</span>
-              <span style={{ fontSize: '10px', color: muted }}>{item.sub}</span>
+        <nav style={{ flex: 1, padding: '8px 0' }}>
+          {NAV.map(item => (
+            <a key={item.href} href={item.href} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', textDecoration: 'none', color: item.href === '/dashboard' ? N : 'rgba(255,255,255,0.6)', background: item.href === '/dashboard' ? 'rgba(57,255,20,0.07)' : 'transparent', borderLeft: item.href === '/dashboard' ? `3px solid ${N}` : '3px solid transparent', fontSize: 13, fontWeight: item.href === '/dashboard' ? 700 : 400 }}>
+              <span>{item.e}</span><span>{item.label}</span>
             </a>
           ))}
+        </nav>
+
+        <div style={{ padding: '12px 14px', borderTop: '1px solid #1a2a14' }}>
+          <a href="/logout" style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.35)', textDecoration: 'none', fontSize: 12 }}>
+            🚪 Sair
+          </a>
+        </div>
+      </aside>
+
+      {/* MAIN */}
+      <main className="gc-main" style={{ marginLeft: SW, flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+
+        {/* Mobile header */}
+        <div className="gc-mob-hdr" style={{ display: 'none', padding: '10px 16px', background: '#060d04', borderBottom: '1px solid #1a2a14', alignItems: 'center', justifyContent: 'space-between' }}>
+          <button onClick={() => setMob(!mob)} style={{ background: 'transparent', border: 'none', color: N, fontSize: 22, cursor: 'pointer' }}>☰</button>
+          <span style={{ fontFamily: S, fontWeight: 800, color: N, fontSize: 15 }}>GestaoFC</span>
+          <UserButton />
+        </div>
+
+        {/* TOP MODULES */}
+        <div style={{ background: '#060d04', borderBottom: '1px solid #1a2a14', overflowX: 'auto', display: 'flex', padding: '0 12px' }}>
+          {MODS.map(m => (
+            <a key={m.href} href={m.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '10px 12px', textDecoration: 'none', color: 'rgba(255,255,255,0.6)', minWidth: 68, borderBottom: '3px solid transparent', whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: 18 }}>{m.e}</span>
+              <span style={{ fontSize: 9, fontFamily: S, fontWeight: 600, letterSpacing: 0.3 }}>{m.label}</span>
+            </a>
+          ))}
+        </div>
+
+        {/* CONTENT */}
+        <div className="gc-pad" style={{ padding: '22px 24px', flex: 1 }}>
+
+          {/* STAT CARDS */}
+          <div className="gc-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12, marginBottom: 22 }}>
+            {statsCards.map(c => (
+              <div key={c.label} style={{ background: c.bg, border: `1px solid ${c.bd}`, borderRadius: 14, padding: '14px 12px' }}>
+                <div style={{ fontSize: 9, color: M, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>{c.label}</div>
+                <div style={{ fontFamily: S, fontSize: 22, fontWeight: 800, color: c.cor }}>{c.val}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* DATE RANGE */}
           {isAdmin && (
-            <>
-              <a href="/financeiro" style={{ background: 'rgba(212,175,55,0.07)', border: '1px solid rgba(212,175,55,0.25)', borderRadius: '14px', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '5px', textDecoration: 'none', color: '#F0F0F0' }}>
-                <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: gold }}>Financeiro</span>
-                <span style={{ fontSize: '10px', color: muted }}>Cobrancas</span>
-              </a>
-              <a href="/matriculas" style={{ background: cardBg, border: cardBorder, borderRadius: '14px', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '5px', textDecoration: 'none', color: '#F0F0F0' }}>
-                <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px' }}>Matriculas</span>
-                {pendentes > 0 ? <span style={{ background: neon, color: '#000', fontSize: '9px', fontWeight: 800, padding: '2px 7px', borderRadius: '20px', fontFamily: syne, display: 'inline-block', width: 'fit-content' }}>{pendentes} pendentes</span> : <span style={{ fontSize: '10px', color: muted }}>Gerenciar</span>}
-              </a>
-              <a href="/alteracao-massa" style={{ background: cardBg, border: cardBorder, borderRadius: '14px', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '5px', textDecoration: 'none', color: '#F0F0F0' }}>
-                <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px' }}>Alteracao em massa</span>
-                <span style={{ fontSize: '10px', color: muted }}>Edicao rapida</span>
-              </a>
-              <a href="/configuracoes" style={{ background: cardBg, border: cardBorder, borderRadius: '14px', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '5px', textDecoration: 'none', color: '#F0F0F0' }}>
-                <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px' }}>Configuracoes</span>
-                <span style={{ fontSize: '10px', color: muted }}>Escola e visual</span>
-              </a>
-            <a href="/financeiro/mensalidades" style={{ background: 'rgba(212,175,55,0.07)', border: '1px solid rgba(212,175,55,0.25)', borderRadius: '14px', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '5px', textDecoration: 'none', color: '#F0F0F0' }}>
-                <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: gold }}>Mensalidades</span>
-                <span style={{ fontSize: '10px', color: muted }}>Mês a mês</span>
-              </a>
-              <a href="/financeiro/caixa" style={{ background: 'rgba(57,255,20,0.07)', border: '1px solid rgba(57,255,20,0.2)', borderRadius: '14px', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '5px', textDecoration: 'none', color: '#F0F0F0' }}>
-                <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: neon }}>Caixa</span>
-                <span style={{ fontSize: '10px', color: muted }}>Entradas e saídas</span>
-              </a>
-              <a href="/financeiro/patrocinadores" style={{ background: cardBg, border: cardBorder, borderRadius: '14px', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '5px', textDecoration: 'none', color: '#F0F0F0' }}>
-                <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px' }}>Patrocinadores</span>
-                <span style={{ fontSize: '10px', color: muted }}>Gestão e recibos</span>
-              </a>
-              <a href="/financeiro/boleto" style={{ background: cardBg, border: cardBorder, borderRadius: '14px', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '5px', textDecoration: 'none', color: '#F0F0F0' }}>
-                <span style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px' }}>Boleto</span>
-                <span style={{ fontSize: '10px', color: muted }}>Gerar cobrança</span>
-              </a></>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 11, color: M }}>Período de</span>
+              <input type="date" value={di} onChange={e => setDi(e.target.value)} style={{ background: '#0a0f08', border: '1px solid #2a3a22', borderRadius: 8, padding: '6px 10px', color: '#fff', fontSize: 12 }} />
+              <span style={{ fontSize: 11, color: M }}>à</span>
+              <input type="date" value={df} onChange={e => setDf(e.target.value)} style={{ background: '#0a0f08', border: '1px solid #2a3a22', borderRadius: 8, padding: '6px 10px', color: '#fff', fontSize: 12 }} />
+            </div>
+          )}
+
+          {/* QUADROS */}
+          {isAdmin && (
+            <div className="gc-quadros" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
+
+              {/* Mensalidades */}
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #1c2418', borderRadius: 14, overflow: 'hidden' }}>
+                <div style={{ background: '#0b1a07', padding: '13px 18px', borderBottom: '1px solid #1c2418' }}>
+                  <span style={{ fontFamily: S, fontWeight: 700, fontSize: 13, color: N }}>💳 Quadro de Mensalidades</span>
+                </div>
+                <div style={{ padding: '0 18px' }}>
+                  {quadroMens.map(row => (
+                    <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #151e11' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>{row.label}</span>
+                        <span style={{ background: 'rgba(255,255,255,0.07)', borderRadius: 20, padding: '1px 7px', fontSize: 9, color: M }}>({row.count})</span>
+                      </div>
+                      <span style={{ fontFamily: S, fontWeight: 700, color: row.cor, fontSize: 12 }}>{brl(row.val)}</span>
+                    </div>
+                  ))}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #151e11' }}>
+                    <span style={{ fontFamily: S, fontWeight: 700, fontSize: 11, color: N }}>TOTAL RECEBIDO</span>
+                    <span style={{ fontFamily: S, fontWeight: 800, color: N, fontSize: 13 }}>{brl(pagasV)}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0' }}>
+                    <span style={{ fontFamily: S, fontWeight: 700, fontSize: 11, color: '#ff5555' }}>TOTAL VENCIDO</span>
+                    <span style={{ fontFamily: S, fontWeight: 800, color: '#ff5555', fontSize: 13 }}>{brl(vencV)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Caixa */}
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #1c2418', borderRadius: 14, overflow: 'hidden' }}>
+                <div style={{ background: '#0b1a07', padding: '13px 18px', borderBottom: '1px solid #1c2418' }}>
+                  <span style={{ fontFamily: S, fontWeight: 700, fontSize: 13, color: G }}>💰 Quadro de Caixa</span>
+                </div>
+                <div style={{ padding: '0 18px' }}>
+                  {quadroCaixa.map(row => (
+                    <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #151e11' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>{row.label}</span>
+                        <span style={{ background: 'rgba(255,255,255,0.07)', borderRadius: 20, padding: '1px 7px', fontSize: 9, color: M }}>({row.count})</span>
+                      </div>
+                      <span style={{ fontFamily: S, fontWeight: 700, color: row.cor, fontSize: 12 }}>{brl(row.val)}</span>
+                    </div>
+                  ))}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '11px 0', borderBottom: '1px solid #151e11' }}>
+                    <span style={{ fontFamily: S, fontWeight: 700, fontSize: 11, color: G }}>TOTAL ENTRADAS</span>
+                    <span style={{ fontFamily: S, fontWeight: 800, color: G, fontSize: 13 }}>{brl(pagasV + recV)}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '11px 0' }}>
+                    <span style={{ fontFamily: S, fontWeight: 700, fontSize: 11, color: saldo >= 0 ? N : '#ff5555' }}>SALDO DO PERÍODO</span>
+                    <span style={{ fontFamily: S, fontWeight: 800, color: saldo >= 0 ? N : '#ff5555', fontSize: 13 }}>{brl(saldo)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
         </div>
-      </div>
+      </main>
 
-      {/* LINK MATRICULA */}
-      {isAdmin && (
-        <div style={{ padding: '0 20px 24px' }}>
-          <div style={{ background: cardBg, borderRadius: '16px', padding: '14px', border: cardBorder }}>
-            <p style={{ fontSize: '11px', color: muted, marginBottom: '8px' }}>Link de pre-matricula</p>
-            <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)', wordBreak: 'break-all', marginBottom: '10px' }}>{linkMatricula}</p>
-            <button onClick={copiarLink} style={{ width: '100%', background: copiado ? 'rgba(57,255,20,0.15)' : 'rgba(255,255,255,0.05)', border: '1px solid rgba(57,255,20,0.3)', borderRadius: '10px', padding: '10px', color: neon, fontFamily: syne, fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>
-              {copiado ? 'Copiado!' : 'Copiar link de matricula'}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* NAV */}
-      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-around', padding: '12px 0 20px', borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(5,5,5,0.95)', backdropFilter: 'blur(10px)' }}>
-        {[
-          { href: '/dashboard', label: 'Inicio', active: true },
-          { href: '/atletas', label: 'Atletas', active: false },
-          { href: '/presenca', label: 'Presenca', active: false },
-        ].map(item => (
-          <a key={item.href} href={item.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', textDecoration: 'none' }}>
-            <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.5px', color: item.active ? neon : muted, fontFamily: syne, fontWeight: item.active ? 700 : 400 }}>{item.label}</span>
-            {item.active && <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: neon, boxShadow: '0 0 4px #39FF14' }}></div>}
-          </a>
-        ))}
-        {isAdmin && (
-          <a href="/financeiro" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', textDecoration: 'none' }}>
-            <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.5px', color: muted, fontFamily: syne }}>Financeiro</span>
-          </a>
-        )}
-      </nav>
+      <style>{`
+        .sidebar { transition: left 0.28s; }
+        @media (max-width: 768px) {
+          .sidebar { left: -${SW}px !important; }
+          .sidebar.open { left: 0 !important; }
+          .gc-main { margin-left: 0 !important; }
+          .gc-mob-hdr { display: flex !important; }
+          .gc-stats { grid-template-columns: repeat(2, 1fr) !important; }
+          .gc-quadros { grid-template-columns: 1fr !important; }
+          .gc-pad { padding: 14px !important; }
+        }
+      `}</style>
     </div>
   )
 }
