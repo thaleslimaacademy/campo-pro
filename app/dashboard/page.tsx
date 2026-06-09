@@ -252,7 +252,25 @@ export default function Dashboard() {
               </div>
             </div>
           )}
-        </div>
+        {/* LINK PRÉ-MATRÍCULA */}
+          {isAdmin && (
+            <div style={{ marginTop: 20, background: 'rgba(212,175,55,0.07)', border: '1px solid rgba(212,175,55,0.3)', borderRadius: 14, padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+              <div>
+                <div style={{ fontFamily: S, fontWeight: 700, fontSize: 14, color: G, marginBottom: 4 }}>🔗 Link de Pré-Matrícula</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', wordBreak: 'break-all' }}>gestaofc.com.br/matricula</div>
+              </div>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button onClick={() => { navigator.clipboard.writeText('https://gestaofc.com.br/matricula'); alert('Link copiado!') }}
+                  style={{ background: G, color: '#1a1400', border: 'none', borderRadius: 10, padding: '10px 18px', fontFamily: S, fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+                  📋 Copiar link
+                </button>
+                <a href="https://gestaofc.com.br/matricula" target="_blank" rel="noreferrer"
+                  style={{ background: 'transparent', color: G, border: `1px solid ${G}`, borderRadius: 10, padding: '10px 18px', fontFamily: S, fontWeight: 700, fontSize: 12, textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
+                  👁️ Visualizar
+                </a>
+              </div>
+            </div>
+          )}</div>
       </main>
 
       <style>{`
