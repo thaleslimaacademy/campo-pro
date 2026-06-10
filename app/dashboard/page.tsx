@@ -94,15 +94,19 @@ export default function Dashboard() {
   const despV = desps.reduce((s, d) => s + Number(d.valor), 0)
   const saldo = pagasV + recV - despV
 
-  if (!isLoaded) return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#050505' }}><p style={{ color: M }}>Carregando...</p></div>
+  if (!isLoaded) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#050505' }}>
+      <p style={{ color: M }}>Carregando...</p>
+    </div>
+  )
 
   const statsCards = [
-    { label: 'Alunos ativos', val: loading ? '...' : totalAtletas, cor: N, bg: 'rgba(57,255,20,0.08)', bd: 'rgba(57,255,20,0.25)' },
-    { label: 'Inadimplentes', val: loading ? '...' : inadimplentes, cor: inadimplentes > 0 ? '#ff5555' : N, bg: inadimplentes > 0 ? 'rgba(255,50,50,0.08)' : 'rgba(255,255,255,0.03)', bd: inadimplentes > 0 ? 'rgba(255,50,50,0.3)' : 'rgba(255,255,255,0.08)' },
-    { label: 'Pré-matrículas', val: loading ? '...' : pendentes, cor: '#ff9f43', bg: 'rgba(255,159,67,0.08)', bd: 'rgba(255,159,67,0.25)' },
-    { label: 'Ré-matrículas', val: loading ? '...' : rematriculas, cor: '#54a0ff', bg: 'rgba(84,160,255,0.08)', bd: 'rgba(84,160,255,0.25)' },
-    { label: 'Presença hoje', val: loading ? '...' : presenca.total === 0 ? '-' : pct + '%', cor: pct >= 75 ? N : G, bg: 'rgba(255,255,255,0.03)', bd: 'rgba(255,255,255,0.08)' },
-    { label: 'Receita do mês', val: loading ? '...' : brl(pagasV), cor: G, bg: 'rgba(212,175,55,0.08)', bd: 'rgba(212,175,55,0.25)' },
+    { label: 'Alunos ativos', val: loading ? '...' : totalAtletas, cor: N, bg: 'rgba(57,255,20,0.08)', bd: 'rgba(57,255,20,0.25)', href: '/atletas' },
+    { label: 'Inadimplentes', val: loading ? '...' : inadimplentes, cor: inadimplentes > 0 ? '#ff5555' : N, bg: inadimplentes > 0 ? 'rgba(255,50,50,0.08)' : 'rgba(255,255,255,0.03)', bd: inadimplentes > 0 ? 'rgba(255,50,50,0.3)' : 'rgba(255,255,255,0.08)', href: '/financeiro/mensalidades' },
+    { label: 'Pré-matrículas', val: loading ? '...' : pendentes, cor: '#ff9f43', bg: 'rgba(255,159,67,0.08)', bd: 'rgba(255,159,67,0.25)', href: '/matriculas' },
+    { label: 'Ré-matrículas', val: loading ? '...' : rematriculas, cor: '#54a0ff', bg: 'rgba(84,160,255,0.08)', bd: 'rgba(84,160,255,0.25)', href: '/matriculas' },
+    { label: 'Presença hoje', val: loading ? '...' : presenca.total === 0 ? '-' : pct + '%', cor: pct >= 75 ? N : G, bg: 'rgba(255,255,255,0.03)', bd: 'rgba(255,255,255,0.08)', href: '/presenca' },
+    { label: 'Receita do mês', val: loading ? '...' : brl(pagasV), cor: G, bg: 'rgba(212,175,55,0.08)', bd: 'rgba(212,175,55,0.25)', href: '/financeiro/caixa' },
   ]
 
   const quadroMens = [
@@ -175,13 +179,13 @@ export default function Dashboard() {
         {/* CONTENT */}
         <div className="gc-pad" style={{ padding: '22px 24px', flex: 1 }}>
 
-          {/* STAT CARDS */}
+          {/* STAT CARDS — agora clicáveis */}
           <div className="gc-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12, marginBottom: 22 }}>
             {statsCards.map(c => (
-              <div key={c.label} style={{ background: c.bg, border: `1px solid ${c.bd}`, borderRadius: 14, padding: '14px 12px' }}>
+              <a key={c.label} href={c.href} style={{ background: c.bg, border: `1px solid ${c.bd}`, borderRadius: 14, padding: '14px 12px', textDecoration: 'none', display: 'block', cursor: 'pointer' }}>
                 <div style={{ fontSize: 9, color: M, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>{c.label}</div>
                 <div style={{ fontFamily: S, fontSize: 22, fontWeight: 800, color: c.cor }}>{c.val}</div>
-              </div>
+              </a>
             ))}
           </div>
 
@@ -252,7 +256,8 @@ export default function Dashboard() {
               </div>
             </div>
           )}
-        {/* LINK PRÉ-MATRÍCULA */}
+
+          {/* LINK PRÉ-MATRÍCULA */}
           {isAdmin && (
             <div style={{ marginTop: 20, background: 'rgba(212,175,55,0.07)', border: '1px solid rgba(212,175,55,0.3)', borderRadius: 14, padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
               <div>
@@ -270,7 +275,8 @@ export default function Dashboard() {
                 </a>
               </div>
             </div>
-          )}</div>
+          )}
+        </div>
       </main>
 
       <style>{`
