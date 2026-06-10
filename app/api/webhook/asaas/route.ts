@@ -10,6 +10,14 @@ const STATUS_MAP: Record<string, string> = {
   PAYMENT_REFUNDED: 'CANCELADO',
 }
 
+const brl = (n: number) =>
+  n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+const dataBR = (s: string | null) => {
+  if (!s) return '-'
+  return s.slice(0, 10).split('-').reverse().join('/')
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
@@ -31,7 +39,7 @@ export async function POST(req: NextRequest) {
     // Baixa no Supabase
     const { error } = await supabaseAdmin
       .from('Cobranca')
-      .update({ status: novoStatus })
+      .update({ status: novoStatus, ...(novoStatus === 'PAGO' ? { pagoEm: new Date().toISOString() } : {}) })
       .eq('asaasId', pagamento.id)
 
     if (error) {
@@ -52,38 +60,59 @@ export async function POST(req: NextRequest) {
 
         if (cobranca?.atletaId) {
           const { data: atleta } = await supabaseAdmin
-            .from('Atleta').select('nome').eq('id', cobranca.atletaId).single()
+            .from('Atleta')
+            .select('nome')
+            .eq('id', cobranca.atletaId)
+            .single()
 
+          // ✅ FIX: filtra por principal: true para pegar o responsável correto
           const { data: responsavel } = await supabaseAdmin
-            .from('Responsavel').select('nome, whatsapp').eq('atletaId', cobranca.atletaId).single()
+            .from('Responsavel')
+            .select('nome, whatsapp')
+            .eq('atletaId', cobranca.atletaId)
+            .eq('principal', true)
+            .maybeSingle()
 
           if (responsavel?.whatsapp) {
-            const dataVenc = cobranca.vencimento
-              ? new Date(cobranca.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
-              : '-'
+            const primeiroNome = responsavel.nome?.split(' ')[0] || 'Responsável'
+            // ✅ FIX: dataBR usa slice(0,10) — sem concatenar horário duplicado
+            const dataVenc = dataBR(cobranca.vencimento)
+            const valorFmt = brl(Number(cobranca.valor))
 
-            const msg =
-              'Ola ' + (responsavel.nome?.split(' ')[0] || '') + '! Recibo de pagamento:\n\n' +
-              'Atleta: *' + (atleta?.nome || '-') + '*\n' +
-              'Descricao: ' + (cobranca.descricao || 'Mensalidade') + '\n' +
-              'Valor: R$ ' + Number(cobranca.valor).toFixed(2) + '\n' +
-              'Vencimento: ' + dataVenc + '\n' +
-              'Status: *PAGO* \n\n' +
-              'Obrigado pelo pagamento!\n' +
-              '_Thales Lima Football Academy_'
+            const msg = [
+              `🏆 *THALES LIMA FOOTBALL ACADEMY*`,
+              ``,
+              `Olá, *${primeiroNome}*! ✅`,
+              ``,
+              `━━━━━━━━━━━━━━━━━━━━`,
+              `      *RECIBO DE PAGAMENTO*`,
+              `━━━━━━━━━━━━━━━━━━━━`,
+              ``,
+              `👤 Atleta: *${atleta?.nome || '-'}*`,
+              `📋 Referente: ${cobranca.descricao || 'Mensalidade'}`,
+              `💰 Valor: *R$ ${valorFmt}*`,
+              `📅 Vencimento: ${dataVenc}`,
+              `✅ Status: *PAGO*`,
+              ``,
+              `━━━━━━━━━━━━━━━━━━━━`,
+              ``,
+              `Obrigado pelo pagamento! 🙏`,
+              `_Thales Lima Football Academy_`,
+              `_gestaofc.com.br_`,
+            ].join('\n')
 
             await enviarWhatsApp(responsavel.whatsapp, msg)
             console.log('Recibo WhatsApp enviado para:', responsavel.whatsapp)
           }
         }
-      } catch (wzErr: any) {
-        console.error('Erro WhatsApp pos-pagamento:', wzErr.message)
+      } catch (wzErr: unknown) {
+        console.error('Erro WhatsApp pos-pagamento:', (wzErr as Error).message)
       }
     }
 
     return NextResponse.json({ sucesso: true, status: novoStatus })
-  } catch (err: any) {
-    console.error('Erro webhook:', err.message)
-    return NextResponse.json({ error: err.message }, { status: 500 })
+  } catch (err: unknown) {
+    console.error('Erro webhook:', (err as Error).message)
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }

@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { Trash2, RotateCcw, Plus, Loader2 } from 'lucide-react'
+import { Trash2, RotateCcw, Plus, Loader2, FileText } from 'lucide-react'
 import {
   listarMensalidades, listarAtletas, gerarMensalidades,
   softDeleteCobranca, restaurarCobranca, excluirDefinitivo,
 } from './actions'
+import { gerarRecibo } from '@/lib/gerarRecibo'
 
 type Cobranca = {
   id: string; valor: number; status: string; competencia: string | null
@@ -57,6 +58,16 @@ export default function MensalidadesPage() {
   const apagar = async (id: string) => { if (!confirm('Apagar esta cobrança da lista? Vai pra lixeira e pode ser restaurada.')) return; await softDeleteCobranca(id); await carregar() }
   const restaurar = async (id: string) => { await restaurarCobranca(id); await carregar() }
   const definitivo = async (id: string) => { if (!confirm('Excluir DEFINITIVAMENTE? Nao da pra desfazer.')) return; await excluirDefinitivo(id); await carregar() }
+
+  const gerarReciboCobranca = (c: Cobranca) => {
+    gerarRecibo({
+      tipo: 'MENSALIDADE',
+      nome: c.atleta?.nome ?? '—',
+      valor: c.valor,
+      descricao: c.descricao ?? 'Mensalidade',
+      data: c.competencia ? c.competencia.slice(0, 10) : new Date().toISOString().slice(0, 10),
+    })
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #0a1a06, #050505, #111003)', color: '#fff', padding: 24 }}>
@@ -112,12 +123,25 @@ export default function MensalidadesPage() {
                       <td style={td}>{dataBR(c.vencimento)}</td>
                       <td style={td}><span style={{ color: corStatus(c.status), fontWeight: 600 }}>{excluida ? 'Excluída' : labelStatus(c.status)}</span></td>
                       <td style={{ ...td, textAlign: 'right' }}>
-                        {excluida ? (
-                          <span style={{ display: 'inline-flex', gap: 6 }}>
-                            <button onClick={() => restaurar(c.id)} style={iconBtn} title="Restaurar"><RotateCcw size={16} /></button>
-                            <button onClick={() => definitivo(c.id)} style={{ ...iconBtn, color: '#ff5470', borderColor: '#5a2230' }} title="Excluir definitivamente"><Trash2 size={16} /></button>
-                          </span>
-                        ) : <button onClick={() => apagar(c.id)} style={iconBtn} title="Apagar da lista"><Trash2 size={16} /></button>}
+                        <span style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
+                          {!excluida && c.status === 'PAGO' && (
+                            <button
+                              onClick={() => gerarReciboCobranca(c)}
+                              style={{ ...iconBtn, color: '#39FF14', borderColor: '#1a3a14' }}
+                              title="Gerar recibo PDF"
+                            >
+                              <FileText size={16} />
+                            </button>
+                          )}
+                          {excluida ? (
+                            <>
+                              <button onClick={() => restaurar(c.id)} style={iconBtn} title="Restaurar"><RotateCcw size={16} /></button>
+                              <button onClick={() => definitivo(c.id)} style={{ ...iconBtn, color: '#ff5470', borderColor: '#5a2230' }} title="Excluir definitivamente"><Trash2 size={16} /></button>
+                            </>
+                          ) : (
+                            <button onClick={() => apagar(c.id)} style={iconBtn} title="Apagar da lista"><Trash2 size={16} /></button>
+                          )}
+                        </span>
                       </td>
                     </tr>
                   )
