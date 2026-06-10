@@ -2,14 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { enviarWhatsApp } from '@/lib/whatsapp'
 
-function aplicarVariaveis(template: string, vars: Record<string, string>): string {
-  let msg = template
-  for (const [key, val] of Object.entries(vars)) {
-    msg = msg.replaceAll(key, val)
-  }
-  return msg
-}
-
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('authorization')
   const isVercelCron = req.headers.get('x-vercel-cron') === '1'
@@ -18,9 +10,7 @@ export async function GET(req: NextRequest) {
   }
 
   const { data: escolas } = await supabaseAdmin
-    .from('Escola')
-    .select('id, nome, msgInadimplente')
-    .eq('ativa', true)
+    .from('Escola').select('id, nome').eq('ativa', true)
 
   if (!escolas) return NextResponse.json({ sucesso: true, enviados: 0 })
 
@@ -36,32 +26,54 @@ export async function GET(req: NextRequest) {
     if (!cobrancas || cobrancas.length === 0) continue
 
     for (const cobranca of cobrancas) {
-      const { data: atleta } = await supabaseAdmin
-        .from('Atleta').select('nome').eq('id', cobranca.atletaId).single()
+      try {
+        const diasAtraso = Math.floor(
+          (Date.now() - new Date(cobranca.vencimento.slice(0, 10) + 'T12:00:00').getTime())
+          / (1000 * 60 * 60 * 24)
+        )
 
-      const { data: responsaveis } = await supabaseAdmin
-        .from('Responsavel').select('nome, whatsapp').eq('atletaId', cobranca.atletaId).limit(1)
+        // ✅ Só envia a cada 3 dias após vencimento (dia 3, 6, 9, 12...)
+        if (diasAtraso <= 0 || diasAtraso % 3 !== 0) continue
 
-      const responsavel = responsaveis?.[0]
-      if (!responsavel?.whatsapp || !atleta) continue
+        const { data: atleta } = await supabaseAdmin
+          .from('Atleta').select('nome').eq('id', cobranca.atletaId).single()
 
-      const dataVenc = new Date(cobranca.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
-      const diasAtraso = Math.floor((new Date().getTime() - new Date(cobranca.vencimento + 'T12:00:00').getTime()) / (1000 * 60 * 60 * 24))
+        // ✅ Filtra responsável principal
+        const { data: resps } = await supabaseAdmin
+          .from('Responsavel').select('nome, whatsapp')
+          .eq('atletaId', cobranca.atletaId).eq('principal', true).limit(1)
 
-      const template = escola.msgInadimplente || 'Ola {nome_responsavel}! A mensalidade de *{nome_atleta}* esta em atraso ha *{dias_atraso} dias*! Valor: R$ {valor}. Vencimento: {data_vencimento}. _{nome_escola}_'
+        const responsavel = resps?.[0]
+        if (!responsavel?.whatsapp || !atleta) continue
 
-      const mensagem = aplicarVariaveis(template, {
-        '{nome_responsavel}': responsavel.nome.split(' ')[0],
-        '{nome_atleta}': atleta.nome,
-        '{nome_escola}': escola.nome,
-        '{valor}': Number(cobranca.valor).toFixed(2),
-        '{data_vencimento}': dataVenc,
-        '{dias_atraso}': String(diasAtraso),
-      })
+        const dataVenc = cobranca.vencimento.slice(0, 10).split('-').reverse().join('/')
+        const nome = responsavel.nome.split(' ')[0]
+        const link = 'https://gestaofc.com.br/pagar/' + cobranca.id
 
-      await enviarWhatsApp(responsavel.whatsapp, mensagem)
-      totalEnviados++
-      await new Promise(r => setTimeout(r, 1000))
+        const msg = [
+          `🚨 *MENSALIDADE EM ATRASO — ${diasAtraso} DIAS*`,
+          ``,
+          `Olá, *${nome}*!`,
+          ``,
+          `A mensalidade de *${atleta.nome}* está em atraso há *${diasAtraso} dias*.`,
+          ``,
+          `💰 Valor: *R$ ${Number(cobranca.valor).toFixed(2)}*`,
+          `📅 Vencimento original: ${dataVenc}`,
+          ``,
+          `⚠️ O não pagamento pode resultar na *suspensão do aluno*.`,
+          ``,
+          `Regularize agora:`,
+          link,
+          ``,
+          `_Thales Lima Football Academy_`,
+        ].join('\n')
+
+        await enviarWhatsApp(responsavel.whatsapp, msg)
+        totalEnviados++
+        await new Promise(r => setTimeout(r, 600))
+      } catch (err) {
+        console.error('Erro inadimplente', cobranca.id, err)
+      }
     }
   }
 
