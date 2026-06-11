@@ -97,7 +97,9 @@ export async function criarCobrancaBoleto(dados: {
   const text = await res.text()
   console.log('📦 Asaas boleto raw:', text)
   return JSON.parse(text)
-}export async function criarCobrancaGenerica(dados: {
+}
+
+export async function criarCobrancaGenerica(dados: {
   customer: string
   billingType: string
   value?: number
