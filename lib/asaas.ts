@@ -97,4 +97,22 @@ export async function criarCobrancaBoleto(dados: {
   const text = await res.text()
   console.log('📦 Asaas boleto raw:', text)
   return JSON.parse(text)
+}export async function criarCobrancaGenerica(dados: {
+  customer: string
+  billingType: string
+  value?: number
+  dueDate: string
+  description: string
+  installmentCount?: number
+  installmentValue?: number
+}) {
+  const res = await fetch(`${getBaseUrl()}/payments`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'access_token': getApiKey() },
+    body: JSON.stringify(dados),
+    signal: AbortSignal.timeout(15000),
+  })
+  const text = await res.text()
+  console.log('📦 Asaas genérico raw:', text)
+  return JSON.parse(text)
 }
