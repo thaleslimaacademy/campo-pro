@@ -51,30 +51,30 @@ export default function BoletoPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #0a1a06, #050505, #111003)', color: '#fff', padding: 24, display: 'flex', justifyContent: 'center' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #0F0F1A, #0F0F1A, #111003)', color: '#fff', padding: 24, display: 'flex', justifyContent: 'center' }}>
       <div style={{ width: '100%', maxWidth: 560 }}>
-        <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 28, fontWeight: 800, color: '#39FF14', margin: '0 0 6px' }}>Gerar Boleto</h1>
+        <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 28, fontWeight: 800, color: '#FF6B00', margin: '0 0 6px' }}>Gerar Boleto</h1>
         <p style={{ color: '#9aa', fontSize: 13, margin: '0 0 28px' }}>Boleto bancário via Asaas</p>
 
         {estado === 'resultado' && resultado ? (
           <div style={card}>
             <div style={{ textAlign: 'center', marginBottom: 24 }}>
-              <CheckCircle size={48} color="#39FF14" />
-              <h2 style={{ fontFamily: 'Syne, sans-serif', color: '#39FF14', margin: '12px 0 4px' }}>Boleto gerado!</h2>
+              <CheckCircle size={48} color="#FF6B00" />
+              <h2 style={{ fontFamily: 'Syne, sans-serif', color: '#FF6B00', margin: '12px 0 4px' }}>Boleto gerado!</h2>
               <p style={{ color: '#9aa', fontSize: 13 }}>Vencimento: {vencimento.split('-').reverse().join('/')}</p>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <a href={resultado.bankSlipUrl} target="_blank" rel="noreferrer"
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#39FF14', color: '#04130a', borderRadius: 12, padding: '14px 20px', fontWeight: 700, fontFamily: 'Syne, sans-serif', textDecoration: 'none', fontSize: 15 }}>
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#FF6B00', color: '#04130a', borderRadius: 12, padding: '14px 20px', fontWeight: 700, fontFamily: 'Syne, sans-serif', textDecoration: 'none', fontSize: 15 }}>
                 <ExternalLink size={18} /> Abrir Boleto
               </a>
               <button onClick={copiar}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'transparent', border: '1px solid #D4AF37', color: '#D4AF37', borderRadius: 12, padding: '12px 20px', fontWeight: 600, cursor: 'pointer' }}>
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'transparent', border: '1px solid #FFD700', color: '#FFD700', borderRadius: 12, padding: '12px 20px', fontWeight: 600, cursor: 'pointer' }}>
                 {copiado ? <><CheckCircle size={16} /> Copiado!</> : <><Copy size={16} /> Copiar link</>}
               </button>
               <button
                 onClick={() => gerarRecibo({ tipo: 'MENSALIDADE', nome: atletaNome, valor: Number(valor), descricao, data: new Date().toISOString().slice(0, 10) })}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'transparent', border: '1px solid #2a3a22', color: '#cdd', borderRadius: 12, padding: '12px 20px', cursor: 'pointer' }}>
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'transparent', border: '1px solid #2A2A4A', color: '#cdd', borderRadius: 12, padding: '12px 20px', cursor: 'pointer' }}>
                 <FileText size={16} /> Gerar recibo PDF
               </button>
               <button onClick={() => { setEstado('form'); setResultado(null); setValor(''); setCpf('') }}
@@ -110,9 +110,9 @@ export default function BoletoPage() {
             <Campo label="Descrição">
               <input value={descricao} onChange={e => setDescricao(e.target.value)} style={inp} />
             </Campo>
-            {erro && <p style={{ color: '#ff5470', fontSize: 13, margin: '8px 0 0' }}>{erro}</p>}
+            {erro && <p style={{ color: '#FF4757', fontSize: 13, margin: '8px 0 0' }}>{erro}</p>}
             <button onClick={gerar} disabled={estado === 'loading'}
-              style={{ marginTop: 20, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#39FF14', color: '#04130a', border: 'none', borderRadius: 12, padding: '14px 20px', fontWeight: 700, fontFamily: 'Syne, sans-serif', fontSize: 15, cursor: 'pointer', opacity: estado === 'loading' ? 0.7 : 1 }}>
+              style={{ marginTop: 20, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#FF6B00', color: '#04130a', border: 'none', borderRadius: 12, padding: '14px 20px', fontWeight: 700, fontFamily: 'Syne, sans-serif', fontSize: 15, cursor: 'pointer', opacity: estado === 'loading' ? 0.7 : 1 }}>
               {estado === 'loading' ? <><Loader2 size={18} className="spin" /> Gerando…</> : 'Gerar Boleto'}
             </button>
             <p style={{ color: '#9aa', fontSize: 11, marginTop: 12, textAlign: 'center' }}>
@@ -130,5 +130,5 @@ function Campo({ label, children }: { label: string; children: React.ReactNode }
   return <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12, color: '#9aa', marginBottom: 12 }}>{label}{children}</label>
 }
 
-const card: React.CSSProperties = { background: 'rgba(255,255,255,0.03)', border: '1px solid #1c2418', borderRadius: 20, padding: 28 }
-const inp: React.CSSProperties = { background: '#0a0f08', border: '1px solid #2a3a22', borderRadius: 10, padding: '11px 14px', color: '#fff', fontSize: 14, width: '100%', boxSizing: 'border-box' }
+const card: React.CSSProperties = { background: 'rgba(255,255,255,0.03)', border: '1px solid #1A1A2E', borderRadius: 20, padding: 28 }
+const inp: React.CSSProperties = { background: '#0a0f08', border: '1px solid #2A2A4A', borderRadius: 10, padding: '11px 14px', color: '#fff', fontSize: 14, width: '100%', boxSizing: 'border-box' }

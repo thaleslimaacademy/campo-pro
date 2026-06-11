@@ -16,7 +16,7 @@ export default function Presenca() {
 
   const hoje = new Date().toLocaleDateString('pt-BR')
   const syne = 'Syne, sans-serif'
-  const neon = '#39FF14'
+  const neon = '#FF6B00'
   const muted = 'rgba(255,255,255,0.4)'
 
   useEffect(() => {
@@ -94,13 +94,13 @@ export default function Presenca() {
             </div>
             <div style={{ background: 'rgba(212,175,55,0.07)', border: '1px solid rgba(212,175,55,0.2)', borderRadius: '14px', padding: '12px' }}>
               <div style={{ fontSize: '9px', color: muted, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '4px' }}>Taxa</div>
-              <div style={{ fontFamily: syne, fontSize: '22px', fontWeight: 800, color: '#D4AF37' }}>{pct}%</div>
+              <div style={{ fontFamily: syne, fontSize: '22px', fontWeight: 800, color: '#FFD700' }}>{pct}%</div>
             </div>
           </div>
 
           {/* Barra de progresso */}
           <div style={{ height: '4px', background: 'rgba(255,255,255,0.08)', borderRadius: '4px', overflow: 'hidden', marginBottom: '4px' }}>
-            <div style={{ height: '100%', background: 'linear-gradient(90deg,#39FF14,#00cc00)', width: pct + '%', borderRadius: '4px', transition: 'width 0.5s ease' }}></div>
+            <div style={{ height: '100%', background: 'linear-gradient(90deg,#FF6B00,#00cc00)', width: pct + '%', borderRadius: '4px', transition: 'width 0.5s ease' }}></div>
           </div>
           <div style={{ fontSize: '10px', color: muted }}>{presentes} de {atletas.length} atletas marcados</div>
         </div>
@@ -147,7 +147,7 @@ export default function Presenca() {
                   disabled={!!carregando}
                   style={{
                     width: '38px', height: '38px', borderRadius: '10px', border: 'none', cursor: 'pointer',
-                    background: status === 'PRESENTE' ? 'linear-gradient(135deg,#39FF14,#00cc00)' : 'rgba(255,255,255,0.07)',
+                    background: status === 'PRESENTE' ? 'linear-gradient(135deg,#FF6B00,#00cc00)' : 'rgba(255,255,255,0.07)',
                     color: status === 'PRESENTE' ? '#000' : muted,
                     fontWeight: 800, fontSize: '16px', fontFamily: syne,
                     boxShadow: status === 'PRESENTE' ? '0 0 10px rgba(57,255,20,0.4)' : 'none',
@@ -182,7 +182,7 @@ export default function Presenca() {
         ].map(item => (
           <a key={item.href} href={item.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', textDecoration: 'none' }}>
             <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.5px', color: item.active ? neon : muted, fontFamily: syne, fontWeight: item.active ? 700 : 400 }}>{item.label}</span>
-            {item.active && <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: neon, boxShadow: '0 0 4px #39FF14' }}></div>}
+            {item.active && <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: neon, boxShadow: '0 0 4px #FF6B00' }}></div>}
           </a>
         ))}
       </nav>

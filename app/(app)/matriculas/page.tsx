@@ -201,7 +201,7 @@ function MatriculasInner() {
         </div>
 
         <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Dados do Atleta</p>
+          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Dados do Atleta</p>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>Nome</span>
@@ -231,7 +231,7 @@ function MatriculasInner() {
         </div>
 
         <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Endereco</p>
+          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Endereco</p>
           <p className="text-sm text-white">
             {selecionada.endereco}{selecionada.numero ? `, ${selecionada.numero}` : ''} — {selecionada.bairro}
           </p>
@@ -239,7 +239,7 @@ function MatriculasInner() {
         </div>
 
         <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Responsavel</p>
+          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Responsavel</p>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>Nome</span>
@@ -247,7 +247,7 @@ function MatriculasInner() {
             </div>
             <div className="flex justify-between">
               <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>WhatsApp</span>
-              <a href={`https://wa.me/55${selecionada.whatsappResponsavel.replace(/\D/g, '')}`} target="_blank" style={{ color: "#39FF14" }}>
+              <a href={`https://wa.me/55${selecionada.whatsappResponsavel.replace(/\D/g, '')}`} target="_blank" style={{ color: "#FF6B00" }}>
                 {selecionada.whatsappResponsavel}
               </a>
             </div>
@@ -261,7 +261,7 @@ function MatriculasInner() {
         </div>
 
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-6">
-          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Assinatura Digital</p>
+          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Assinatura Digital</p>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>Assinado por</span>
@@ -273,7 +273,7 @@ function MatriculasInner() {
             </div>
             <div className="flex justify-between">
               <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>Contrato aceito</span>
-              <span style={{ color: "#39FF14", fontSize: "12px" }}>Sim</span>
+              <span style={{ color: "#FF6B00", fontSize: "12px" }}>Sim</span>
             </div>
           </div>
         </div>
@@ -283,7 +283,7 @@ function MatriculasInner() {
             <button
               onClick={() => aprovar(selecionada)}
               disabled={processando}
-              style={{ width: "100%", background: "linear-gradient(135deg,#39FF14,#00cc00)", color: "#000", padding: "16px", borderRadius: "14px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", border: "none", cursor: "pointer", boxShadow: "0 0 16px rgba(57,255,20,0.3)", marginBottom: "10px" }}
+              style={{ width: "100%", background: "linear-gradient(135deg,#FF6B00,#00cc00)", color: "#000", padding: "16px", borderRadius: "14px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", border: "none", cursor: "pointer", boxShadow: "0 0 16px rgba(57,255,20,0.3)", marginBottom: "10px" }}
             >
               {processando ? 'Processando...' : '✅ Aprovar e notificar WhatsApp'}
             </button>
@@ -299,12 +299,12 @@ function MatriculasInner() {
 
         {selecionada.status === 'APROVADO' && (
           <div style={{ background: "rgba(57,255,20,0.07)", border: "1px solid rgba(57,255,20,0.2)", borderRadius: "16px", padding: "16px", textAlign: "center", marginBottom: "12px" }}>
-            <p style={{ color: "#39FF14", fontFamily: "Syne, sans-serif", fontWeight: 700, margin: "0 0 4px" }}>Matricula aprovada</p>
+            <p style={{ color: "#FF6B00", fontFamily: "Syne, sans-serif", fontWeight: 700, margin: "0 0 4px" }}>Matricula aprovada</p>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px", margin: "0 0 14px" }}>Atleta ja esta na lista</p>
             <button
               onClick={() => gerarCobrancaAtleta(selecionada.atletaId || '', selecionada.nomeAtleta)}
               disabled={gerandoCobranca || !selecionada.atletaId}
-              style={{ width: "100%", background: "linear-gradient(135deg,#D4AF37,#b8960c)", color: "#000", padding: "14px", borderRadius: "12px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "13px", border: "none", cursor: "pointer", opacity: gerandoCobranca ? 0.6 : 1 }}
+              style={{ width: "100%", background: "linear-gradient(135deg,#FFD700,#b8960c)", color: "#000", padding: "14px", borderRadius: "12px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "13px", border: "none", cursor: "pointer", opacity: gerandoCobranca ? 0.6 : 1 }}
             >
               {gerandoCobranca ? 'Gerando...' : 'Gerar Cobranca Pix'}
             </button>
@@ -326,7 +326,7 @@ function MatriculasInner() {
         <a href="/dashboard" style={{ color: "rgba(255,255,255,0.4)", textDecoration: "none", fontSize: "13px" }}>Voltar</a>
         <h1 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "22px", color: "#F0F0F0" }}>Pre-matriculas</h1>
         {pendentes > 0 && (
-          <span style={{ background: "#D4AF37", color: "#000", fontSize: "10px", fontWeight: 800, padding: "2px 8px", borderRadius: "20px", fontFamily: "Syne, sans-serif" }}>{pendentes}</span>
+          <span style={{ background: "#FFD700", color: "#000", fontSize: "10px", fontWeight: 800, padding: "2px 8px", borderRadius: "20px", fontFamily: "Syne, sans-serif" }}>{pendentes}</span>
         )}
       </div>
 

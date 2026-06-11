@@ -30,9 +30,9 @@ export default function ConvocacaoDetalhes() {
   const [loading, setLoading] = useState(true)
 
   const syne = 'Syne, sans-serif'
-  const neon = '#39FF14'
-  const gold = '#D4AF37'
-  const bg = 'linear-gradient(160deg,#0a1a06,#050505,#111003)'
+  const neon = '#FF6B00'
+  const gold = '#FFD700'
+  const bg = 'linear-gradient(160deg,#0F0F1A,#0F0F1A,#111003)'
   const cardBg = 'rgba(255,255,255,0.03)'
   const cardBorder = '1px solid rgba(255,255,255,0.07)'
 

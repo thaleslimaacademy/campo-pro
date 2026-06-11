@@ -35,9 +35,9 @@ export default function Carteirinha() {
   const numero = id.slice(0, 8).toUpperCase()
 
   const syne = 'Syne, sans-serif'
-  const neon = '#39FF14'
-  const gold = '#D4AF37'
-  const bg = 'linear-gradient(160deg,#0a1a06,#050505,#111003)'
+  const neon = '#FF6B00'
+  const gold = '#FFD700'
+  const bg = 'linear-gradient(160deg,#0F0F1A,#0F0F1A,#111003)'
 
   useEffect(() => {
     async function carregar() {
@@ -146,7 +146,7 @@ export default function Carteirinha() {
             </div>
             <div style={{ background: 'rgba(57,255,20,0.12)', border: '0.5px solid rgba(57,255,20,0.3)', borderRadius: '4px', padding: '2px 5px', textAlign: 'center' }}>
               <p style={{ color: 'rgba(57,255,20,0.7)', fontSize: '4px', margin: 0 }}>Nº</p>
-              <p style={{ color: '#39FF14', fontSize: '6px', fontWeight: 'bold', margin: 0 }}>{numero}</p>
+              <p style={{ color: '#FF6B00', fontSize: '6px', fontWeight: 'bold', margin: 0 }}>{numero}</p>
             </div>
           </div>
 
@@ -162,7 +162,7 @@ export default function Carteirinha() {
                   style={{ width: '18mm', height: '22mm', objectFit: 'cover', borderRadius: '4px', border: '1.5px solid rgba(57,255,20,0.5)' }}
                 />
               ) : (
-                <div style={{ width: '18mm', height: '22mm', background: 'rgba(57,255,20,0.08)', borderRadius: '4px', border: '1.5px solid rgba(57,255,20,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#39FF14', fontSize: '14px', fontWeight: 'bold' }}>
+                <div style={{ width: '18mm', height: '22mm', background: 'rgba(57,255,20,0.08)', borderRadius: '4px', border: '1.5px solid rgba(57,255,20,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FF6B00', fontSize: '14px', fontWeight: 'bold' }}>
                   {atleta.nome[0]}
                 </div>
               )}
@@ -171,7 +171,7 @@ export default function Carteirinha() {
             {/* Dados */}
             <div style={{ flex: 1 }}>
               <p style={{ color: '#ffffff', fontSize: '8px', fontWeight: 'bold', margin: '0 0 1mm', lineHeight: 1.2 }}>{atleta.nome}</p>
-              <p style={{ color: '#39FF14', fontSize: '6px', fontWeight: 'bold', margin: '0 0 2mm' }}>{atleta.posicao || 'Atleta'}</p>
+              <p style={{ color: '#FF6B00', fontSize: '6px', fontWeight: 'bold', margin: '0 0 2mm' }}>{atleta.posicao || 'Atleta'}</p>
               {nascimento && (
                 <div style={{ marginBottom: '1mm' }}>
                   <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '5px', margin: 0 }}>NASCIMENTO</p>
@@ -187,7 +187,7 @@ export default function Carteirinha() {
               {turma && (
                 <div>
                   <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '5px', margin: 0 }}>TURMA</p>
-                  <p style={{ color: '#D4AF37', fontSize: '6px', fontWeight: 'bold', margin: 0 }}>{turma.nome}</p>
+                  <p style={{ color: '#FFD700', fontSize: '6px', fontWeight: 'bold', margin: 0 }}>{turma.nome}</p>
                 </div>
               )}
             </div>
@@ -206,7 +206,7 @@ export default function Carteirinha() {
             <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '4px', margin: 0 }}>
               Iturama - MG | gestaofc.com.br
             </p>
-            <p style={{ color: '#39FF14', fontSize: '5px', fontWeight: 'bold', margin: 0, letterSpacing: '0.5px' }}>
+            <p style={{ color: '#FF6B00', fontSize: '5px', fontWeight: 'bold', margin: 0, letterSpacing: '0.5px' }}>
               ATLETA OFICIAL
             </p>
           </div>
@@ -217,7 +217,7 @@ export default function Carteirinha() {
       <div style={{ display: 'flex', justifyContent: 'center', padding: '0 20px', marginBottom: '16px' }}>
         <button
           onClick={imprimir}
-          style={{ background: 'linear-gradient(135deg,#39FF14,#2bcc0f)', color: '#050505', padding: '14px 36px', borderRadius: '14px', fontSize: '15px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', boxShadow: '0 0 24px rgba(57,255,20,0.3)' }}
+          style={{ background: 'linear-gradient(135deg,#FF6B00,#2bcc0f)', color: '#0F0F1A', padding: '14px 36px', borderRadius: '14px', fontSize: '15px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', boxShadow: '0 0 24px rgba(57,255,20,0.3)' }}
         >
           🖨️ Imprimir Carteirinha
         </button>

@@ -65,21 +65,21 @@ export default function CaixaPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #0a1a06, #050505, #111003)', color: '#fff', padding: 24 }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #0F0F1A, #0F0F1A, #111003)', color: '#fff', padding: 24 }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 24 }}>
-          <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 28, fontWeight: 800, color: '#39FF14', margin: 0 }}>Caixa</h1>
+          <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 28, fontWeight: 800, color: '#FF6B00', margin: 0 }}>Caixa</h1>
           <input type="month" value={mes} onChange={e => setMes(e.target.value)}
-            style={{ background: '#0a0f08', border: '1px solid #2a3a22', borderRadius: 10, padding: '8px 14px', color: '#fff', fontSize: 14 }} />
+            style={{ background: '#0a0f08', border: '1px solid #2A2A4A', borderRadius: 10, padding: '8px 14px', color: '#fff', fontSize: 14 }} />
           {carregando && <span style={{ color: '#9aa', fontSize: 13 }}>Carregando…</span>}
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 28 }}>
-          <Tile icon={<DollarSign size={20} />} label="Mensalidades pagas" valor={totalMensal} cor="#39FF14" />
-          <Tile icon={<TrendingUp size={20} />} label="Outras receitas" valor={totalRec} cor="#39FF14" />
-          <Tile icon={<TrendingDown size={20} />} label="Despesas" valor={totalDesp} cor="#ff5470" />
-          <Tile icon={<Wallet size={20} />} label="Saldo do mês" valor={saldo} cor={saldo >= 0 ? '#39FF14' : '#ff5470'} destaque />
+          <Tile icon={<DollarSign size={20} />} label="Mensalidades pagas" valor={totalMensal} cor="#FF6B00" />
+          <Tile icon={<TrendingUp size={20} />} label="Outras receitas" valor={totalRec} cor="#FF6B00" />
+          <Tile icon={<TrendingDown size={20} />} label="Despesas" valor={totalDesp} cor="#FF4757" />
+          <Tile icon={<Wallet size={20} />} label="Saldo do mês" valor={saldo} cor={saldo >= 0 ? '#FF6B00' : '#FF4757'} destaque />
         </div>
 
         <div style={section}>
@@ -101,11 +101,11 @@ export default function CaixaPage() {
           {mensalidades.length > 0 && (
             <div style={{ marginBottom: 12 }}>
               <p style={{ color: '#9aa', fontSize: 12, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 }}>Mensalidades pagas</p>
-              {mensalidades.map(i => <Row key={i.id} label={i.nome ?? '—'} sub={i.descricao ?? ''} valor={i.valor} cor="#39FF14" />)}
+              {mensalidades.map(i => <Row key={i.id} label={i.nome ?? '—'} sub={i.descricao ?? ''} valor={i.valor} cor="#FF6B00" />)}
             </div>
           )}
           {receitas.length > 0 ? receitas.map(i => (
-            <Row key={i.id} label={catLabel(i.categoria ?? 'OUTRA')} sub={i.descricao ?? ''} data={dataLabel(i.data ?? '')} valor={i.valor} cor="#39FF14"
+            <Row key={i.id} label={catLabel(i.categoria ?? 'OUTRA')} sub={i.descricao ?? ''} data={dataLabel(i.data ?? '')} valor={i.valor} cor="#FF6B00"
               onDelete={async () => { await excluirReceita(i.id); await carregar() }} />
           )) : mensalidades.length === 0 && <p style={{ color: '#9aa', fontSize: 13 }}>Nenhuma entrada em {mes}.</p>}
         </div>
@@ -113,7 +113,7 @@ export default function CaixaPage() {
         <div style={section}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <h2 style={secTitle}>Saídas (Despesas)</h2>
-            <button onClick={() => setShowDesp(v => !v)} style={{ ...btnAdd, background: 'rgba(255,84,112,0.1)', borderColor: '#ff5470', color: '#ff5470' }}><Plus size={14} /> Nova despesa</button>
+            <button onClick={() => setShowDesp(v => !v)} style={{ ...btnAdd, background: 'rgba(255,84,112,0.1)', borderColor: '#FF4757', color: '#FF4757' }}><Plus size={14} /> Nova despesa</button>
           </div>
           {showDesp && (
             <div style={formBox}>
@@ -123,11 +123,11 @@ export default function CaixaPage() {
                 <Campo label="Descrição"><input type="text" value={dDesc} onChange={e => setDDesc(e.target.value)} placeholder="Ex: pagamento professor" style={inp} /></Campo>
                 <Campo label="Data"><input type="date" value={dData} onChange={e => setDData(e.target.value)} style={inp} /></Campo>
               </div>
-              <button onClick={addDespesa} disabled={salvando} style={{ ...btnSave, background: '#ff5470', color: '#fff' }}>Salvar despesa</button>
+              <button onClick={addDespesa} disabled={salvando} style={{ ...btnSave, background: '#FF4757', color: '#fff' }}>Salvar despesa</button>
             </div>
           )}
           {despesas.length > 0 ? despesas.map(i => (
-            <Row key={i.id} label={catLabel(i.categoria ?? 'OUTRA')} sub={i.descricao ?? ''} data={dataLabel(i.data ?? '')} valor={i.valor} cor="#ff5470"
+            <Row key={i.id} label={catLabel(i.categoria ?? 'OUTRA')} sub={i.descricao ?? ''} data={dataLabel(i.data ?? '')} valor={i.valor} cor="#FF4757"
               onDelete={async () => { await excluirDespesa(i.id); await carregar() }} />
           )) : <p style={{ color: '#9aa', fontSize: 13 }}>Nenhuma despesa em {mes}.</p>}
         </div>
@@ -139,7 +139,7 @@ export default function CaixaPage() {
 
 function Tile({ icon, label, valor, cor, destaque }: { icon: React.ReactNode; label: string; valor: number; cor: string; destaque?: boolean }) {
   return (
-    <div style={{ background: destaque ? 'rgba(57,255,20,0.06)' : 'rgba(255,255,255,0.03)', border: `1px solid ${destaque ? cor : '#1c2418'}`, borderRadius: 16, padding: '18px 20px' }}>
+    <div style={{ background: destaque ? 'rgba(57,255,20,0.06)' : 'rgba(255,255,255,0.03)', border: `1px solid ${destaque ? cor : '#1A1A2E'}`, borderRadius: 16, padding: '18px 20px' }}>
       <div style={{ color: cor, marginBottom: 8 }}>{icon}</div>
       <p style={{ color: '#9aa', fontSize: 12, margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</p>
       <p style={{ color: cor, fontFamily: 'Syne, sans-serif', fontSize: 22, fontWeight: 800, margin: 0 }}>{brl(valor)}</p>
@@ -149,14 +149,14 @@ function Tile({ icon, label, valor, cor, destaque }: { icon: React.ReactNode; la
 
 function Row({ label, sub, data, valor, cor, onDelete }: { label: string; sub: string; data?: string; valor: number; cor: string; onDelete?: () => void }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: '1px solid #1c2418' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: '1px solid #1A1A2E' }}>
       <div style={{ flex: 1 }}>
         <span style={{ fontWeight: 600, fontSize: 14 }}>{label}</span>
         {sub && <span style={{ color: '#9aa', fontSize: 13, marginLeft: 8 }}>{sub}</span>}
         {data && <span style={{ color: '#9aa', fontSize: 12, marginLeft: 8 }}>{data}</span>}
       </div>
       <span style={{ color: cor, fontWeight: 700, fontSize: 14 }}>{brl(valor)}</span>
-      {onDelete && <button onClick={onDelete} style={{ background: 'transparent', border: '1px solid #2a3a22', borderRadius: 8, padding: 7, color: '#9aa', cursor: 'pointer', display: 'inline-flex' }}><Trash2 size={14} /></button>}
+      {onDelete && <button onClick={onDelete} style={{ background: 'transparent', border: '1px solid #2A2A4A', borderRadius: 8, padding: 7, color: '#9aa', cursor: 'pointer', display: 'inline-flex' }}><Trash2 size={14} /></button>}
     </div>
   )
 }
@@ -165,9 +165,9 @@ function Campo({ label, children }: { label: string; children: React.ReactNode }
   return <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12, color: '#9aa' }}>{label}{children}</label>
 }
 
-const section: React.CSSProperties = { background: 'rgba(255,255,255,0.03)', border: '1px solid #1c2418', borderRadius: 16, padding: 20, marginBottom: 20 }
-const secTitle: React.CSSProperties = { fontFamily: 'Syne, sans-serif', fontSize: 18, fontWeight: 700, color: '#D4AF37', margin: 0 }
-const btnAdd: React.CSSProperties = { display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(57,255,20,0.08)', border: '1px solid #39FF14', color: '#39FF14', borderRadius: 10, padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }
-const btnSave: React.CSSProperties = { marginTop: 12, background: '#39FF14', color: '#04130a', border: 'none', borderRadius: 10, padding: '10px 20px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Syne, sans-serif' }
-const formBox: React.CSSProperties = { background: 'rgba(0,0,0,0.3)', border: '1px solid #2a3a22', borderRadius: 12, padding: 16, marginBottom: 16 }
-const inp: React.CSSProperties = { background: '#0a0f08', border: '1px solid #2a3a22', borderRadius: 10, padding: '10px 12px', color: '#fff', fontSize: 14 }
+const section: React.CSSProperties = { background: 'rgba(255,255,255,0.03)', border: '1px solid #1A1A2E', borderRadius: 16, padding: 20, marginBottom: 20 }
+const secTitle: React.CSSProperties = { fontFamily: 'Syne, sans-serif', fontSize: 18, fontWeight: 700, color: '#FFD700', margin: 0 }
+const btnAdd: React.CSSProperties = { display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(57,255,20,0.08)', border: '1px solid #FF6B00', color: '#FF6B00', borderRadius: 10, padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }
+const btnSave: React.CSSProperties = { marginTop: 12, background: '#FF6B00', color: '#04130a', border: 'none', borderRadius: 10, padding: '10px 20px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Syne, sans-serif' }
+const formBox: React.CSSProperties = { background: 'rgba(0,0,0,0.3)', border: '1px solid #2A2A4A', borderRadius: 12, padding: 16, marginBottom: 16 }
+const inp: React.CSSProperties = { background: '#0a0f08', border: '1px solid #2A2A4A', borderRadius: 10, padding: '10px 12px', color: '#fff', fontSize: 14 }

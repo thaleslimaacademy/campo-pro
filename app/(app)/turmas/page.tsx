@@ -22,8 +22,8 @@ export default function Turmas() {
   const [form, setForm] = useState({ nome: '', descricao: '', diasSemana: '', horario: '' })
 
   const syne = 'Syne, sans-serif'
-  const neon = '#39FF14'
-  const gold = '#D4AF37'
+  const neon = '#FF6B00'
+  const gold = '#FFD700'
   const muted = 'rgba(255,255,255,0.4)'
   const card = 'rgba(255,255,255,0.05)'
   const border = '1px solid rgba(255,255,255,0.07)'
@@ -79,7 +79,7 @@ export default function Turmas() {
               </div>
             </div>
           </div>
-          <button onClick={() => setCriando(!criando)} style={{ background: 'linear-gradient(135deg,#39FF14,#00cc00)', color: '#000', padding: '10px 18px', borderRadius: '12px', fontSize: '12px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', boxShadow: '0 0 16px rgba(57,255,20,0.3)' }}>
+          <button onClick={() => setCriando(!criando)} style={{ background: 'linear-gradient(135deg,#FF6B00,#00cc00)', color: '#000', padding: '10px 18px', borderRadius: '12px', fontSize: '12px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', boxShadow: '0 0 16px rgba(57,255,20,0.3)' }}>
             + Nova
           </button>
         </div>
@@ -106,7 +106,7 @@ export default function Turmas() {
               <textarea name="descricao" value={form.descricao} onChange={handleChange} rows={2} style={{ ...inputStyle, resize: 'none' }} placeholder="Observacoes..." />
             </div>
             <div style={{ display: 'flex', gap: '8px' }}>
-              <button onClick={salvar} disabled={salvando || !form.nome} style={{ flex: 1, background: 'linear-gradient(135deg,#39FF14,#00cc00)', color: '#000', padding: '14px', borderRadius: '12px', fontWeight: 800, fontFamily: syne, fontSize: '13px', border: 'none', cursor: 'pointer', opacity: salvando || !form.nome ? 0.5 : 1 }}>
+              <button onClick={salvar} disabled={salvando || !form.nome} style={{ flex: 1, background: 'linear-gradient(135deg,#FF6B00,#00cc00)', color: '#000', padding: '14px', borderRadius: '12px', fontWeight: 800, fontFamily: syne, fontSize: '13px', border: 'none', cursor: 'pointer', opacity: salvando || !form.nome ? 0.5 : 1 }}>
                 {salvando ? 'Salvando...' : 'Salvar'}
               </button>
               <button onClick={() => setCriando(false)} style={{ flex: 1, background: 'rgba(255,255,255,0.05)', color: muted, padding: '14px', borderRadius: '12px', fontWeight: 700, fontFamily: syne, fontSize: '13px', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer' }}>

@@ -20,8 +20,8 @@ export default function Atletas() {
   const [busca, setBusca] = useState('')
 
   const syne = 'Syne, sans-serif'
-  const neon = '#39FF14'
-  const gold = '#D4AF37'
+  const neon = '#FF6B00'
+  const gold = '#FFD700'
   const muted = 'rgba(255,255,255,0.4)'
   const cardBg = 'rgba(255,255,255,0.05)'
   const cardBorder = '1px solid rgba(255,255,255,0.07)'
@@ -85,7 +85,7 @@ export default function Atletas() {
             </div>
           </div>
           <a href="/atletas/novo" style={{
-            background: 'linear-gradient(135deg,#39FF14,#00cc00)',
+            background: 'linear-gradient(135deg,#FF6B00,#00cc00)',
             color: '#000',
             padding: '10px 18px',
             borderRadius: '12px',
@@ -146,7 +146,7 @@ export default function Atletas() {
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>o</div>
           <p style={{ fontFamily: syne, fontSize: '18px', fontWeight: 700, color: '#F0F0F0', marginBottom: '8px' }}>Nenhum atleta</p>
           <p style={{ fontSize: '13px', color: muted, marginBottom: '24px' }}>Cadastre o primeiro atleta da sua escola</p>
-          <a href="/atletas/novo" style={{ background: 'linear-gradient(135deg,#39FF14,#00cc00)', color: '#000', padding: '12px 24px', borderRadius: '12px', fontSize: '13px', fontWeight: 800, fontFamily: syne, textDecoration: 'none' }}>
+          <a href="/atletas/novo" style={{ background: 'linear-gradient(135deg,#FF6B00,#00cc00)', color: '#000', padding: '12px 24px', borderRadius: '12px', fontSize: '13px', fontWeight: 800, fontFamily: syne, textDecoration: 'none' }}>
             Cadastrar atleta
           </a>
         </div>
@@ -222,7 +222,7 @@ export default function Atletas() {
         ].map(item => (
           <a key={item.href} href={item.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', textDecoration: 'none' }}>
             <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.5px', color: item.active ? neon : muted, fontFamily: syne, fontWeight: item.active ? 700 : 400 }}>{item.label}</span>
-            {item.active && <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: neon, boxShadow: '0 0 4px #39FF14' }}></div>}
+            {item.active && <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: neon, boxShadow: '0 0 4px #FF6B00' }}></div>}
           </a>
         ))}
       </nav>

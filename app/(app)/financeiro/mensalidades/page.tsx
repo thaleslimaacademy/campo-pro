@@ -24,7 +24,7 @@ const brl = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', c
 const competenciaLabel = (c: string | null) => { if (!c) return '—'; const [a, m] = c.slice(0, 7).split('-'); return `${MESES[Number(m) - 1]}/${a}` }
 const dataBR = (c: string | null) => (c ? c.slice(0, 10).split('-').reverse().join('/') : '—')
 const labelStatus = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()
-const corStatus = (s: string) => ({ PAGO: '#39FF14', PENDENTE: '#D4AF37', VENCIDO: '#ff5470', CANCELADO: '#888' } as Record<string, string>)[s] ?? '#888'
+const corStatus = (s: string) => ({ PAGO: '#FF6B00', PENDENTE: '#FFD700', VENCIDO: '#FF4757', CANCELADO: '#888' } as Record<string, string>)[s] ?? '#888'
 
 export default function MensalidadesPage() {
   const [filtro, setFiltro] = useState('todas')
@@ -70,9 +70,9 @@ export default function MensalidadesPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #0a1a06, #050505, #111003)', color: '#fff', padding: 24 }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #0F0F1A, #0F0F1A, #111003)', color: '#fff', padding: 24 }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 28, fontWeight: 800, color: '#39FF14', margin: 0 }}>Mensalidades</h1>
+        <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 28, fontWeight: 800, color: '#FF6B00', margin: 0 }}>Mensalidades</h1>
         <p style={{ color: '#9aa', fontFamily: 'Inter, sans-serif', marginTop: 4 }}>Controle mês a mês, lançamento em lote e organização por status</p>
 
         <div style={card}>
@@ -116,7 +116,7 @@ export default function MensalidadesPage() {
                 {lista.map(c => {
                   const excluida = !!c.excluidaEm
                   return (
-                    <tr key={c.id} style={{ borderTop: '1px solid #1c2418', opacity: excluida ? 0.5 : 1 }}>
+                    <tr key={c.id} style={{ borderTop: '1px solid #1A1A2E', opacity: excluida ? 0.5 : 1 }}>
                       <td style={td}>{competenciaLabel(c.competencia)}</td>
                       <td style={td}>{c.atleta?.nome ?? '—'}</td>
                       <td style={td}>{brl(c.valor)}</td>
@@ -127,7 +127,7 @@ export default function MensalidadesPage() {
                           {!excluida && c.status === 'PAGO' && (
                             <button
                               onClick={() => gerarReciboCobranca(c)}
-                              style={{ ...iconBtn, color: '#39FF14', borderColor: '#1a3a14' }}
+                              style={{ ...iconBtn, color: '#FF6B00', borderColor: '#1a3a14' }}
                               title="Gerar recibo PDF"
                             >
                               <FileText size={16} />
@@ -136,7 +136,7 @@ export default function MensalidadesPage() {
                           {excluida ? (
                             <>
                               <button onClick={() => restaurar(c.id)} style={iconBtn} title="Restaurar"><RotateCcw size={16} /></button>
-                              <button onClick={() => definitivo(c.id)} style={{ ...iconBtn, color: '#ff5470', borderColor: '#5a2230' }} title="Excluir definitivamente"><Trash2 size={16} /></button>
+                              <button onClick={() => definitivo(c.id)} style={{ ...iconBtn, color: '#FF4757', borderColor: '#5a2230' }} title="Excluir definitivamente"><Trash2 size={16} /></button>
                             </>
                           ) : (
                             <button onClick={() => apagar(c.id)} style={iconBtn} title="Apagar da lista"><Trash2 size={16} /></button>
@@ -160,17 +160,17 @@ function Campo({ label, children }: { label: string; children: React.ReactNode }
   return <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12, color: '#9aa' }}>{label}{children}</label>
 }
 
-const card: React.CSSProperties = { background: 'rgba(255,255,255,0.03)', border: '1px solid #1c2418', borderRadius: 16, padding: 20, marginTop: 20 }
-const cardTitle: React.CSSProperties = { fontFamily: 'Syne, sans-serif', fontSize: 18, fontWeight: 700, color: '#D4AF37', margin: '0 0 14px' }
-const input: React.CSSProperties = { background: '#0a0f08', border: '1px solid #2a3a22', borderRadius: 10, padding: '10px 12px', color: '#fff', fontSize: 14 }
+const card: React.CSSProperties = { background: 'rgba(255,255,255,0.03)', border: '1px solid #1A1A2E', borderRadius: 16, padding: 20, marginTop: 20 }
+const cardTitle: React.CSSProperties = { fontFamily: 'Syne, sans-serif', fontSize: 18, fontWeight: 700, color: '#FFD700', margin: '0 0 14px' }
+const input: React.CSSProperties = { background: '#0a0f08', border: '1px solid #2A2A4A', borderRadius: 10, padding: '10px 12px', color: '#fff', fontSize: 14 }
 const th: React.CSSProperties = { padding: '14px 16px', fontWeight: 600, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.5 }
 const td: React.CSSProperties = { padding: '14px 16px' }
-const btnPrimary: React.CSSProperties = { marginTop: 16, display: 'inline-flex', alignItems: 'center', gap: 8, background: '#39FF14', color: '#04130a', border: 'none', borderRadius: 10, padding: '12px 20px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Syne, sans-serif' }
-const iconBtn: React.CSSProperties = { background: 'transparent', border: '1px solid #2a3a22', borderRadius: 8, padding: 8, color: '#cdd', cursor: 'pointer', display: 'inline-flex' }
+const btnPrimary: React.CSSProperties = { marginTop: 16, display: 'inline-flex', alignItems: 'center', gap: 8, background: '#FF6B00', color: '#04130a', border: 'none', borderRadius: 10, padding: '12px 20px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Syne, sans-serif' }
+const iconBtn: React.CSSProperties = { background: 'transparent', border: '1px solid #2A2A4A', borderRadius: 8, padding: 8, color: '#cdd', cursor: 'pointer', display: 'inline-flex' }
 
 function chip(active: boolean): React.CSSProperties {
-  return { background: active ? '#D4AF37' : 'transparent', color: active ? '#1a1400' : '#D4AF37', border: '1px solid #D4AF37', borderRadius: 999, padding: '6px 14px', fontSize: 13, cursor: 'pointer', fontWeight: 600 }
+  return { background: active ? '#FFD700' : 'transparent', color: active ? '#1a1400' : '#FFD700', border: '1px solid #FFD700', borderRadius: 999, padding: '6px 14px', fontSize: 13, cursor: 'pointer', fontWeight: 600 }
 }
 function tab(active: boolean): React.CSSProperties {
-  return { background: active ? '#39FF14' : 'rgba(255,255,255,0.04)', color: active ? '#04130a' : '#cdd', border: `1px solid ${active ? '#39FF14' : '#2a3a22'}`, borderRadius: 10, padding: '8px 16px', fontSize: 13, cursor: 'pointer', fontWeight: 600 }
+  return { background: active ? '#FF6B00' : 'rgba(255,255,255,0.04)', color: active ? '#04130a' : '#cdd', border: `1px solid ${active ? '#FF6B00' : '#2A2A4A'}`, borderRadius: 10, padding: '8px 16px', fontSize: 13, cursor: 'pointer', fontWeight: 600 }
 }

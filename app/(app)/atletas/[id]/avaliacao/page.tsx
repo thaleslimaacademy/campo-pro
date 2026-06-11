@@ -52,7 +52,7 @@ function GraficoEvolucao({ avaliacoes }: { avaliacoes: any[] }) {
 
   return (
     <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginTop: "16px" }}>
-      <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Evolucao do Atleta</p>
+      <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Evolucao do Atleta</p>
       <div className="space-y-4">
         {dados[0]?.peso && (
           <div>
@@ -311,15 +311,15 @@ export default function AvaliacaoAtleta() {
           <h1 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "22px", color: "#F0F0F0" }}>Avaliacao</h1>
         </div>
         {notaGeral > 0 && (
-          <div style={{ width: "48px", height: "48px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "18px", background: notaGeral >= 7 ? "linear-gradient(135deg,#39FF14,#00cc00)" : notaGeral >= 5 ? "#D4AF37" : "#ff5555", color: notaGeral >= 5 ? "#000" : "#fff" }}>
+          <div style={{ width: "48px", height: "48px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "18px", background: notaGeral >= 7 ? "linear-gradient(135deg,#FF6B00,#00cc00)" : notaGeral >= 5 ? "#FFD700" : "#ff5555", color: notaGeral >= 5 ? "#000" : "#fff" }}>
             {notaGeral}
           </div>
         )}
       </div>
 
       <div className="flex gap-2 mb-4">
-        <button onClick={() => setAba('form')} style={{ flex: 1, padding: "10px", borderRadius: "12px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer", border: "none", background: aba === "form" ? "#39FF14" : "rgba(255,255,255,0.05)", color: aba === "form" ? "#000" : "rgba(255,255,255,0.4)" }}>Nova Avaliacao</button>
-        <button onClick={() => setAba('historico')} style={{ flex: 1, padding: "10px", borderRadius: "12px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer", border: "none", background: aba === "historico" ? "#39FF14" : "rgba(255,255,255,0.05)", color: aba === "historico" ? "#000" : "rgba(255,255,255,0.4)" }}>
+        <button onClick={() => setAba('form')} style={{ flex: 1, padding: "10px", borderRadius: "12px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer", border: "none", background: aba === "form" ? "#FF6B00" : "rgba(255,255,255,0.05)", color: aba === "form" ? "#000" : "rgba(255,255,255,0.4)" }}>Nova Avaliacao</button>
+        <button onClick={() => setAba('historico')} style={{ flex: 1, padding: "10px", borderRadius: "12px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer", border: "none", background: aba === "historico" ? "#FF6B00" : "rgba(255,255,255,0.05)", color: aba === "historico" ? "#000" : "rgba(255,255,255,0.4)" }}>
           Historico {avaliacoes.length > 0 ? '(' + avaliacoes.length + ')' : ''}
         </button>
       </div>
@@ -366,18 +366,18 @@ export default function AvaliacaoAtleta() {
       {aba === 'form' && (
         <div>
           <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "14px", padding: "12px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "14px", color: "#39FF14" }}>{atletaNome}</p>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "14px", color: "#FF6B00" }}>{atletaNome}</p>
             <input name="dataAvaliacao" value={form.dataAvaliacao} onChange={handleChange} type="date" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "8px 12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px" }} />
           </div>
 
           {sucesso && (
             <div style={{ background: "rgba(57,255,20,0.08)", border: "1px solid rgba(57,255,20,0.25)", borderRadius: "12px", padding: "12px", textAlign: "center", marginBottom: "12px" }}>
-              <p style={{ color: "#39FF14", fontFamily: "Syne, sans-serif", fontWeight: 700, margin: 0 }}>Avaliacao salva!</p>
+              <p style={{ color: "#FF6B00", fontFamily: "Syne, sans-serif", fontWeight: 700, margin: 0 }}>Avaliacao salva!</p>
             </div>
           )}
 
           <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Dados Antropometricos</p>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Dados Antropometricos</p>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div><label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Peso (kg)</label><input name="peso" value={form.peso} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="70.5" /></div>
               <div><label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Altura (cm)</label><input name="altura" value={form.altura} onChange={handleChange} type="number" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="175" /></div>
@@ -391,7 +391,7 @@ export default function AvaliacaoAtleta() {
             </div>
             {gordura && (
               <div style={{ background: "rgba(57,255,20,0.06)", border: "1px solid rgba(57,255,20,0.2)", borderRadius: "14px", padding: "14px", marginTop: "14px" }}>
-                <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "10px", textTransform: "uppercase", letterSpacing: "1px" }}>Composicao Corporal (Faulkner)</p>
+                <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", marginBottom: "10px", textTransform: "uppercase", letterSpacing: "1px" }}>Composicao Corporal (Faulkner)</p>
                 <div className="space-y-2">
                   <div className="flex justify-between"><span className="text-sm text-gray-300">% Gordura</span><span className="font-bold">{gordura.percentual}% - {gordura.classificacao}</span></div>
                   {massaGorda && <div className="flex justify-between"><span className="text-sm text-gray-300">Massa Gorda</span><span className="font-bold text-red-400">{massaGorda} kg</span></div>}
@@ -402,7 +402,7 @@ export default function AvaliacaoAtleta() {
           </div>
 
           <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Testes Fisicos</p>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Testes Fisicos</p>
             <div className="grid grid-cols-2 gap-3">
               <div><label className="text-xs text-gray-400">Velocidade 40m (seg)</label><input name="velocidade40m" value={form.velocidade40m} onChange={handleChange} type="number" step="0.01" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="5.20" /></div>
               <div><label className="text-xs text-gray-400">Cooper (metros)</label><input name="cooper" value={form.cooper} onChange={handleChange} type="number" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="2800" /></div>
@@ -412,7 +412,7 @@ export default function AvaliacaoAtleta() {
           </div>
 
           <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Tecnica</p>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Tecnica</p>
             <NotaSelector label="Passe" name="notaPasse" value={form.notaPasse} onChange={handleNota} />
             <NotaSelector label="Chute" name="notaChute" value={form.notaChute} onChange={handleNota} />
             <NotaSelector label="Drible" name="notaDrible" value={form.notaDrible} onChange={handleNota} />
@@ -421,7 +421,7 @@ export default function AvaliacaoAtleta() {
           </div>
 
           <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Fisico</p>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Fisico</p>
             <NotaSelector label="Velocidade" name="notaVelocidade" value={form.notaVelocidade} onChange={handleNota} />
             <NotaSelector label="Resistencia" name="notaResistencia" value={form.notaResistencia} onChange={handleNota} />
             <NotaSelector label="Forca" name="notaForca" value={form.notaForca} onChange={handleNota} />
@@ -430,7 +430,7 @@ export default function AvaliacaoAtleta() {
           </div>
 
           <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Tatico</p>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Tatico</p>
             <NotaSelector label="Posicionamento" name="notaPosicionamento" value={form.notaPosicionamento} onChange={handleNota} />
             <NotaSelector label="Visao de jogo" name="notaVisaoJogo" value={form.notaVisaoJogo} onChange={handleNota} />
             <NotaSelector label="Marcacao" name="notaMarcacao" value={form.notaMarcacao} onChange={handleNota} />
@@ -439,7 +439,7 @@ export default function AvaliacaoAtleta() {
           </div>
 
           <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Anamnese</p>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Anamnese</p>
             {[{name:'historicoCirurgias',label:'Historico de cirurgias'},{name:'historicoLesoes',label:'Historico de lesoes'},{name:'medicamentosUso',label:'Medicamentos em uso'},{name:'doencasCronicas',label:'Doencas cronicas'},{name:'praticaOutroEsporte',label:'Pratica outro esporte?'},{name:'observacoes',label:'Observacoes gerais'}].map(f => (
               <div key={f.name} className="mb-3">
                 <label className="text-xs text-gray-400">{f.label}</label>
@@ -449,7 +449,7 @@ export default function AvaliacaoAtleta() {
           </div>
 
           <div className="flex gap-3">
-            <button onClick={salvar} disabled={salvando} style={{ flex: 1, background: "linear-gradient(135deg,#39FF14,#00cc00)", color: "#000", padding: "16px", borderRadius: "14px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", border: "none", cursor: "pointer", boxShadow: "0 0 16px rgba(57,255,20,0.3)" }}>
+            <button onClick={salvar} disabled={salvando} style={{ flex: 1, background: "linear-gradient(135deg,#FF6B00,#00cc00)", color: "#000", padding: "16px", borderRadius: "14px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", border: "none", cursor: "pointer", boxShadow: "0 0 16px rgba(57,255,20,0.3)" }}>
               {salvando ? 'Salvando...' : 'Salvar Avaliacao'}
             </button>
             <button onClick={() => gerarPDF()} disabled={gerando} style={{ background: "rgba(59,130,246,0.15)", border: "1px solid rgba(59,130,246,0.3)", color: "#60a5fa", padding: "16px 20px", borderRadius: "14px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", cursor: "pointer" }}>
@@ -461,7 +461,7 @@ export default function AvaliacaoAtleta() {
 
       <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
         <a href="/dashboard" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Inicio</a>
-        <a href="/atletas" style={{ textDecoration: "none", color: "#39FF14", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif", fontWeight: 700 }}>Atletas</a>
+        <a href="/atletas" style={{ textDecoration: "none", color: "#FF6B00", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif", fontWeight: 700 }}>Atletas</a>
         <a href="/presenca" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Presenca</a>
         <a href="/financeiro" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Financeiro</a>
       </nav>

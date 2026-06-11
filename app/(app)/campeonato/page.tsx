@@ -122,7 +122,7 @@ export default function Campeonatos() {
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          style={{ background: "linear-gradient(135deg,#39FF14,#00cc00)", color: "#000", padding: "10px 18px", borderRadius: "12px", fontSize: "12px", fontWeight: 800, fontFamily: "Syne, sans-serif", border: "none", cursor: "pointer" }}
+          style={{ background: "linear-gradient(135deg,#FF6B00,#00cc00)", color: "#000", padding: "10px 18px", borderRadius: "12px", fontSize: "12px", fontWeight: 800, fontFamily: "Syne, sans-serif", border: "none", cursor: "pointer" }}
         >
           {showForm ? 'Fechar' : '+ Novo'}
         </button>
@@ -130,13 +130,13 @@ export default function Campeonatos() {
 
       {sucesso && (
         <div style={{ background: "rgba(57,255,20,0.1)", border: "1px solid rgba(57,255,20,0.3)", borderRadius: "12px", padding: "12px", textAlign: "center", marginBottom: "16px" }}>
-          <p style={{ color: "#39FF14", fontFamily: "Syne, sans-serif", fontWeight: 700, margin: 0 }}>Campeonato criado!</p>
+          <p style={{ color: "#FF6B00", fontFamily: "Syne, sans-serif", fontWeight: 700, margin: 0 }}>Campeonato criado!</p>
         </div>
       )}
 
       {showForm && (
         <div style={{ background: "rgba(212,175,55,0.04)", border: "1px solid rgba(212,175,55,0.15)", borderRadius: "16px", padding: "16px", marginBottom: "20px" }}>
-          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", color: "#D4AF37", marginBottom: "16px" }}>Novo Campeonato</p>
+          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", color: "#FFD700", marginBottom: "16px" }}>Novo Campeonato</p>
           <div className="space-y-3">
             <div>
               <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Nome *</label>
@@ -164,7 +164,7 @@ export default function Campeonatos() {
               <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Descricao</label>
               <textarea name="descricao" value={form.descricao} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} rows={2} placeholder="Detalhes do campeonato..." />
             </div>
-            <button onClick={salvar} disabled={salvando} style={{ width: "100%", background: "linear-gradient(135deg,#39FF14,#00cc00)", color: "#000", padding: "14px", borderRadius: "12px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "13px", border: "none", cursor: "pointer" }}>
+            <button onClick={salvar} disabled={salvando} style={{ width: "100%", background: "linear-gradient(135deg,#FF6B00,#00cc00)", color: "#000", padding: "14px", borderRadius: "12px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "13px", border: "none", cursor: "pointer" }}>
               {salvando ? 'Salvando...' : 'Criar Campeonato'}
             </button>
           </div>
@@ -197,7 +197,7 @@ export default function Campeonatos() {
               )}
               {c.descricao && <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginBottom: "10px" }}>{c.descricao}</p>}
               <div className="flex gap-2">
-                <a href={"/campeonato/" + c.id} style={{ flex: 1, background: "rgba(212,175,55,0.1)", border: "1px solid rgba(212,175,55,0.25)", color: "#D4AF37", textAlign: "center", padding: "10px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", textDecoration: "none" }}>
+                <a href={"/campeonato/" + c.id} style={{ flex: 1, background: "rgba(212,175,55,0.1)", border: "1px solid rgba(212,175,55,0.25)", color: "#FFD700", textAlign: "center", padding: "10px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", textDecoration: "none" }}>
                   Gerenciar
                 </a>
                 <button onClick={() => excluir(c.id)} style={{ background: "rgba(255,70,70,0.08)", color: "#ff5555", padding: "10px 12px", borderRadius: "10px", fontSize: "12px", border: "none", cursor: "pointer" }}>

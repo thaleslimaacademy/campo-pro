@@ -38,8 +38,8 @@ export default function TurmaDetalhes() {
 
   // ── Tokens visuais ──
   const syne = 'Syne, sans-serif'
-  const neon = '#39FF14'
-  const gold = '#D4AF37'
+  const neon = '#FF6B00'
+  const gold = '#FFD700'
   const cardBg = 'rgba(255,255,255,0.03)'
   const cardBorder = '1px solid rgba(255,255,255,0.07)'
 
@@ -105,13 +105,13 @@ export default function TurmaDetalhes() {
   }
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0a1a06,#050505,#111003)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0F0F1A,#0F0F1A,#111003)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <p style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter,sans-serif' }}>Carregando...</p>
     </div>
   )
 
   if (!turma) return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0a1a06,#050505,#111003)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0F0F1A,#0F0F1A,#111003)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <p style={{ color: 'rgba(255,255,255,0.4)' }}>Turma não encontrada.</p>
     </div>
   )
@@ -119,7 +119,7 @@ export default function TurmaDetalhes() {
   const linkMensagem = '/mensagens/nova?turmaId=' + id + '&turmaNome=' + encodeURIComponent(turma.nome)
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0a1a06,#050505,#111003)', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', paddingBottom: '96px' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0F0F1A,#0F0F1A,#111003)', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', paddingBottom: '96px' }}>
 
       {/* ── HEADER ── */}
       <div style={{ padding: '20px 20px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
@@ -173,7 +173,7 @@ export default function TurmaDetalhes() {
                 </div>
               ))}
               <div style={{ display: 'flex', gap: '8px' }}>
-                <button onClick={salvarEdicao} style={{ flex: 1, background: 'linear-gradient(135deg,#39FF14,#2bcc0f)', color: '#050505', padding: '11px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer' }}>Salvar</button>
+                <button onClick={salvarEdicao} style={{ flex: 1, background: 'linear-gradient(135deg,#FF6B00,#2bcc0f)', color: '#0F0F1A', padding: '11px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer' }}>Salvar</button>
                 <button onClick={() => setEditando(false)} style={{ flex: 1, background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)', padding: '11px', borderRadius: '10px', fontSize: '13px', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>Cancelar</button>
               </div>
             </div>
@@ -258,7 +258,7 @@ export default function TurmaDetalhes() {
         {/* ── BOTÃO MENSAGEM ── */}
         <a
           href={linkMensagem}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', background: 'linear-gradient(135deg,#39FF14,#2bcc0f)', color: '#050505', padding: '15px', borderRadius: '14px', fontWeight: 800, fontSize: '14px', fontFamily: syne, textDecoration: 'none', boxShadow: '0 0 24px rgba(57,255,20,0.25)', boxSizing: 'border-box' }}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', background: 'linear-gradient(135deg,#FF6B00,#2bcc0f)', color: '#0F0F1A', padding: '15px', borderRadius: '14px', fontWeight: 800, fontSize: '14px', fontFamily: syne, textDecoration: 'none', boxShadow: '0 0 24px rgba(57,255,20,0.25)', boxSizing: 'border-box' }}
         >
           💬 Enviar Mensagem para a Turma
         </a>

@@ -20,8 +20,8 @@ function ConfiguracoesInner() {
   })
 
   const syne = 'Syne, sans-serif'
-  const neon = '#39FF14'
-  const gold = '#D4AF37'
+  const neon = '#FF6B00'
+  const gold = '#FFD700'
   const muted = 'rgba(255,255,255,0.4)'
   const card = { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '16px', marginBottom: '12px' }
   const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px', color: '#F0F0F0', fontFamily: 'Inter, sans-serif', fontSize: '13px', marginTop: '4px', boxSizing: 'border-box' as const }
@@ -170,7 +170,7 @@ function ConfiguracoesInner() {
         </div>
 
         {/* Botao salvar */}
-        <button onClick={salvar} disabled={salvando} style={{ width: '100%', background: 'linear-gradient(135deg,#39FF14,#00cc00)', color: '#000', padding: '16px', borderRadius: '14px', fontFamily: syne, fontWeight: 800, fontSize: '15px', border: 'none', cursor: 'pointer', boxShadow: '0 0 20px rgba(57,255,20,0.3)', marginBottom: '10px', opacity: salvando ? 0.6 : 1 }}>
+        <button onClick={salvar} disabled={salvando} style={{ width: '100%', background: 'linear-gradient(135deg,#FF6B00,#00cc00)', color: '#000', padding: '16px', borderRadius: '14px', fontFamily: syne, fontWeight: 800, fontSize: '15px', border: 'none', cursor: 'pointer', boxShadow: '0 0 20px rgba(57,255,20,0.3)', marginBottom: '10px', opacity: salvando ? 0.6 : 1 }}>
           {salvando ? 'Salvando...' : 'Salvar Configuracoes'}
         </button>
 

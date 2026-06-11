@@ -215,7 +215,7 @@ export default function Convocacoes() {
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          style={{ background: "linear-gradient(135deg,#39FF14,#00cc00)", color: "#000", padding: "10px 18px", borderRadius: "12px", fontSize: "12px", fontWeight: 800, fontFamily: "Syne, sans-serif", border: "none", cursor: "pointer" }}
+          style={{ background: "linear-gradient(135deg,#FF6B00,#00cc00)", color: "#000", padding: "10px 18px", borderRadius: "12px", fontSize: "12px", fontWeight: 800, fontFamily: "Syne, sans-serif", border: "none", cursor: "pointer" }}
         >
           {showForm ? 'Fechar' : '+ Nova'}
         </button>
@@ -223,13 +223,13 @@ export default function Convocacoes() {
 
       {sucesso && (
         <div style={{ background: "rgba(57,255,20,0.1)", border: "1px solid rgba(57,255,20,0.3)", borderRadius: "12px", padding: "12px", textAlign: "center", marginBottom: "16px" }}>
-          <p style={{ color: "#39FF14", fontFamily: "Syne, sans-serif", fontWeight: 700, margin: 0 }}>Convocacao criada!</p>
+          <p style={{ color: "#FF6B00", fontFamily: "Syne, sans-serif", fontWeight: 700, margin: 0 }}>Convocacao criada!</p>
         </div>
       )}
 
       {showForm && (
         <div style={{ background: "rgba(57,255,20,0.04)", border: "1px solid rgba(57,255,20,0.15)", borderRadius: "16px", padding: "16px", marginBottom: "20px" }}>
-          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", color: "#39FF14", marginBottom: "16px" }}>Nova Convocacao</p>
+          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", color: "#FF6B00", marginBottom: "16px" }}>Nova Convocacao</p>
           <div className="space-y-3">
             <div>
               <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Titulo *</label>
@@ -266,7 +266,7 @@ export default function Convocacoes() {
             <div style={{ border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", padding: "12px" }}>
               <div className="flex justify-between items-center mb-3">
                 <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px", fontWeight: 700 }}>Atletas *</label>
-                <button onClick={selecionarTodos} style={{ fontSize: "11px", color: "#39FF14", fontWeight: 700, background: "none", border: "none", cursor: "pointer" }}>
+                <button onClick={selecionarTodos} style={{ fontSize: "11px", color: "#FF6B00", fontWeight: 700, background: "none", border: "none", cursor: "pointer" }}>
                   {atletasSelecionados.length === atletas.length ? 'Desmarcar todos' : 'Todos'}
                 </button>
               </div>
@@ -338,7 +338,7 @@ export default function Convocacoes() {
               <p className="text-xs text-gray-500 mt-2">{atletasSelecionados.length} atleta(s) selecionado(s)</p>
             </div>
 
-            <button onClick={salvar} disabled={salvando} style={{ width: "100%", background: "linear-gradient(135deg,#39FF14,#00cc00)", color: "#000", padding: "14px", borderRadius: "12px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "13px", border: "none", cursor: "pointer" }}>
+            <button onClick={salvar} disabled={salvando} style={{ width: "100%", background: "linear-gradient(135deg,#FF6B00,#00cc00)", color: "#000", padding: "14px", borderRadius: "12px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "13px", border: "none", cursor: "pointer" }}>
               {salvando ? 'Salvando...' : 'Criar Convocacao'}
             </button>
           </div>
@@ -372,7 +372,7 @@ export default function Convocacoes() {
                 {c.descricao && <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>{c.descricao}</p>}
               </div>
               <div className="flex gap-2">
-                <a href={"/convocacao/" + c.id} style={{ flex: 1, background: "rgba(57,255,20,0.08)", border: "1px solid rgba(57,255,20,0.2)", color: "#39FF14", textAlign: "center", padding: "10px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", textDecoration: "none" }}>
+                <a href={"/convocacao/" + c.id} style={{ flex: 1, background: "rgba(57,255,20,0.08)", border: "1px solid rgba(57,255,20,0.2)", color: "#FF6B00", textAlign: "center", padding: "10px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", textDecoration: "none" }}>
                   Ver detalhes
                 </a>
                 {c.status === 'aberta' && (

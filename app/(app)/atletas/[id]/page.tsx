@@ -119,7 +119,7 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
           <FotoAtleta atletaId={atleta.id} fotoUrl={atleta.fotoUrl || null} nome={atleta.nome} />
           <div>
             <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "20px", color: "#F0F0F0", margin: "0 0 4px" }}>{atleta.nome}</p>
-            <p style={{ color: "#39FF14", fontSize: "13px", fontWeight: 600 }}>{atleta.posicao || 'Sem posição'}</p>
+            <p style={{ color: "#FF6B00", fontSize: "13px", fontWeight: 600 }}>{atleta.posicao || 'Sem posição'}</p>
           </div>
         </div>
         <div className="space-y-2 text-sm">
@@ -153,14 +153,14 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
       <GerarCobranca atletaId={atleta.id} atletaNome={atleta.nome} />
 
       <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-        <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Historico Financeiro</p>
+        <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Historico Financeiro</p>
         <div className="grid grid-cols-3 gap-2 mb-4">
           <div style={{ background: "rgba(57,255,20,0.07)", border: "1px solid rgba(57,255,20,0.15)", borderRadius: "12px", padding: "10px", textAlign: "center" }}>
-            <p style={{ color: "#39FF14", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px" }}>{'R$ ' + totalPago.toFixed(0)}</p>
+            <p style={{ color: "#FF6B00", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px" }}>{'R$ ' + totalPago.toFixed(0)}</p>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "10px", marginTop: "4px" }}>Pago</p>
           </div>
           <div style={{ background: "rgba(212,175,55,0.07)", border: "1px solid rgba(212,175,55,0.15)", borderRadius: "12px", padding: "10px", textAlign: "center" }}>
-            <p style={{ color: "#D4AF37", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px" }}>{'R$ ' + totalPendente.toFixed(0)}</p>
+            <p style={{ color: "#FFD700", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px" }}>{'R$ ' + totalPendente.toFixed(0)}</p>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "10px", marginTop: "4px" }}>Pendente</p>
           </div>
           <div style={{ background: "rgba(255,70,70,0.07)", border: "1px solid rgba(255,70,70,0.15)", borderRadius: "12px", padding: "10px", textAlign: "center" }}>
@@ -190,7 +190,7 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
 
       <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
         <div className="flex justify-between items-center mb-4">
-          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", textTransform: "uppercase", letterSpacing: "1px" }}>Historico de Presenca</p>
+          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", textTransform: "uppercase", letterSpacing: "1px" }}>Historico de Presenca</p>
           <div className="text-right">
             <p className={'text-lg font-bold ' + (percentualGeral >= 75 ? 'text-green-400' : percentualGeral >= 50 ? 'text-yellow-400' : 'text-red-400')}>
               {percentualGeral}%
@@ -217,7 +217,7 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
 
       {atleta.endereco && (
         <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "1px" }}>Endereco</p>
+          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "1px" }}>Endereco</p>
           <p className="text-sm">{atleta.endereco}, {atleta.numero}</p>
           <p className="text-sm text-gray-400">{atleta.bairro} — {atleta.cidade}/{atleta.estado}</p>
           <p className="text-sm text-gray-400">CEP: {atleta.cep}</p>
@@ -226,7 +226,7 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
 
       {responsaveis && responsaveis.length > 0 && (
         <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "1px" }}>Responsavel</p>
+          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "1px" }}>Responsavel</p>
           {responsaveis.map((r: { id: string; nome: string; whatsapp: string; telefone: string }) => (
             <div key={r.id}>
               <p className="font-bold">{r.nome}</p>
@@ -237,13 +237,13 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
       )}
 
       <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-        <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#39FF14", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "1px" }}>Link Area dos Pais</p>
+        <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "1px" }}>Link Area dos Pais</p>
         <p className="text-xs text-gray-400 break-all mb-3">{linkPais}</p>
         <CopiarLink link={linkPais} />
       </div>
 
       <div style={{ background: "rgba(212,175,55,0.07)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: "16px", padding: "14px", marginBottom: "12px" }}>
-        <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#D4AF37", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "1px" }}>Link de Rematricula</p>
+        <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FFD700", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "1px" }}>Link de Rematricula</p>
         <p className="text-xs text-gray-500 mb-3">Envie para o responsável renovar a matrícula do atleta.</p>
         <p className="text-xs text-gray-400 break-all mb-3">{linkRematricula}</p>
         <CopiarLink link={linkRematricula} />
@@ -251,7 +251,7 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
 
       <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
         <a href="/dashboard" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Inicio</a>
-        <a href="/atletas" style={{ textDecoration: "none", color: "#39FF14", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif", fontWeight: 700 }}>Atletas</a>
+        <a href="/atletas" style={{ textDecoration: "none", color: "#FF6B00", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif", fontWeight: 700 }}>Atletas</a>
         <a href="/presenca" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Presenca</a>
         <a href="/financeiro" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Financeiro</a>
       </nav>

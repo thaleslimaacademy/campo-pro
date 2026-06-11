@@ -293,7 +293,7 @@ export default function EditarAtleta() {
         <button
           onClick={salvar}
           disabled={salvando}
-          style={{ width: "100%", background: "linear-gradient(135deg,#39FF14,#00cc00)", color: "#000", padding: "16px", borderRadius: "14px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", border: "none", cursor: "pointer" }}
+          style={{ width: "100%", background: "linear-gradient(135deg,#FF6B00,#00cc00)", color: "#000", padding: "16px", borderRadius: "14px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", border: "none", cursor: "pointer" }}
         >
           {salvando ? 'Salvando...' : '💾 Salvar Alterações'}
         </button>
@@ -320,7 +320,7 @@ export default function EditarAtleta() {
 
       <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
         <a href="/dashboard" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", fontFamily: "Syne, sans-serif" }}>Inicio</a>
-        <a href="/atletas" style={{ textDecoration: "none", color: "#39FF14", fontSize: "9px", textTransform: "uppercase", fontFamily: "Syne, sans-serif", fontWeight: 700 }}>Atletas</a>
+        <a href="/atletas" style={{ textDecoration: "none", color: "#FF6B00", fontSize: "9px", textTransform: "uppercase", fontFamily: "Syne, sans-serif", fontWeight: 700 }}>Atletas</a>
         <a href="/presenca" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", fontFamily: "Syne, sans-serif" }}>Presenca</a>
         <a href="/financeiro" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", fontFamily: "Syne, sans-serif" }}>Financeiro</a>
       </nav>

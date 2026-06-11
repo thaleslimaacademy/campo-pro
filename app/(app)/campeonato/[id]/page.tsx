@@ -60,9 +60,9 @@ export default function CampeonatoDetalhes() {
 
   // ── Tokens visuais ──
   const syne = 'Syne, sans-serif'
-  const neon = '#39FF14'
-  const gold = '#D4AF37'
-  const bg = 'linear-gradient(160deg,#0a1a06,#050505,#111003)'
+  const neon = '#FF6B00'
+  const gold = '#FFD700'
+  const bg = 'linear-gradient(160deg,#0F0F1A,#0F0F1A,#111003)'
   const cardBg = 'rgba(255,255,255,0.03)'
   const cardBorder = '1px solid rgba(255,255,255,0.07)'
   const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 12px', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '6px', outline: 'none', boxSizing: 'border-box' as const }
@@ -72,7 +72,7 @@ export default function CampeonatoDetalhes() {
     const map: { [k: string]: { background: string; color: string; border: string } } = {
       rascunho:  { background: 'rgba(107,114,128,0.15)', color: '#9CA3AF', border: '1px solid rgba(107,114,128,0.2)' },
       inscricoes: { background: 'rgba(59,130,246,0.12)',  color: '#60A5FA', border: '1px solid rgba(59,130,246,0.2)'  },
-      andamento:  { background: 'rgba(57,255,20,0.08)',   color: '#39FF14', border: '1px solid rgba(57,255,20,0.2)'   },
+      andamento:  { background: 'rgba(57,255,20,0.08)',   color: '#FF6B00', border: '1px solid rgba(57,255,20,0.2)'   },
       encerrado:  { background: 'rgba(239,68,68,0.12)',   color: '#F87171', border: '1px solid rgba(239,68,68,0.2)'   },
     }
     return map[status] || {}
@@ -375,7 +375,7 @@ export default function CampeonatoDetalhes() {
         {/* ── TABS ── */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
           {(['times', 'jogos', 'classificacao'] as const).map(a => (
-            <button key={a} onClick={() => setAba(a)} style={{ flex: 1, padding: '10px', borderRadius: '12px', fontSize: '12px', fontWeight: 700, fontFamily: syne, border: 'none', cursor: 'pointer', background: aba === a ? 'linear-gradient(135deg,#39FF14,#2bcc0f)' : 'rgba(255,255,255,0.05)', color: aba === a ? '#050505' : 'rgba(255,255,255,0.5)', transition: 'all 0.2s' }}>
+            <button key={a} onClick={() => setAba(a)} style={{ flex: 1, padding: '10px', borderRadius: '12px', fontSize: '12px', fontWeight: 700, fontFamily: syne, border: 'none', cursor: 'pointer', background: aba === a ? 'linear-gradient(135deg,#FF6B00,#2bcc0f)' : 'rgba(255,255,255,0.05)', color: aba === a ? '#0F0F1A' : 'rgba(255,255,255,0.5)', transition: 'all 0.2s' }}>
               {a === 'times' ? '⚽ Times' : a === 'jogos' ? '📋 Jogos' : '🏅 Classificação'}
             </button>
           ))}
@@ -414,7 +414,7 @@ export default function CampeonatoDetalhes() {
                     <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>WhatsApp</label>
                     <input value={formTime.responsavelWhatsapp} onChange={e => setFormTime(p => ({ ...p, responsavelWhatsapp: e.target.value }))} placeholder="5534999999999" style={inputStyle} />
                   </div>
-                  <button onClick={adicionarTime} disabled={salvandoTime} style={{ width: '100%', background: salvandoTime ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg,#39FF14,#2bcc0f)', color: salvandoTime ? 'rgba(255,255,255,0.3)' : '#050505', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer' }}>
+                  <button onClick={adicionarTime} disabled={salvandoTime} style={{ width: '100%', background: salvandoTime ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg,#FF6B00,#2bcc0f)', color: salvandoTime ? 'rgba(255,255,255,0.3)' : '#0F0F1A', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer' }}>
                     {salvandoTime ? 'Salvando...' : 'Adicionar Time ✓'}
                   </button>
                 </div>

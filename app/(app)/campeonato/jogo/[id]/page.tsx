@@ -40,9 +40,9 @@ export default function Sumula() {
 
   // ── Tokens visuais ──
   const syne = 'Syne, sans-serif'
-  const neon = '#39FF14'
-  const gold = '#D4AF37'
-  const bg = 'linear-gradient(160deg,#0a1a06,#050505,#111003)'
+  const neon = '#FF6B00'
+  const gold = '#FFD700'
+  const bg = 'linear-gradient(160deg,#0F0F1A,#0F0F1A,#111003)'
   const cardBg = 'rgba(255,255,255,0.03)'
   const cardBorder = '1px solid rgba(255,255,255,0.07)'
   const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 12px', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '6px', outline: 'none', boxSizing: 'border-box' as const }
@@ -175,7 +175,7 @@ export default function Sumula() {
           {/* Botões de ação */}
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
             {jogo.status === 'agendado' && (
-              <button onClick={iniciarJogo} style={{ background: 'linear-gradient(135deg,#39FF14,#2bcc0f)', color: '#050505', padding: '10px 24px', borderRadius: '12px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', boxShadow: '0 0 16px rgba(57,255,20,0.3)' }}>
+              <button onClick={iniciarJogo} style={{ background: 'linear-gradient(135deg,#FF6B00,#2bcc0f)', color: '#0F0F1A', padding: '10px 24px', borderRadius: '12px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', boxShadow: '0 0 16px rgba(57,255,20,0.3)' }}>
                 ▶ Iniciar Jogo
               </button>
             )}
@@ -241,7 +241,7 @@ export default function Sumula() {
                 <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Minuto (opcional)</label>
                 <input value={formEvento.minuto} onChange={e => setFormEvento(p => ({ ...p, minuto: e.target.value }))} type="number" placeholder="Ex: 23" style={inputStyle} />
               </div>
-              <button onClick={adicionarEvento} disabled={salvando} style={{ width: '100%', background: salvando ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg,#39FF14,#2bcc0f)', color: salvando ? 'rgba(255,255,255,0.3)' : '#050505', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer' }}>
+              <button onClick={adicionarEvento} disabled={salvando} style={{ width: '100%', background: salvando ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg,#FF6B00,#2bcc0f)', color: salvando ? 'rgba(255,255,255,0.3)' : '#0F0F1A', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer' }}>
                 {salvando ? 'Salvando...' : 'Registrar Evento'}
               </button>
             </div>
@@ -259,7 +259,7 @@ export default function Sumula() {
               placeholder="Descreva ocorrências, incidentes, observações do jogo..."
               style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const, resize: 'vertical' as const }}
             />
-            <button onClick={salvarRelatorio} disabled={salvando} style={{ width: '100%', background: salvando ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg,#D4AF37,#a88520)', color: salvando ? 'rgba(255,255,255,0.3)' : '#050505', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', marginTop: '10px' }}>
+            <button onClick={salvarRelatorio} disabled={salvando} style={{ width: '100%', background: salvando ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg,#FFD700,#a88520)', color: salvando ? 'rgba(255,255,255,0.3)' : '#0F0F1A', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', marginTop: '10px' }}>
               {salvando ? 'Salvando...' : 'Salvar Relatório'}
             </button>
           </div>
