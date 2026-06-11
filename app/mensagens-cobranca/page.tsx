@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { usePerfil } from '@/lib/usePerfil'
-import { salvarMensagens } from '../configuracoes/actions-mensagens'
+import { salvarMensagens } from '../(app)/configuracoes/actions-mensagens'
 
 const VARIAVEIS = [
   { tag: '{nome_responsavel}', desc: 'Nome do responsável' },
