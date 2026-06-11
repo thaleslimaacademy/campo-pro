@@ -1,17 +1,12 @@
 'use server'
 
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { createClient } from '@supabase/supabase-js'
 
 const ESCOLA_ID = 'escola-demo'
 const BUCKET_WM = 'fotos-watermark'
 const BUCKET_ORI = 'fotos-originais'
 
-// Cliente Supabase com service role para Storage
-const storage = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-).storage
+const storage = supabaseAdmin.storage
 
 // ── ÁLBUNS ────────────────────────────────────────────────
 
@@ -54,8 +49,8 @@ export async function listarFotos(albumId: string) {
 export async function uploadFoto(p: {
   albumId: string
   nomeArquivo: string
-  conteudoWatermark: string  // base64
-  conteudoOriginal: string   // base64
+  conteudoWatermark: string
+  conteudoOriginal: string
   valor: number
 }) {
   const id = crypto.randomUUID()
@@ -70,15 +65,18 @@ export async function uploadFoto(p: {
     storage.from(BUCKET_WM).upload(pathWm, bufWm, { contentType: `image/${ext}`, upsert: true }),
     storage.from(BUCKET_ORI).upload(pathOri, bufOri, { contentType: `image/${ext}`, upsert: true }),
   ])
+
   if (u1.error) throw new Error('Erro upload watermark: ' + u1.error.message)
   if (u2.error) throw new Error('Erro upload original: ' + u2.error.message)
 
   const urlWm = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${BUCKET_WM}/${pathWm}`
 
   const { error } = await supabaseAdmin.from('Foto').insert({
-    id, albumId: p.albumId, escolaId: ESCOLA_ID,
+    id,
+    albumId: p.albumId,
+    escolaId: ESCOLA_ID,
     urlWatermark: urlWm,
-    urlOriginal: pathOri, // path privado — só acessado via signed URL
+    urlOriginal: pathOri,
     valor: p.valor,
   })
   if (error) throw new Error(error.message)
@@ -104,77 +102,29 @@ export async function atualizarValorFoto(id: string, valor: number) {
 export async function criarCompra(p: {
   compradorNome: string
   compradorTelefone: string
-  fotos: string[]  // array de Foto.id
+  fotos: string[]
   metodoPagamento: 'PIX' | 'CREDIT_CARD'
   parcelas?: number
 }) {
-  // Calcula valor total
   const { data: fotosData } = await supabaseAdmin
     .from('Foto').select('id, valor').in('id', p.fotos)
   const valorTotal = (fotosData || []).reduce((s, f) => s + Number(f.valor), 0)
-
-  // Cria cliente Asaas
-  const telefone = p.compradorTelefone.replace(/\D/g, '')
-  const asaasCustomer = await fetch(`https://api.asaas.com/v3/customers`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'access_token': process.env.ASAAS_API_KEY! },
-    body: JSON.stringify({ name: p.compradorNome, mobilePhone: telefone, cpfCnpj: '00000000191' }),
-  }).then(r => r.json())
-
-  const customerId = asaasCustomer.id || asaasCustomer.errors?.[0]?.description
-
-  // Cria cobrança no Asaas
-  const body: Record<string, unknown> = {
-    customer: customerId,
-    billingType: p.metodoPagamento,
-    value: valorTotal,
-    dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
-    description: `Fotos GestaoFC (${p.fotos.length} foto${p.fotos.length > 1 ? 's' : ''})`,
-  }
-  if (p.metodoPagamento === 'CREDIT_CARD' && p.parcelas && p.parcelas > 1) {
-    body.installmentCount = p.parcelas
-    body.installmentValue = Number((valorTotal / p.parcelas).toFixed(2))
-    delete body.value
-  }
-
-  const asaasCobranca = await fetch(`https://api.asaas.com/v3/payments`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'access_token': process.env.ASAAS_API_KEY! },
-    body: JSON.stringify(body),
-  }).then(r => r.json())
 
   const compraId = crypto.randomUUID()
   await supabaseAdmin.from('FotoCompra').insert({
     id: compraId,
     escolaId: ESCOLA_ID,
     compradorNome: p.compradorNome,
-    compradorTelefone: telefone,
+    compradorTelefone: p.compradorTelefone.replace(/\D/g, ''),
     fotos: p.fotos,
     valor: valorTotal,
     status: 'PENDENTE',
-    asaasId: asaasCobranca.id,
     metodoPagamento: p.metodoPagamento,
   })
 
-  // Retorna dados para o frontend mostrar QR Code ou link de cartão
-  let pixData = null
-  if (p.metodoPagamento === 'PIX' && asaasCobranca.id) {
-    const qr = await fetch(`https://api.asaas.com/v3/payments/${asaasCobranca.id}/pixQrCode`, {
-      headers: { 'access_token': process.env.ASAAS_API_KEY! },
-    }).then(r => r.json())
-    pixData = { copiaCola: qr.payload, qrCodeImage: qr.encodedImage }
-  }
-
-  return {
-    compraId,
-    valor: valorTotal,
-    asaasId: asaasCobranca.id,
-    pixData,
-    creditCardUrl: asaasCobranca.invoiceUrl || null,
-  }
+  return { compraId, valor: valorTotal }
 }
 
-// Gera signed URLs para fotos originais (após pagamento)
 export async function gerarLinksOriginais(compraId: string) {
   const { data: compra } = await supabaseAdmin
     .from('FotoCompra').select('fotos, status').eq('id', compraId).single()
@@ -185,7 +135,7 @@ export async function gerarLinksOriginais(compraId: string) {
     .from('Foto').select('id, urlOriginal').in('id', compra.fotos)
 
   const links = await Promise.all((fotos || []).map(async (f) => {
-    const { data } = await storage.from(BUCKET_ORI).createSignedUrl(f.urlOriginal, 60 * 60 * 24) // 24h
+    const { data } = await storage.from(BUCKET_ORI).createSignedUrl(f.urlOriginal, 60 * 60 * 24)
     return { id: f.id, url: data?.signedUrl || '' }
   }))
 
