@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { use, useEffect, useState, useRef } from 'react'
 import { ArrowLeft, Upload, Trash2, Loader2, DollarSign, Link } from 'lucide-react'
 import { listarFotos, uploadFoto, excluirFoto, atualizarValorFoto } from '../actions'
 
@@ -21,7 +21,6 @@ async function adicionarMarcaDagua(file: File): Promise<{ watermark: string; ori
         canvas.height = img.height
         const ctx = canvas.getContext('2d')!
         ctx.drawImage(img, 0, 0)
-
         const fontSize = Math.max(Math.floor(img.width / 10), 28)
         ctx.save()
         ctx.globalAlpha = 0.4
@@ -31,7 +30,6 @@ async function adicionarMarcaDagua(file: File): Promise<{ watermark: string; ori
         ctx.font = `bold ${fontSize}px Arial`
         ctx.translate(canvas.width / 2, canvas.height / 2)
         ctx.rotate(-Math.PI / 4)
-
         const text = '© GESTÃO FC'
         const tw = ctx.measureText(text).width + 40
         const th = fontSize * 2.5
@@ -41,7 +39,6 @@ async function adicionarMarcaDagua(file: File): Promise<{ watermark: string; ori
           }
         }
         ctx.restore()
-
         resolve({ watermark: canvas.toDataURL('image/jpeg', 0.82), original, nome: file.name })
       }
       img.onerror = reject
@@ -52,8 +49,8 @@ async function adicionarMarcaDagua(file: File): Promise<{ watermark: string; ori
   })
 }
 
-export default function AlbumAdminPage({ params }: { params: { albumId: string } }) {
-  const { albumId } = params
+export default function AlbumAdminPage({ params }: { params: Promise<{ albumId: string }> }) {
+  const { albumId } = use(params)
   const [fotos, setFotos] = useState<Foto[]>([])
   const [loading, setLoading] = useState(true)
   const [processando, setProcessando] = useState(false)
@@ -67,14 +64,13 @@ export default function AlbumAdminPage({ params }: { params: { albumId: string }
     finally { setLoading(false) }
   }
 
-  useEffect(() => { carregar() }, [albumId])
+  useEffect(() => { if (albumId) carregar() }, [albumId])
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     if (!files.length) return
     setProcessando(true)
     setProgresso({ atual: 0, total: files.length })
-
     for (let i = 0; i < files.length; i++) {
       try {
         setProgresso({ atual: i + 1, total: files.length })
@@ -84,7 +80,6 @@ export default function AlbumAdminPage({ params }: { params: { albumId: string }
         console.error('Erro foto', i, err)
       }
     }
-
     setProcessando(false)
     await carregar()
     if (inputRef.current) inputRef.current.value = ''
@@ -92,8 +87,7 @@ export default function AlbumAdminPage({ params }: { params: { albumId: string }
 
   const excluir = async (id: string) => {
     if (!confirm('Excluir esta foto?')) return
-    await excluirFoto(id)
-    await carregar()
+    await excluirFoto(id); await carregar()
   }
 
   const atualizarValor = async (id: string, valor: number) => {
@@ -103,7 +97,6 @@ export default function AlbumAdminPage({ params }: { params: { albumId: string }
   return (
     <div style={{ minHeight: '100vh', background: C.bg, color: C.text, padding: 20 }}>
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
-
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
           <a href="/fotos" style={{ color: C.muted, display: 'flex' }}><ArrowLeft size={20} /></a>
           <h1 style={{ fontFamily: SYNE, fontSize: 22, fontWeight: 800, color: C.orange, margin: 0 }}>Gerenciar Fotos</h1>
@@ -113,18 +106,13 @@ export default function AlbumAdminPage({ params }: { params: { albumId: string }
           </a>
         </div>
 
-        {/* Upload */}
         <div style={{ background: C.surface, border: `2px dashed ${C.orange}44`, borderRadius: 16, padding: 24, marginBottom: 20, textAlign: 'center' }}>
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 12 }}>
-              <DollarSign size={16} color={C.gold} />
-              <span style={{ fontSize: 13, color: C.muted }}>Valor padrão por foto:</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ color: C.muted, fontSize: 13 }}>R$</span>
-                <input type="number" value={valorPadrao} onChange={e => setValorPadrao(Number(e.target.value))} min={1} step={0.5}
-                  style={{ width: 70, background: '#0F0F1A', border: `1px solid ${C.border}`, borderRadius: 8, padding: '6px 10px', color: C.text, fontSize: 13, textAlign: 'center' }} />
-              </div>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 16 }}>
+            <DollarSign size={16} color={C.gold} />
+            <span style={{ fontSize: 13, color: C.muted }}>Valor padrão por foto:</span>
+            <span style={{ color: C.muted, fontSize: 13 }}>R$</span>
+            <input type="number" value={valorPadrao} onChange={e => setValorPadrao(Number(e.target.value))} min={1} step={0.5}
+              style={{ width: 70, background: '#0F0F1A', border: `1px solid ${C.border}`, borderRadius: 8, padding: '6px 10px', color: C.text, fontSize: 13, textAlign: 'center' }} />
           </div>
 
           {processando ? (
@@ -139,7 +127,7 @@ export default function AlbumAdminPage({ params }: { params: { albumId: string }
             <>
               <Upload size={32} color={C.orange} style={{ marginBottom: 8 }} />
               <p style={{ color: C.text, fontFamily: SYNE, fontWeight: 700, marginBottom: 4 }}>Clique para fazer upload</p>
-              <p style={{ color: C.muted, fontSize: 12, marginBottom: 14 }}>Marca d'água aplicada automaticamente · Fotos até 5MB</p>
+              <p style={{ color: C.muted, fontSize: 12, marginBottom: 14 }}>Marca d'água aplicada automaticamente · Fotos até 15MB</p>
               <button onClick={() => inputRef.current?.click()}
                 style={{ background: C.orange, color: '#fff', border: 'none', borderRadius: 10, padding: '10px 24px', fontFamily: SYNE, fontWeight: 700, cursor: 'pointer' }}>
                 Selecionar fotos
@@ -149,7 +137,6 @@ export default function AlbumAdminPage({ params }: { params: { albumId: string }
           )}
         </div>
 
-        {/* Grid de fotos */}
         {loading ? (
           <p style={{ color: C.muted, textAlign: 'center', padding: 40 }}>Carregando...</p>
         ) : fotos.length === 0 ? (
