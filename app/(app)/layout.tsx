@@ -1,10 +1,10 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { UserButton } from '@clerk/nextjs'
 import { usePerfil } from '@/lib/usePerfil'
 import { supabase } from '@/lib/supabase'
 import { useEffect, useState } from 'react'
+import AccountButton from '@/components/AccountButton'
 
 const C = {
   bg: '#0F0F1A', surface: '#1A1A2E', orange: '#FF6B00',
@@ -15,10 +15,10 @@ const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
 
 const NAV = [
-  { href: '/dashboard',            label: 'Início',     e: '🏠' },
-  { href: '/atletas',              label: 'Atletas',    e: '👥' },
-  { href: '/presenca',             label: 'Presença',   e: '✅' },
-  { href: '/financeiro/caixa',     label: 'Financeiro', e: '💰' },
+  { href: '/dashboard',        label: 'Início',     e: '🏠' },
+  { href: '/atletas',          label: 'Atletas',    e: '👥' },
+  { href: '/presenca',         label: 'Presença',   e: '✅' },
+  { href: '/financeiro/caixa', label: 'Financeiro', e: '💰' },
 ]
 
 const TITULO: Record<string, string> = {
@@ -57,10 +57,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* HEADER */}
       {!isDashboard && (
-        <div style={{ background: `linear-gradient(135deg, #FF6B00 0%, #1A1A2E 60%, #0F0F1A 100%)`, padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 40 }}>
+        <div style={{ background: 'linear-gradient(135deg, #FF6B00 0%, #1A1A2E 60%, #0F0F1A 100%)', padding: '12px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 40 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <a href="/dashboard" style={{ display: 'flex', alignItems: 'center' }}>
-              <img src="/gestaofc-logo.png" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'cover' }} alt="logo"
+              <img src="/gestaofc-logo.png" style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'cover' }} alt="logo"
                 onError={e => (e.currentTarget.style.display = 'none')} />
             </a>
             <div>
@@ -68,7 +68,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               {titulo && <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)' }}>{nomeEscola}</div>}
             </div>
           </div>
-          <UserButton />
+          <AccountButton />
         </div>
       )}
 
