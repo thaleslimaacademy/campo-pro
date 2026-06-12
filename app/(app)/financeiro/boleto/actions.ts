@@ -53,9 +53,15 @@ export async function gerarBoleto(params: {
     id: boleto.id as string,
   }
 }export async function getCpfResponsavel(atletaId: string) {
-  const { data } = await supabaseAdmin.from('Responsavel')
+  // 1. Tenta CPF do responsável principal
+  const { data: resp } = await supabaseAdmin.from('Responsavel')
     .select('cpf').eq('atletaId', atletaId).eq('principal', true).limit(1)
-  return data?.[0]?.cpf ?? null
+  if (resp?.[0]?.cpf) return resp[0].cpf
+
+  // 2. Fallback: CPF do próprio atleta
+  const { data: atleta } = await supabaseAdmin.from('Atleta')
+    .select('cpf').eq('id', atletaId).single()
+  return atleta?.cpf ?? null
 }
 
 export async function salvarCpfResponsavel(atletaId: string, cpf: string) {

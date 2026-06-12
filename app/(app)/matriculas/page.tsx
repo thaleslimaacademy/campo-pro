@@ -60,7 +60,7 @@ function MatriculasInner() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           atletaId,
-          valor: 100,
+          valor: 85,
           vencimento,
           descricao: 'Mensalidade',
         }),
