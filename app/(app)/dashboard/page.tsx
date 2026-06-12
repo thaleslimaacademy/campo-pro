@@ -5,38 +5,31 @@ import { UserButton } from '@clerk/nextjs'
 import { supabase } from '@/lib/supabase'
 import { usePerfil } from '@/lib/usePerfil'
 
-// ── Design System GestaoFC ──────────────────────────────
 const C = {
-  bg:       '#0F0F1A',
-  surface:  '#1A1A2E',
-  surface2: '#16213E',
-  orange:   '#FF6B00',
-  gold:     '#FFD700',
-  green:    '#00C896',
-  red:      '#FF4757',
-  blue:     '#4A90D9',
-  text:     '#F0F0F0',
-  muted:    'rgba(240,240,240,0.45)',
-  border:   'rgba(255,255,255,0.08)',
+  bg: '#0F0F1A', surface: '#1A1A2E', surface2: '#16213E',
+  orange: '#FF6B00', gold: '#FFD700', green: '#00C896',
+  red: '#FF4757', blue: '#4A90D9', text: '#F0F0F0',
+  muted: 'rgba(240,240,240,0.45)', border: 'rgba(255,255,255,0.08)',
 }
 const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
 const brl = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n || 0)
 
-// ── Módulos principais ──────────────────────────────────
 const MODULOS = [
-  { href: '/atletas',                    label: 'Atletas',        e: '👥', cor: C.blue },
-  { href: '/presenca',                   label: 'Presença',       e: '✅', cor: C.green },
-  { href: '/turmas',                     label: 'Turmas',         e: '🏃', cor: C.orange },
-  { href: '/financeiro/mensalidades',    label: 'Mensalidades',   e: '💳', cor: C.gold },
-  { href: '/financeiro/caixa',           label: 'Caixa',          e: '💰', cor: C.green },
-  { href: '/financeiro/patrocinadores',  label: 'Patrocinadores', e: '🏅', cor: C.gold },
-  { href: '/financeiro/boleto',          label: 'Boleto',         e: '📄', cor: C.orange },
-  { href: '/campeonato',                 label: 'Campeonatos',    e: '🏆', cor: C.gold },
-  { href: '/convocacao',                 label: 'Convocações',    e: '📣', cor: C.blue },
-  { href: '/mensagens',                  label: 'Mensagens',      e: '💬', cor: C.green },
-  { href: '/matriculas',                 label: 'Matrículas',     e: '📝', cor: C.orange },
-  { href: '/configuracoes',              label: 'Config',         e: '⚙️', cor: C.muted },
+  { href: '/atletas',                   label: 'Atletas',        e: '👥', cor: C.blue },
+  { href: '/presenca',                  label: 'Presença',       e: '✅', cor: C.green },
+  { href: '/turmas',                    label: 'Turmas',         e: '🏃', cor: C.orange },
+  { href: '/financeiro/mensalidades',   label: 'Mensalidades',   e: '💳', cor: C.gold },
+  { href: '/financeiro/caixa',          label: 'Caixa',          e: '💰', cor: C.green },
+  { href: '/financeiro/patrocinadores', label: 'Patrocinadores', e: '🏅', cor: C.gold },
+  { href: '/financeiro/boleto',         label: 'Boleto',         e: '📄', cor: C.orange },
+  { href: '/fotos',                     label: 'Fotos',          e: '📸', cor: C.gold },
+  { href: '/estoque',                   label: 'Loja',           e: '🛍️', cor: C.orange },
+  { href: '/campeonato',                label: 'Campeonatos',    e: '🏆', cor: C.gold },
+  { href: '/convocacao',                label: 'Convocações',    e: '📣', cor: C.blue },
+  { href: '/mensagens',                 label: 'Mensagens',      e: '💬', cor: C.green },
+  { href: '/matriculas',                label: 'Matrículas',     e: '📝', cor: C.orange },
+  { href: '/configuracoes',             label: 'Config',         e: '⚙️', cor: C.muted },
 ]
 
 export default function Dashboard() {
@@ -45,7 +38,6 @@ export default function Dashboard() {
   const [totalAtletas, setTotalAtletas] = useState(0)
   const [inadimplentes, setInadimplentes] = useState(0)
   const [pendentes, setPendentes] = useState(0)
-  const [rematriculas, setRematriculas] = useState(0)
   const [presenca, setPresenca] = useState({ p: 0, t: 0 })
   const [pagasV, setPagasV] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -60,7 +52,6 @@ export default function Dashboard() {
       supabase.from('Escola').select('nome').eq('id', escolaId).single().then(({ data }) => { if (data) setEscola(data.nome) })
       supabase.from('Atleta').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('ativo', true).then(({ count }) => setTotalAtletas(count || 0))
       supabase.from('Matricula').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('status', 'PENDENTE').eq('tipo', 'matricula').then(({ count }) => setPendentes(count || 0))
-      supabase.from('Matricula').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('status', 'PENDENTE').eq('tipo', 'rematricula').then(({ count }) => setRematriculas(count || 0))
       supabase.from('Cobranca').select('valor, status').eq('escolaId', escolaId).gte('vencimento', di).lte('vencimento', df).then(({ data }) => {
         const cobs = data || []
         setPagasV(cobs.filter(c => c.status === 'PAGO').reduce((s, c) => s + Number(c.valor), 0))
@@ -91,7 +82,7 @@ export default function Dashboard() {
   return (
     <div style={{ minHeight: '100vh', background: C.bg, color: C.text, fontFamily: INTER, paddingBottom: 80 }}>
 
-      {/* ── HEADER ─────────────────────────────────── */}
+      {/* HEADER */}
       <div style={{ background: `linear-gradient(135deg, #FF6B00 0%, #1A1A2E 60%, #0F0F1A 100%)`, padding: '20px 20px 28px', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,215,0,0.1)' }} />
         <div style={{ position: 'absolute', bottom: -20, left: '40%', width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,107,0,0.15)' }} />
@@ -107,28 +98,15 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── MÉTRICAS ────────────────────────────────── */}
+      {/* MÉTRICAS */}
       <div style={{ padding: '20px 16px 0' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-
-          <MetricCard href="/atletas" label="Atletas ativos" value={loading ? '...' : String(totalAtletas)}
-            cor={C.green} icon="👥" sub="cadastrados" />
-
-          <MetricCard href="/financeiro/mensalidades" label="Inadimplentes" value={loading ? '...' : String(inadimplentes)}
-            cor={inadimplentes > 0 ? C.red : C.green} icon="⚠️"
-            sub={inadimplentes > 0 ? 'em atraso' : 'em dia'} alert={inadimplentes > 0} />
-
-          <MetricCard href="/matriculas" label="Pré-matrículas" value={loading ? '...' : String(pendentes)}
-            cor={pendentes > 0 ? C.orange : C.muted} icon="📝"
-            sub="aguardando" alert={pendentes > 0} />
-
-          <MetricCard href="/presenca" label="Presença hoje" value={loading ? '...' : presenca.t === 0 ? '-' : pct + '%'}
-            cor={pct >= 75 ? C.green : pct > 0 ? C.gold : C.muted} icon="✅"
-            sub={presenca.t > 0 ? `${presenca.p} de ${presenca.t}` : 'sem treino'} />
-
+          <MetricCard href="/atletas" label="Atletas ativos" value={loading ? '...' : String(totalAtletas)} cor={C.green} icon="👥" sub="cadastrados" />
+          <MetricCard href="/financeiro/mensalidades" label="Inadimplentes" value={loading ? '...' : String(inadimplentes)} cor={inadimplentes > 0 ? C.red : C.green} icon="⚠️" sub={inadimplentes > 0 ? 'em atraso' : 'em dia'} alert={inadimplentes > 0} />
+          <MetricCard href="/matriculas" label="Pré-matrículas" value={loading ? '...' : String(pendentes)} cor={pendentes > 0 ? C.orange : C.muted} icon="📝" sub="aguardando" alert={pendentes > 0} />
+          <MetricCard href="/presenca" label="Presença hoje" value={loading ? '...' : presenca.t === 0 ? '-' : pct + '%'} cor={pct >= 75 ? C.green : pct > 0 ? C.gold : C.muted} icon="✅" sub={presenca.t > 0 ? `${presenca.p} de ${presenca.t}` : 'sem treino'} />
         </div>
 
-        {/* Receita destaque */}
         {isAdmin && (
           <a href="/financeiro/caixa" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: `linear-gradient(135deg, ${C.orange}22, ${C.surface})`, border: `1px solid ${C.orange}44`, borderRadius: 16, padding: '16px 20px', marginTop: 12, textDecoration: 'none' }}>
             <div>
@@ -140,12 +118,12 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* ── MÓDULOS ─────────────────────────────────── */}
+      {/* MÓDULOS */}
       <div style={{ padding: '24px 16px 0' }}>
         <div style={{ fontFamily: SYNE, fontSize: 13, fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 14 }}>Módulos</div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
           {MODULOS.map(m => (
-            <a key={m.href} href={m.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 14, padding: '14px 8px', textDecoration: 'none', cursor: 'pointer' }}>
+            <a key={m.href} href={m.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 14, padding: '14px 8px', textDecoration: 'none' }}>
               <div style={{ width: 40, height: 40, borderRadius: 12, background: `${m.cor}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>{m.e}</div>
               <span style={{ fontSize: 10, color: C.text, fontWeight: 600, textAlign: 'center', lineHeight: 1.2 }}>{m.label}</span>
             </a>
@@ -153,7 +131,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── LINK PRÉ-MATRÍCULA ──────────────────────── */}
+      {/* LINK PRÉ-MATRÍCULA */}
       {isAdmin && (
         <div style={{ margin: '20px 16px 0' }}>
           <div style={{ background: `linear-gradient(135deg, ${C.gold}18, ${C.surface})`, border: `1px solid ${C.gold}44`, borderRadius: 16, padding: '16px 18px' }}>
@@ -173,12 +151,12 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* ── BOTTOM NAV ──────────────────────────────── */}
+      {/* BOTTOM NAV */}
       <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: C.surface, borderTop: `1px solid ${C.border}`, backdropFilter: 'blur(12px)', display: 'flex', justifyContent: 'space-around', padding: '10px 0 20px', zIndex: 50 }}>
         {[
-          { href: '/dashboard', label: 'Início',    e: '🏠', active: true },
-          { href: '/atletas',   label: 'Atletas',   e: '👥', active: false },
-          { href: '/presenca',  label: 'Presença',  e: '✅', active: false },
+          { href: '/dashboard',        label: 'Início',     e: '🏠', active: true },
+          { href: '/atletas',          label: 'Atletas',    e: '👥', active: false },
+          { href: '/presenca',         label: 'Presença',   e: '✅', active: false },
           { href: '/financeiro/caixa', label: 'Financeiro', e: '💰', active: false },
         ].map(item => (
           <a key={item.href} href={item.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, textDecoration: 'none', minWidth: 60 }}>
