@@ -1,4 +1,7 @@
 import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
+import { auth } from '@clerk/nextjs/server'
+import { redirect } from 'next/navigation'
 import CopiarLink from './CopiarLink'
 import GraficoPresenca from './GraficoPresenca'
 import FotoAtleta from './FotoAtleta'
@@ -6,11 +9,23 @@ import GerarCobranca from './GerarCobranca'
 
 export default async function PerfilAtleta({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  const { userId } = await auth()
+  if (!userId) redirect('/login')
+
+  const { data: perfil } = await supabaseAdmin
+    .from('PerfilUsuario')
+    .select('escolaId')
+    .eq('clerkUserId', userId)
+    .single()
+
+  const escolaId = perfil?.escolaId
+  if (!escolaId) redirect('/onboarding')
 
   const { data: atleta } = await supabase
     .from('Atleta')
     .select('*')
     .eq('id', id)
+    .eq('escolaId', escolaId)
     .single()
 
   if (!atleta) {

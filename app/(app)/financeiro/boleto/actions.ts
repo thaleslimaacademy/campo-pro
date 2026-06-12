@@ -2,10 +2,10 @@
 
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { buscarClienteAsaas, criarClienteAsaas, criarCobrancaBoleto } from '@/lib/asaas'
-
-const ESCOLA_ID = 'escola-demo'
+import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 
 export async function listarAtletasBoleto() {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { data } = await supabaseAdmin
     .from('Atleta').select('id, nome')
     .eq('escolaId', ESCOLA_ID).eq('ativo', true).order('nome')
@@ -15,6 +15,7 @@ export async function listarAtletasBoleto() {
 export async function gerarBoleto(params: {
   atletaId: string; cpf: string; valor: number; vencimento: string; descricao: string
 }) {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { atletaId, cpf, valor, vencimento, descricao } = params
   const cpfLimpo = cpf.replace(/\D/g, '')
   if (cpfLimpo.length !== 11 && cpfLimpo.length !== 14) throw new Error('CPF/CNPJ inválido')

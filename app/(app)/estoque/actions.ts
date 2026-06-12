@@ -1,12 +1,12 @@
 'use server'
 
 import { supabaseAdmin } from '@/lib/supabase-admin'
-
-const ESCOLA_ID = 'escola-demo'
+import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 
 // ── PRODUTOS ──────────────────────────────────────────────
 
 export async function listarProdutos() {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { data } = await supabaseAdmin
     .from('Produto')
     .select('*, ProdutoVariacao(*)')
@@ -16,6 +16,7 @@ export async function listarProdutos() {
 }
 
 export async function criarProduto(p: { nome: string; descricao?: string; categoria?: string; foto?: string }) {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { data, error } = await supabaseAdmin.from('Produto')
     .insert({ escolaId: ESCOLA_ID, ...p }).select('id').single()
   if (error) throw new Error(error.message)
@@ -23,16 +24,19 @@ export async function criarProduto(p: { nome: string; descricao?: string; catego
 }
 
 export async function atualizarProduto(id: string, p: { nome?: string; descricao?: string; categoria?: string; foto?: string; ativo?: boolean }) {
+  const ESCOLA_ID = await getEscolaIdServer()
   await supabaseAdmin.from('Produto').update(p).eq('id', id).eq('escolaId', ESCOLA_ID)
   return { ok: true }
 }
 
 export async function excluirProduto(id: string) {
+  const ESCOLA_ID = await getEscolaIdServer()
   await supabaseAdmin.from('Produto').delete().eq('id', id).eq('escolaId', ESCOLA_ID)
   return { ok: true }
 }
 
 export async function uploadFotoProduto(produtoId: string, base64: string, nome: string) {
+  const ESCOLA_ID = await getEscolaIdServer()
   const ext = nome.split('.').pop() || 'jpg'
   const path = `${ESCOLA_ID}/produtos/${produtoId}.${ext}`
   const buf = Buffer.from(base64.replace(/^data:.+;base64,/, ''), 'base64')
@@ -65,6 +69,7 @@ export async function excluirVariacao(id: string) {
 // ── PEDIDOS ───────────────────────────────────────────────
 
 export async function listarPedidos() {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { data } = await supabaseAdmin
     .from('Pedido')
     .select('*')

@@ -1,8 +1,7 @@
 'use server'
 
 import { supabaseAdmin } from '@/lib/supabase-admin'
-
-const ESCOLA_ID = 'escola-demo'
+import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 const BUCKET_WM = 'fotos-watermark'
 const BUCKET_ORI = 'fotos-originais'
 
@@ -11,6 +10,7 @@ const storage = supabaseAdmin.storage
 // ── ÁLBUNS ────────────────────────────────────────────────
 
 export async function listarAlbuns() {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { data, error } = await supabaseAdmin
     .from('Album')
     .select('id, titulo, descricao, dataEvento, capa, ativo, createdAt')
@@ -21,6 +21,7 @@ export async function listarAlbuns() {
 }
 
 export async function criarAlbum(p: { titulo: string; descricao?: string; dataEvento?: string }) {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { data, error } = await supabaseAdmin.from('Album').insert({
     escolaId: ESCOLA_ID, ...p
   }).select('id').single()
@@ -29,6 +30,7 @@ export async function criarAlbum(p: { titulo: string; descricao?: string; dataEv
 }
 
 export async function excluirAlbum(id: string) {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from('Album').delete().eq('id', id).eq('escolaId', ESCOLA_ID)
   if (error) throw new Error(error.message)
   return { ok: true }
@@ -53,6 +55,7 @@ export async function uploadFoto(p: {
   conteudoOriginal: string
   valor: number
 }) {
+  const ESCOLA_ID = await getEscolaIdServer()
   const id = crypto.randomUUID()
   const ext = p.nomeArquivo.split('.').pop() || 'jpg'
   const pathWm  = `${ESCOLA_ID}/${p.albumId}/${id}_wm.${ext}`
@@ -93,6 +96,7 @@ export async function excluirFoto(id: string) {
 }
 
 export async function atualizarValorFoto(id: string, valor: number) {
+  const ESCOLA_ID = await getEscolaIdServer()
   await supabaseAdmin.from('Foto').update({ valor }).eq('id', id).eq('escolaId', ESCOLA_ID)
   return { ok: true }
 }
@@ -106,6 +110,7 @@ export async function criarCompra(p: {
   metodoPagamento: 'PIX' | 'CREDIT_CARD'
   parcelas?: number
 }) {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { data: fotosData } = await supabaseAdmin
     .from('Foto').select('id, valor').in('id', p.fotos)
   const valorTotal = (fotosData || []).reduce((s, f) => s + Number(f.valor), 0)
@@ -143,6 +148,7 @@ export async function gerarLinksOriginais(compraId: string) {
 }
 
 export async function listarCompras() {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { data } = await supabaseAdmin
     .from('FotoCompra')
     .select('id, compradorNome, compradorTelefone, fotos, valor, status, metodoPagamento, pagoEm, linkEnviado, createdAt')

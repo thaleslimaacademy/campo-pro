@@ -2,12 +2,12 @@
 
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { DEFAULT_TEMPLATE } from './constants'
+import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 
 export type { Patrocinador } from './constants'
 
-const ESCOLA_ID = 'escola-demo'
-
 export async function listarPatrocinadores() {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { data, error } = await supabaseAdmin
     .from('Patrocinador')
     .select('id, nome, empresa, telefone, valor, vencimento, status, descricao, mensagemCobranca, createdAt')
@@ -21,6 +21,7 @@ export async function criarPatrocinador(p: {
   nome: string; empresa?: string; telefone?: string; valor: number
   vencimento: string; descricao?: string; mensagemCobranca?: string
 }) {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from('Patrocinador').insert({
     escolaId: ESCOLA_ID, ...p,
     mensagemCobranca: p.mensagemCobranca || DEFAULT_TEMPLATE,
@@ -30,6 +31,7 @@ export async function criarPatrocinador(p: {
 }
 
 export async function renovarPatrocinador(id: string, novoVencimento: string) {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from('Patrocinador')
     .update({ vencimento: novoVencimento, status: 'ATIVO' })
     .eq('id', id).eq('escolaId', ESCOLA_ID)
@@ -38,6 +40,7 @@ export async function renovarPatrocinador(id: string, novoVencimento: string) {
 }
 
 export async function atualizarMensagem(id: string, mensagemCobranca: string) {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from('Patrocinador')
     .update({ mensagemCobranca }).eq('id', id).eq('escolaId', ESCOLA_ID)
   if (error) throw new Error(error.message)
@@ -45,6 +48,7 @@ export async function atualizarMensagem(id: string, mensagemCobranca: string) {
 }
 
 export async function excluirPatrocinador(id: string) {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from('Patrocinador')
     .delete().eq('id', id).eq('escolaId', ESCOLA_ID)
   if (error) throw new Error(error.message)
@@ -52,6 +56,7 @@ export async function excluirPatrocinador(id: string) {
 }
 
 export async function enviarCobrancaWhatsApp(id: string) {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { data, error } = await supabaseAdmin.from('Patrocinador')
     .select('nome, telefone, valor, vencimento, mensagemCobranca')
     .eq('id', id).single()

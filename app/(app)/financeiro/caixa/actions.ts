@@ -1,10 +1,10 @@
 'use server'
 
 import { supabaseAdmin } from '@/lib/supabase-admin'
-
-const ESCOLA_ID = 'escola-demo'
+import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 
 export async function carregarCaixa(mes: string) {
+  const ESCOLA_ID = await getEscolaIdServer()
   const [anoStr, mesStr] = mes.split('-')
   const ano = Number(anoStr), m = Number(mesStr)
   const inicio = `${mes}-01`
@@ -30,24 +30,28 @@ export async function carregarCaixa(mes: string) {
 }
 
 export async function criarReceita(p: { valor: number; descricao: string; categoria: string; data: string }) {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from('Receita').insert({ escolaId: ESCOLA_ID, ...p })
   if (error) throw new Error(error.message)
   return { ok: true }
 }
 
 export async function excluirReceita(id: string) {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from('Receita').delete().eq('id', id).eq('escolaId', ESCOLA_ID)
   if (error) throw new Error(error.message)
   return { ok: true }
 }
 
 export async function criarDespesa(p: { valor: number; descricao: string; categoria: string; data: string }) {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from('Despesa').insert({ escolaId: ESCOLA_ID, ...p })
   if (error) throw new Error(error.message)
   return { ok: true }
 }
 
 export async function excluirDespesa(id: string) {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from('Despesa').delete().eq('id', id).eq('escolaId', ESCOLA_ID)
   if (error) throw new Error(error.message)
   return { ok: true }
