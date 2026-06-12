@@ -11,6 +11,7 @@ function ConfiguracoesInner() {
   const [salvando, setSalvando] = useState(false)
   const [sucesso, setSucesso] = useState(false)
   const [erro, setErro] = useState('')
+  const [slug, setSlug] = useState('')
   const [form, setForm] = useState({
     nome: '', telefone: '', whatsapp: '', email: '',
     endereco: '', cidade: '', estado: '', cep: '',
@@ -38,6 +39,7 @@ function ConfiguracoesInner() {
     async function carregar() {
       const { data } = await supabase.from('Escola').select('*').eq('id', escolaId!).single()
       if (data) {
+        setSlug(data.slug || '')
         setForm({
           nome: data.nome || '', telefone: data.telefone || '',
           whatsapp: data.whatsapp || '', email: data.email || '',
@@ -169,6 +171,28 @@ function ConfiguracoesInner() {
           </div>
         </div>
 
+        {/* Links Publicos */}
+        {slug && (
+          <div style={{ background: 'rgba(255,107,0,0.06)', border: '1px solid rgba(255,107,0,0.2)', borderRadius: '16px', padding: '16px', marginBottom: '12px' }}>
+            <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '13px', color: neon, marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.8px' }}>🔗 Links Públicos</p>
+            <p style={{ fontSize: '11px', color: muted, marginBottom: '12px' }}>Compartilhe estes links com os responsáveis e clientes.</p>
+            {[
+              { label: '🛍️ Loja', url: `https://gestaofc.com.br/loja/${slug}` },
+              { label: '📷 Galeria', url: `https://gestaofc.com.br/galeria/${slug}` },
+            ].map(({ label, url }) => (
+              <div key={label} style={{ marginBottom: '10px' }}>
+                <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '4px' }}>{label}</div>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <div style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 12px', fontSize: '11px', color: 'rgba(255,255,255,0.6)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{url}</div>
+                  <button onClick={() => { navigator.clipboard.writeText(url) }}
+                    style={{ background: 'rgba(255,107,0,0.15)', border: '1px solid rgba(255,107,0,0.3)', color: neon, borderRadius: '10px', padding: '10px 14px', fontSize: '11px', fontFamily: syne, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+                    Copiar
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
         {/* Botao salvar */}
         <button onClick={salvar} disabled={salvando} style={{ width: '100%', background: 'linear-gradient(135deg,#FF6B00,#00cc00)', color: '#000', padding: '16px', borderRadius: '14px', fontFamily: syne, fontWeight: 800, fontSize: '15px', border: 'none', cursor: 'pointer', boxShadow: '0 0 20px rgba(57,255,20,0.3)', marginBottom: '10px', opacity: salvando ? 0.6 : 1 }}>
           {salvando ? 'Salvando...' : 'Salvar Configuracoes'}
