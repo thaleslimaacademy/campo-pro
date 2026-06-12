@@ -3,7 +3,7 @@ import { usePerfil } from '@/lib/usePerfil'
 import AdminGuard from '@/components/AdminGuard'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { salvarConfiguracoes } from './actions'
+import { salvarConfiguracoes, listarPlanos, salvarPlano, criarPlano, excluirPlano } from './actions'
 
 function ConfiguracoesInner() {
   const { escolaId } = usePerfil()
@@ -12,6 +12,10 @@ function ConfiguracoesInner() {
   const [sucesso, setSucesso] = useState(false)
   const [erro, setErro] = useState('')
   const [slug, setSlug] = useState('')
+  const [planos, setPlanos] = useState<{id:string;nome:string;slug:string;valor:number}[]>([])
+  const [novoPlanoNome, setNovoPlanoNome] = useState('')
+  const [novoPlanoValor, setNovoPlanoValor] = useState('')
+  const [salvandoPlano, setSalvandoPlano] = useState<string|null>(null)
   const [form, setForm] = useState({
     nome: '', telefone: '', whatsapp: '', email: '',
     endereco: '', cidade: '', estado: '', cep: '',
@@ -40,6 +44,7 @@ function ConfiguracoesInner() {
       const { data } = await supabase.from('Escola').select('*').eq('id', escolaId!).single()
       if (data) {
         setSlug(data.slug || '')
+        listarPlanos().then(setPlanos).catch(() => {})
         setForm({
           nome: data.nome || '', telefone: data.telefone || '',
           whatsapp: data.whatsapp || '', email: data.email || '',
@@ -171,6 +176,44 @@ function ConfiguracoesInner() {
           </div>
         </div>
 
+        {/* Planos de Mensalidade */}
+        <div style={{ background: 'rgba(255,215,0,0.06)', border: '1px solid rgba(255,215,0,0.2)', borderRadius: '16px', padding: '16px', marginBottom: '12px' }}>
+          <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '13px', color: gold, marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.8px' }}>💰 Planos de Mensalidade</p>
+          {planos.map(p => (
+            <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+              <div style={{ flex: 1, fontSize: '13px', color: '#F0F0F0', fontWeight: 600 }}>{p.nome}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '11px', color: muted }}>R$</span>
+                <input
+                  type="number"
+                  defaultValue={p.valor}
+                  onBlur={async e => {
+                    const novoValor = Number(e.target.value)
+                    if (novoValor === p.valor) return
+                    setSalvandoPlano(p.id)
+                    await salvarPlano(p.id, novoValor).catch(() => {})
+                    setPlanos(prev => prev.map(x => x.id === p.id ? { ...x, valor: novoValor } : x))
+                    setSalvandoPlano(null)
+                  }}
+                  style={{ width: '80px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,215,0,0.3)', borderRadius: '8px', padding: '8px', color: gold, fontFamily: syne, fontWeight: 700, fontSize: '13px', textAlign: 'center' }}
+                />
+                {salvandoPlano === p.id && <span style={{ fontSize: '10px', color: muted }}>...</span>}
+                <button onClick={async () => { if (confirm('Excluir plano ' + p.nome + '?')) { await excluirPlano(p.id); setPlanos(prev => prev.filter(x => x.id !== p.id)) } }}
+                  style={{ background: 'transparent', border: 'none', color: 'rgba(255,70,70,0.6)', cursor: 'pointer', fontSize: '16px', padding: '4px' }}>×</button>
+              </div>
+            </div>
+          ))}
+          <div style={{ display: 'flex', gap: '8px', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <input value={novoPlanoNome} onChange={e => setNovoPlanoNome(e.target.value)} placeholder="Nome do plano" style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '8px 10px', color: '#F0F0F0', fontSize: '12px' }} />
+            <input value={novoPlanoValor} onChange={e => setNovoPlanoValor(e.target.value)} type="number" placeholder="R$" style={{ width: '70px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '8px', color: '#F0F0F0', fontSize: '12px' }} />
+            <button onClick={async () => {
+              if (!novoPlanoNome || !novoPlanoValor) return
+              await criarPlano(novoPlanoNome, Number(novoPlanoValor))
+              await listarPlanos().then(setPlanos)
+              setNovoPlanoNome(''); setNovoPlanoValor('')
+            }} style={{ background: 'rgba(255,215,0,0.15)', border: '1px solid rgba(255,215,0,0.3)', color: gold, borderRadius: '8px', padding: '8px 14px', fontSize: '12px', fontFamily: syne, fontWeight: 700, cursor: 'pointer' }}>+ Adicionar</button>
+          </div>
+        </div>
         {/* Links Publicos */}
         {slug && (
           <div style={{ background: 'rgba(255,107,0,0.06)', border: '1px solid rgba(255,107,0,0.2)', borderRadius: '16px', padding: '16px', marginBottom: '12px' }}>

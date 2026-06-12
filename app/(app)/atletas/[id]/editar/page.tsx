@@ -29,6 +29,10 @@ export default function EditarAtleta() {
     nomeResponsavel: '',
     whatsappResponsavel: '',
     planoMensalidade: 'STANDARD',
+    diaVencimento: '10',
+    escolaEstuda: '',
+    serieEstuda: '',
+    turnoEstuda: '',
   })
   const [responsavelId, setResponsavelId] = useState<string | null>(null)
 
@@ -57,6 +61,10 @@ export default function EditarAtleta() {
           cidade: atleta.cidade || '',
           estado: atleta.estado || '',
           planoMensalidade: atleta.planoMensalidade || 'STANDARD',
+          diaVencimento: atleta.diaVencimento?.toString() || '10',
+          escolaEstuda: atleta.escolaEstuda || '',
+          serieEstuda: atleta.serieEstuda || '',
+          turnoEstuda: atleta.turnoEstuda || '',
         }))
       }
 
@@ -120,6 +128,10 @@ export default function EditarAtleta() {
         cidade: form.cidade,
         estado: form.estado,
         planoMensalidade: form.planoMensalidade,
+        diaVencimento: Number(form.diaVencimento) || 10,
+        escolaEstuda: form.escolaEstuda || null,
+        serieEstuda: form.serieEstuda || null,
+        turnoEstuda: form.turnoEstuda || null,
       })
       .eq('id', id)
 
@@ -222,6 +234,16 @@ export default function EditarAtleta() {
               <option value="STANDARD">Standard - R$ 85,00</option>
               <option value="BABYFUT">BabyFut - R$ 100,00</option>
             </select>
+            </div>
+            </div>
+            <div>
+              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Dia de Vencimento</label>
+              <select name="diaVencimento" value={form.diaVencimento} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" as const }}>
+                {[5,10,15,20,25].map(d => <option key={d} value={d}>Dia {d}</option>)}
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
             <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Posição</label>
                 <select name="posicao" value={form.posicao} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }}>
                   <option value="">Selecione</option>

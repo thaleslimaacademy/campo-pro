@@ -57,6 +57,10 @@ export default function NovoAtleta() {
       cidade: dados.get('cidade'),
       estado: dados.get('estado'),
       tokenPais,
+      diaVencimento: Number(dados.get('diaVencimento')) || 10,
+      escolaEstuda: dados.get('escolaEstuda') || null,
+      serieEstuda: dados.get('serieEstuda') || null,
+      turnoEstuda: dados.get('turnoEstuda') || null,
       ativo: true,
     })
 
@@ -145,6 +149,12 @@ export default function NovoAtleta() {
           </div>
         )}
 
+        <div>
+          <label className="text-sm text-gray-400">Dia de Vencimento</label>
+          <select name="diaVencimento" className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 mt-1 text-white">
+            {[5,10,15,20,25].map(d => <option key={d} value={d}>Dia {d}</option>)}
+          </select>
+        </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-sm text-gray-400">Posição</label>
@@ -194,6 +204,31 @@ export default function NovoAtleta() {
           </div>
         </div>
 
+        <p className="text-green-500 font-bold text-sm uppercase pt-2">Escola</p>
+        <div>
+          <label className="text-sm text-gray-400">Nome da escola que estuda</label>
+          <input name="escolaEstuda" type="text" className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 mt-1 text-white" placeholder="Ex: Escola Estadual João Silva" />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-sm text-gray-400">Série / Ano</label>
+            <select name="serieEstuda" className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 mt-1 text-white">
+              <option value="">Selecione</option>
+              <option>1º ano EF</option><option>2º ano EF</option><option>3º ano EF</option>
+              <option>4º ano EF</option><option>5º ano EF</option><option>6º ano EF</option>
+              <option>7º ano EF</option><option>8º ano EF</option><option>9º ano EF</option>
+              <option>1º ano EM</option><option>2º ano EM</option><option>3º ano EM</option>
+              <option>Faculdade</option><option>Outro</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-sm text-gray-400">Turno</label>
+            <select name="turnoEstuda" className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 mt-1 text-white">
+              <option value="">Selecione</option>
+              <option>Manhã</option><option>Tarde</option><option>Noite</option><option>Integral</option>
+            </select>
+          </div>
+        </div>
         <p className="text-green-500 font-bold text-sm uppercase pt-2">Responsável</p>
         <div>
           <label className="text-sm text-gray-400">Nome do responsável *</label>

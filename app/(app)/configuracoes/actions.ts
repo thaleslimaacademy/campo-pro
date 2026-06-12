@@ -54,3 +54,45 @@ export async function salvarConfiguracoes(form: ConfiguracaoForm): Promise<{ ok:
 
   return { ok: true, message: 'salvo' }
 }
+
+export async function listarPlanos() {
+  const { userId } = await auth()
+  const escolaId = (await import('@/lib/getEscolaIdServer')).getEscolaIdServer
+  const { sessionClaims } = await auth()
+  const eid = (sessionClaims?.metadata as any)?.escolaId as string
+  if (!eid) throw new Error('escolaId ausente')
+  const { data } = await supabaseAdmin.from('PlanoMensalidade')
+    .select('id, nome, slug, valor').eq('escolaId', eid).order('valor')
+  return data ?? []
+}
+
+export async function salvarPlano(id: string, valor: number) {
+  const { sessionClaims } = await auth()
+  const eid = (sessionClaims?.metadata as any)?.escolaId as string
+  if (!eid) throw new Error('escolaId ausente')
+  const { error } = await supabaseAdmin.from('PlanoMensalidade')
+    .update({ valor }).eq('id', id).eq('escolaId', eid)
+  if (error) throw new Error(error.message)
+  return { ok: true }
+}
+
+export async function criarPlano(nome: string, valor: number) {
+  const { sessionClaims } = await auth()
+  const eid = (sessionClaims?.metadata as any)?.escolaId as string
+  if (!eid) throw new Error('escolaId ausente')
+  const slug = nome.toUpperCase().replace(/[^A-Z0-9]/g, '_')
+  const { error } = await supabaseAdmin.from('PlanoMensalidade')
+    .insert({ id: crypto.randomUUID(), escolaId: eid, nome, slug, valor })
+  if (error) throw new Error(error.message)
+  return { ok: true }
+}
+
+export async function excluirPlano(id: string) {
+  const { sessionClaims } = await auth()
+  const eid = (sessionClaims?.metadata as any)?.escolaId as string
+  if (!eid) throw new Error('escolaId ausente')
+  const { error } = await supabaseAdmin.from('PlanoMensalidade')
+    .delete().eq('id', id).eq('escolaId', eid)
+  if (error) throw new Error(error.message)
+  return { ok: true }
+}

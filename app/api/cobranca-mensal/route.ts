@@ -2,11 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { criarClienteAsaas, criarCobrancaPix, getPixQrCode } from '@/lib/asaas'
 
-const PLANOS: Record<string, number> = {
-  AMIGO: 80,
-  STANDARD: 85,
-  BABYFUT: 100,
-}
+// Planos carregados dinamicamente do banco por escola
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,7 +14,6 @@ export async function POST(req: NextRequest) {
     const agora = new Date()
     const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString().split('T')[0]
     const fimMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0).toISOString().split('T')[0]
-    const vencimento = new Date(agora.getFullYear(), agora.getMonth(), 10).toISOString().split('T')[0]
 
     const { data: escolas } = await supabaseAdmin
       .from('Escola').select('id, nome').eq('ativo', true)
@@ -28,9 +23,15 @@ export async function POST(req: NextRequest) {
     let totalPuladas = 0
 
     for (const escola of escolas || []) {
+      // Carrega planos da escola do banco
+      const { data: planosEscola } = await supabaseAdmin
+        .from('PlanoMensalidade').select('slug, valor').eq('escolaId', escola.id)
+      const PLANOS: Record<string, number> = {}
+      for (const p of planosEscola || []) PLANOS[p.slug] = Number(p.valor)
+
       const { data: atletas } = await supabaseAdmin
         .from('Atleta')
-        .select('id, nome, cpf, telefone, asaasCustomerId, planoMensalidade')
+        .select('id, nome, cpf, telefone, asaasCustomerId, planoMensalidade, diaVencimento')
         .eq('escolaId', escola.id)
         .eq('ativo', true)
 
@@ -44,6 +45,8 @@ export async function POST(req: NextRequest) {
 
         if (count && count > 0) { totalPuladas++; continue }
 
+        const dia = atleta.diaVencimento || 10
+        const vencimento = new Date(agora.getFullYear(), agora.getMonth(), dia).toISOString().split('T')[0]
         const valor = PLANOS[atleta.planoMensalidade || 'STANDARD'] || 85
 
         try {
