@@ -10,13 +10,8 @@ const STATUS_MAP: Record<string, string> = {
   PAYMENT_REFUNDED: 'CANCELADO',
 }
 
-const brl = (n: number) =>
-  n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-
-const dataBR = (s: string | null) => {
-  if (!s) return '-'
-  return s.slice(0, 10).split('-').reverse().join('/')
-}
+const brl = (n: number) => n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+const dataBR = (s: string | null) => { if (!s) return '-'; return s.slice(0, 10).split('-').reverse().join('/') }
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,12 +26,63 @@ export async function POST(req: NextRequest) {
     }
 
     const novoStatus = STATUS_MAP[evento]
-    if (!novoStatus) {
-      console.log('Evento ignorado:', evento)
-      return NextResponse.json({ ignorado: true })
+    if (!novoStatus) return NextResponse.json({ ignorado: true })
+
+    // ── VERIFICA SE É COMPRA DE FOTO ──────────────────────
+    const { data: fotoCompra } = await supabaseAdmin
+      .from('FotoCompra')
+      .select('id, fotos, compradorNome, compradorTelefone, linkEnviado')
+      .eq('asaasId', pagamento.id)
+      .maybeSingle()
+
+    if (fotoCompra) {
+      // Atualiza status da compra de foto
+      await supabaseAdmin.from('FotoCompra')
+        .update({ status: novoStatus, ...(novoStatus === 'PAGO' ? { pagoEm: new Date().toISOString() } : {}) })
+        .eq('id', fotoCompra.id)
+
+      console.log('FotoCompra atualizada:', fotoCompra.id, '->', novoStatus)
+
+      // Envia fotos se PAGO e ainda não enviou
+      if (novoStatus === 'PAGO' && !fotoCompra.linkEnviado) {
+        try {
+          const { data: fotos } = await supabaseAdmin
+            .from('Foto').select('id, urlOriginal').in('id', fotoCompra.fotos)
+
+          const links = await Promise.all((fotos || []).map(async (f, i) => {
+            const { data } = await supabaseAdmin.storage
+              .from('fotos-originais')
+              .createSignedUrl(f.urlOriginal, 60 * 60 * 24 * 7)
+            return `📷 Foto ${i + 1}: ${data?.signedUrl || ''}`
+          }))
+
+          const primeiroNome = fotoCompra.compradorNome.split(' ')[0]
+          const msg = [
+            `✅ *Pagamento confirmado!*`,
+            ``,
+            `Olá, *${primeiroNome}*! 🎉`,
+            ``,
+            `Suas fotos estão prontas. Links válidos por *7 dias*:`,
+            ``,
+            ...links,
+            ``,
+            `⬇️ Clique em cada link para baixar a foto original.`,
+            ``,
+            `_Gestão FC · gestaofc.com.br_`,
+          ].join('\n')
+
+          await enviarWhatsApp(fotoCompra.compradorTelefone, msg)
+          await supabaseAdmin.from('FotoCompra').update({ linkEnviado: true }).eq('id', fotoCompra.id)
+          console.log('Fotos enviadas via WhatsApp para:', fotoCompra.compradorTelefone)
+        } catch (e) {
+          console.error('Erro ao enviar fotos WhatsApp:', (e as Error).message)
+        }
+      }
+
+      return NextResponse.json({ sucesso: true, tipo: 'foto', status: novoStatus })
     }
 
-    // Baixa no Supabase
+    // ── MENSALIDADE NORMAL ────────────────────────────────
     const { error } = await supabaseAdmin
       .from('Cobranca')
       .update({ status: novoStatus, ...(novoStatus === 'PAGO' ? { pagoEm: new Date().toISOString() } : {}) })
@@ -49,7 +95,6 @@ export async function POST(req: NextRequest) {
 
     console.log('Cobranca atualizada:', pagamento.id, '->', novoStatus)
 
-    // Envia recibo WhatsApp se pagamento confirmado
     if (novoStatus === 'PAGO') {
       try {
         const { data: cobranca } = await supabaseAdmin
@@ -60,25 +105,14 @@ export async function POST(req: NextRequest) {
 
         if (cobranca?.atletaId) {
           const { data: atleta } = await supabaseAdmin
-            .from('Atleta')
-            .select('nome')
-            .eq('id', cobranca.atletaId)
-            .single()
+            .from('Atleta').select('nome').eq('id', cobranca.atletaId).single()
 
-          // ✅ FIX: filtra por principal: true para pegar o responsável correto
           const { data: responsavel } = await supabaseAdmin
-            .from('Responsavel')
-            .select('nome, whatsapp')
-            .eq('atletaId', cobranca.atletaId)
-            .eq('principal', true)
-            .maybeSingle()
+            .from('Responsavel').select('nome, whatsapp')
+            .eq('atletaId', cobranca.atletaId).eq('principal', true).maybeSingle()
 
           if (responsavel?.whatsapp) {
             const primeiroNome = responsavel.nome?.split(' ')[0] || 'Responsável'
-            // ✅ FIX: dataBR usa slice(0,10) — sem concatenar horário duplicado
-            const dataVenc = dataBR(cobranca.vencimento)
-            const valorFmt = brl(Number(cobranca.valor))
-
             const msg = [
               `🏆 *THALES LIMA FOOTBALL ACADEMY*`,
               ``,
@@ -90,8 +124,8 @@ export async function POST(req: NextRequest) {
               ``,
               `👤 Atleta: *${atleta?.nome || '-'}*`,
               `📋 Referente: ${cobranca.descricao || 'Mensalidade'}`,
-              `💰 Valor: *R$ ${valorFmt}*`,
-              `📅 Vencimento: ${dataVenc}`,
+              `💰 Valor: *R$ ${brl(Number(cobranca.valor))}*`,
+              `📅 Vencimento: ${dataBR(cobranca.vencimento)}`,
               `✅ Status: *PAGO*`,
               ``,
               `━━━━━━━━━━━━━━━━━━━━`,
@@ -102,15 +136,14 @@ export async function POST(req: NextRequest) {
             ].join('\n')
 
             await enviarWhatsApp(responsavel.whatsapp, msg)
-            console.log('Recibo WhatsApp enviado para:', responsavel.whatsapp)
           }
         }
       } catch (wzErr: unknown) {
-        console.error('Erro WhatsApp pos-pagamento:', (wzErr as Error).message)
+        console.error('Erro WhatsApp:', (wzErr as Error).message)
       }
     }
 
-    return NextResponse.json({ sucesso: true, status: novoStatus })
+    return NextResponse.json({ sucesso: true, tipo: 'mensalidade', status: novoStatus })
   } catch (err: unknown) {
     console.error('Erro webhook:', (err as Error).message)
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
