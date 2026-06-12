@@ -15,6 +15,10 @@
     {
       "path": "/api/cobranca-mensal",
       "schedule": "0 10 10 * *"
+    },
+    {
+      "path": "/api/cobranca-reemissao",
+      "schedule": "0 8 * * *"
     }
   ]
 }
