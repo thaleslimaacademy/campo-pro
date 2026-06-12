@@ -2,15 +2,11 @@
 
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { criarClienteAsaas, criarCobrancaGenerica, getPixQrCode } from '@/lib/asaas'
-import { createClient } from '@supabase/supabase-js'
 
 const ESCOLA_ID = 'escola-demo'
 const BUCKET_ORI = 'fotos-originais'
 
-const storage = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-).storage
+const storage = supabaseAdmin.storage
 
 export async function listarAlbunsPublicos() {
   const { data } = await supabaseAdmin
@@ -25,7 +21,7 @@ export async function listarAlbunsPublicos() {
 export async function listarFotosPublicas(albumId: string) {
   const { data } = await supabaseAdmin
     .from('Foto')
-    .select('id, urlWatermark, valor') // só watermark, nunca original
+    .select('id, urlWatermark, valor')
     .eq('albumId', albumId)
     .order('createdAt')
   return data ?? []
@@ -58,13 +54,13 @@ export async function criarCompraPublica(p: {
     billingType: p.metodoPagamento,
     dueDate,
     description: desc,
+    value: valorTotal,
   }
 
   if (p.metodoPagamento === 'CREDIT_CARD' && p.parcelas && p.parcelas > 1) {
+    delete dadosCobranca.value
     dadosCobranca.installmentCount = p.parcelas
     dadosCobranca.installmentValue = Number((valorTotal / p.parcelas).toFixed(2))
-  } else {
-    dadosCobranca.value = valorTotal
   }
 
   const cobranca = await criarCobrancaGenerica(dadosCobranca)
@@ -84,8 +80,12 @@ export async function criarCompraPublica(p: {
 
   let pixData = null
   if (p.metodoPagamento === 'PIX' && cobranca.id) {
-    const qr = await getPixQrCode(cobranca.id)
-    pixData = { copiaCola: qr.payload, qrCodeImage: qr.encodedImage }
+    try {
+      const qr = await getPixQrCode(cobranca.id)
+      pixData = { copiaCola: qr.payload, qrCodeImage: qr.encodedImage }
+    } catch (e) {
+      console.error('Erro QR Code:', e)
+    }
   }
 
   return {
