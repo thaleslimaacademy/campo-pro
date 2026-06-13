@@ -7,7 +7,8 @@ export function usePerfil() {
 
   useEffect(() => {
     if (isLoaded && user) {
-      getToken({ skipCache: true })
+      // Força refresh do token para pegar metadata atualizado
+      user.reload().then(() => getToken({ skipCache: true }))
     }
   }, [isLoaded, user?.id])
 
