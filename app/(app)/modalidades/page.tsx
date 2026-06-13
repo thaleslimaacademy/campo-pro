@@ -1,7 +1,7 @@
 'use client'
-export const dynamic = 'force-dynamic'
 import { useEffect, useState } from 'react'
-import { listarModalidadesEscola, toggleModalidade, getInfoEscola, MODALIDADES, PLANOS_GESTAOFC } from './actions'
+import { listarModalidadesEscola, toggleModalidade, getInfoEscola } from './actions'
+import { MODALIDADES, PLANOS_GESTAOFC } from './constants'
 
 const C = { bg: '#0F0F1A', surface: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.07)', orange: '#FF6B00', gold: '#FFD700', muted: 'rgba(255,255,255,0.4)', text: '#F0F0F0' }
 const SYNE = 'Syne, sans-serif'
