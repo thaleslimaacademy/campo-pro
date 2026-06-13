@@ -20,6 +20,7 @@ export default function Turmas() {
   const [loading, setLoading] = useState(true)
   const [criando, setCriando] = useState(false)
   const [salvando, setSalvando] = useState(false)
+  const [filtroModal, setFiltroModal] = useState('todas')
   const [form, setForm] = useState({ nome: '', descricao: '', diasSemana: '', horario: '', modalidade: 'futebol' })
 
   const syne = 'Syne, sans-serif'
@@ -139,8 +140,28 @@ export default function Turmas() {
         </div>
       )}
 
+      {/* FILTRO MODALIDADE */}
+      <div style={{ padding: '0 20px 8px', overflowX: 'auto' }}>
+        <div style={{ display: 'flex', gap: '8px', minWidth: 'max-content' }}>
+          {[
+            { slug: 'todas', label: 'Todas', emoji: '🏅' },
+            { slug: 'futebol', label: 'Futebol', emoji: '⚽' },
+            { slug: 'futsal', label: 'Futsal', emoji: '🥅' },
+            { slug: 'volei', label: 'Vôlei', emoji: '🏐' },
+            { slug: 'basquete', label: 'Basquete', emoji: '🏀' },
+            { slug: 'artes-marciais', label: 'Artes Marciais', emoji: '🥋' },
+            { slug: 'beach-tennis', label: 'Beach Tennis', emoji: '🎾' },
+            { slug: 'outras', label: 'Outras', emoji: '🏅' },
+          ].map(m => (
+            <button key={m.slug} onClick={() => setFiltroModal(m.slug)}
+              style={{ padding: '6px 14px', borderRadius: '20px', border: `1px solid ${filtroModal === m.slug ? neon : 'rgba(255,255,255,0.1)'}`, background: filtroModal === m.slug ? 'rgba(255,107,0,0.15)' : 'transparent', color: filtroModal === m.slug ? neon : muted, fontSize: '11px', fontFamily: syne, fontWeight: filtroModal === m.slug ? 700 : 400, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              {m.emoji} {m.label}
+            </button>
+          ))}
+        </div>
+      </div>
       <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {turmas.map((t, i) => (
+        {turmas.filter(t => filtroModal === 'todas' || (t.modalidade || 'futebol') === filtroModal).map((t, i) => (
           <a key={t.id} href={'/turmas/' + t.id} style={{ display: 'block', background: card, border: border, borderRadius: '16px', padding: '16px', textDecoration: 'none', color: '#F0F0F0' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div style={{ flex: 1 }}>
