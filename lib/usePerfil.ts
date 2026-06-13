@@ -1,22 +1,33 @@
-import { useUser, useAuth } from '@clerk/nextjs'
-import { useEffect } from 'react'
+'use client'
+import { useUser } from '@clerk/nextjs'
+import { useEffect, useState } from 'react'
+
+type Perfil = {
+  escolaId: string
+  role: string
+  nome: string
+}
 
 export function usePerfil() {
   const { user, isLoaded } = useUser()
-  const { getToken } = useAuth()
+  const [perfil, setPerfil] = useState<Perfil | null>(null)
+  const [perfilLoaded, setPerfilLoaded] = useState(false)
 
   useEffect(() => {
-    if (isLoaded && user) {
-      // Força refresh do token para pegar metadata atualizado
-      user.reload().then(() => getToken({ skipCache: true }))
-    }
+    if (!isLoaded || !user) return
+    fetch('/api/perfil')
+      .then(r => r.json())
+      .then(({ perfil }) => {
+        if (perfil) setPerfil(perfil)
+      })
+      .finally(() => setPerfilLoaded(true))
   }, [isLoaded, user?.id])
 
-  const meta = (user?.publicMetadata ?? {}) as { escolaId?: string; role?: string }
   return {
-    isLoaded,
-    escolaId: meta.escolaId,
-    role: meta.role,
-    isAdmin: meta.role === 'admin' || meta.role === 'superadmin',
+    isLoaded: isLoaded && perfilLoaded,
+    escolaId: perfil?.escolaId,
+    role: perfil?.role,
+    isAdmin: perfil?.role === 'admin' || perfil?.role === 'superadmin',
+    nome: perfil?.nome,
   }
 }
