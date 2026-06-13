@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 type Perfil = {
   escolaId: string
-  role: string
+  perfil: string
   nome: string
 }
 
@@ -26,8 +26,8 @@ export function usePerfil() {
   return {
     isLoaded: isLoaded && perfilLoaded,
     escolaId: perfil?.escolaId,
-    role: perfil?.role,
-    isAdmin: perfil?.role === 'admin' || perfil?.role === 'superadmin',
+    role: perfil?.perfil,
+    isAdmin: perfil?.perfil === 'admin' || perfil?.perfil === 'superadmin',
     nome: perfil?.nome,
   }
 }

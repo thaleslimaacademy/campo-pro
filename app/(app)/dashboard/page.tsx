@@ -42,7 +42,7 @@ const MODULOS_PROFESSOR = [
 ]
 
 export default function Dashboard() {
-  const { isAdmin, isLoaded, escolaId, role } = usePerfil()
+  const { isAdmin, isLoaded, escolaId, role, nome: nomeUsuario } = usePerfil()
   const MODULOS = role === 'diretor' ? MODULOS_ADMIN.filter(m => m.href !== '/configuracoes')
     : role === 'preparador' ? [
         { href: '/atletas',  label: 'Atletas',  e: '👥', cor: C.blue },
