@@ -18,8 +18,8 @@ export default function ModalidadesPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const isAtiva = (slug: string) => ativas.find(a => a.modalidade === slug)?.ativa ?? false
-  const totalAtivas = ativas.filter(a => a.ativa).length
+  const isAtiva = (slug: string) => Array.isArray(ativas) ? (ativas.find(a => a.modalidade === slug)?.ativa ?? false) : false
+  const totalAtivas = Array.isArray(ativas) ? ativas.filter(a => a.ativa).length : 0
   const plano = PLANOS_GESTAOFC.find(p => p.slug === info?.planoGestaoFC) || PLANOS_GESTAOFC[0]
 
   const toggle = async (slug: string) => {
