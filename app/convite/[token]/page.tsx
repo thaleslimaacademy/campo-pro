@@ -11,6 +11,7 @@ interface Professor {
   nome: string
   email: string
   cargo: string
+  perfil: string
   escolaId: string
   ativo: boolean
   contaCriada: boolean
@@ -58,7 +59,8 @@ export default function Convite() {
       professor.id,
       professor.escolaId,
       professor.nome,
-      professor.email
+      professor.email,
+      professor.perfil || 'professor'
     )
     if (!result.ok) {
       setErro('Erro: ' + result.message)

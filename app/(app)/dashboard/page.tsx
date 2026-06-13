@@ -30,6 +30,7 @@ const MODULOS_ADMIN = [
   { href: '/mensagens',                 label: 'Mensagens',      e: '💬', cor: C.green },
   { href: '/matriculas',                label: 'Matrículas',     e: '📝', cor: C.orange },
   { href: '/configuracoes',             label: 'Config',         e: '⚙️', cor: C.muted },
+  { href: '/comissao',                   label: 'Comissão',       e: '👨‍💼', cor: C.blue },
 ]
 
 const MODULOS_PROFESSOR = [
@@ -42,7 +43,14 @@ const MODULOS_PROFESSOR = [
 
 export default function Dashboard() {
   const { isAdmin, isLoaded, escolaId, role } = usePerfil()
-  const MODULOS = role === 'professor' ? MODULOS_PROFESSOR : MODULOS_ADMIN
+  const MODULOS = role === 'diretor' ? MODULOS_ADMIN.filter(m => m.href !== '/configuracoes')
+    : role === 'preparador' ? [
+        { href: '/atletas',  label: 'Atletas',  e: '👥', cor: C.blue },
+        { href: '/presenca', label: 'Presença', e: '✅', cor: C.green },
+        { href: '/turmas',   label: 'Turmas',   e: '🏃', cor: C.orange },
+      ]
+    : role === 'professor' ? MODULOS_PROFESSOR
+    : MODULOS_ADMIN
   const [escola, setEscola] = useState('Gestão FC')
   const [totalAtletas, setTotalAtletas] = useState(0)
   const [inadimplentes, setInadimplentes] = useState(0)
