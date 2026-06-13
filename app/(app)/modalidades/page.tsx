@@ -33,7 +33,10 @@ export default function ModalidadesPage() {
         if (existe) return prev.map(a => a.modalidade === slug ? { ...a, ativa: novoEstado } : a)
         return [...prev, { id: slug, modalidade: slug, ativa: novoEstado }]
       })
-    } catch (e) { setErro((e as Error).message) }
+    } catch (e) {
+      const msg = (e as Error).message
+      setErro(msg.includes('Limite') ? msg : 'Erro ao atualizar modalidade. Tente novamente.')
+    }
     finally { setSalvando(null) }
   }
 
