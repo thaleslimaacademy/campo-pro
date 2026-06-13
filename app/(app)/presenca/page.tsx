@@ -3,8 +3,9 @@ import { usePerfil } from '@/lib/usePerfil'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
-type Atleta = { id: string; nome: string; posicao: string | null }
+type Atleta = { id: string; nome: string; posicao: string | null; turmaId: string | null }
 type Presenca = { atletaId: string; status: 'PRESENTE' | 'AUSENTE' }
+type Turma = { id: string; nome: string; modalidade: string }
 
 export default function Presenca() {
   const { escolaId, isLoaded } = usePerfil()
@@ -13,6 +14,8 @@ export default function Presenca() {
   const [treinoId, setTreinoId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [salvando, setSalvando] = useState<string | null>(null)
+  const [turmas, setTurmas] = useState<Turma[]>([])
+  const [turmaSel, setTurmaSel] = useState<string>('todas')
 
   const hoje = new Date().toLocaleDateString('pt-BR')
   const syne = 'Syne, sans-serif'
@@ -22,8 +25,13 @@ export default function Presenca() {
   useEffect(() => {
     if (!escolaId) return
     async function carregar() {
+      const { data: turmasData } = await supabase
+        .from('Turma').select('id, nome, modalidade')
+        .eq('escolaId', escolaId!).eq('ativa', true).order('nome')
+      setTurmas(turmasData || [])
+
       const { data: atletasData } = await supabase
-        .from('Atleta').select('id, nome, posicao')
+        .from('Atleta').select('id, nome, posicao, turmaId')
         .eq('escolaId', escolaId!).eq('ativo', true).order('nome')
       setAtletas(atletasData || [])
 
@@ -64,9 +72,10 @@ export default function Presenca() {
     setSalvando(null)
   }
 
+  const atletasFiltrados = turmaSel === 'todas' ? atletas : atletas.filter(a => a.turmaId === turmaSel)
   const presentes = Object.values(presencas).filter(s => s === 'PRESENTE').length
   const ausentes = Object.values(presencas).filter(s => s === 'AUSENTE').length
-  const pct = atletas.length > 0 ? Math.round((presentes / atletas.length) * 100) : 0
+  const pct = atletasFiltrados.length > 0 ? Math.round((presentes / atletasFiltrados.length) * 100) : 0
 
   const iniciais = (nome: string) => nome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
 
@@ -102,7 +111,25 @@ export default function Presenca() {
           <div style={{ height: '4px', background: 'rgba(255,255,255,0.08)', borderRadius: '4px', overflow: 'hidden', marginBottom: '4px' }}>
             <div style={{ height: '100%', background: 'linear-gradient(90deg,#FF6B00,#00cc00)', width: pct + '%', borderRadius: '4px', transition: 'width 0.5s ease' }}></div>
           </div>
-          <div style={{ fontSize: '10px', color: muted }}>{presentes} de {atletas.length} atletas marcados</div>
+          <div style={{ fontSize: '10px', color: muted }}>{presentes} de {atletasFiltrados.length} atletas marcados</div>
+        </div>
+      )}
+
+      {/* SELETOR DE TURMA */}
+      {!loading && turmas.length > 0 && (
+        <div style={{ padding: '0 20px 12px', overflowX: 'auto' }}>
+          <div style={{ display: 'flex', gap: '8px', minWidth: 'max-content' }}>
+            <button onClick={() => setTurmaSel('todas')}
+              style={{ padding: '6px 14px', borderRadius: '20px', border: `1px solid ${turmaSel === 'todas' ? neon : 'rgba(255,255,255,0.1)'}`, background: turmaSel === 'todas' ? 'rgba(255,107,0,0.15)' : 'transparent', color: turmaSel === 'todas' ? neon : muted, fontSize: '11px', fontFamily: syne, fontWeight: turmaSel === 'todas' ? 700 : 400, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              Todos
+            </button>
+            {turmas.map(t => (
+              <button key={t.id} onClick={() => setTurmaSel(t.id)}
+                style={{ padding: '6px 14px', borderRadius: '20px', border: `1px solid ${turmaSel === t.id ? neon : 'rgba(255,255,255,0.1)'}`, background: turmaSel === t.id ? 'rgba(255,107,0,0.15)' : 'transparent', color: turmaSel === t.id ? neon : muted, fontSize: '11px', fontFamily: syne, fontWeight: turmaSel === t.id ? 700 : 400, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                {t.nome}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
@@ -110,7 +137,7 @@ export default function Presenca() {
 
       {/* LISTA */}
       <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {atletas.map(atleta => {
+        {atletasFiltrados.map(atleta => {
           const status = presencas[atleta.id]
           const carregando = salvando === atleta.id
           return (
