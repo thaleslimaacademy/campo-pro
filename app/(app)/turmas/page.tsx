@@ -57,7 +57,7 @@ export default function Turmas() {
       diasSemana: form.diasSemana || null,
       horario: form.horario || null,
     })
-    setForm({ nome: '', descricao: '', diasSemana: '', horario: '' })
+    setForm({ nome: '', descricao: '', diasSemana: '', horario: '', modalidade: 'futebol' })
     setCriando(false)
     await carregar()
     setSalvando(false)
@@ -94,7 +94,7 @@ export default function Turmas() {
               <label style={labelStyle}>Nome da turma *</label>
               <div style={{ marginBottom: '10px' }}>
                 <label style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Modalidade</label>
-                <select name="modalidade" value={form.modalidade} onChange={handleChange} style={{ ...inputStyle, marginTop: '4px' }}>
+                <select name="modalidade" value={form.modalidade} onChange={e => setForm(prev => ({ ...prev, modalidade: e.target.value }))} style={{ ...inputStyle, marginTop: '4px' }}>
                   <option value="futebol">⚽ Futebol</option>
                   <option value="futsal">🥅 Futsal</option>
                   <option value="volei">🏐 Vôlei</option>
