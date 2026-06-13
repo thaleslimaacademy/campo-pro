@@ -18,7 +18,7 @@ export function usePerfil() {
     fetch('/api/perfil')
       .then(r => r.json())
       .then(({ perfil }) => {
-        if (perfil) setPerfil(perfil)
+        if (perfil) setPerfil(perfil as Perfil)
       })
       .finally(() => setPerfilLoaded(true))
   }, [isLoaded, user?.id])

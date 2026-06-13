@@ -15,7 +15,7 @@ const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
 const brl = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n || 0)
 
-const MODULOS = [
+const MODULOS_ADMIN = [
   { href: '/atletas',                   label: 'Atletas',        e: '👥', cor: C.blue },
   { href: '/presenca',                  label: 'Presença',       e: '✅', cor: C.green },
   { href: '/turmas',                    label: 'Turmas',         e: '🏃', cor: C.orange },
@@ -32,8 +32,17 @@ const MODULOS = [
   { href: '/configuracoes',             label: 'Config',         e: '⚙️', cor: C.muted },
 ]
 
+const MODULOS_PROFESSOR = [
+  { href: '/atletas',    label: 'Atletas',     e: '👥', cor: C.blue },
+  { href: '/presenca',   label: 'Presença',    e: '✅', cor: C.green },
+  { href: '/turmas',     label: 'Turmas',      e: '🏃', cor: C.orange },
+  { href: '/campeonato', label: 'Campeonatos', e: '🏆', cor: C.gold },
+  { href: '/convocacao', label: 'Convocações', e: '📣', cor: C.blue },
+]
+
 export default function Dashboard() {
-  const { isAdmin, isLoaded, escolaId } = usePerfil()
+  const { isAdmin, isLoaded, escolaId, role } = usePerfil()
+  const MODULOS = role === 'professor' ? MODULOS_PROFESSOR : MODULOS_ADMIN
   const [escola, setEscola] = useState('Gestão FC')
   const [totalAtletas, setTotalAtletas] = useState(0)
   const [inadimplentes, setInadimplentes] = useState(0)
