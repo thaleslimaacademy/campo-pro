@@ -55,6 +55,7 @@ export default function MensalidadesPage() {
     catch (e) { alert('Erro: ' + (e as Error).message) }
     finally { setSalvando(false) }
   }
+  const marcar = async (id: string) => { await marcarPago(id); await carregar() }
   const apagar = async (id: string) => { if (!confirm('Apagar esta cobrança da lista? Vai pra lixeira e pode ser restaurada.')) return; await softDeleteCobranca(id); await carregar() }
   const restaurar = async (id: string) => { await restaurarCobranca(id); await carregar() }
   const definitivo = async (id: string) => { if (!confirm('Excluir DEFINITIVAMENTE? Nao da pra desfazer.')) return; await excluirDefinitivo(id); await carregar() }
