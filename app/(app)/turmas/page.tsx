@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase'
 type Turma = {
   id: string
   nome: string
+  modalidade: string
   descricao: string | null
   diasSemana: string | null
   horario: string | null
@@ -19,7 +20,7 @@ export default function Turmas() {
   const [loading, setLoading] = useState(true)
   const [criando, setCriando] = useState(false)
   const [salvando, setSalvando] = useState(false)
-  const [form, setForm] = useState({ nome: '', descricao: '', diasSemana: '', horario: '' })
+  const [form, setForm] = useState({ nome: '', descricao: '', diasSemana: '', horario: '', modalidade: 'futebol' })
 
   const syne = 'Syne, sans-serif'
   const neon = '#FF6B00'
@@ -51,7 +52,7 @@ export default function Turmas() {
     if (!form.nome) return
     setSalvando(true)
     await supabase.from('Turma').insert({
-      escolaId: escolaId!, nome: form.nome,
+      escolaId: escolaId!, nome: form.nome, modalidade: form.modalidade,
       descricao: form.descricao || null,
       diasSemana: form.diasSemana || null,
       horario: form.horario || null,
@@ -91,6 +92,18 @@ export default function Turmas() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div>
               <label style={labelStyle}>Nome da turma *</label>
+              <div style={{ marginBottom: '10px' }}>
+                <label style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Modalidade</label>
+                <select name="modalidade" value={form.modalidade} onChange={handleChange} style={{ ...inputStyle, marginTop: '4px' }}>
+                  <option value="futebol">⚽ Futebol</option>
+                  <option value="futsal">🥅 Futsal</option>
+                  <option value="volei">🏐 Vôlei</option>
+                  <option value="basquete">🏀 Basquete</option>
+                  <option value="artes-marciais">🥋 Artes Marciais</option>
+                  <option value="beach-tennis">🎾 Beach Tennis</option>
+                  <option value="outras">🏅 Outras</option>
+                </select>
+              </div>
               <input name="nome" value={form.nome} onChange={handleChange} style={inputStyle} placeholder="Ex: Sub-10, Iniciante..." />
             </div>
             <div>
@@ -135,7 +148,12 @@ export default function Turmas() {
                   <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(57,255,20,0.1)', border: '1px solid rgba(57,255,20,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: syne, fontWeight: 800, fontSize: '11px', color: neon }}>
                     {String(i + 1).padStart(2, '0')}
                   </div>
-                  <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '15px', color: '#F0F0F0', margin: 0 }}>{t.nome}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                    <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '15px', color: '#F0F0F0', margin: 0 }}>{t.nome}</p>
+                    <span style={{ fontSize: '10px', color: '#FF6B00', background: 'rgba(255,107,0,0.1)', borderRadius: '20px', padding: '2px 8px', fontWeight: 600 }}>
+                      {t.modalidade || 'futebol'}
+                    </span>
+                  </div>
                 </div>
                 {t.diasSemana && <p style={{ fontSize: '12px', color: neon, margin: '0 0 2px', fontWeight: 600 }}>{t.diasSemana}{t.horario ? ' · ' + t.horario : ''}</p>}
                 {t.descricao && <p style={{ fontSize: '11px', color: muted, margin: 0 }}>{t.descricao}</p>}

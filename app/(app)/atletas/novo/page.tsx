@@ -1,4 +1,14 @@
 'use client'
+// Posições por modalidade
+const POSICOES_POR_MODALIDADE: Record<string, string[]> = {
+  futebol:         ['Goleiro', 'Zagueiro', 'Lateral', 'Volante', 'Meia', 'Atacante', 'Centroavante', 'Ponta'],
+  futsal:          ['Goleiro', 'Fixo', 'Ala', 'Pivô'],
+  volei:           ['Levantador', 'Oposto', 'Ponteiro', 'Central', 'Líbero'],
+  basquete:        ['Armador', 'Ala-Armador', 'Ala', 'Ala-Pivô', 'Pivô'],
+  'artes-marciais':['Faixa Branca', 'Faixa Azul', 'Faixa Roxa', 'Faixa Marrom', 'Faixa Preta'],
+  'beach-tennis':  ['Atacante', 'Defensor'],
+  outras:          ['Atleta'],
+}
 import { usePerfil } from '@/lib/usePerfil'
 
 import { useState } from 'react'
@@ -7,6 +17,7 @@ import { supabase } from '@/lib/supabase'
 export default function NovoAtleta() {
   const { escolaId } = usePerfil()
   const [loading, setLoading] = useState(false)
+  const [modalidadeSel, setModalidadeSel] = useState('futebol')
   const [sucesso, setSucesso] = useState(false)
   const [cpf, setCpf] = useState('')
   const [rg, setRg] = useState('')
@@ -157,14 +168,19 @@ export default function NovoAtleta() {
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-sm text-gray-400">Posição</label>
+            <label className="text-sm text-gray-400">Modalidade</label>
+            <select name="modalidade" value={modalidadeSel} onChange={e => setModalidadeSel(e.target.value)} className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 mt-1 text-white">
+              <option value="futebol">⚽ Futebol</option>
+              <option value="futsal">🥅 Futsal</option>
+              <option value="volei">🏐 Vôlei</option>
+              <option value="basquete">🏀 Basquete</option>
+              <option value="artes-marciais">🥋 Artes Marciais</option>
+              <option value="beach-tennis">🎾 Beach Tennis</option>
+              <option value="outras">🏅 Outras</option>
+            </select>
+            <label className="text-sm text-gray-400 mt-2 block">Posição</label>
             <select name="posicao" className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 mt-1 text-white">
-              <option>Goleiro</option>
-              <option>Zagueiro</option>
-              <option>Lateral</option>
-              <option>Volante</option>
-              <option>Meia</option>
-              <option>Atacante</option>
+              {(POSICOES_POR_MODALIDADE[modalidadeSel] || []).map(p => <option key={p}>{p}</option>)}
             </select>
           </div>
           <div>
