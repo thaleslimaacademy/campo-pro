@@ -91,5 +91,55 @@ export async function marcarPago(id: string) {
     .update({ status: 'PAGO' as Status })
     .eq('id', id).eq('escolaId', ESCOLA_ID)
   if (error) throw new Error(error.message)
+
+  // Busca dados para enviar recibo WhatsApp
+  try {
+    const { data: cob } = await supabaseAdmin.from(TABELA)
+      .select('atletaId, valor, vencimento, descricao').eq('id', id).single()
+
+    if (cob?.atletaId) {
+      const { data: atleta } = await supabaseAdmin.from('Atleta')
+        .select('nome').eq('id', cob.atletaId).single()
+
+      const { data: resps } = await supabaseAdmin.from('Responsavel')
+        .select('nome, whatsapp').eq('atletaId', cob.atletaId).eq('principal', true).limit(1)
+
+      const resp = resps?.[0]
+      if (resp?.whatsapp && atleta) {
+        const brl = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n)
+        const dataFmt = new Date((cob.vencimento || '').includes('T') ? cob.vencimento : cob.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
+        const nome = resp.nome.split(' ')[0]
+
+        const msg = [
+          '✅ *PAGAMENTO CONFIRMADO*',
+          '',
+          `Olá, *${nome}*!`,
+          '',
+          `O pagamento de *${atleta.nome}* foi confirmado.`,
+          '',
+          `💰 Valor: *${brl(Number(cob.valor))}*`,
+          `📅 Referência: *${dataFmt}*`,
+          `📝 ${cob.descricao || 'Mensalidade'}`,
+          '',
+          '_Obrigado! Thales Lima Football Academy_ ⚽',
+        ].join('\n')
+
+        const numero = resp.whatsapp.replace(/\D/g, '')
+        const numeroFmt = numero.startsWith('55') ? numero : '55' + numero
+
+        await fetch(
+          'https://api.z-api.io/instances/' + process.env.ZAPI_INSTANCE_ID + '/token/' + process.env.ZAPI_TOKEN + '/send-text',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Client-Token': process.env.ZAPI_CLIENT_TOKEN || '' },
+            body: JSON.stringify({ phone: numeroFmt, message: msg }),
+          }
+        )
+      }
+    }
+  } catch (e) {
+    console.error('Erro ao enviar WhatsApp marcarPago:', e)
+  }
+
   return { ok: true }
 }
