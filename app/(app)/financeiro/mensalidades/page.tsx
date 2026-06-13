@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { Trash2, RotateCcw, Plus, Loader2, FileText } from 'lucide-react'
 import {
   listarMensalidades, listarAtletas, gerarMensalidades,
-  softDeleteCobranca, restaurarCobranca, excluirDefinitivo,
+  softDeleteCobranca, restaurarCobranca, excluirDefinitivo, marcarPago,
 } from './actions'
 import { gerarRecibo } from '@/lib/gerarRecibo'
 
@@ -139,7 +139,18 @@ export default function MensalidadesPage() {
                               <button onClick={() => definitivo(c.id)} style={{ ...iconBtn, color: '#FF4757', borderColor: '#5a2230' }} title="Excluir definitivamente"><Trash2 size={16} /></button>
                             </>
                           ) : (
-                            <button onClick={() => apagar(c.id)} style={iconBtn} title="Apagar da lista"><Trash2 size={16} /></button>
+                            <>
+                              {(c.status === 'PENDENTE' || c.status === 'VENCIDO') && (
+                                <button
+                                  onClick={() => marcar(c.id)}
+                                  style={{ ...iconBtn, color: '#4ade80', borderColor: '#14532d' }}
+                                  title="Marcar como pago"
+                                >
+                                  ✓
+                                </button>
+                              )}
+                              <button onClick={() => apagar(c.id)} style={iconBtn} title="Apagar da lista"><Trash2 size={16} /></button>
+                            </>
                           )}
                         </span>
                       </td>

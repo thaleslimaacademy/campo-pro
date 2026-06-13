@@ -84,3 +84,12 @@ export async function excluirDefinitivo(id: string) {
   if (error) throw new Error(error.message)
   return { ok: true }
 }
+
+export async function marcarPago(id: string) {
+  const ESCOLA_ID = await getEscolaIdServer()
+  const { error } = await supabaseAdmin.from(TABELA)
+    .update({ status: 'PAGO' as Status })
+    .eq('id', id).eq('escolaId', ESCOLA_ID)
+  if (error) throw new Error(error.message)
+  return { ok: true }
+}
