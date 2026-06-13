@@ -42,7 +42,7 @@ export async function listarMensalidades(opts?: { status?: Status | 'todas'; inc
   let q = supabaseAdmin.from(TABELA)
     .select('id, atletaId, valor, status, competencia, vencimento, descricao, excluidaEm')
     .eq('escolaId', ESCOLA_ID)
-    .order('competencia', { ascending: true })
+    .order('vencimento', { ascending: false })
   if (!opts?.incluirExcluidas) q = q.is('excluidaEm', null)
   if (opts?.status && opts.status !== 'todas') q = q.eq('status', opts.status)
   const { data, error } = await q

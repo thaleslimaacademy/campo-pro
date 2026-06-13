@@ -97,6 +97,7 @@ export async function POST(req: NextRequest) {
       atletaId,
       valor,
       vencimento,
+      competencia: vencimento.slice(0, 7) + '-01',
       status: 'PENDENTE',
       asaasId: cobranca.id,
       pixCopiaCola: qrCode.payload || null,
