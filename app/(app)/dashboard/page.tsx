@@ -120,7 +120,7 @@ export default function Dashboard() {
       <div style={{ padding: '20px 16px 0' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <MetricCard href="/atletas" label="Atletas ativos" value={loading ? '...' : String(totalAtletas)} cor={C.green} icon="👥" sub="cadastrados" />
-          <MetricCard href="/financeiro/mensalidades" label="Inadimplentes" value={loading ? '...' : String(inadimplentes)} cor={inadimplentes > 0 ? C.red : C.green} icon="⚠️" sub={inadimplentes > 0 ? 'em atraso' : 'em dia'} alert={inadimplentes > 0} />
+          <MetricCard href="/financeiro/mensalidades?status=VENCIDO" label="Inadimplentes" value={loading ? '...' : String(inadimplentes)} cor={inadimplentes > 0 ? C.red : C.green} icon="⚠️" sub={inadimplentes > 0 ? 'em atraso' : 'em dia'} alert={inadimplentes > 0} />
           <MetricCard href="/matriculas" label="Pré-matrículas" value={loading ? '...' : String(pendentes)} cor={pendentes > 0 ? C.orange : C.muted} icon="📝" sub="aguardando" alert={pendentes > 0} />
           <MetricCard href="/presenca" label="Presença hoje" value={loading ? '...' : presenca.t === 0 ? '-' : pct + '%'} cor={pct >= 75 ? C.green : pct > 0 ? C.gold : C.muted} icon="✅" sub={presenca.t > 0 ? `${presenca.p} de ${presenca.t}` : 'sem treino'} />
         </div>

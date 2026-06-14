@@ -27,7 +27,8 @@ const labelStatus = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowe
 const corStatus = (s: string) => ({ PAGO: '#FF6B00', PENDENTE: '#FFD700', VENCIDO: '#FF4757', CANCELADO: '#888' } as Record<string, string>)[s] ?? '#888'
 
 export default function MensalidadesPage() {
-  const [filtro, setFiltro] = useState('todas')
+  const searchParams = useSearchParams()
+  const [filtro, setFiltro] = useState(() => searchParams.get('status') || 'todas')
   const [verExcluidas, setVerExcluidas] = useState(false)
   const [lista, setLista] = useState<Cobranca[]>([])
   const [atletas, setAtletas] = useState<{ id: string; nome: string }[]>([])
