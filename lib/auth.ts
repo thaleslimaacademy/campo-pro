@@ -1,15 +1,13 @@
 import { auth } from '@clerk/nextjs/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { redirect } from 'next/navigation'
 
-export type Papel = 'admin' | 'professor' | 'comissao' | 'pai' | 'aluno'
+export type Papel = 'admin' | 'professor' | 'responsavel'
 
 export interface Sessao {
   clerkUserId: string
-  perfilId: string
   escolaId: string
-  papel: Papel
-  nome: string
+  perfil: Papel
+  ativo: boolean
 }
 
 export async function getSessao(): Promise<Sessao | null> {
@@ -18,31 +16,47 @@ export async function getSessao(): Promise<Sessao | null> {
 
   const { data, error } = await supabaseAdmin
     .from('PerfilUsuario')
-    .select('id, escolaId, perfil, nome')
+    .select('escolaId, perfil, ativo')
     .eq('clerkUserId', userId)
-    .eq('ativo', true)
-    .maybeSingle()
+    .single()
 
   if (error || !data) return null
 
   return {
     clerkUserId: userId,
-    perfilId: data.id,
     escolaId: data.escolaId,
-    papel: data.perfil as Papel,
-    nome: data.nome,
+    perfil: data.perfil as Papel,
+    ativo: data.ativo,
   }
 }
 
-export async function requireSessao(): Promise<Sessao> {
+export async function requirePapel(papelRequerido: Papel | Papel[]): Promise<Sessao> {
   const sessao = await getSessao()
-  if (!sessao) redirect('/acesso-negado')
+
+  if (!sessao) {
+    throw new Error('NAO_AUTENTICADO')
+  }
+
+  if (!sessao.ativo) {
+    throw new Error('CONTA_INATIVA')
+  }
+
+  const papeis = Array.isArray(papelRequerido) ? papelRequerido : [papelRequerido]
+
+  if (!papeis.includes(sessao.perfil)) {
+    throw new Error('SEM_PERMISSAO')
+  }
+
   return sessao
 }
 
-export async function requirePapel(...papeis: Papel[]): Promise<Sessao> {
-  const sessao = await getSessao()
-  if (!sessao) throw new Error('NAO_AUTENTICADO')
-  if (!papeis.includes(sessao.papel)) throw new Error('SEM_PERMISSAO')
-  return sessao
+export async function getAtletasDoResponsavel(clerkUserId: string, escolaId: string) {
+  const { data } = await supabaseAdmin
+    .from('ResponsavelAtleta')
+    .select('atletaId, relacao, principal, Atleta(id, nome, dataNascimento, foto, turmaId, Turma(nome))')
+    .eq('clerkUserId', clerkUserId)
+    .eq('escolaId', escolaId)
+    .eq('status', 'ativo')
+
+  return data ?? []
 }
