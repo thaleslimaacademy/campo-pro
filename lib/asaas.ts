@@ -36,6 +36,7 @@ export async function criarCobrancaPix(dados: {
   value: number
   dueDate: string
   description: string
+  discount?: { value: number; dueDateLimitDays: number; type: 'FIXED' }
 }) {
   const res = await fetch(`${getBaseUrl()}/payments`, {
     method: 'POST',

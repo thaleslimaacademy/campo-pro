@@ -8,7 +8,7 @@ import { enviarWhatsApp } from '@/lib/whatsapp'
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { atletaId, valor, vencimento, descricao } = body
+    const { atletaId, valor, vencimento, descricao, desconto } = body
 
     if (!atletaId || !valor || !vencimento) {
       return NextResponse.json(
@@ -77,6 +77,7 @@ export async function POST(req: NextRequest) {
       description: descricao || 'Mensalidade',
       ...(multaAtraso > 0 ? { fine: { value: multaAtraso } } : {}),
       ...(jurosAoMes > 0 ? { interest: { value: jurosAoMes } } : {}),
+      ...(desconto ? { discount: desconto } : {}),
     })
 
     if (cobranca.errors || !cobranca.id) {

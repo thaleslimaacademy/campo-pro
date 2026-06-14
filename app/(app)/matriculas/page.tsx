@@ -60,9 +60,10 @@ function MatriculasInner() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           atletaId,
-          valor: 85,
+          valor: 100,
           vencimento,
           descricao: 'Mensalidade',
+          desconto: { value: 15, dueDateLimitDays: 0, type: 'FIXED' },
         }),
       })
       const data = await res.json()
