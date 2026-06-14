@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { Trash2, RotateCcw, Plus, Loader2, FileText } from 'lucide-react'
 import {
   listarMensalidades, listarAtletas, gerarMensalidades,
-  softDeleteCobranca, restaurarCobranca, excluirDefinitivo, marcarPago,
+  softDeleteCobranca, restaurarCobranca, excluirDefinitivo, marcarPago, cancelarCobranca,
 } from './actions'
 import { gerarRecibo } from '@/lib/gerarRecibo'
 
@@ -62,6 +62,7 @@ export default function MensalidadesPage() {
     finally { setSalvando(false) }
   }
   const marcar = async (id: string) => { await marcarPago(id); await carregar() }
+  const cancelar = async (id: string) => { if (!confirm('Cancelar esta cobrança? O atleta sairá dos inadimplentes.')) return; await cancelarCobranca(id); await carregar() }
   const apagar = async (id: string) => { if (!confirm('Apagar esta cobrança da lista? Vai pra lixeira e pode ser restaurada.')) return; await softDeleteCobranca(id); await carregar() }
   const restaurar = async (id: string) => { await restaurarCobranca(id); await carregar() }
   const definitivo = async (id: string) => { if (!confirm('Excluir DEFINITIVAMENTE? Nao da pra desfazer.')) return; await excluirDefinitivo(id); await carregar() }

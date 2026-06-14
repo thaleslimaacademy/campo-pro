@@ -143,3 +143,12 @@ export async function marcarPago(id: string) {
 
   return { ok: true }
 }
+
+export async function cancelarCobranca(id: string) {
+  const ESCOLA_ID = await getEscolaIdServer()
+  const { error } = await supabaseAdmin.from(TABELA)
+    .update({ status: 'CANCELADO' as Status })
+    .eq('id', id).eq('escolaId', ESCOLA_ID)
+  if (error) throw new Error(error.message)
+  return { ok: true }
+}
