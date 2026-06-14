@@ -58,22 +58,34 @@ export default function TurmaDetalhes() {
     const { data: t } = await supabase.from('Turma').select('*').eq('id', id).single()
     if (t) setTurma(t)
 
-    const { data: comTurma } = await supabase
-      .from('Atleta')
-      .select('id, nome, posicao, fotoUrl, turmaId, dataNascimento')
+    // Busca atletas já nessa turma via AtletaTurma
+    const { data: vinculos } = await supabase
+      .from('AtletaTurma')
+      .select('atletaId')
       .eq('turmaId', id)
-      .eq('ativo', true)
-      .order('nome')
-    setAtletasTurma(comTurma || [])
+    const idsNaTurma = (vinculos || []).map((v: any) => v.atletaId)
 
-    const { data: semTurma } = await supabase
+    if (idsNaTurma.length > 0) {
+      const { data: comTurma } = await supabase
+        .from('Atleta')
+        .select('id, nome, posicao, fotoUrl, turmaId, dataNascimento')
+        .in('id', idsNaTurma)
+        .eq('ativo', true)
+        .order('nome')
+      setAtletasTurma(comTurma || [])
+    } else {
+      setAtletasTurma([])
+    }
+
+    // Busca todos atletas da escola para adicionar
+    const { data: todosAtletas } = await supabase
       .from('Atleta')
       .select('id, nome, posicao, fotoUrl, turmaId, dataNascimento')
       .eq('escolaId', escolaId!)
       .eq('ativo', true)
-      .is('turmaId', null)
       .order('nome')
-    setAtletasSemTurma(semTurma || [])
+    // Exclui os que já estão nessa turma
+    setAtletasSemTurma((todosAtletas || []).filter(a => !idsNaTurma.includes(a.id)))
 
     if (t) setFormEdit({ nome: t.nome || '', diasSemana: t.diasSemana || '', horario: t.horario || '', descricao: t.descricao || '' })
     setLoading(false)
@@ -82,12 +94,24 @@ export default function TurmaDetalhes() {
   useEffect(() => { if (escolaId) carregar() }, [id, escolaId])
 
   async function adicionarAtleta(atletaId: string) {
+    await supabase.from('AtletaTurma').upsert({
+      id: crypto.randomUUID(),
+      atletaId,
+      turmaId: id,
+      escolaId: escolaId!,
+    }, { onConflict: 'atletaId,turmaId' })
+    // Mantém turmaId no atleta para compatibilidade
     await supabase.from('Atleta').update({ turmaId: id }).eq('id', atletaId)
     await carregar()
   }
 
   async function removerAtleta(atletaId: string) {
-    await supabase.from('Atleta').update({ turmaId: null }).eq('id', atletaId)
+    await supabase.from('AtletaTurma').delete().eq('atletaId', atletaId).eq('turmaId', id)
+    // Limpa turmaId se essa era a única turma
+    const { count } = await supabase.from('AtletaTurma').select('*', { count: 'exact', head: true }).eq('atletaId', atletaId)
+    if (!count || count === 0) {
+      await supabase.from('Atleta').update({ turmaId: null }).eq('id', atletaId)
+    }
     await carregar()
   }
 
@@ -99,6 +123,7 @@ export default function TurmaDetalhes() {
 
   async function excluirTurma() {
     if (!confirm('Excluir esta turma? Os atletas serão desvinculados.')) return
+    await supabase.from('AtletaTurma').delete().eq('turmaId', id)
     await supabase.from('Atleta').update({ turmaId: null }).eq('turmaId', id)
     await supabase.from('Turma').update({ ativa: false }).eq('id', id)
     router.push('/turmas')
@@ -224,7 +249,7 @@ export default function TurmaDetalhes() {
           {/* Lista atletas sem turma */}
           {adicionando && atletasSemTurma.length > 0 && (
             <div style={{ marginTop: '14px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '14px' }}>
-              <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px' }}>Atletas sem turma</p>
+              <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px' }}>Adicionar atleta à turma</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {atletasSemTurma.map(a => (
                   <div key={a.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '10px 12px' }}>
@@ -251,7 +276,7 @@ export default function TurmaDetalhes() {
           )}
 
           {adicionando && atletasSemTurma.length === 0 && (
-            <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', textAlign: 'center', marginTop: '14px', paddingTop: '14px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>Todos os atletas já estão em uma turma</p>
+            <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', textAlign: 'center', marginTop: '14px', paddingTop: '14px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>Todos os atletas já estão nesta turma</p>
           )}
         </div>
 

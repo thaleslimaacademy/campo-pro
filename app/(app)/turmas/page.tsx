@@ -34,7 +34,7 @@ export default function Turmas() {
     const { data } = await supabase.from('Turma').select('*').eq('escolaId', escolaId!).eq('ativa', true).order('nome')
     if (data) {
       const turmasComTotal = await Promise.all(data.map(async t => {
-        const { count } = await supabase.from('Atleta').select('*', { count: 'exact', head: true }).eq('turmaId', t.id).eq('ativo', true)
+        const { count } = await supabase.from('AtletaTurma').select('*', { count: 'exact', head: true }).eq('turmaId', t.id)
         return { ...t, totalAtletas: count || 0 }
       }))
       setTurmas(turmasComTotal)

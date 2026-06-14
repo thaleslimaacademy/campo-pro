@@ -72,7 +72,7 @@ export default function Presenca() {
     setSalvando(null)
   }
 
-  const atletasFiltrados = turmaSel === 'todas' ? atletas : atletas.filter(a => a.turmaId === turmaSel)
+  const atletasFiltrados = turmaSel === 'todas' ? atletas : atletas.filter(a => a.turmaId === turmaSel || a.id === turmaSel)
   const presentes = Object.values(presencas).filter(s => s === 'PRESENTE').length
   const ausentes = Object.values(presencas).filter(s => s === 'AUSENTE').length
   const pct = atletasFiltrados.length > 0 ? Math.round((presentes / atletasFiltrados.length) * 100) : 0
