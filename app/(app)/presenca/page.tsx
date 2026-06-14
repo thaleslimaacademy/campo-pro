@@ -17,7 +17,9 @@ export default function Presenca() {
   const [turmas, setTurmas] = useState<Turma[]>([])
   const [turmaSel, setTurmaSel] = useState<string>('todas')
 
-  const hoje = new Date().toLocaleDateString('pt-BR')
+  const hoje = new Date().toISOString().split('T')[0]
+  const [dataSel, setDataSel] = useState(hoje)
+  const hojeFormatado = new Date().toLocaleDateString('pt-BR')
   const syne = 'Syne, sans-serif'
   const neon = '#FF6B00'
   const muted = 'rgba(255,255,255,0.4)'
@@ -35,14 +37,15 @@ export default function Presenca() {
         .eq('escolaId', escolaId!).eq('ativo', true).order('nome')
       setAtletas(atletasData || [])
 
-      const dataHoje = new Date().toISOString().split('T')[0]
+      const dataISO = dataSel + 'T00:00:00.000Z'
+      const dataFim = dataSel + 'T23:59:59.999Z'
       let { data: treino } = await supabase
         .from('Treino').select('id').eq('escolaId', escolaId!)
-        .gte('data', dataHoje).limit(1).single()
+        .gte('data', dataISO).lte('data', dataFim).limit(1).single()
 
       if (!treino) {
         const { data: novoTreino } = await supabase
-          .from('Treino').insert({ id: crypto.randomUUID(), escolaId: escolaId!, data: new Date().toISOString() })
+          .from('Treino').insert({ id: crypto.randomUUID(), escolaId: escolaId!, data: dataISO })
           .select('id').single()
         treino = novoTreino
       }
@@ -86,7 +89,18 @@ export default function Presenca() {
       <div style={{ padding: '20px 20px 0' }}>
         <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '2px' }}>Chamada</div>
         <div style={{ fontFamily: syne, fontSize: '24px', fontWeight: 800, color: '#F0F0F0', marginBottom: '4px' }}>Presenca</div>
-        <div style={{ fontSize: '12px', color: muted }}>Hoje — {hoje}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '6px' }}>
+          <div style={{ fontSize: '12px', color: muted }}>
+            {dataSel === hoje ? 'Hoje — ' + hojeFormatado : 'Data selecionada'}
+          </div>
+          <input
+            type="date"
+            value={dataSel}
+            max={hoje}
+            onChange={e => { setDataSel(e.target.value); setPresencas({}) }}
+            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '4px 10px', color: dataSel !== hoje ? '#FF6B00' : 'rgba(255,255,255,0.4)', fontSize: '12px', fontFamily: 'Inter, sans-serif', outline: 'none' }}
+          />
+        </div>
       </div>
 
       {/* STATS */}
