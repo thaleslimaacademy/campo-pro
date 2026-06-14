@@ -157,6 +157,9 @@ export default function MensalidadesPage() {
                                   ✓
                                 </button>
                               )}
+                              {c.status === 'VENCIDO' && (
+                                <button onClick={() => cancelar(c.id)} style={{ ...iconBtn, color: '#fb923c', borderColor: '#7c2d12' }} title="Cancelar cobrança">✕</button>
+                              )}
                               <button onClick={() => apagar(c.id)} style={iconBtn} title="Apagar da lista"><Trash2 size={16} /></button>
                             </>
                           )}
