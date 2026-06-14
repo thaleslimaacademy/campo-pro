@@ -2,7 +2,7 @@ import { getEscolaId } from '@/lib/auth/getEscolaId'
 import { NextRequest, NextResponse } from 'next/server'
 import { criarClienteAsaas, criarCobrancaPix, getPixQrCode } from '@/lib/asaas'
 import { supabase } from '@/lib/supabase'
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { supabaseAdmin } from '@/lib/supabase'
 import { enviarWhatsApp } from '@/lib/whatsapp'
 
 export async function POST(req: NextRequest) {

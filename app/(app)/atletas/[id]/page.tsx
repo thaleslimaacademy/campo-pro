@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { supabaseAdmin } from '@/lib/supabase'
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import CopiarLink from './CopiarLink'

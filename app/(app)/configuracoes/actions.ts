@@ -1,6 +1,6 @@
 'use server'
 import { auth } from '@clerk/nextjs/server'
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export interface ConfiguracaoForm {
   nome: string

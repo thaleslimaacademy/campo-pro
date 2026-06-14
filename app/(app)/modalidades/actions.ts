@@ -1,5 +1,5 @@
 'use server'
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { supabaseAdmin } from '@/lib/supabase'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 
 import { PLANOS_GESTAOFC } from './constants'

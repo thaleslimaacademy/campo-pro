@@ -1,6 +1,6 @@
 'use server'
 
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { supabaseAdmin } from '@/lib/supabase'
 import { buscarClienteAsaas, criarClienteAsaas, criarCobrancaBoleto } from '@/lib/asaas'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 

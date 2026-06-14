@@ -1,5 +1,5 @@
 import { auth } from '@clerk/nextjs/server'
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { supabaseAdmin } from '@/lib/supabase'
 import { redirect } from 'next/navigation'
 
 export async function getEscolaIdServer(): Promise<string> {

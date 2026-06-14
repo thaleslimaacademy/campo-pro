@@ -1,14 +1,12 @@
 'use server'
-
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { supabaseAdmin } from '@/lib/supabase'
+import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 import { criarClienteAsaas, criarCobrancaGenerica, getPixQrCode } from '@/lib/asaas'
 
-const ESCOLA_ID = 'escola-demo'
 const BUCKET_ORI = 'fotos-originais'
 
-const storage = supabaseAdmin.storage
-
 export async function listarAlbunsPublicos() {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { data } = await supabaseAdmin
     .from('Album')
     .select('id, titulo, descricao, dataEvento, capa')
@@ -34,10 +32,10 @@ export async function criarCompraPublica(p: {
   metodoPagamento: 'PIX' | 'CREDIT_CARD'
   parcelas?: number
 }) {
+  const ESCOLA_ID = await getEscolaIdServer()
   const { data: fotosData } = await supabaseAdmin
     .from('Foto').select('id, valor').in('id', p.fotos)
   const valorTotal = (fotosData || []).reduce((s, f) => s + Number(f.valor), 0)
-
   const telefone = p.compradorTelefone.replace(/\D/g, '')
   const cliente = await criarClienteAsaas({
     name: p.compradorNome,
@@ -45,10 +43,8 @@ export async function criarCompraPublica(p: {
     phone: telefone,
     address: '', addressNumber: '', province: '', postalCode: '',
   })
-
   const dueDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
   const desc = `Fotos GestaoFC (${p.fotos.length} foto${p.fotos.length > 1 ? 's' : ''})`
-
   const dadosCobranca: Parameters<typeof criarCobrancaGenerica>[0] = {
     customer: cliente.id,
     billingType: p.metodoPagamento,
@@ -56,15 +52,12 @@ export async function criarCompraPublica(p: {
     description: desc,
     value: valorTotal,
   }
-
   if (p.metodoPagamento === 'CREDIT_CARD' && p.parcelas && p.parcelas > 1) {
     delete dadosCobranca.value
     dadosCobranca.installmentCount = p.parcelas
     dadosCobranca.installmentValue = Number((valorTotal / p.parcelas).toFixed(2))
   }
-
   const cobranca = await criarCobrancaGenerica(dadosCobranca)
-
   const compraId = crypto.randomUUID()
   await supabaseAdmin.from('FotoCompra').insert({
     id: compraId,
@@ -77,7 +70,6 @@ export async function criarCompraPublica(p: {
     asaasId: cobranca.id,
     metodoPagamento: p.metodoPagamento,
   })
-
   let pixData = null
   if (p.metodoPagamento === 'PIX' && cobranca.id) {
     try {
@@ -87,7 +79,6 @@ export async function criarCompraPublica(p: {
       console.error('Erro QR Code:', e)
     }
   }
-
   return {
     compraId,
     valor: valorTotal,
@@ -100,12 +91,12 @@ export async function gerarLinksOriginaisPublico(compraId: string) {
   const { data: compra } = await supabaseAdmin
     .from('FotoCompra').select('fotos, status').eq('id', compraId).single()
   if (!compra || compra.status !== 'PAGO') throw new Error('Compra não paga')
-
   const { data: fotos } = await supabaseAdmin
     .from('Foto').select('id, urlOriginal').in('id', compra.fotos)
-
   return Promise.all((fotos || []).map(async (f) => {
-    const { data } = await storage.from(BUCKET_ORI).createSignedUrl(f.urlOriginal, 60 * 60 * 24 * 7)
+    const { data } = await supabaseAdmin.storage
+      .from(BUCKET_ORI)
+      .createSignedUrl(f.urlOriginal, 60 * 60 * 24 * 7)
     return { id: f.id, url: data?.signedUrl || '' }
   }))
 }

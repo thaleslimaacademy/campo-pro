@@ -1,6 +1,6 @@
 'use server'
 
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { supabaseAdmin } from '@/lib/supabase'
 import { criarClienteAsaas, criarCobrancaGenerica, getPixQrCode } from '@/lib/asaas'
 import { enviarWhatsApp } from '@/lib/whatsapp'
 

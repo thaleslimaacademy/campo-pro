@@ -2,7 +2,7 @@
 
 import { randomUUID } from 'crypto'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { supabaseAdmin } from '@/lib/supabase'
 
 // ⚙️ Tabela/colunas reais do seu banco:
 const TABELA = 'Cobranca'

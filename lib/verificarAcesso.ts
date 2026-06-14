@@ -1,5 +1,5 @@
 import { auth } from '@clerk/nextjs/server'
-import { supabaseAdmin } from './supabase-admin'
+import { supabaseAdmin } from './supabase'
 import { redirect } from 'next/navigation'
 
 export async function verificarAcesso(rotasPermitidas?: string[]) {

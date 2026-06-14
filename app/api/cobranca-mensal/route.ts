@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { supabaseAdmin } from '@/lib/supabase'
 import { criarClienteAsaas, criarCobrancaPix, getPixQrCode } from '@/lib/asaas'
 
 // Planos carregados dinamicamente do banco por escola

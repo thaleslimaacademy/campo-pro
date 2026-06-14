@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { supabaseAdmin } from '@/lib/supabase'
 import { createClient } from '@supabase/supabase-js'
 import { enviarWhatsApp } from '@/lib/whatsapp'
 

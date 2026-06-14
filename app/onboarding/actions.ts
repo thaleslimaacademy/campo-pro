@@ -1,5 +1,5 @@
 'use server'
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { supabaseAdmin } from '@/lib/supabase'
 import { clerkClient } from '@clerk/nextjs/server'
 
 export async function criarEscola(

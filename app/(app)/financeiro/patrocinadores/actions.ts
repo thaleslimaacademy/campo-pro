@@ -1,6 +1,6 @@
 'use server'
 
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { supabaseAdmin } from '@/lib/supabase'
 import { DEFAULT_TEMPLATE } from './constants'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 

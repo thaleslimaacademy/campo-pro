@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { supabaseAdmin } from '@/lib/supabase'
 import { enviarWhatsApp } from '@/lib/whatsapp'
 
 const STATUS_MAP: Record<string, string> = {
