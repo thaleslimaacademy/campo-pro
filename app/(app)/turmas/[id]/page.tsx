@@ -94,12 +94,22 @@ export default function TurmaDetalhes() {
   useEffect(() => { if (escolaId) carregar() }, [id, escolaId])
 
   async function adicionarAtleta(atletaId: string) {
-    await supabase.from('AtletaTurma').upsert({
-      id: crypto.randomUUID(),
-      atletaId,
-      turmaId: id,
-      escolaId: escolaId!,
-    }, { onConflict: 'atletaId,turmaId' })
+    // Verifica se já existe o vínculo
+    const { data: existente } = await supabase
+      .from('AtletaTurma')
+      .select('id')
+      .eq('atletaId', atletaId)
+      .eq('turmaId', id)
+      .single()
+
+    if (!existente) {
+      await supabase.from('AtletaTurma').insert({
+        id: crypto.randomUUID(),
+        atletaId,
+        turmaId: id,
+        escolaId: escolaId!,
+      })
+    }
     // Mantém turmaId no atleta para compatibilidade
     await supabase.from('Atleta').update({ turmaId: id }).eq('id', atletaId)
     await carregar()
