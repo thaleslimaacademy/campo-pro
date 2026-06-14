@@ -7,16 +7,12 @@ interface Props {
   params: Promise<{ token: string }>
 }
 
-export default function AceitarConvitePage({ params }: Props) {
+export default async function AceitarConvitePage({ params }: Props) {
   const { token } = use(params)
-  return <AceitarConviteLoader token={token} />
-}
-
-async function AceitarConviteLoader({ token }: { token: string }) {
   const { userId } = await auth()
 
   if (!userId) {
-    redirect(`/sign-in?redirect_url=${encodeURIComponent(`/convite/${token}/aceitar`)}`)
+    redirect('/sign-in?redirect_url=' + encodeURIComponent('/convite/' + token + '/aceitar'))
   }
 
   const { data: convite } = await supabaseAdmin
