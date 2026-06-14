@@ -27,8 +27,14 @@ const labelStatus = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowe
 const corStatus = (s: string) => ({ PAGO: '#FF6B00', PENDENTE: '#FFD700', VENCIDO: '#FF4757', CANCELADO: '#888' } as Record<string, string>)[s] ?? '#888'
 
 export default function MensalidadesPage() {
-  const [filtro, setFiltro] = useState(() => typeof window !== 'undefined' ? (new URLSearchParams(window.location.search).get('status') || 'todas') : 'todas')
+  const [filtro, setFiltro] = useState('todas')
   const [verExcluidas, setVerExcluidas] = useState(false)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const s = params.get('status')
+    if (s) setFiltro(s)
+  }, [])
   const [lista, setLista] = useState<Cobranca[]>([])
   const [atletas, setAtletas] = useState<{ id: string; nome: string }[]>([])
   const [carregando, setCarregando] = useState(false)
