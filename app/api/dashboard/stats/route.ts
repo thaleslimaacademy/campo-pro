@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
-
-const escolaId = 'escola-demo'
+import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 
 export async function GET() {
+  const escolaId = await getEscolaIdServer()
+
   const hoje = new Date()
   const di = new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString().slice(0, 10)
   const df = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).toISOString().slice(0, 10)
