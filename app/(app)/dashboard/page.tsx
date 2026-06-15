@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { UserButton } from '@clerk/nextjs'
-import { supabase } from '@/lib/supabase'
 import { usePerfil } from '@/lib/usePerfil'
 
 const C = {
@@ -64,26 +63,20 @@ export default function Dashboard() {
   const [di] = useState(new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString().slice(0, 10))
   const [df] = useState(new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).toISOString().slice(0, 10))
 
-  useEffect(() => {
-    if (!escolaId) return
-    const run = async () => {
-      supabase.from('Escola').select('nome').eq('id', escolaId).single().then(({ data }) => { if (data) setEscola(data.nome) })
-      supabase.from('Atleta').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('ativo', true).then(({ count }) => setTotalAtletas(count || 0))
-      supabase.from('Matricula').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('status', 'PENDENTE').eq('tipo', 'matricula').then(({ count }) => setPendentes(count || 0))
-      supabase.from('Cobranca').select('valor, status').eq('escolaId', escolaId).gte('vencimento', di).lte('vencimento', df).then(({ data }) => {
-        const cobs = data || []
-        setPagasV(cobs.filter(c => c.status === 'PAGO').reduce((s, c) => s + Number(c.valor), 0))
-        setInadimplentes(cobs.filter(c => c.status === 'VENCIDO').length)
-      })
-      supabase.from('Treino').select('id').eq('escolaId', escolaId).gte('data', hoje.toISOString().split('T')[0]).limit(1).single().then(({ data: t }) => {
-        if (t) supabase.from('Presenca').select('status').eq('treinoId', t.id).then(({ data: p }) => {
-          setPresenca({ p: p?.filter(x => x.status === 'PRESENTE').length || 0, t: p?.length || 0 })
+    useEffect(() => {
+      if (!escolaId) return
+      fetch('/api/dashboard/stats')
+        .then(r => r.json())
+        .then(d => {
+          setEscola(d.escola)
+          setTotalAtletas(d.totalAtletas)
+          setPendentes(d.matriculasPendentes)
+          setPagasV(d.pagasV)
+          setInadimplentes(d.inadimplentes)
+          setPresenca(d.presenca)
+          setLoading(false)
         })
-      })
-      setLoading(false)
-    }
-    run()
-  }, [escolaId])
+    }, [escolaId])
 
   const pct = presenca.t > 0 ? Math.round((presenca.p / presenca.t) * 100) : 0
   const dia = hoje.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
