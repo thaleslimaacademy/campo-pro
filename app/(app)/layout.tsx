@@ -40,7 +40,7 @@ const TITULO: Record<string, string> = {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const { escolaId } = usePerfil()
+  const { isLoaded, escolaId, role } = usePerfil()
   const [nomeEscola, setNomeEscola] = useState('Gestão FC')
 
   useEffect(() => {
@@ -48,6 +48,27 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     supabase.from('Escola').select('nome').eq('id', escolaId).single()
       .then(({ data }) => { if (data) setNomeEscola(data.nome) })
   }, [escolaId])
+
+
+  if (!isLoaded) return (
+    <div style={{ minHeight: '100vh', background: C.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: C.muted, fontFamily: INTER, fontSize: 13 }}>Verificando acesso...</p>
+    </div>
+  )
+
+  if (!role) return (
+    <div style={{ minHeight: '100vh', background: C.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div style={{ textAlign: 'center', maxWidth: 340 }}>
+        <div style={{ fontSize: 52, marginBottom: 16 }}>🔒</div>
+        <h1 style={{ fontFamily: SYNE, fontSize: 20, fontWeight: 800, color: C.text, marginBottom: 8 }}>Acesso não autorizado</h1>
+        <p style={{ color: C.muted, fontFamily: INTER, fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>
+          Sua conta não tem permissão de acesso ao GestãoFC.<br />
+          Entre em contato com o administrador da sua academia.
+        </p>
+        <AccountButton />
+      </div>
+    </div>
+  )
 
   const isDashboard = pathname === '/dashboard'
   const titulo = TITULO[pathname] ?? TITULO[Object.keys(TITULO).find(k => pathname.startsWith(k)) ?? ''] ?? ''
