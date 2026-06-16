@@ -31,11 +31,24 @@ export async function importarAtletas(atletas: AtletaImport[]) {
     }
     try {
       const atletaId = crypto.randomUUID()
+      // Convert DD/MM/YYYY to YYYY-MM-DD
+      let dataNasc: string | null = null
+      if (a.dataNascimento) {
+        const d = a.dataNascimento.trim()
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(d)) {
+          const [dia, mes, ano] = d.split('/')
+          dataNasc = `${ano}-${mes}-${dia}`
+        } else if (/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+          dataNasc = d
+        }
+      }
+
       const { error } = await supabaseAdmin.from('Atleta').insert({
         id: atletaId,
         escolaId,
         nome: a.nome.trim(),
-        dataNascimento: a.dataNascimento || null,
+        tokenPais: crypto.randomUUID(),
+        dataNascimento: dataNasc,
         posicao: a.posicao || null,
         cpf: a.cpf?.replace(/\D/g,'') || null,
         rg: a.rg || null,
