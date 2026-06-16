@@ -1,17 +1,23 @@
 'use server'
+import { auth, clerkClient } from '@clerk/nextjs/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { clerkClient } from '@clerk/nextjs/server'
 
 export async function criarEscola(
-  clerkUserId: string,
-  email: string,
   nomeEscola: string,
   cidade: string,
   estado: string,
   telefone: string,
   whatsapp: string,
-  responsavel: string
+  responsavel: string,
+  plano: string = 'PRO'
 ) {
+  const { userId } = await auth()
+  if (!userId) return { ok: false, message: 'Não autenticado' }
+
+  const clerk = await clerkClient()
+  const clerkUser = await clerk.users.getUser(userId)
+  const email = clerkUser.emailAddresses[0]?.emailAddress || ''
+
   const slug = nomeEscola.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').slice(0, 30) + '-' + Date.now().toString().slice(-4)
   const escolaId = 'escola-' + slug
 
@@ -24,14 +30,14 @@ export async function criarEscola(
     telefone: telefone || null,
     whatsapp,
     email,
-    clerkUserId,
-    plano: 'STARTER',
+    clerkUserId: userId,
+    plano,
     ativo: true,
   })
   if (escolaError) return { ok: false, message: escolaError.message }
 
   const { error: perfilError } = await supabaseAdmin.from('PerfilUsuario').upsert({
-    clerkUserId,
+    clerkUserId: userId,
     escolaId,
     nome: responsavel,
     email,
@@ -40,9 +46,7 @@ export async function criarEscola(
   }, { onConflict: 'clerkUserId' })
   if (perfilError) return { ok: false, message: perfilError.message }
 
-  // Atualiza metadata do Clerk para o token pegar escolaId e role
-  const clerk = await clerkClient()
-  await clerk.users.updateUserMetadata(clerkUserId, {
+  await clerk.users.updateUserMetadata(userId, {
     publicMetadata: { escolaId, role: 'admin' }
   })
 

@@ -119,3 +119,31 @@ export async function criarCobrancaGenerica(dados: {
   console.log('📦 Asaas genérico raw:', text)
   return JSON.parse(text)
 }
+export async function criarAssinatura(dados: {
+  customer: string
+  billingType: string
+  value: number
+  nextDueDate: string
+  cycle: 'MONTHLY' | 'YEARLY'
+  description: string
+}) {
+  const res = await fetch(`${getBaseUrl()}/subscriptions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'access_token': getApiKey() },
+    body: JSON.stringify(dados),
+    signal: AbortSignal.timeout(15000),
+  })
+  const text = await res.text()
+  console.log('📦 Asaas assinatura raw:', text)
+  return JSON.parse(text)
+}
+
+export async function buscarCobrancasDaAssinatura(subscriptionId: string) {
+  const res = await fetch(`${getBaseUrl()}/payments?subscription=${subscriptionId}`, {
+    headers: { 'access_token': getApiKey() },
+    signal: AbortSignal.timeout(10000),
+  })
+  const text = await res.text()
+  console.log('📦 Asaas cobranças assinatura raw:', text)
+  return JSON.parse(text)
+}

@@ -1,229 +1,206 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
+import { useState } from "react";
+import Link from "next/link";
 
-const planos = [
+const plans = [
   {
-    id: 'basico',
-    nome: 'Básico',
-    popular: false,
-    precoMensal: 49,
-    precoAnual: 39,
-    atletasMax: 30,
-    acento: 'rgba(255,255,255,0.5)',
-    acentoBg: 'rgba(255,255,255,0.04)',
-    acentoBorder: 'rgba(255,255,255,0.1)',
-    recursos: [
-      { nome: 'Até 30 atletas', ok: true },
-      { nome: '2 turmas', ok: true },
-      { nome: 'Financeiro e Pix', ok: true },
-      { nome: 'Presença', ok: true },
-      { nome: 'Matrículas online', ok: true },
-      { nome: 'Área dos pais', ok: true },
-      { nome: 'Relatórios PDF', ok: false },
-      { nome: 'Avaliação física', ok: false },
-      { nome: 'Campeonatos', ok: false },
-      { nome: 'Convocações', ok: false },
-      { nome: 'WhatsApp automático', ok: false },
-      { nome: '1 usuário', ok: true },
-      { nome: 'Suporte por email', ok: true },
-    ]
+    id: "basico",
+    name: "Básico",
+    color: "border-gray-600",
+    badge: null,
+    monthly: 79,
+    annual: 65,
+    description: "Ideal para academias em fase inicial",
+    limits: "Até 50 atletas",
+    features: [
+      { label: "Até 50 atletas", ok: true },
+      { label: "1 usuário", ok: true },
+      { label: "Até 3 turmas", ok: true },
+      { label: "Só futebol", ok: true },
+      { label: "WhatsApp automático", ok: false },
+      { label: "Relatórios PDF", ok: false },
+      { label: "Avaliação física", ok: false },
+      { label: "Campeonatos", ok: false },
+      { label: "App dos pais", ok: false },
+      { label: "IA + automações", ok: false },
+    ],
   },
   {
-    id: 'pro',
-    nome: 'Pro',
-    popular: true,
-    precoMensal: 99,
-    precoAnual: 79,
-    atletasMax: 100,
-    acento: '#39FF14',
-    acentoBg: 'rgba(57,255,20,0.06)',
-    acentoBorder: 'rgba(57,255,20,0.3)',
-    recursos: [
-      { nome: 'Até 100 atletas', ok: true },
-      { nome: '5 turmas', ok: true },
-      { nome: 'Financeiro e Pix', ok: true },
-      { nome: 'Presença', ok: true },
-      { nome: 'Matrículas online', ok: true },
-      { nome: 'Área dos pais', ok: true },
-      { nome: 'Relatórios PDF', ok: true },
-      { nome: 'Avaliação física', ok: true },
-      { nome: 'Campeonatos', ok: true },
-      { nome: 'Convocações', ok: true },
-      { nome: 'WhatsApp automático', ok: false },
-      { nome: '3 usuários', ok: true },
-      { nome: 'Suporte WhatsApp', ok: true },
-    ]
+    id: "pro",
+    name: "Pro",
+    color: "border-orange-500",
+    badge: "MAIS POPULAR",
+    monthly: 129,
+    annual: 107,
+    description: "Para academias em crescimento",
+    limits: "Até 150 atletas",
+    features: [
+      { label: "Até 150 atletas", ok: true },
+      { label: "3 usuários", ok: true },
+      { label: "Até 10 turmas", ok: true },
+      { label: "Até 3 modalidades", ok: true },
+      { label: "WhatsApp automático", ok: true },
+      { label: "Relatórios PDF", ok: true },
+      { label: "Avaliação física", ok: true },
+      { label: "Campeonatos", ok: true },
+      { label: "App dos pais", ok: false },
+      { label: "IA + automações", ok: false },
+    ],
   },
   {
-    id: 'elite',
-    nome: 'Elite',
-    popular: false,
-    precoMensal: 197,
-    precoAnual: 157,
-    atletasMax: 999,
-    acento: '#D4AF37',
-    acentoBg: 'rgba(212,175,55,0.06)',
-    acentoBorder: 'rgba(212,175,55,0.3)',
-    recursos: [
-      { nome: 'Atletas ilimitados', ok: true },
-      { nome: 'Turmas ilimitadas', ok: true },
-      { nome: 'Financeiro e Pix', ok: true },
-      { nome: 'Presença', ok: true },
-      { nome: 'Matrículas online', ok: true },
-      { nome: 'Área dos pais', ok: true },
-      { nome: 'Relatórios PDF', ok: true },
-      { nome: 'Avaliação física', ok: true },
-      { nome: 'Campeonatos', ok: true },
-      { nome: 'Convocações', ok: true },
-      { nome: 'WhatsApp automático', ok: true },
-      { nome: 'Usuários ilimitados', ok: true },
-      { nome: 'Suporte prioritário', ok: true },
-    ]
-  }
-]
+    id: "elite",
+    name: "Elite",
+    color: "border-yellow-400",
+    badge: "COMPLETO",
+    monthly: 199,
+    annual: 165,
+    description: "Para clubes e academias consolidadas",
+    limits: "Atletas ilimitados",
+    features: [
+      { label: "Atletas ilimitados", ok: true },
+      { label: "Usuários ilimitados", ok: true },
+      { label: "Turmas ilimitadas", ok: true },
+      { label: "Modalidades ilimitadas", ok: true },
+      { label: "WhatsApp automático", ok: true },
+      { label: "Relatórios PDF", ok: true },
+      { label: "Avaliação física", ok: true },
+      { label: "Campeonatos", ok: true },
+      { label: "App dos pais", ok: true },
+      { label: "IA + automações", ok: true },
+    ],
+  },
+];
 
-export default function Planos() {
-  const [periodo, setPeriodo] = useState<'mensal' | 'anual'>('mensal')
-
-  const syne = 'Syne, sans-serif'
-  const neon = '#39FF14'
-  const gold = '#D4AF37'
-  const bg = 'linear-gradient(160deg,#0a1a06,#050505,#111003)'
-
-  function assinar(planoId: string) {
-    const plano = planos.find(p => p.id === planoId)
-    const valor = periodo === 'mensal' ? plano?.precoMensal : plano?.precoAnual
-    const msg = encodeURIComponent(
-      'Olá! Quero assinar o plano ' + plano?.nome + ' do GestaoFC.\n\n' +
-      'Plano: ' + plano?.nome + '\n' +
-      'Período: ' + (periodo === 'mensal' ? 'Mensal' : 'Anual') + '\n' +
-      'Valor: R$ ' + valor + (periodo === 'mensal' ? '/mês' : '/mês (cobrado anualmente)') + '\n\n' +
-      'Aguardo as instruções de pagamento!'
-    )
-    window.open('https://wa.me/5534998168467?text=' + msg, '_blank')
-  }
+export default function PlanosPage() {
+  const [anual, setAnual] = useState(false);
 
   return (
-    <div style={{ minHeight: '100vh', background: bg, color: '#F0F0F0', fontFamily: 'Inter,sans-serif' }}>
+    <div className="min-h-screen bg-[#0F0F1A] text-white font-[Inter,sans-serif]">
 
-      {/* ── HERO ── */}
-      <div style={{ position: 'relative', overflow: 'hidden', padding: '48px 24px 40px', textAlign: 'center' }}>
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-          <div style={{ width: '300px', height: '150px', borderRadius: '50%', filter: 'blur(60px)', opacity: 0.15, background: neon }} />
+      {/* Header */}
+      <div className="pt-16 pb-10 text-center px-4">
+        <div className="inline-block bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs font-semibold px-4 py-1.5 rounded-full mb-6 tracking-widest uppercase">
+          Planos e Preços
         </div>
-        <div style={{ position: 'relative' }}>
-          <div style={{ width: '64px', height: '64px', borderRadius: '20px', background: 'rgba(57,255,20,0.08)', border: '1px solid rgba(57,255,20,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '30px', margin: '0 auto 14px', boxShadow: '0 0 30px rgba(57,255,20,0.15)' }}>
-            ⚽
-          </div>
-          <h1 style={{ fontFamily: syne, fontWeight: 900, fontSize: '32px', color: neon, margin: '0 0 6px', letterSpacing: '-0.5px' }}>GestaoFC</h1>
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '15px', margin: 0 }}>Gerencie sua escolinha com profissionalismo</p>
+        <h1 className="text-4xl md:text-5xl font-bold font-[Syne,sans-serif] mb-4">
+          Escolha o plano{" "}
+          <span className="text-[#FF6B00]">certo para sua academia</span>
+        </h1>
+        <p className="text-gray-400 text-lg max-w-xl mx-auto">
+          Tudo que você precisa para gerenciar, crescer e profissionalizar sua academia de futebol.
+        </p>
+
+        {/* Toggle mensal/anual */}
+        <div className="flex items-center justify-center gap-4 mt-8">
+          <span className={`text-sm font-medium ${!anual ? "text-white" : "text-gray-500"}`}>Mensal</span>
+          <button
+            onClick={() => setAnual(!anual)}
+            className={`relative w-14 h-7 rounded-full transition-colors duration-300 ${anual ? "bg-[#FF6B00]" : "bg-gray-700"}`}
+          >
+            <span
+              className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow transition-transform duration-300 ${anual ? "translate-x-7" : "translate-x-0"}`}
+            />
+          </button>
+          <span className={`text-sm font-medium ${anual ? "text-white" : "text-gray-500"}`}>
+            Anual{" "}
+            <span className="bg-green-500/20 text-green-400 text-xs px-2 py-0.5 rounded-full ml-1">-18%</span>
+          </span>
         </div>
       </div>
 
-      <div style={{ padding: '0 20px 40px', maxWidth: '440px', margin: '0 auto' }}>
-
-        {/* ── TOGGLE MENSAL/ANUAL ── */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '28px' }}>
-          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '14px', padding: '4px', display: 'flex', gap: '4px', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <button
-              onClick={() => setPeriodo('mensal')}
-              style={{ padding: '8px 20px', borderRadius: '10px', fontSize: '13px', fontWeight: 700, fontFamily: syne, border: 'none', cursor: 'pointer', background: periodo === 'mensal' ? 'linear-gradient(135deg,#39FF14,#2bcc0f)' : 'transparent', color: periodo === 'mensal' ? '#050505' : 'rgba(255,255,255,0.4)', transition: 'all 0.2s' }}
-            >
-              Mensal
-            </button>
-            <button
-              onClick={() => setPeriodo('anual')}
-              style={{ padding: '8px 20px', borderRadius: '10px', fontSize: '13px', fontWeight: 700, fontFamily: syne, border: 'none', cursor: 'pointer', background: periodo === 'anual' ? 'linear-gradient(135deg,#39FF14,#2bcc0f)' : 'transparent', color: periodo === 'anual' ? '#050505' : 'rgba(255,255,255,0.4)', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px' }}
-            >
-              Anual
-              <span style={{ background: 'rgba(57,255,20,0.15)', color: neon, fontSize: '10px', padding: '1px 6px', borderRadius: '20px', fontWeight: 800 }}>-20%</span>
-            </button>
-          </div>
-        </div>
-
-        {/* ── CARDS DE PLANO ── */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {planos.map(p => (
+      {/* Cards */}
+      <div className="max-w-6xl mx-auto px-4 pb-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {plans.map((plan) => (
             <div
-              key={p.id}
-              style={{ position: 'relative', background: p.acentoBg, border: '1px solid ' + p.acentoBorder, borderRadius: '20px', padding: '24px', boxShadow: p.popular ? '0 0 30px ' + p.acento + '20' : 'none' }}
+              key={plan.id}
+              className={`relative rounded-2xl border-2 ${plan.color} bg-[#1A1A2E] p-6 flex flex-col transition-transform hover:-translate-y-1 duration-200 ${plan.id === "pro" ? "shadow-[0_0_40px_rgba(255,107,0,0.15)]" : ""}`}
             >
-              {/* Badge mais popular */}
-              {p.popular && (
-                <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)' }}>
-                  <span style={{ background: 'linear-gradient(135deg,#39FF14,#2bcc0f)', color: '#050505', fontSize: '10px', fontWeight: 900, fontFamily: syne, padding: '4px 14px', borderRadius: '20px', whiteSpace: 'nowrap', boxShadow: '0 0 16px rgba(57,255,20,0.4)' }}>
-                    MAIS POPULAR
-                  </span>
+              {/* Badge */}
+              {plan.badge && (
+                <div className={`absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-4 py-1 rounded-full ${plan.id === "pro" ? "bg-[#FF6B00] text-white" : "bg-[#FFD700] text-[#0F0F1A]"}`}>
+                  {plan.badge}
                 </div>
               )}
 
-              {/* Nome + Preço */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
-                <div>
-                  <h2 style={{ fontFamily: syne, fontWeight: 800, fontSize: '22px', color: p.acento, margin: '0 0 4px' }}>{p.nome}</h2>
-                  <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', margin: 0 }}>
-                    {p.atletasMax >= 999 ? 'Atletas ilimitados' : 'Até ' + p.atletasMax + ' atletas'}
-                  </p>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <p style={{ fontFamily: syne, fontWeight: 900, fontSize: '32px', color: p.acento, margin: 0, lineHeight: 1 }}>
-                    R$ {periodo === 'mensal' ? p.precoMensal : p.precoAnual}
-                  </p>
-                  <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: '2px 0 0' }}>/mês</p>
-                  {periodo === 'anual' && (
-                    <p style={{ fontSize: '11px', color: p.acento, margin: '2px 0 0', fontWeight: 600 }}>R$ {(p.precoAnual * 12).toLocaleString('pt-BR')}/ano</p>
-                  )}
-                </div>
+              {/* Nome + desc */}
+              <div className="mb-6">
+                <h2 className={`text-2xl font-bold font-[Syne,sans-serif] mb-1 ${plan.id === "elite" ? "text-[#FFD700]" : plan.id === "pro" ? "text-[#FF6B00]" : "text-white"}`}>
+                  {plan.name}
+                </h2>
+                <p className="text-gray-400 text-sm">{plan.description}</p>
               </div>
 
-              {/* Lista de recursos */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-                {p.recursos.map((r, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '13px', color: r.ok ? p.acento : 'rgba(255,255,255,0.2)', fontWeight: 700, flexShrink: 0, width: '16px' }}>{r.ok ? '✓' : '✗'}</span>
-                    <span style={{ fontSize: '12px', color: r.ok ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.25)' }}>{r.nome}</span>
-                  </div>
-                ))}
+              {/* Preço */}
+              <div className="mb-6">
+                <div className="flex items-end gap-1">
+                  <span className="text-gray-400 text-sm self-start mt-1">R$</span>
+                  <span className="text-5xl font-bold font-[Syne,sans-serif] leading-none">
+                    {anual ? plan.annual : plan.monthly}
+                  </span>
+                  <span className="text-gray-400 text-sm self-end mb-1">/mês</span>
+                </div>
+                {anual && (
+                  <p className="text-gray-500 text-xs mt-1">
+                    Cobrado anualmente — R$ {plan.annual * 12}/ano
+                  </p>
+                )}
               </div>
 
-              {/* Botão assinar */}
-              <button
-                onClick={() => assinar(p.id)}
-                style={{ width: '100%', padding: '13px', borderRadius: '12px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', background: p.popular ? 'linear-gradient(135deg,#39FF14,#2bcc0f)' : 'rgba(255,255,255,0.07)', color: p.popular ? '#050505' : p.acento, boxShadow: p.popular ? '0 0 20px rgba(57,255,20,0.25)' : 'none', transition: 'all 0.2s' }}
+              {/* CTA */}
+              <Link
+                href={`/cadastro?plano=${plan.id}${anual ? "&periodo=anual" : ""}`}
+                className={`block w-full text-center py-3 rounded-xl font-semibold text-sm transition-all duration-200 mb-6 ${
+                  plan.id === "pro"
+                    ? "bg-[#FF6B00] text-white hover:bg-orange-600"
+                    : plan.id === "elite"
+                    ? "bg-[#FFD700] text-[#0F0F1A] hover:bg-yellow-300"
+                    : "bg-white/10 text-white hover:bg-white/20 border border-white/10"
+                }`}
               >
-                📲 Assinar via WhatsApp
-              </button>
+                Começar agora
+              </Link>
+
+              {/* Limite destaque */}
+              <p className="text-xs text-center text-gray-500 mb-4 -mt-3">{plan.limits}</p>
+
+              {/* Divisor */}
+              <div className="border-t border-white/10 mb-4"></div>
+
+              {/* Features */}
+              <ul className="space-y-2.5 flex-1">
+                {plan.features.map((f, i) => (
+                  <li key={i} className="flex items-center gap-2.5">
+                    {f.ok ? (
+                      <span className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                        <svg className="w-3 h-3 text-green-400" viewBox="0 0 12 12" fill="none">
+                          <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </span>
+                    ) : (
+                      <span className="w-5 h-5 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0">
+                        <svg className="w-3 h-3 text-red-400" viewBox="0 0 12 12" fill="none">
+                          <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                        </svg>
+                      </span>
+                    )}
+                    <span className={`text-sm ${f.ok ? "text-gray-200" : "text-gray-600"}`}>
+                      {f.label}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>
 
-        {/* ── TRUST BADGES ── */}
-        <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '20px', marginTop: '20px' }}>
-          <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '13px', color: neon, marginBottom: '12px' }}>✅ Pagamento seguro</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            {['Pix ou cartão de crédito', 'Cancele quando quiser', 'Suporte em português', 'Dados seguros e criptografados'].map((item, i) => (
-              <p key={i} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', margin: 0 }}>✅ {item}</p>
-            ))}
-          </div>
-        </div>
-
-        {/* ── SUPORTE ── */}
-        <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.3)', fontSize: '12px', marginTop: '20px', marginBottom: '12px' }}>
-          Dúvidas? Fale conosco pelo WhatsApp
+        {/* Trial note */}
+        <p className="text-center text-gray-500 text-sm mt-10">
+          Sem fidelidade no plano mensal · Cancele quando quiser ·{" "}
+          <Link href="/contato" className="text-orange-400 hover:underline">Falar com vendas</Link>
         </p>
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
-          <a
-            href="https://wa.me/5534998168467"
-            target="_blank"
-            rel="noreferrer"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(57,255,20,0.08)', border: '1px solid rgba(57,255,20,0.25)', color: neon, padding: '12px 28px', borderRadius: '12px', fontWeight: 700, fontSize: '14px', fontFamily: syne, textDecoration: 'none' }}
-          >
-            💬 Falar com suporte
-          </a>
-        </div>
-
       </div>
     </div>
-  )
+  );
 }
