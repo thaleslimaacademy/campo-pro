@@ -84,7 +84,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center' }}>
               <img src="/gestaofc-logo.png" style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'cover' }} alt="logo"
                 onError={e => (e.currentTarget.style.display = 'none')} />
-            </a>
+            </Link>
             <div>
               <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 15, color: '#fff' }}>{titulo || nomeEscola}</div>
               {titulo && <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)' }}>{nomeEscola}</div>}
