@@ -1,4 +1,5 @@
 'use client'
+import PlanoGate from '@/components/PlanoGate'
 import { usePerfil } from '@/lib/usePerfil'
 
 import { useEffect, useState } from 'react'
@@ -207,6 +208,7 @@ export default function Convocacoes() {
   }
 
   return (
+    <PlanoGate feature="convocacoes" planoMinimo="PRO">
     <div style={{ minHeight: "100vh", color: "#F0F0F0", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -396,5 +398,6 @@ export default function Convocacoes() {
         <a href="/financeiro" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Financeiro</a>
       </nav>
     </div>
+    </PlanoGate>
   )
 }

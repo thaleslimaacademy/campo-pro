@@ -1,4 +1,5 @@
 'use client'
+import PlanoGate from '@/components/PlanoGate'
 import { usePerfil } from '@/lib/usePerfil'
 
 import { useEffect, useState } from 'react'
@@ -162,6 +163,7 @@ export default function Relatorios() {
   if (loading) return <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center"><p className="text-gray-400">Carregando...</p></div>
 
   return (
+    <PlanoGate feature="relatorios" planoMinimo="PRO">
     <div style={{ minHeight: "100vh", color: "#F0F0F0", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
         <a href="/dashboard" className="text-gray-400">Voltar</a>
@@ -233,5 +235,6 @@ export default function Relatorios() {
         <a href="/financeiro" className="text-gray-400 text-xs text-center">Financeiro</a>
       </nav>
     </div>
+    </PlanoGate>
   )
 }

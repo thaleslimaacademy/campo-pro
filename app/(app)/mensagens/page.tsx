@@ -1,4 +1,5 @@
 'use client'
+import PlanoGate from '@/components/PlanoGate'
 import { usePerfil } from '@/lib/usePerfil'
 
 import { useEffect, useState } from 'react'
@@ -39,6 +40,7 @@ export default function Mensagens() {
   }
 
   return (
+    <PlanoGate feature="mensagens" planoMinimo="PRO">
     <div style={{ minHeight: "100vh", color: "#F0F0F0", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
@@ -114,5 +116,6 @@ export default function Mensagens() {
         <a href="/financeiro" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", fontFamily: "Syne, sans-serif" }}>Financeiro</a>
       </nav>
     </div>
+    </PlanoGate>
   )
 }
