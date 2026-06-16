@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic'
 
 import { useState, useEffect } from 'react'
 
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 const PLANOS = [
   {
@@ -41,7 +41,6 @@ const PLANOS = [
 
 export default function Onboarding() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [step, setStep] = useState(1)
   const [salvando, setSalvando] = useState(false)
   const [erro, setErro] = useState('')
@@ -56,11 +55,12 @@ export default function Onboarding() {
   })
 
   useEffect(() => {
-    const planoParam = searchParams.get('plano')?.toUpperCase()
+    const params = new URLSearchParams(window.location.search)
+    const planoParam = params.get('plano')?.toUpperCase()
     if (planoParam && ['BASICO', 'PRO', 'ELITE'].includes(planoParam)) {
       setPlanoSelecionado(planoParam)
     }
-  }, [searchParams])
+  }, [])
 
   const syne = 'Syne, sans-serif'
   const neon = '#39FF14'
