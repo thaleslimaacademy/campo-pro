@@ -15,14 +15,18 @@ export type MesData = {
 export async function carregarFluxoPeriodo(inicio: string, fim: string): Promise<MesData[]> {
   const ESCOLA_ID = await getEscolaIdServer()
 
+  const dataInicio = inicio + '-01'
+  const [anoF, mesF] = fim.split('-').map(Number)
+  const dataFim = `${fim}-${String(new Date(anoF, mesF, 0).getDate()).padStart(2,'0')}`
+
   const [{ data: cobr }, { data: rec }, { data: desp }] = await Promise.all([
     supabaseAdmin.from('Cobranca').select('valor, competencia')
       .eq('escolaId', ESCOLA_ID).eq('status', 'PAGO')
-      .gte('competencia', inicio + '-01').lte('competencia', fim + '-31'),
+      .gte('competencia', dataInicio).lte('competencia', dataFim),
     supabaseAdmin.from('Receita').select('valor, categoria, data')
-      .eq('escolaId', ESCOLA_ID).gte('data', inicio + '-01').lte('data', fim + '-31'),
+      .eq('escolaId', ESCOLA_ID).gte('data', dataInicio).lte('data', dataFim),
     supabaseAdmin.from('Despesa').select('valor, categoria, data')
-      .eq('escolaId', ESCOLA_ID).gte('data', inicio + '-01').lte('data', fim + '-31'),
+      .eq('escolaId', ESCOLA_ID).gte('data', dataInicio).lte('data', dataFim),
   ])
 
   const meses: string[] = []
