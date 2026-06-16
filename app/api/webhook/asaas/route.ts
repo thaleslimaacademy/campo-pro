@@ -103,6 +103,40 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ sucesso: true, tipo: 'pedido', status: novoStatus })
     }
 
+
+    // ── ASSINATURA GESTAOFC (ativação de escola) ──────────
+    if (pagamento.subscription && novoStatus === 'PAGO') {
+      const { data: escola } = await supabaseAdmin
+        .from('Escola')
+        .select('id, nome, ativo, statusPlano, whatsapp, planoGestaoFC')
+        .eq('asaasSubscriptionId', pagamento.subscription)
+        .maybeSingle()
+
+      if (escola) {
+        await supabaseAdmin.from('Escola').update({
+          ativo: true,
+          statusPlano: 'ATIVO',
+        }).eq('id', escola.id)
+        console.log('✅ Escola ativada:', escola.id, escola.nome)
+
+        if (escola.whatsapp) {
+          try {
+            const msg = [
+              `🏆 *GestãoFC — Plano Ativado!*`, ``,
+              `Olá! Seu pagamento foi confirmado e o *${escola.nome}* já está ativo no GestãoFC. 🎉`, ``,
+              `📋 Plano: *${escola.planoGestaoFC || 'PRO'}*`,
+              `✅ Status: *ATIVO*`, ``,
+              `Acesse agora: *gestaofc.com.br*`, ``,
+              `_Gestão FC · Bem-vindo(a)!_`,
+            ].join('\n')
+            await enviarWhatsApp(escola.whatsapp, msg)
+          } catch (e) { console.error('Erro WhatsApp escola:', (e as Error).message) }
+        }
+
+        return NextResponse.json({ sucesso: true, tipo: 'escola', status: 'ATIVO' })
+      }
+    }
+
     // ── MENSALIDADE ───────────────────────────────────────
     const { error } = await supabaseAdmin
       .from('Cobranca')
