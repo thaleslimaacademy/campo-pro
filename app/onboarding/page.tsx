@@ -105,7 +105,7 @@ export default function Onboarding() {
           escolaId: result.escolaId,
           plano: planoSelecionado,
           nome: form.responsavel,
-          email: user.emailAddresses[0]?.emailAddress || '',
+          email: '',
           whatsapp: form.whatsapp,
         })
       })
