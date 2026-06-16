@@ -387,7 +387,7 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
                   {/* Linha inferior: vencimento + valor */}
                   <div className="flex justify-between items-center">
                     <p className="text-xs text-gray-400">
-                      {'Vence: ' + new Date(c.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}
+                      {'Vence: ' + new Date((c.vencimento || '').slice(0,10) + 'T12:00:00').toLocaleDateString('pt-BR')}
                     </p>
                     <p className="text-sm font-bold text-white">
                       {'R$ ' + Number(c.valor).toFixed(2)}
