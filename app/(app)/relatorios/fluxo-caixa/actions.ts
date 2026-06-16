@@ -16,8 +16,8 @@ export async function carregarFluxoPeriodo(inicio: string, fim: string): Promise
   const ESCOLA_ID = await getEscolaIdServer()
 
   const dataInicio = inicio + '-01'
-  const [anoF, mesF] = fim.split('-').map(Number)
-  const dataFim = `${fim}-${String(new Date(anoF, mesF, 0).getDate()).padStart(2,'0')}`
+  const [anoFim, mesFim] = fim.split('-').map(Number)
+  const dataFim = `${fim}-${String(new Date(anoFim, mesFim, 0).getDate()).padStart(2,'0')}`
 
   const [{ data: cobr }, { data: rec }, { data: desp }] = await Promise.all([
     supabaseAdmin.from('Cobranca').select('valor, competencia')
