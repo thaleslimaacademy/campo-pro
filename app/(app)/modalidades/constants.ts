@@ -22,4 +22,13 @@ export const PLANOS_GESTAOFC = [
   { slug: 'SIMPLE', label: 'Simple', maxModalidades: 1,  preco: 79  },
   { slug: 'MEDIO',  label: 'Médio',  maxModalidades: 2,  preco: 99  },
   { slug: 'MASTER', label: 'Master', maxModalidades: 99, preco: 149 },
+  // Planos novos (BASICO/PRO/ELITE)
+  { slug: 'BASICO', label: 'Básico', maxModalidades: 1,  preco: 79  },
+  { slug: 'PRO',    label: 'Pro',    maxModalidades: 3,  preco: 129 },
+  { slug: 'ELITE',  label: 'Elite',  maxModalidades: 99, preco: 199 },
 ]
+
+export const MAX_MODALIDADES_POR_PLANO: Record<string, number> = {
+  SIMPLE: 1, MEDIO: 2, MASTER: 99,
+  BASICO: 1, PRO: 3,   ELITE: 99,
+}

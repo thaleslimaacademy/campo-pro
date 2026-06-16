@@ -113,9 +113,11 @@ export async function POST(req: NextRequest) {
         .maybeSingle()
 
       if (escola) {
+        const maxMod = escola.planoGestaoFC === 'ELITE' ? 99 : escola.planoGestaoFC === 'PRO' ? 3 : 1
         await supabaseAdmin.from('Escola').update({
           ativo: true,
           statusPlano: 'ATIVO',
+          maxModalidades: maxMod,
         }).eq('id', escola.id)
         console.log('✅ Escola ativada:', escola.id, escola.nome)
 

@@ -20,6 +20,8 @@ export async function POST(req: NextRequest) {
       id: escolaId, slug, nome: nomeEscola, cidade, estado,
       telefone: telefone || null, whatsapp, email,
       clerkUserId: userId, plano, ativo: true,
+      planoGestaoFC: plano,
+      maxModalidades: plano === 'ELITE' ? 99 : plano === 'PRO' ? 3 : 1,
     })
     if (escolaError) return NextResponse.json({ ok: false, message: escolaError.message })
 
