@@ -57,7 +57,7 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
 
   // ── Última avaliação física ──
   const { data: avaliacoes } = await supabase
-    .from('Avaliacao').select('dataAvaliacao, peso, altura, imc, gordura')
+    .from('Avaliacao').select('dataAvaliacao, peso, altura, imc, percentualGordura')
     .eq('atletaId', atleta.id).order('dataAvaliacao', { ascending: false }).limit(1)
   const ultimaAval = avaliacoes?.[0] || null
 
@@ -467,7 +467,7 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
                 { label: 'Peso', valor: ultimaAval.peso ? ultimaAval.peso + ' kg' : '—' },
                 { label: 'Altura', valor: ultimaAval.altura ? ultimaAval.altura + ' cm' : '—' },
                 { label: 'IMC', valor: ultimaAval.imc ? Number(ultimaAval.imc).toFixed(1) : '—' },
-                { label: '% Gordura', valor: ultimaAval.gordura ? Number(ultimaAval.gordura).toFixed(1) + '%' : '—' },
+                { label: '% Gordura', valor: (ultimaAval as any).percentualGordura ? Number((ultimaAval as any).percentualGordura).toFixed(1) + '%' : '—' },
               ].map(item => (
                 <div key={item.label} className="rounded-xl p-3 text-center"
                   style={{ background: 'rgba(57,255,20,0.05)', border: '1px solid rgba(57,255,20,0.15)' }}>
