@@ -36,15 +36,16 @@ function MatriculasInner() {
   const [selecionada, setSelecionada] = useState<Matricula | null>(null)
   const [processando, setProcessando] = useState(false)
   const [gerandoCobranca, setGerandoCobranca] = useState(false)
+  const [valorMensalidade, setValorMensalidade] = useState<number>(100)
   const [filtro, setFiltro] = useState<'PENDENTE' | 'APROVADO' | 'RECUSADO'>('PENDENTE')
 
   async function carregar() {
-    const { data } = await supabase
-      .from('Matricula')
-      .select('*')
-      .eq('escolaId', escolaId!)
-      .order('criadoEm', { ascending: false })
+    const [{ data }, { data: escolaData }] = await Promise.all([
+      supabase.from('Matricula').select('*').eq('escolaId', escolaId!).order('criadoEm', { ascending: false }),
+      supabase.from('Escola').select('valorMensalidade').eq('id', escolaId!).single(),
+    ])
     setMatriculas(data || [])
+    if (escolaData?.valorMensalidade) setValorMensalidade(Number(escolaData.valorMensalidade))
     setLoading(false)
   }
 
@@ -60,7 +61,7 @@ function MatriculasInner() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           atletaId,
-          valor: 100,
+          valor: valorMensalidade,
           vencimento,
           descricao: 'Mensalidade',
           desconto: { value: 15, dueDateLimitDays: 0, type: 'FIXED' },
