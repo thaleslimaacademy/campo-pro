@@ -6,7 +6,7 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
   // ── Busca atleta pelo token do responsável ──
   const { data: atleta } = await supabase
     .from('Atleta')
-    .select('id, nome, posicao, tokenPais, fotoUrl')
+    .select('id, nome, posicao, tokenPais, fotoUrl, escolaId')
     .eq('tokenPais', token)
     .single()
 
@@ -49,6 +49,33 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
     .eq('atletaId', atleta.id)
     .order('vencimento', { ascending: false })
     .limit(6)
+
+  // ── Premiações ──
+  const { data: premiacoes } = await supabase
+    .from('Premiacao').select('id, titulo, icone')
+    .eq('atletaId', atleta.id).order('dataConquista', { ascending: false })
+
+  // ── Última avaliação física ──
+  const { data: avaliacoes } = await supabase
+    .from('Avaliacao').select('dataAvaliacao, peso, altura, imc, gordura')
+    .eq('atletaId', atleta.id).order('dataAvaliacao', { ascending: false }).limit(1)
+  const ultimaAval = avaliacoes?.[0] || null
+
+  // ── Slug da escola para fotos/loja ──
+  const { data: escola } = await supabase
+    .from('Escola').select('slug').eq('id', atleta.escolaId).single()
+  const escolaSlug = escola?.slug || ''
+
+  // ── Nível do atleta ──
+  const totalConquistas = premiacoes?.length || 0
+  const nivel = totalConquistas >= 61 ? { label: 'Lenda TLFA', emoji: '👑' }
+    : totalConquistas >= 51 ? { label: 'Referência', emoji: '🟡' }
+    : totalConquistas >= 41 ? { label: 'Elite', emoji: '🔴' }
+    : totalConquistas >= 31 ? { label: 'Destaque', emoji: '🟠' }
+    : totalConquistas >= 21 ? { label: 'Competidor', emoji: '🟣' }
+    : totalConquistas >= 11 ? { label: 'Em Desenvolvimento', emoji: '🔵' }
+    : totalConquistas >= 6  ? { label: 'Aprendiz', emoji: '🟢' }
+    : { label: 'Iniciante', emoji: '🔰' }
 
   const totalPago = cobrancas?.filter(c => c.status === 'PAGO').reduce((s, c) => s + Number(c.valor), 0) || 0
   const totalPendente = cobrancas?.filter(c => c.status === 'PENDENTE' || c.status === 'VENCIDO').reduce((s, c) => s + Number(c.valor), 0) || 0
@@ -390,6 +417,91 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
             </div>
           )}
         </div>
+
+        {/* ── CARD NIVEL E CONQUISTAS ── */}
+        {premiacoes && premiacoes.length > 0 && (
+          <div
+            className="rounded-2xl p-4 border"
+            style={{ background: 'rgba(255,255,255,0.025)', borderColor: 'rgba(255,215,0,0.2)' }}
+          >
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#D4AF37' }}>
+              🏆 Conquistas
+            </p>
+            <div className="flex items-center gap-3 mb-3">
+              <span style={{ fontSize: 28 }}>{nivel.emoji}</span>
+              <div>
+                <p className="font-black text-white" style={{ fontFamily: 'Syne, sans-serif' }}>{nivel.label}</p>
+                <p className="text-xs" style={{ color: '#D4AF37' }}>{totalConquistas} conquistas desbloqueadas</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {premiacoes.slice(0, 8).map((p: {id:string;titulo:string;icone:string}) => (
+                <span key={p.id} className="flex items-center gap-1 text-xs px-2 py-1 rounded-full"
+                  style={{ background: 'rgba(255,215,0,0.1)', border: '1px solid rgba(255,215,0,0.25)', color: '#D4AF37' }}>
+                  {p.icone} {p.titulo}
+                </span>
+              ))}
+              {premiacoes.length > 8 && (
+                <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
+                  +{premiacoes.length - 8} mais
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── CARD AVALIACAO FISICA ── */}
+        {ultimaAval && (
+          <div
+            className="rounded-2xl p-4 border"
+            style={{ background: 'rgba(255,255,255,0.025)', borderColor: 'rgba(57,255,20,0.15)' }}
+          >
+            <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: '#D4AF37' }}>
+              💪 Última Avaliação Física
+            </p>
+            <p className="text-xs mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              {new Date(ultimaAval.dataAvaliacao + 'T12:00:00').toLocaleDateString('pt-BR')}
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { label: 'Peso', valor: ultimaAval.peso ? ultimaAval.peso + ' kg' : '—' },
+                { label: 'Altura', valor: ultimaAval.altura ? ultimaAval.altura + ' cm' : '—' },
+                { label: 'IMC', valor: ultimaAval.imc ? Number(ultimaAval.imc).toFixed(1) : '—' },
+                { label: '% Gordura', valor: ultimaAval.gordura ? Number(ultimaAval.gordura).toFixed(1) + '%' : '—' },
+              ].map(item => (
+                <div key={item.label} className="rounded-xl p-3 text-center"
+                  style={{ background: 'rgba(57,255,20,0.05)', border: '1px solid rgba(57,255,20,0.15)' }}>
+                  <p className="font-black text-white" style={{ fontFamily: 'Syne, sans-serif', fontSize: 18 }}>{item.valor}</p>
+                  <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{item.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── FOTOS E LOJA ── */}
+        {escolaSlug && (
+          <div
+            className="rounded-2xl p-4 border"
+            style={{ background: 'rgba(255,255,255,0.025)', borderColor: 'rgba(255,255,255,0.06)' }}
+          >
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#D4AF37' }}>
+              📸 Academia
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <a href={`/galeria/${escolaSlug}`}
+                className="flex flex-col items-center justify-center gap-2 py-4 rounded-xl font-black text-sm"
+                style={{ background: 'rgba(255,107,0,0.1)', border: '1px solid rgba(255,107,0,0.25)', color: '#FF6B00', textDecoration: 'none', fontFamily: 'Syne, sans-serif' }}>
+                📸 Fotos
+              </a>
+              <a href={`/loja/${escolaSlug}`}
+                className="flex flex-col items-center justify-center gap-2 py-4 rounded-xl font-black text-sm"
+                style={{ background: 'rgba(255,215,0,0.1)', border: '1px solid rgba(255,215,0,0.25)', color: '#FFD700', textDecoration: 'none', fontFamily: 'Syne, sans-serif' }}>
+                🛒 Loja
+              </a>
+            </div>
+          </div>
+        )}
 
         {/* ── CARD CONTATO ── */}
         <div
