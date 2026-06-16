@@ -41,7 +41,7 @@ export default function Presenca() {
       const dataFim = dataSel + 'T23:59:59.999Z'
       let { data: treino } = await supabase
         .from('Treino').select('id').eq('escolaId', escolaId!)
-        .gte('data', dataISO).lte('data', dataFim).limit(1).single()
+        .gte('data', dataISO).lte('data', dataFim).limit(1).maybeSingle()
 
       if (!treino) {
         const { data: novoTreino } = await supabase
@@ -61,7 +61,7 @@ export default function Presenca() {
       setLoading(false)
     }
     carregar()
-  }, [escolaId])
+  }, [escolaId, dataSel])
 
   async function marcar(atletaId: string, status: 'PRESENTE' | 'AUSENTE') {
     if (!treinoId) return
