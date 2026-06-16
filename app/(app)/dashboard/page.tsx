@@ -31,6 +31,9 @@ const MODULOS_ADMIN = [
   { href: '/configuracoes',             label: 'Config',         e: '⚙️', cor: C.muted },
   { href: '/comissao',                   label: 'Comissão',       e: '👨‍💼', cor: C.blue },
   { href: '/modalidades',                label: 'Modalidades',    e: '🏅', cor: C.orange },
+  { href: '/premios',                    label: 'Premiações',     e: '🥇', cor: C.gold },
+  { href: '/atletas/importar',           label: 'Importar',       e: '📥', cor: C.green },
+  { href: '/relatorios/fluxo-caixa',    label: 'Fluxo de Caixa', e: '📊', cor: C.green },
 ]
 
 const MODULOS_PROFESSOR = [
