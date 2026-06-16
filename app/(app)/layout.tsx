@@ -1,6 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
+import Link from 'next/link'
 import { usePerfil } from '@/lib/usePerfil'
 import { supabase } from '@/lib/supabase'
 import { useEffect, useState } from 'react'
@@ -80,7 +81,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {!isDashboard && (
         <div style={{ background: 'linear-gradient(135deg, #FF6B00 0%, #1A1A2E 60%, #0F0F1A 100%)', padding: '12px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 40 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <a href="/dashboard" style={{ display: 'flex', alignItems: 'center' }}>
+            <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center' }}>
               <img src="/gestaofc-logo.png" style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'cover' }} alt="logo"
                 onError={e => (e.currentTarget.style.display = 'none')} />
             </a>
@@ -103,13 +104,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         {NAV.map(item => {
           const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
           return (
-            <a key={item.href} href={item.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, textDecoration: 'none', minWidth: 60 }}>
+            <Link key={item.href} href={item.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, textDecoration: 'none', minWidth: 60 }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: active ? `${C.orange}22` : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>
                 {item.e}
               </div>
               <span style={{ fontSize: 9, fontFamily: SYNE, fontWeight: 600, color: active ? C.orange : C.muted, letterSpacing: 0.3 }}>{item.label}</span>
               {active && <div style={{ width: 4, height: 4, borderRadius: '50%', background: C.orange }} />}
-            </a>
+            </Link>
           )
         })}
       </nav>
