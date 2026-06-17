@@ -73,12 +73,11 @@ export default function BoletoPage() {
                 {copiado ? <><CheckCircle size={16} /> Copiado!</> : <><Copy size={16} /> Copiar link</>}
               </button>
               
-                href={`https://wa.me/?text=${encodeURIComponent('Olá! Segue o link do seu boleto TLFA:\n\n' + resultado.bankSlipUrl + '\n\nVencimento: ' + vencimento.split('-').reverse().join('/'))}`}
-                target="_blank" rel="noreferrer"
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#25D366', color: '#fff', borderRadius: 12, padding: '12px 20px', fontWeight: 600, textDecoration: 'none' }}
-              >
-                💬 Enviar via WhatsApp
-              </a>
+                href={"https://wa.me/?text=" + encodeURIComponent("Olá! Segue o link do boleto TLFA:\n\n" + resultado.bankSlipUrl + "\n\nVencimento: " + vencimento.split("-").reverse().join("/"))}
+                target="_blank"
+                rel="noreferrer"
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#25D366", color: "#fff", borderRadius: 12, padding: "12px 20px", fontWeight: 600, textDecoration: "none" }}
+              >{"💬 Enviar via WhatsApp"}</a>
               <button
                 onClick={() => gerarRecibo({ tipo: 'MENSALIDADE', nome: atletaNome, valor: Number(valor), descricao, data: new Date().toISOString().slice(0, 10) })}
                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'transparent', border: '1px solid #2A2A4A', color: '#cdd', borderRadius: 12, padding: '12px 20px', cursor: 'pointer' }}>
