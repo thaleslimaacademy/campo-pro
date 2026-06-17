@@ -60,6 +60,43 @@ As partes elegem o foro da Comarca de Iturama - MG para dirimir quaisquer dúvid
 CLÁUSULA 9 — DA ASSINATURA DIGITAL
 Este contrato é celebrado em meio digital, tendo plena validade jurídica nos termos da MP nº 2.200-2/2001 e do Marco Civil da Internet (Lei nº 12.965/2014). A assinatura digital mediante confirmação eletrônica equivale à assinatura manuscrita para todos os fins legais. Os dados de aceite (nome, data, hora e IP) serão registrados como prova da concordância contratual.`
 
+const MANUAL = `MANUAL DE PROTECAO INTEGRAL - THALES LIMA FOOTBALL ACADEMY (TLFA) - Versao 1.0 - 2026
+
+APRESENTACAO: A TLFA estabelece a presente Politica de Protecao Integral da Crianca e do Adolescente com o objetivo de garantir um ambiente seguro, respeitoso e protegido. A protecao integral e responsabilidade compartilhada entre instituicao, colaboradores, familias e comunidade.
+
+BASE LEGAL: Constituicao Federal de 1988; ECA (Lei 8.069/1990); LGPD (Lei 13.709/2018); Marco Civil da Internet (Lei 12.965/2014); Codigo Civil; Lei 14.063/2020.
+
+PRINCIPIOS: Toda crianca tem direito a Seguranca, Respeito, Dignidade, Privacidade, Inclusao e Desenvolvimento saudavel. Tolerancia zero para violencia.
+
+DIREITOS DOS ALUNOS: Ser tratado com respeito; ser ouvido; ambiente seguro; atendimento sem discriminacao; privacidade respeitada; igualdade de condicoes; protecao fisica, emocional e digital.
+
+DEVERES DOS RESPONSAVEIS: Manter dados atualizados; informar restricoes medicas; acompanhar frequencia e desempenho escolar; participar de reunioes; respeitar normas; usar canais oficiais.
+
+PROTECAO DIGITAL: A TLFA protege dados pessoais, utiliza sistemas seguros e evita exposicao excessiva. Proibido divulgar: enderecos, documentos, rotinas, dados financeiros e informacoes sensiveis.
+
+PREVENCAO A VIOLENCIA: Tolerancia zero para violencia fisica, psicologica, verbal, bullying, cyberbullying, assedio e discriminacao. Denuncias tratadas com sigilo absoluto.
+
+COMPROMISSO INSTITUCIONAL: Formar cidadaos pelo esporte promovendo disciplina, respeito, educacao, inclusao e desenvolvimento humano. Nosso proposito e transformar vidas.`
+
+const TERMO = `TERMO DE CONSENTIMENTO, USO DE IMAGEM, LGPD E AUTORIZACAO DIGITAL
+THALES LIMA FOOTBALL ACADEMY - CNPJ 56.100.918/0001-67
+
+OBJETO: Regulamentar a protecao integral, dados pessoais, uso de imagem, seguranca digital, comunicacao institucional e plataformas digitais.
+
+USO DE IMAGEM E VOZ: O RESPONSAVEL LEGAL autoriza gratuitamente e por prazo indeterminado o uso da imagem, voz e nome do aluno para: fotografias e videos institucionais; Instagram, Facebook, YouTube, TikTok; site e aplicativo Gestao FC; materiais impressos; campanhas publicitarias; transmissoes ao vivo; eventos e competicoes; projetos sociais. Vedada a comercializacao isolada da imagem.
+
+PROTECAO DE DADOS (LGPD): A TLFA coleta: nome, nascimento, CPF, RG, endereco, telefones, e-mail, dados escolares, informacoes medicas, historico esportivo, avaliacoes fisicas e dados financeiros. Uso exclusivo para gestao administrativa, pedagogica, esportiva, financeira, seguranca e comunicacao. Sem compartilhamento com terceiros sem autorizacao.
+
+CANAIS OFICIAIS: Aplicativo Gestao FC; WhatsApp oficial; grupos de pais; site institucional; Instagram oficial; comunicados impressos.
+
+DIREITOS DO RESPONSAVEL: Solicitar atualizacao, correcao e informacoes sobre dados; revogar autorizacoes futuras; pedir esclarecimentos a qualquer momento.
+
+ASSINATURA ELETRONICA: Validade juridica nos termos da MP 2.200-2/2001 e Lei 12.965/2014. Equivale a assinatura manuscrita para todos os fins legais.
+
+VIGENCIA: Durante todo o periodo de vinculacao do aluno a TLFA.
+FORO: Comarca de Iturama - MG.`
+
+
 function PainelAssinatura({ onAssinar, disabled }: { onAssinar: (img: string) => void, disabled: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const desenhando = useRef(false)
@@ -294,7 +331,22 @@ export default function Matricula() {
             if (el.scrollHeight - el.scrollTop <= el.clientHeight + 50) setContratoLido(true)
           }}
         >
-          <pre className="whitespace-pre-wrap font-sans">{CONTRATO}</pre>
+          <div className="space-y-8">
+            <div>
+              <h3 className="font-bold text-yellow-500 mb-3 text-sm uppercase tracking-wider">📋 Contrato de Prestação de Serviços</h3>
+              <pre className="whitespace-pre-wrap font-sans text-xs leading-relaxed">{CONTRATO}</pre>
+            </div>
+            <hr className="border-gray-700" />
+            <div>
+              <h3 className="font-bold text-yellow-500 mb-3 text-sm uppercase tracking-wider">📖 Manual de Proteção Integral</h3>
+              <pre className="whitespace-pre-wrap font-sans text-xs leading-relaxed">{MANUAL}</pre>
+            </div>
+            <hr className="border-gray-700" />
+            <div>
+              <h3 className="font-bold text-yellow-500 mb-3 text-sm uppercase tracking-wider">✅ Termo de Consentimento e LGPD</h3>
+              <pre className="whitespace-pre-wrap font-sans text-xs leading-relaxed">{TERMO}</pre>
+            </div>
+          </div>
           {contratoLido && <p className="text-green-500 text-center mt-4 font-bold">Contrato lido!</p>}
         </div>
         {!contratoLido && (
@@ -323,7 +375,7 @@ export default function Matricula() {
           <label className="flex items-start gap-3 cursor-pointer mt-4">
             <input type="checkbox" checked={aceito} onChange={e => setAceito(e.target.checked)} className="mt-1 w-5 h-5 accent-green-500" />
             <span className="text-sm text-gray-300">
-              Li e concordo com todos os termos do contrato, incluindo mensalidade, juros, direito de imagem e responsabilidade civil.
+              Li e concordo com o Contrato de Prestacao de Servicos, o Manual de Protecao Integral e o Termo de Consentimento (LGPD), incluindo mensalidade, juros, direito de imagem, protecao de dados e responsabilidade civil.
             </span>
           </label>
           {assinaturaImg && aceito && nomeAssinatura && (
