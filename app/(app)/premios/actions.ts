@@ -26,6 +26,21 @@ export async function concederPremio(atletaId: string, titulo: string, icone: st
     dataConquista: new Date().toISOString().split('T')[0],
   })
   if (error) throw new Error(error.message)
+
+  // Enviar push notification para os pais
+  try {
+    await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://gestaofc.com.br'}/api/push/send`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        atletaId,
+        title: `${icone} Nova conquista!`,
+        body: `${titulo} — ${descricao}`,
+        url: '/',
+      }),
+    })
+  } catch {}
+
   return { ok: true }
 }
 

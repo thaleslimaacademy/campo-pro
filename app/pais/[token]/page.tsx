@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import PushNotificationButton from '@/components/PushNotificationButton'
 
 export default async function AreaPais({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params
@@ -502,6 +503,9 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
             </div>
           </div>
         )}
+
+        {/* ── PUSH NOTIFICATIONS ── */}
+        <PushNotificationButton atletaId={atleta.id} escolaId={atleta.escolaId || ''} />
 
         {/* ── CARD CONTATO ── */}
         <div
