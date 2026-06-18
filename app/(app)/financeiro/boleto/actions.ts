@@ -1,7 +1,7 @@
 'use server'
 
 import { supabaseAdmin } from '@/lib/supabase'
-import { buscarClienteAsaas, criarClienteAsaas, criarCobrancaBoleto } from '@/lib/asaas'
+import { buscarClienteAsaas, criarClienteAsaas, criarCobrancaBoleto, cancelarCobrancaAsaas } from '@/lib/asaas'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 
 export async function listarAtletasBoleto() {
@@ -81,4 +81,26 @@ export async function getTelefoneResponsavel(atletaId: string) {
   const { data } = await supabaseAdmin.from('Responsavel')
     .select('telefone').eq('atletaId', atletaId).eq('principal', true).limit(1)
   return data?.[0]?.telefone as string | null
+}
+
+export async function listarBoletos() {
+  const escolaId = await getEscolaIdServer()
+  const { data } = await supabaseAdmin
+    .from('Cobranca')
+    .select('id, atletaId, atletaNome, valor, valorPago, vencimento, status, pagoEm, bankSlipUrl, descricao, asaasId, createdAt')
+    .eq('escolaId', escolaId)
+    .eq('tipo', 'BOLETO')
+    .is('excluidaEm', null)
+    .order('createdAt', { ascending: false })
+    .limit(50)
+  return (data ?? []) as any[]
+}
+
+export async function cancelarBoleto(cobrancaId: string, asaasId: string) {
+  const escolaId = await getEscolaIdServer()
+  await cancelarCobrancaAsaas(asaasId)
+  await supabaseAdmin.from('Cobranca')
+    .update({ status: 'CANCELLED', excluidaEm: new Date().toISOString() })
+    .eq('id', cobrancaId).eq('escolaId', escolaId)
+  return { ok: true }
 }
