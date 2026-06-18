@@ -52,18 +52,17 @@ export async function gerarBoleto(params: {
     invoiceUrl: boleto.invoiceUrl as string,
     id: boleto.id as string,
   }
-}export async function getCpfResponsavel(atletaId: string) {
-  // 1. CPF do responsável principal
+}
+
+export async function getCpfResponsavel(atletaId: string) {
   const { data: resp } = await supabaseAdmin.from('Responsavel')
     .select('cpf').eq('atletaId', atletaId).eq('principal', true).limit(1)
   if (resp?.[0]?.cpf) return resp[0].cpf as string
 
-  // 2. CPF do próprio atleta
   const { data: atleta } = await supabaseAdmin.from('Atleta')
     .select('cpf').eq('id', atletaId).single()
   if (atleta?.cpf) return atleta.cpf as string
 
-  // 3. CPF da matrícula (formulário de inscrição)
   const { data: matricula } = await supabaseAdmin.from('Matricula')
     .select('cpf').eq('atletaId', atletaId).not('cpf', 'is', null).limit(1)
   if (matricula?.[0]?.cpf) return matricula[0].cpf as string
@@ -77,6 +76,7 @@ export async function salvarCpfResponsavel(atletaId: string, cpf: string) {
     .eq('atletaId', atletaId).eq('principal', true)
   return { ok: true }
 }
+
 export async function getTelefoneResponsavel(atletaId: string) {
   const { data } = await supabaseAdmin.from('Responsavel')
     .select('telefone').eq('atletaId', atletaId).eq('principal', true).limit(1)
@@ -100,7 +100,7 @@ export async function cancelarBoleto(cobrancaId: string, asaasId: string) {
   const escolaId = await getEscolaIdServer()
   await cancelarCobrancaAsaas(asaasId)
   await supabaseAdmin.from('Cobranca')
-    .update({ status: 'CANCELLED', excluidaEm: new Date().toISOString() })
+    .update({ status: 'CANCELADO' })
     .eq('id', cobrancaId).eq('escolaId', escolaId)
   return { ok: true }
 }
