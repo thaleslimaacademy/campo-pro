@@ -23,6 +23,7 @@ export default function BoletoPage() {
   const [descricao, setDescricao] = useState('Mensalidade TLFA')
   const [resultado, setResultado] = useState<{ bankSlipUrl: string; invoiceUrl: string } | null>(null)
   const [copiado, setCopiado] = useState(false)
+  const [cancelando, setCancelando] = useState<string | null>(null)
   const [erro, setErro] = useState('')
 
   useEffect(() => { listarAtletasBoleto().then(setAtletas).catch(() => {}) }, [])
@@ -77,8 +78,21 @@ export default function BoletoPage() {
 
   const handleCancelar = async (id: string, asaasId: string) => {
     if (!confirm('Cancelar este boleto?')) return
-    await cancelarBoleto(id, asaasId)
-    listarBoletos().then(setBoletos)
+    setCancelando(id)
+    // Atualização otimista — reflete na UI imediatamente
+    setBoletos(prev => prev.map(b => b.id === id ? { ...b, status: 'CANCELADO' } : b))
+    try {
+      await cancelarBoleto(id, asaasId)
+      // Confirma com o banco após sucesso
+      const atualizados = await listarBoletos()
+      setBoletos(atualizados)
+    } catch (e) {
+      // Reverte se a server action falhou
+      setBoletos(prev => prev.map(b => b.id === id ? { ...b, status: 'PENDENTE' } : b))
+      alert('Erro ao cancelar boleto. Tente novamente.')
+    } finally {
+      setCancelando(null)
+    }
   }
 
   const fmtDate = (d: string) => d ? new Date(d.length === 10 ? d + 'T12:00:00' : d).toLocaleDateString('pt-BR') : '-'
@@ -88,7 +102,6 @@ export default function BoletoPage() {
       <div style={{ width: '100%', maxWidth: 560 }}>
         <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 28, fontWeight: 800, color: '#FF6B00', margin: '0 0 16px' }}>Boleto</h1>
 
-        {/* Abas */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
           {(['novo', 'historico'] as const).map(a => (
             <button key={a} onClick={() => setAba(a)}
@@ -98,7 +111,6 @@ export default function BoletoPage() {
           ))}
         </div>
 
-        {/* ABA: HISTORICO */}
         {aba === 'historico' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {boletos.length === 0 && (
@@ -146,9 +158,11 @@ export default function BoletoPage() {
                       </a>
                     )}
                     {b.status === 'PENDENTE' && (
-                      <button onClick={() => handleCancelar(b.id, b.asaasId)}
-                        style={{ flex: 1, background: 'rgba(255,68,68,0.08)', border: '1px solid rgba(255,68,68,0.25)', color: '#FF4444', borderRadius: 8, padding: '8px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-                        {'🚫 Cancelar'}
+                      <button
+                        onClick={() => handleCancelar(b.id, b.asaasId)}
+                        disabled={cancelando === b.id}
+                        style={{ flex: 1, background: cancelando === b.id ? 'rgba(255,68,68,0.04)' : 'rgba(255,68,68,0.08)', border: '1px solid rgba(255,68,68,0.25)', color: '#FF4444', borderRadius: 8, padding: '8px', fontSize: 12, fontWeight: 600, cursor: cancelando === b.id ? 'not-allowed' : 'pointer', opacity: cancelando === b.id ? 0.5 : 1 }}>
+                        {cancelando === b.id ? '⏳ Cancelando…' : '🚫 Cancelar'}
                       </button>
                     )}
                   </div>
@@ -158,7 +172,6 @@ export default function BoletoPage() {
           </div>
         )}
 
-        {/* ABA: NOVO BOLETO */}
         {aba === 'novo' && (
           <>
             {estado === 'resultado' && resultado ? (
