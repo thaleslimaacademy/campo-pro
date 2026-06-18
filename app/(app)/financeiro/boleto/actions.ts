@@ -77,3 +77,8 @@ export async function salvarCpfResponsavel(atletaId: string, cpf: string) {
     .eq('atletaId', atletaId).eq('principal', true)
   return { ok: true }
 }
+export async function getTelefoneResponsavel(atletaId: string) {
+  const { data } = await supabaseAdmin.from('Responsavel')
+    .select('telefone').eq('atletaId', atletaId).eq('principal', true).limit(1)
+  return data?.[0]?.telefone as string | null
+}

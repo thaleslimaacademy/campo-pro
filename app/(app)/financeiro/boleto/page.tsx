@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { FileText, ExternalLink, Copy, CheckCircle, Loader2 } from 'lucide-react'
-import { listarAtletasBoleto, gerarBoleto, getCpfResponsavel, salvarCpfResponsavel } from './actions'
+import { listarAtletasBoleto, gerarBoleto, getCpfResponsavel, salvarCpfResponsavel, getTelefoneResponsavel } from './actions'
 import { gerarRecibo } from '@/lib/gerarRecibo'
 
 type Estado = 'form' | 'loading' | 'resultado'
@@ -11,6 +11,7 @@ export default function BoletoPage() {
   const [atletas, setAtletas] = useState<{ id: string; nome: string }[]>([])
   const [estado, setEstado] = useState<Estado>('form')
   const [atletaId, setAtletaId] = useState('')
+  const [telefoneResp, setTelefoneResp] = useState('')
   const [cpf, setCpf] = useState('')
   const [valor, setValor] = useState('')
   const [vencimento, setVencimento] = useState(() => {
@@ -28,6 +29,7 @@ export default function BoletoPage() {
     if (!atletaId) return
     setCpf('')
     getCpfResponsavel(atletaId).then(c => { if (c) setCpf(c) }).catch(() => {})
+    getTelefoneResponsavel(atletaId).then(t => { if (t) setTelefoneResp(t.replace(/\D/g, '')) }).catch(() => {})
   }, [atletaId])
 
   const atletaNome = atletas.find(a => a.id === atletaId)?.nome ?? ''
@@ -74,8 +76,9 @@ export default function BoletoPage() {
               </button>
               <button
                 onClick={() => {
-                  const msg = 'Boleto TLFA - ' + atletaNome + ': ' + resultado.bankSlipUrl + ' - Vencimento: ' + vencimento.split('-').reverse().join('/')
-                  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank')
+                  const msg = 'Boleto TLFA - ' + atletaNome + ' - Vencimento: ' + vencimento.split('-').reverse().join('/') + ' - Link: ' + resultado.bankSlipUrl
+                  const numero = telefoneResp ? '55' + telefoneResp.replace(/\D/g, '') : ''
+                  window.open('https://wa.me/' + numero + '?text=' + encodeURIComponent(msg), '_blank')
                 }}
                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#25D366', color: '#fff', borderRadius: 12, padding: '12px 20px', fontWeight: 600, cursor: 'pointer', border: 'none', width: '100%' }}
               >
