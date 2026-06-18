@@ -1,33 +1,29 @@
 export async function enviarWhatsApp(telefone: string, mensagem: string) {
-  const instanceId = process.env.ZAPI_INSTANCE_ID
-  const token = process.env.ZAPI_TOKEN
-  const clientToken = process.env.ZAPI_CLIENT_TOKEN
+  const baseUrl = process.env.EVOLUTION_API_URL
+  const apiKey = process.env.EVOLUTION_API_KEY
+  const instance = process.env.EVOLUTION_INSTANCE
 
-  if (!instanceId || !token) {
-    console.warn('⚠️ Z-API não configurada')
+  if (!baseUrl || !apiKey || !instance) {
+    console.warn('⚠️ Evolution API não configurada')
     return
   }
 
   const numero = telefone.replace(/\D/g, '')
-  const numeroFormatado = numero.startsWith('55') ? numero : `55${numero}`
+  const numeroFormatado = numero.startsWith('55') ? numero : '55' + numero
 
   try {
-    const res = await fetch(
-      `https://api.z-api.io/instances/${instanceId}/token/${token}/send-text`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Client-Token': clientToken || '',
-        },
-        body: JSON.stringify({
-          phone: numeroFormatado,
-          message: mensagem,
-        }),
-        signal: AbortSignal.timeout(10000),
-      }
-    )
-
+    const res = await fetch(`${baseUrl}/message/sendText/${instance}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': apiKey,
+      },
+      body: JSON.stringify({
+        number: numeroFormatado,
+        textMessage: { text: mensagem },
+      }),
+      signal: AbortSignal.timeout(10000),
+    })
     const data = await res.json()
     console.log('📲 WhatsApp enviado:', data)
     return data
