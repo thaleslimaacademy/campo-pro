@@ -1,45 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 import { cancelarCobrancaAsaas } from '@/lib/asaas'
+import { getAsaasKey } from '@/lib/getAsaasKey'
 
 export async function POST(req: NextRequest) {
   try {
     const { cobrancaId } = await req.json()
-    if (!cobrancaId) {
-      return NextResponse.json({ error: 'cobrancaId obrigatorio' }, { status: 400 })
-    }
-
-    // Busca asaasId no Supabase
-    const { data: cobranca, error: errBusca } = await supabase
-      .from('Cobranca')
-      .select('id, asaasId, status')
-      .eq('id', cobrancaId)
-      .single()
-
-    if (errBusca || !cobranca) {
-      return NextResponse.json({ error: 'Cobranca nao encontrada' }, { status: 404 })
-    }
-
-    // Cancela no Asaas (se tiver asaasId e nao estiver ja cancelado/pago)
+    if (!cobrancaId) return NextResponse.json({ error: 'cobrancaId obrigatorio' }, { status: 400 })
+    const { data: cobranca, error: errBusca } = await supabaseAdmin.from('Cobranca')
+      .select('id, asaasId, status, escolaId').eq('id', cobrancaId).single()
+    if (errBusca || !cobranca) return NextResponse.json({ error: 'Cobranca nao encontrada' }, { status: 404 })
     if (cobranca.asaasId && cobranca.status !== 'PAGO' && cobranca.status !== 'CANCELADO') {
-      const resultado = await cancelarCobrancaAsaas(cobranca.asaasId)
-      console.log('Asaas cancelamento:', resultado)
+      const apiKey = await getAsaasKey(cobranca.escolaId)
+      await cancelarCobrancaAsaas(apiKey, cobranca.asaasId)
     }
-
-    // Atualiza status no Supabase para CANCELADO
-    const { error: errUpdate } = await supabase
-      .from('Cobranca')
-      .update({ status: 'CANCELADO' })
-      .eq('id', cobrancaId)
-
-    if (errUpdate) {
-      return NextResponse.json({ error: errUpdate.message }, { status: 500 })
-    }
-
-    console.log('✅ Cobranca cancelada:', cobrancaId)
+    const { error: errUpdate } = await supabaseAdmin.from('Cobranca').update({ status: 'CANCELADO' }).eq('id', cobrancaId)
+    if (errUpdate) return NextResponse.json({ error: errUpdate.message }, { status: 500 })
     return NextResponse.json({ sucesso: true })
-  } catch (err: any) {
-    console.error('Erro ao cancelar cobranca:', err.message)
-    return NextResponse.json({ error: err.message }, { status: 500 })
-  }
+  } catch (err: any) { console.error('Erro ao cancelar cobranca:', err.message); return NextResponse.json({ error: err.message }, { status: 500 }) }
 }
