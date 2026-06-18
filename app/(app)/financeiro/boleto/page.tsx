@@ -64,8 +64,8 @@ export default function BoletoPage() {
   }
 
   const statusBoleto = (b: any) => {
-    if (b.status === 'CANCELLED') return { label: 'Cancelado', cor: '#666' }
-    if (b.status === 'RECEIVED' || b.status === 'CONFIRMED') {
+    if (b.status === 'CANCELADO') return { label: 'Cancelado', cor: '#666' }
+    if (b.status === 'PAGO') {
       return calcularJuros(b.valor, b.vencimento, b.pagoEm) > 0
         ? { label: 'Pago com atraso', cor: '#FF6B00' }
         : { label: 'Pago', cor: '#00C896' }
@@ -145,7 +145,7 @@ export default function BoletoPage() {
                         {'📄 Ver boleto'}
                       </a>
                     )}
-                    {b.status === 'PENDING' && (
+                    {b.status === 'PENDENTE' && (
                       <button onClick={() => handleCancelar(b.id, b.asaasId)}
                         style={{ flex: 1, background: 'rgba(255,68,68,0.08)', border: '1px solid rgba(255,68,68,0.25)', color: '#FF4444', borderRadius: 8, padding: '8px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
                         {'🚫 Cancelar'}
