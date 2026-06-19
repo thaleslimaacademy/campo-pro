@@ -21,7 +21,6 @@ async function FichaAtletaLoader({ atletaId }: { atletaId: string }) {
     redirect('/sign-in')
   }
 
-  // Verifica vínculo
   const { data: vinculo } = await supabaseAdmin
     .from('ResponsavelAtleta')
     .select('relacao')
@@ -38,7 +37,7 @@ async function FichaAtletaLoader({ atletaId }: { atletaId: string }) {
     await Promise.all([
       supabaseAdmin
         .from('Atleta')
-        .select('id, nome, dataNascimento, foto, posicao, Turma(nome)')
+        .select('id, nome, dataNascimento, foto, posicao, bolsista, motivoBolsa, Turma(nome)')
         .eq('id', atletaId)
         .single(),
       supabaseAdmin

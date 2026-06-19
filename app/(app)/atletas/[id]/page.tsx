@@ -135,6 +135,14 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
           <div>
             <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "20px", color: "#F0F0F0", margin: "0 0 4px" }}>{atleta.nome}</p>
             <p style={{ color: "#FF6B00", fontSize: "13px", fontWeight: 600 }}>{atleta.posicao || 'Sem posição'}</p>
+            {atleta.bolsista && (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '6px', background: 'rgba(0,200,150,0.12)', border: '1px solid rgba(0,200,150,0.3)', color: '#00C896', borderRadius: '20px', padding: '3px 10px', fontSize: '11px', fontWeight: 700 }}>
+                🎓 Bolsista 100%
+                {atleta.motivoBolsa && (
+                  <span style={{ color: 'rgba(0,200,150,0.7)', fontWeight: 400 }}>· {atleta.motivoBolsa}</span>
+                )}
+              </span>
+            )}
           </div>
         </div>
         <div className="space-y-2 text-sm">
@@ -165,43 +173,52 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
         </div>
       </div>
 
-      <GerarCobranca atletaId={atleta.id} atletaNome={atleta.nome} />
+      {/* Bloco financeiro — oculto para bolsistas */}
+      {!atleta.bolsista && <GerarCobranca atletaId={atleta.id} atletaNome={atleta.nome} />}
 
-      <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-        <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Historico Financeiro</p>
-        <div className="grid grid-cols-3 gap-2 mb-4">
-          <div style={{ background: "rgba(57,255,20,0.07)", border: "1px solid rgba(57,255,20,0.15)", borderRadius: "12px", padding: "10px", textAlign: "center" }}>
-            <p style={{ color: "#FF6B00", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px" }}>{'R$ ' + totalPago.toFixed(0)}</p>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "10px", marginTop: "4px" }}>Pago</p>
-          </div>
-          <div style={{ background: "rgba(212,175,55,0.07)", border: "1px solid rgba(212,175,55,0.15)", borderRadius: "12px", padding: "10px", textAlign: "center" }}>
-            <p style={{ color: "#FFD700", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px" }}>{'R$ ' + totalPendente.toFixed(0)}</p>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "10px", marginTop: "4px" }}>Pendente</p>
-          </div>
-          <div style={{ background: "rgba(255,70,70,0.07)", border: "1px solid rgba(255,70,70,0.15)", borderRadius: "12px", padding: "10px", textAlign: "center" }}>
-            <p style={{ color: "#ff5555", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px" }}>{'R$ ' + totalVencido.toFixed(0)}</p>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "10px", marginTop: "4px" }}>Vencido</p>
-          </div>
+      {atleta.bolsista ? (
+        <div style={{ background: 'rgba(0,200,150,0.06)', border: '1px solid rgba(0,200,150,0.2)', borderRadius: '16px', padding: '14px', marginBottom: '12px', textAlign: 'center' }}>
+          <p style={{ color: '#00C896', fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: '14px', marginBottom: '4px' }}>🎓 Aluno Bolsista</p>
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>Mensalidade 100% gratuita — nenhuma cobrança gerada.</p>
+          {atleta.motivoBolsa && <p style={{ color: 'rgba(0,200,150,0.7)', fontSize: '11px', marginTop: '4px' }}>Motivo: {atleta.motivoBolsa}</p>}
         </div>
-        {!cobrancas || cobrancas.length === 0 ? (
-          <p className="text-gray-500 text-sm text-center py-4">Nenhuma cobrança registrada</p>
-        ) : (
-          <div className="space-y-2">
-            {cobrancas.map(c => (
-              <div key={c.id} className={'flex justify-between items-center rounded-xl p-3 ' + (statusBg[c.status] || 'bg-gray-800')}>
-                <div>
-                  <p className="text-sm font-medium">{c.descricao || 'Mensalidade'}</p>
-                  <p className="text-xs text-gray-400">{new Date((c.vencimento || '').includes('T') ? c.vencimento : c.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-sm">{'R$ ' + Number(c.valor).toFixed(2)}</p>
-                  <p className={'text-xs font-bold ' + (statusCor[c.status] || 'text-gray-400')}>{c.status}</p>
-                </div>
-              </div>
-            ))}
+      ) : (
+        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
+          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FF6B00", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Historico Financeiro</p>
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            <div style={{ background: "rgba(57,255,20,0.07)", border: "1px solid rgba(57,255,20,0.15)", borderRadius: "12px", padding: "10px", textAlign: "center" }}>
+              <p style={{ color: "#FF6B00", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px" }}>{'R$ ' + totalPago.toFixed(0)}</p>
+              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "10px", marginTop: "4px" }}>Pago</p>
+            </div>
+            <div style={{ background: "rgba(212,175,55,0.07)", border: "1px solid rgba(212,175,55,0.15)", borderRadius: "12px", padding: "10px", textAlign: "center" }}>
+              <p style={{ color: "#FFD700", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px" }}>{'R$ ' + totalPendente.toFixed(0)}</p>
+              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "10px", marginTop: "4px" }}>Pendente</p>
+            </div>
+            <div style={{ background: "rgba(255,70,70,0.07)", border: "1px solid rgba(255,70,70,0.15)", borderRadius: "12px", padding: "10px", textAlign: "center" }}>
+              <p style={{ color: "#ff5555", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px" }}>{'R$ ' + totalVencido.toFixed(0)}</p>
+              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "10px", marginTop: "4px" }}>Vencido</p>
+            </div>
           </div>
-        )}
-      </div>
+          {!cobrancas || cobrancas.length === 0 ? (
+            <p className="text-gray-500 text-sm text-center py-4">Nenhuma cobrança registrada</p>
+          ) : (
+            <div className="space-y-2">
+              {cobrancas.map(c => (
+                <div key={c.id} className={'flex justify-between items-center rounded-xl p-3 ' + (statusBg[c.status] || 'bg-gray-800')}>
+                  <div>
+                    <p className="text-sm font-medium">{c.descricao || 'Mensalidade'}</p>
+                    <p className="text-xs text-gray-400">{new Date((c.vencimento || '').includes('T') ? c.vencimento : c.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-sm">{'R$ ' + Number(c.valor).toFixed(2)}</p>
+                    <p className={'text-xs font-bold ' + (statusCor[c.status] || 'text-gray-400')}>{c.status}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
         <div className="flex justify-between items-center mb-4">
