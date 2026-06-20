@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
-// GET /api/atleta-turma?turmaId=xxx
 export async function GET(req: NextRequest) {
   const userId = req.headers.get('x-clerk-user-id')
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -9,16 +8,17 @@ export async function GET(req: NextRequest) {
   const turmaId = req.nextUrl.searchParams.get('turmaId')
   if (!turmaId) return NextResponse.json({ error: 'turmaId required' }, { status: 400 })
 
-  const { data, error } = await supabaseAdmin
+  const { data: vinculos, error } = await supabaseAdmin
     .from('AtletaTurma')
     .select('atletaId')
     .eq('turmaId', turmaId)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json(data)
+
+  const ids = (vinculos ?? []).map((v: any) => v.atletaId)
+  return NextResponse.json({ ids })
 }
 
-// POST /api/atleta-turma
 export async function POST(req: NextRequest) {
   const userId = req.headers.get('x-clerk-user-id')
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -43,12 +43,16 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ ok: true })
 }
 
-// DELETE /api/atleta-turma
 export async function DELETE(req: NextRequest) {
   const userId = req.headers.get('x-clerk-user-id')
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { atletaId, turmaId } = await req.json()
+
+  if (atletaId === '__all__') {
+    await supabaseAdmin.from('AtletaTurma').delete().eq('turmaId', turmaId)
+    return NextResponse.json({ ok: true })
+  }
 
   await supabaseAdmin.from('AtletaTurma').delete().eq('atletaId', atletaId).eq('turmaId', turmaId)
 
