@@ -103,7 +103,7 @@ export default function Dashboard() {
         <div style={{ position: 'absolute', right: -40, top: -40, width: 180, height: 180, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <img src="/gestaofc-icon.svg" alt="GestaoFC" style={{ width: 40, height: 40, borderRadius: 10, objectFit: "cover" }} />
+            <img src="/gestaofc-icon.svg" alt="GestaoFC" style={{ width: 48, height: 48, borderRadius: 12, objectFit: "cover" }} />
             <div>
               <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 900, fontSize: 16, color: '#fff', letterSpacing: 0.5, textTransform: 'uppercase' }}>{escola}</div>
               <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', marginTop: 1, textTransform: 'capitalize' }}>{dia}</div>
