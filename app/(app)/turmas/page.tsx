@@ -22,11 +22,9 @@ export default function Turmas() {
   async function carregar() {
     const { data } = await supabase.from('Turma').select('*').eq('escolaId', escolaId!).eq('ativa', true).order('nome')
     if (data) {
-      const com = await Promise.all(data.map(async t => {
-        const res = await fetch('/api/atleta-turma?turmaId=' + t.id)
-        const json = res.ok ? await res.json() : { ids: [] }
-        return { ...t, totalAtletas: (json.ids ?? []).length }
-      }))
+      const countsRes = await fetch('/api/atleta-turma/counts?escolaId=' + escolaId)
+      const counts: Record<string, number> = countsRes.ok ? await countsRes.json() : {}
+      const com = data.map(t => ({ ...t, totalAtletas: counts[t.id] ?? 0 }))
       setTurmas(com)
     }
     setLoading(false)
