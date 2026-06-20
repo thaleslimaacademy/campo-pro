@@ -21,7 +21,7 @@ export default function AccountButton() {
     <div style={{ position: 'relative' }}>
       <button onClick={() => setOpen(v => !v)}
         style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 14, padding: '8px 14px 8px 8px', cursor: 'pointer', color: '#fff' }}>
-        <img src="/gestaofc-logo.png" style={{ width: 32, height: 32, borderRadius: 8, objectFit: 'cover' }} alt="logo"
+        <img src="/gestaofc-logo.svg" style={{ width: 32, height: 32, borderRadius: 8, objectFit: 'cover' }} alt="logo"
           onError={e => (e.currentTarget.style.display = 'none')} />
         <div style={{ textAlign: 'left' }}>
           <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 12, color: '#fff', lineHeight: 1.2 }}>{nomeEscola}</div>
@@ -35,7 +35,7 @@ export default function AccountButton() {
           <div onClick={() => setOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 98 }} />
           <div style={{ position: 'absolute', right: 0, top: '110%', zIndex: 99, background: '#1A1A2E', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: 16, minWidth: 220, boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-              <img src="/gestaofc-logo.png" style={{ width: 44, height: 44, borderRadius: 12 }} alt="logo"
+              <img src="/gestaofc-logo.svg" style={{ width: 44, height: 44, borderRadius: 12 }} alt="logo"
                 onError={e => (e.currentTarget.style.display = 'none')} />
               <div>
                 <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 14, color: '#fff' }}>{nomeEscola}</div>
