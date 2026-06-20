@@ -1,20 +1,15 @@
 'use client'
 import PlanoGate from '@/components/PlanoGate'
 import { usePerfil } from '@/lib/usePerfil'
-
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
-interface Campeonato {
-  id: string
-  nome: string
-  formato: string
-  status: string
-  dataInicio: string
-  dataFim: string
-  descricao: string
-  createdAt: string
-}
+const T = { bg: '#0A0E1A', surface: '#0D1220', primary: '#4169E1', accent: '#00BFFF', text: '#F0F4FF', muted: 'rgba(240,244,255,0.4)', border: 'rgba(240,244,255,0.08)', green: '#00D67A', gold: '#FFD700' }
+const SYNE = 'Syne, sans-serif'
+const INP: React.CSSProperties = { width: '100%', background: '#080C15', border: '1px solid rgba(240,244,255,0.1)', borderRadius: 8, padding: '11px 14px', color: T.text, fontFamily: 'Inter, sans-serif', fontSize: 13, marginTop: 4, boxSizing: 'border-box' }
+const LBL: React.CSSProperties = { fontSize: 10, color: T.muted, textTransform: 'uppercase', letterSpacing: '0.8px' }
+
+interface Campeonato { id: string; nome: string; formato: string; status: string; dataInicio: string; dataFim: string; descricao: string; createdAt: string }
 
 export default function Campeonatos() {
   const { escolaId } = usePerfil()
@@ -22,200 +17,119 @@ export default function Campeonatos() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [salvando, setSalvando] = useState(false)
-  const [sucesso, setSucesso] = useState(false)
-  const [form, setForm] = useState({
-    nome: '',
-    formato: 'grupos',
-    dataInicio: '',
-    dataFim: '',
-    descricao: '',
-  })
+  const [form, setForm] = useState({ nome: '', formato: 'grupos', dataInicio: '', dataFim: '', descricao: '' })
 
   async function carregar() {
-    const { data } = await supabase
-      .from('Campeonato')
-      .select('*')
-      .eq('escolaId', escolaId!)
-      .order('createdAt', { ascending: false })
+    const { data } = await supabase.from('Campeonato').select('*').eq('escolaId', escolaId!).order('createdAt', { ascending: false })
     setCampeonatos(data || [])
     setLoading(false)
   }
 
   useEffect(() => { if (escolaId) carregar() }, [escolaId])
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
-    const { name, value } = e.target
-    setForm(prev => ({ ...prev, [name]: value }))
-  }
-
   async function salvar() {
-    if (!form.nome) return alert('Nome obrigatorio.')
+    if (!form.nome) return alert('Nome obrigatório.')
     setSalvando(true)
-
-    const { error } = await supabase.from('Campeonato').insert({
-      escolaId: escolaId!,
-      nome: form.nome,
-      formato: form.formato,
-      dataInicio: form.dataInicio || null,
-      dataFim: form.dataFim || null,
-      descricao: form.descricao,
-      status: 'rascunho',
-    })
-
-    if (error) {
-      alert('Erro: ' + error.message)
-    } else {
-      setSucesso(true)
-      setForm({ nome: '', formato: 'grupos', dataInicio: '', dataFim: '', descricao: '' })
-      setShowForm(false)
-      carregar()
-      setTimeout(() => setSucesso(false), 3000)
-    }
+    await supabase.from('Campeonato').insert({ escolaId: escolaId!, nome: form.nome, formato: form.formato, dataInicio: form.dataInicio || null, dataFim: form.dataFim || null, descricao: form.descricao, status: 'rascunho' })
+    setForm({ nome: '', formato: 'grupos', dataInicio: '', dataFim: '', descricao: '' })
+    setShowForm(false)
+    await carregar()
     setSalvando(false)
   }
 
   async function excluir(id: string) {
     if (!confirm('Excluir este campeonato?')) return
-    await supabase.from('SumulaEvento').delete().eq('jogoId', id)
     await supabase.from('CampeonatoJogo').delete().eq('campeonatoId', id)
-    await supabase.from('CampeonatoAtleta').delete().in('timeId',
-      (await supabase.from('CampeonatoTime').select('id').eq('campeonatoId', id)).data?.map(t => t.id) || []
-    )
     await supabase.from('CampeonatoTime').delete().eq('campeonatoId', id)
     await supabase.from('Campeonato').delete().eq('id', id)
     carregar()
   }
 
-  const statusLabel: Record<string, string> = {
-    rascunho: 'Rascunho',
-    inscricoes: 'Inscricoes',
-    andamento: 'Em andamento',
-    encerrado: 'Encerrado',
-  }
-
-  const statusColor: Record<string, string> = {
-    rascunho: 'bg-gray-700 text-gray-300',
-    inscricoes: 'bg-blue-600/20 text-blue-400',
-    andamento: 'bg-green-600/20 text-green-400',
-    encerrado: 'bg-red-600/20 text-red-400',
-  }
-
-  const formatoLabel: Record<string, string> = {
-    grupos: 'Fase de Grupos',
-    'mata-mata': 'Mata-Mata',
-    misto: 'Grupos + Mata-Mata',
-  }
-
-  if (loading) {
-    return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontFamily: "Inter, sans-serif" }}>Carregando...</p>
-      </div>
-    )
+  const STATUS_COR: Record<string, { bg: string; color: string; label: string }> = {
+    rascunho:   { bg: 'rgba(240,244,255,0.06)', color: T.muted, label: 'Rascunho' },
+    inscricoes: { bg: `${T.primary}20`, color: T.primary, label: 'Inscrições' },
+    andamento:  { bg: `${T.green}20`, color: T.green, label: 'Em andamento' },
+    encerrado:  { bg: 'rgba(255,68,68,0.12)', color: '#FF4444', label: 'Encerrado' },
   }
 
   return (
     <PlanoGate feature="campeonatos" planoMinimo="PRO">
-    <div style={{ minHeight: "100vh", color: "#F0F0F0", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <a href="/dashboard" style={{ color: "rgba(255,255,255,0.4)", textDecoration: "none", fontSize: "13px" }}>Voltar</a>
-          <h1 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "22px", color: "#F0F0F0" }}>Campeonatos</h1>
+    <div style={{ minHeight: '100vh', background: T.bg, color: T.text, fontFamily: 'Inter, sans-serif', paddingBottom: 80 }}>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+
+      <div style={{ background: T.primary, padding: '20px 20px 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Competição</div>
+            <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: T.text, letterSpacing: -0.8, textTransform: 'uppercase' }}>Campeonatos</div>
+          </div>
+          <button onClick={() => setShowForm(!showForm)} style={{ background: T.text, color: T.primary, borderRadius: 8, padding: '10px 16px', fontFamily: SYNE, fontWeight: 800, fontSize: 12, border: 'none', cursor: 'pointer', textTransform: 'uppercase' }}>{showForm ? 'Fechar' : '+ Novo'}</button>
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          style={{ background: "linear-gradient(135deg,#FF6B00,#00cc00)", color: "#000", padding: "10px 18px", borderRadius: "12px", fontSize: "12px", fontWeight: 800, fontFamily: "Syne, sans-serif", border: "none", cursor: "pointer" }}
-        >
-          {showForm ? 'Fechar' : '+ Novo'}
-        </button>
       </div>
 
-      {sucesso && (
-        <div style={{ background: "rgba(57,255,20,0.1)", border: "1px solid rgba(57,255,20,0.3)", borderRadius: "12px", padding: "12px", textAlign: "center", marginBottom: "16px" }}>
-          <p style={{ color: "#FF6B00", fontFamily: "Syne, sans-serif", fontWeight: 700, margin: 0 }}>Campeonato criado!</p>
-        </div>
-      )}
-
       {showForm && (
-        <div style={{ background: "rgba(212,175,55,0.04)", border: "1px solid rgba(212,175,55,0.15)", borderRadius: "16px", padding: "16px", marginBottom: "20px" }}>
-          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", color: "#FFD700", marginBottom: "16px" }}>Novo Campeonato</p>
-          <div className="space-y-3">
-            <div>
-              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Nome *</label>
-              <input name="nome" value={form.nome} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="Ex: Copa Verao 2026" />
-            </div>
-            <div>
-              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Formato</label>
-              <select name="formato" value={form.formato} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }}>
-                <option value="grupos">Fase de Grupos</option>
-                <option value="mata-mata">Mata-Mata</option>
-                <option value="misto">Grupos + Mata-Mata</option>
+        <div style={{ margin: '16px 20px', background: T.surface, border: `1px solid ${T.primary}33`, borderLeft: `3px solid ${T.primary}`, borderRadius: 8, padding: 16 }}>
+          <p style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 13, color: T.primary, marginBottom: 14, textTransform: 'uppercase' }}>Novo Campeonato</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div><label style={LBL}>Nome *</label><input value={form.nome} onChange={e => setForm(p => ({ ...p, nome: e.target.value }))} style={INP} placeholder="Ex: Copa Verão 2026" /></div>
+            <div><label style={LBL}>Formato</label>
+              <select value={form.formato} onChange={e => setForm(p => ({ ...p, formato: e.target.value }))} style={INP}>
+                <option value="grupos">Fase de Grupos</option><option value="mata-mata">Mata-Mata</option><option value="misto">Grupos + Mata-Mata</option>
               </select>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Data inicio</label>
-                <input name="dataInicio" value={form.dataInicio} onChange={handleChange} type="date" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
-              </div>
-              <div>
-                <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Data fim</label>
-                <input name="dataFim" value={form.dataFim} onChange={handleChange} type="date" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} />
-              </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div><label style={LBL}>Data início</label><input type="date" value={form.dataInicio} onChange={e => setForm(p => ({ ...p, dataInicio: e.target.value }))} style={INP} /></div>
+              <div><label style={LBL}>Data fim</label><input type="date" value={form.dataFim} onChange={e => setForm(p => ({ ...p, dataFim: e.target.value }))} style={INP} /></div>
             </div>
-            <div>
-              <label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Descricao</label>
-              <textarea name="descricao" value={form.descricao} onChange={handleChange} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} rows={2} placeholder="Detalhes do campeonato..." />
-            </div>
-            <button onClick={salvar} disabled={salvando} style={{ width: "100%", background: "linear-gradient(135deg,#FF6B00,#00cc00)", color: "#000", padding: "14px", borderRadius: "12px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "13px", border: "none", cursor: "pointer" }}>
-              {salvando ? 'Salvando...' : 'Criar Campeonato'}
-            </button>
+            <div><label style={LBL}>Descrição</label><textarea value={form.descricao} onChange={e => setForm(p => ({ ...p, descricao: e.target.value }))} rows={2} style={{ ...INP, resize: 'none' }} placeholder="Detalhes..." /></div>
+            <button onClick={salvar} disabled={salvando} style={{ background: T.primary, color: T.text, padding: '13px', borderRadius: 8, fontFamily: SYNE, fontWeight: 800, fontSize: 13, border: 'none', cursor: 'pointer', textTransform: 'uppercase' }}>{salvando ? 'Salvando...' : 'Criar Campeonato'}</button>
           </div>
         </div>
       )}
 
-      {campeonatos.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "60px 0" }}>
-          <p className="text-4xl mb-3">🏆</p>
-          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "16px", color: "#F0F0F0", marginBottom: "8px" }}>Nenhum campeonato ainda.</p>
-          <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)" }}>Clique em + Novo para criar.</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {campeonatos.map(c => (
-            <div key={c.id} style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "10px" }}>
-              <div className="flex items-start justify-between mb-2">
+      <div style={{ padding: '16px 20px' }}>
+        {loading && <p style={{ color: T.muted, textAlign: 'center', padding: 40, fontSize: 13 }}>Carregando...</p>}
+        {campeonatos.length === 0 && !loading && (
+          <div style={{ textAlign: 'center', padding: '60px 0' }}>
+            <i className="ti ti-trophy" style={{ fontSize: 48, color: T.border, display: 'block', marginBottom: 12 }} aria-hidden="true"></i>
+            <p style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 16, color: T.text, marginBottom: 6, textTransform: 'uppercase' }}>Nenhum campeonato</p>
+            <p style={{ fontSize: 13, color: T.muted }}>Clique em + Novo para criar</p>
+          </div>
+        )}
+        {campeonatos.map(c => {
+          const st = STATUS_COR[c.status] || STATUS_COR.rascunho
+          return (
+            <div key={c.id} style={{ background: T.surface, border: `1px solid ${T.border}`, borderLeft: `3px solid ${T.primary}`, borderRadius: 8, padding: 16, marginBottom: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
                 <div>
-                  <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "16px", color: "#F0F0F0", margin: "0 0 4px" }}>{c.nome}</p>
-                  <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", margin: 0 }}>{formatoLabel[c.formato]}</p>
+                  <p style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 15, color: T.text, margin: '0 0 4px', textTransform: 'uppercase' }}>{c.nome}</p>
+                  <p style={{ fontSize: 11, color: T.muted, margin: 0 }}>{c.formato === 'grupos' ? 'Fase de Grupos' : c.formato === 'mata-mata' ? 'Mata-Mata' : 'Grupos + Mata-Mata'}</p>
                 </div>
-                <span className={"text-xs px-2 py-1 rounded-full font-bold " + statusColor[c.status]}>
-                  {statusLabel[c.status]}
-                </span>
+                <span style={{ background: st.bg, color: st.color, fontSize: 10, fontWeight: 800, padding: '3px 10px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: 0.5, whiteSpace: 'nowrap' }}>{st.label}</span>
               </div>
               {(c.dataInicio || c.dataFim) && (
-                <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginBottom: "10px" }}>
-                  {"📅 " + (c.dataInicio ? new Date(c.dataInicio + 'T00:00:00').toLocaleDateString('pt-BR') : '') + (c.dataFim ? " ate " + new Date(c.dataFim + 'T00:00:00').toLocaleDateString('pt-BR') : '')}
+                <p style={{ fontSize: 11, color: T.muted, marginBottom: 10 }}>
+                  {c.dataInicio ? new Date(c.dataInicio + 'T00:00:00').toLocaleDateString('pt-BR') : ''}{c.dataFim ? ' → ' + new Date(c.dataFim + 'T00:00:00').toLocaleDateString('pt-BR') : ''}
                 </p>
               )}
-              {c.descricao && <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginBottom: "10px" }}>{c.descricao}</p>}
-              <div className="flex gap-2">
-                <a href={"/campeonato/" + c.id} style={{ flex: 1, background: "rgba(212,175,55,0.1)", border: "1px solid rgba(212,175,55,0.25)", color: "#FFD700", textAlign: "center", padding: "10px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", textDecoration: "none" }}>
-                  Gerenciar
-                </a>
-                <button onClick={() => excluir(c.id)} style={{ background: "rgba(255,70,70,0.08)", color: "#ff5555", padding: "10px 12px", borderRadius: "10px", fontSize: "12px", border: "none", cursor: "pointer" }}>
-                  Excluir
+              <div style={{ display: 'flex', gap: 8 }}>
+                <a href={`/campeonato/${c.id}`} style={{ flex: 1, background: `${T.primary}15`, border: `1px solid ${T.primary}33`, color: T.primary, textAlign: 'center', padding: '10px', borderRadius: 8, fontSize: 12, fontWeight: 800, fontFamily: SYNE, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: 0.5 }}>Gerenciar</a>
+                <button onClick={() => excluir(c.id)} style={{ background: 'rgba(255,68,68,0.08)', color: '#FF4444', padding: '10px 14px', borderRadius: 8, fontSize: 12, border: '1px solid rgba(255,68,68,0.2)', cursor: 'pointer' }}>
+                  <i className="ti ti-trash" aria-hidden="true"></i>
                 </button>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          )
+        })}
+      </div>
 
-      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
-        <a href="/dashboard" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Inicio</a>
-        <a href="/atletas" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Atletas</a>
-        <a href="/presenca" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Presenca</a>
-        <a href="/financeiro" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Financeiro</a>
+      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-around', padding: '10px 0 20px', borderTop: `1px solid ${T.border}`, background: 'rgba(10,14,26,0.97)', backdropFilter: 'blur(12px)', zIndex: 50 }}>
+        {[{ href: '/dashboard', label: 'Início', icon: 'ti-home' }, { href: '/atletas', label: 'Atletas', icon: 'ti-users' }, { href: '/presenca', label: 'Presença', icon: 'ti-check' }, { href: '/financeiro/caixa', label: 'Financeiro', icon: 'ti-wallet' }].map(item => (
+          <a key={item.href} href={item.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, textDecoration: 'none' }}>
+            <i className={`ti ${item.icon}`} style={{ fontSize: 22, color: T.muted }} aria-hidden="true"></i>
+            <span style={{ fontSize: 9, fontFamily: SYNE, fontWeight: 700, color: T.muted, letterSpacing: '0.5px', textTransform: 'uppercase' }}>{item.label}</span>
+          </a>
+        ))}
       </nav>
     </div>
     </PlanoGate>
