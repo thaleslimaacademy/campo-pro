@@ -154,7 +154,7 @@ export default function Dashboard() {
       {/* RECEITA CARD */}
       {isAdmin && (
         <div style={{ padding: '12px 20px 0' }}>
-          <a href="/financeiro/caixa" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#0D0D0D', border: '1px solid #1A1A1A', borderLeft: '3px solid #2B4EFF', borderRadius: 4, padding: '16px 18px', textDecoration: 'none' }}>
+          <a href="/financeiro/dashboard" style={{ display: "flex", alignItems: "center", justifyContent: "space-between', background: '#0D0D0D', border: '1px solid #1A1A1A', borderLeft: '3px solid #2B4EFF', borderRadius: 4, padding: '16px 18px', textDecoration: 'none' }}>
             <div>
               <div style={{ fontSize: 9, color: '#555', textTransform: 'uppercase', letterSpacing: 1.5, fontWeight: 800, marginBottom: 6 }}>Receita do mês</div>
               <div style={{ fontFamily: 'Syne, sans-serif', fontSize: 28, fontWeight: 900, color: '#00D67A', letterSpacing: -1, lineHeight: 1 }}>{loading ? '...' : brl(pagasV)}</div>
