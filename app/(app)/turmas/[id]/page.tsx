@@ -62,8 +62,8 @@ export default function TurmaDetalhes() {
     }
 
     const res = await fetch('/api/atleta-turma?turmaId=' + id)
-    const vinculos: { atletaId: string }[] = res.ok ? await res.json() : []
-    const idsNaTurma = vinculos.map(v => v.atletaId)
+    const json = res.ok ? await res.json() : { ids: [] }
+    const idsNaTurma: string[] = json.ids ?? []
 
     if (idsNaTurma.length > 0) {
       const { data: comTurma } = await supabase
