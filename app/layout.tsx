@@ -9,23 +9,24 @@ export const metadata: Metadata = {
   description: 'Gestao de escolinha de futebol',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider>
       <html lang="pt-BR">
         <head>
           <link rel="manifest" href="/manifest.webmanifest" />
-          <meta name="theme-color" content="#FF6B00" />
+          <meta name="theme-color" content="#4169E1" />
           <meta name="apple-mobile-web-app-capable" content="yes" />
-          <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+          <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
           <meta name="apple-mobile-web-app-title" content="GestaoFC" />
           <meta name="mobile-web-app-capable" content="yes" />
+          <link rel="icon" href="/gestaofc-icon.png" type="image/png" />
+          <link rel="apple-touch-icon" href="/gestaofc-icon.png" />
         </head>
-        <body><BrandingProvider>{children}</BrandingProvider><ServiceWorkerRegister /></body>
+        <body style={{ margin: 0, padding: 0, background: '#0A0E1A' }}>
+          <BrandingProvider>{children}</BrandingProvider>
+          <ServiceWorkerRegister />
+        </body>
       </html>
     </ClerkProvider>
   )
