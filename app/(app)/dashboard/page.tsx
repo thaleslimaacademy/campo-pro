@@ -46,17 +46,18 @@ const GRUPOS = [
   { key: 'outros',      label: 'Ferramentas',       icon: 'ti-tool'            },
 ]
 
-// Paleta Royal Blue
+// Paleta balanceada - fundo neutro escuro, azul nos acentos
 const C = {
-  navy:    '#0A0E1A',
+  navy:    '#0D0D0F',
   blue:    '#4169E1',
   cobalt:  '#1A3FA8',
   cyan:    '#00BFFF',
   sky:     '#7DD3FC',
   off:     '#F0F4FF',
-  card:    'rgba(65,105,225,0.08)',
-  border:  'rgba(65,105,225,0.25)',
-  muted:   'rgba(240,244,255,0.4)',
+  card:    '#141418',
+  border:  '#1E1E24',
+  muted:   'rgba(240,244,255,0.35)',
+  accent:  'rgba(65,105,225,0.15)',
 }
 
 export default function Dashboard() {
@@ -137,14 +138,14 @@ export default function Dashboard() {
       </div>
 
       {/* STATS STRIP */}
-      <div style={{ display: 'flex', background: 'rgba(65,105,225,0.06)', borderBottom: '1px solid rgba(65,105,225,0.15)' }}>
+      <div style={{ display: 'flex', background: '#111115', borderBottom: '1px solid #1E1E24' }}>
         {[
           { label: 'Atletas',  value: loading ? '...' : String(totalAtletas), color: C.sky },
           { label: 'Receita',  value: loading ? '...' : brl(pagasV).replace('R$ ','R$'), color: '#4ADE80' },
           { label: 'Presenca', value: loading ? '...' : presenca.t === 0 ? '-' : pct + '%', color: pct >= 75 ? '#4ADE80' : pct > 0 ? '#FBBF24' : C.muted },
           { label: 'Inadimp.', value: loading ? '...' : String(inadimplentes), color: inadimplentes > 0 ? '#FF6B6B' : C.muted },
         ].map((s, i, arr) => (
-          <div key={s.label} style={{ flex: 1, padding: '14px 0 12px', textAlign: 'center', borderRight: i < arr.length - 1 ? '1px solid rgba(65,105,225,0.15)' : 'none' }}>
+          <div key={s.label} style={{ flex: 1, padding: '14px 0 12px', textAlign: 'center', borderRight: i < arr.length - 1 ? '1px solid #1E1E24' : 'none' }}>
             <div style={{ fontFamily: 'Syne, sans-serif', fontSize: 18, fontWeight: 900, color: s.color, letterSpacing: -0.5, lineHeight: 1 }}>{s.value}</div>
             <div style={{ fontSize: 9, color: C.sky, textTransform: 'uppercase', letterSpacing: 0.8, fontWeight: 600, marginTop: 4, opacity: 0.7 }}>{s.label}</div>
           </div>
@@ -172,13 +173,13 @@ export default function Dashboard() {
       {/* RECEITA CARD */}
       {isAdmin && (
         <div style={{ padding: '12px 16px 0' }}>
-          <a href="/financeiro/dashboard" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(65,105,225,0.1)', border: '1px solid rgba(65,105,225,0.3)', borderLeft: '3px solid #4169E1', borderRadius: 12, padding: '16px 18px', textDecoration: 'none' }}>
+          <a href="/financeiro/dashboard" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#141418', border: '1px solid #1E1E24', borderLeft: '3px solid #4169E1', borderRadius: 12, padding: '16px 18px', textDecoration: 'none' }}>
             <div>
               <div style={{ fontSize: 9, color: C.sky, textTransform: 'uppercase', letterSpacing: 1.5, fontWeight: 700, marginBottom: 6 }}>Receita do mes</div>
               <div style={{ fontFamily: 'Syne, sans-serif', fontSize: 28, fontWeight: 900, color: '#4ADE80', letterSpacing: -1, lineHeight: 1 }}>{loading ? '...' : brl(pagasV)}</div>
             </div>
             <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(65,105,225,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <i className="ti ti-chart-bar" style={{ fontSize: 24, color: C.blue }} />
+              <i className="ti ti-chart-bar" style={{ fontSize: 24, color: '#5B7FE8' }} />
             </div>
           </a>
         </div>
@@ -186,7 +187,7 @@ export default function Dashboard() {
 
       {/* MODULOS */}
       <div style={{ padding: '20px 16px 0' }}>
-        <div style={{ fontSize: 10, color: C.sky, textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 12, opacity: 0.7 }}>Modulos</div>
+        <div style={{ fontSize: 10, color: '#555', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 12 }}>Modulos</div>
         {GRUPOS.map(grupo => {
           const itens = MODULOS.filter(m => m.grupo === grupo.key)
           if (itens.length === 0) return null
@@ -198,15 +199,15 @@ export default function Dashboard() {
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   padding: '13px 16px',
-                  background: aberto ? 'rgba(65,105,225,0.15)' : C.card,
+                  background: aberto ? '#1A1F35' : '#111115',
                   borderRadius: aberto ? '12px 12px 0 0' : 12,
-                  border: `1px solid ${aberto ? 'rgba(65,105,225,0.4)' : C.border}`,
-                  borderBottom: aberto ? '1px solid rgba(65,105,225,0.1)' : `1px solid ${C.border}`,
+                  border: `1px solid ${aberto ? '#2D3A6E' : '#1E1E24'}`,
+                  borderBottom: aberto ? '1px solid #1A1F35' : '1px solid #1E1E24',
                   cursor: 'pointer',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, background: aberto ? 'rgba(65,105,225,0.25)' : 'rgba(65,105,225,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: aberto ? 'rgba(65,105,225,0.2)' : '#1A1A22', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <i className={'ti ' + grupo.icon} style={{ fontSize: 16, color: aberto ? C.cyan : C.sky }} />
                   </div>
                   <span style={{ fontSize: 13, fontWeight: 800, color: aberto ? C.off : C.sky, textTransform: 'uppercase', letterSpacing: 0.5, fontFamily: 'Syne, sans-serif' }}>{grupo.label}</span>
@@ -214,11 +215,11 @@ export default function Dashboard() {
                 <i className={'ti ti-chevron-' + (aberto ? 'up' : 'down')} style={{ fontSize: 16, color: aberto ? C.cyan : C.sky, opacity: aberto ? 1 : 0.5 }} />
               </div>
               {aberto && (
-                <div style={{ background: 'rgba(65,105,225,0.04)', border: `1px solid ${C.border}`, borderTop: 'none', borderRadius: '0 0 12px 12px', padding: '4px 0 8px' }}>
+                <div style={{ background: '#0D0D0F', border: '1px solid #1E1E24', borderTop: 'none', borderRadius: '0 0 12px 12px', padding: '4px 0 8px' }}>
                   {itens.map((m, idx) => (
-                    <a key={m.href} href={m.href} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 16px 11px 58px', textDecoration: 'none', borderBottom: idx < itens.length - 1 ? `1px solid rgba(65,105,225,0.1)` : 'none' }}>
-                      <i className={'ti ' + m.icon} style={{ fontSize: 16, color: C.blue }} />
-                      <span style={{ fontSize: 13, fontWeight: 600, color: C.off }}>{m.label}</span>
+                    <a key={m.href} href={m.href} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 16px 11px 58px', textDecoration: 'none', borderBottom: idx < itens.length - 1 ? '1px solid #161618' : 'none' }}>
+                      <i className={'ti ' + m.icon} style={{ fontSize: 16, color: '#5B7FE8' }} />
+                      <span style={{ fontSize: 13, fontWeight: 500, color: '#C8CDD8' }}>{m.label}</span>
                       <i className="ti ti-chevron-right" style={{ fontSize: 13, color: C.border, marginLeft: 'auto' }} />
                     </a>
                   ))}
@@ -232,7 +233,7 @@ export default function Dashboard() {
       {/* LINK PRE-MATRICULA */}
       {isAdmin && (
         <div style={{ margin: '16px 16px 0' }}>
-          <div style={{ background: 'rgba(65,105,225,0.08)', border: `1px solid ${C.border}`, borderLeft: '3px solid #00BFFF', borderRadius: 12, padding: '14px 16px' }}>
+          <div style={{ background: '#141418', border: '1px solid #1E1E24', borderLeft: '3px solid #00BFFF', borderRadius: 12, padding: '14px 16px' }}>
             <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 11, color: C.cyan, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>Link de Pre-Matricula</div>
             <div style={{ fontSize: 11, color: C.sky, marginBottom: 12, opacity: 0.7 }}>gestaofc.com.br/matricula</div>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -251,7 +252,7 @@ export default function Dashboard() {
       )}
 
       {/* BOTTOM NAV */}
-      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#0A0E1A', borderTop: '1px solid rgba(65,105,225,0.2)', display: 'flex', justifyContent: 'space-around', padding: '10px 0 20px', zIndex: 50 }}>
+      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#0A0A0C', borderTop: '1px solid #1A1A22', display: 'flex', justifyContent: 'space-around', padding: '10px 0 20px', zIndex: 50 }}>
         {[
           { href: '/dashboard',           label: 'Inicio',     icon: 'ti-home',   active: true  },
           { href: '/atletas',             label: 'Atletas',    icon: 'ti-users',  active: false },
