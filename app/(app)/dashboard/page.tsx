@@ -25,6 +25,7 @@ const MODULOS_ADMIN = [
   { href: '/estoque',                   label: 'Loja',           icon: 'ti-shopping-bag',   grupo: 'outros' },
   { href: '/comissao',                  label: 'Comissão',       icon: 'ti-users-group',    grupo: 'outros' },
   { href: '/locais',                     label: 'Locais',         icon: 'ti-map-pin',        grupo: 'elenco' },
+  { href: '/treinamentos',               label: 'Treinamentos',   icon: 'ti-ball-football',  grupo: 'elenco' },
   { href: '/atletas/importar',          label: 'Importar',       icon: 'ti-download',       grupo: 'outros' },
   { href: '/configuracoes',             label: 'Config',         icon: 'ti-settings',       grupo: 'outros' },
 ]
