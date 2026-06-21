@@ -10,7 +10,7 @@ const MODULOS_ADMIN = [
   { href: '/atletas',                   label: 'Atletas',        icon: 'ti-users',          grupo: 'elenco' },
   { href: '/presenca',                  label: 'Presença',       icon: 'ti-check',          grupo: 'elenco' },
   { href: '/turmas',                    label: 'Turmas',         icon: 'ti-run',            grupo: 'elenco' },
-  { href: '/premios',                   label: 'Premiações',     icon: 'ti-medal',          grupo: 'elenco' },
+  { href: '/premios',                   label: 'Premiações',     icon: 'ti-medal',          grupo: 'comissao' },
   { href: '/modalidades',               label: 'Modalidades',    icon: 'ti-ball-football',  grupo: 'elenco' },
   { href: '/financeiro/caixa',          label: 'Caixa',          icon: 'ti-cash',           grupo: 'financeiro' },
   { href: '/financeiro/boleto',         label: 'Boleto',         icon: 'ti-file-invoice',   grupo: 'financeiro' },
@@ -18,14 +18,14 @@ const MODULOS_ADMIN = [
   { href: '/relatorios/fluxo-caixa',   label: 'Fluxo de Caixa', icon: 'ti-chart-line',    grupo: 'financeiro' },
   { href: '/financeiro/patrocinadores', label: 'Patrocinadores', icon: 'ti-building-bank',  grupo: 'financeiro' },
   { href: '/campeonato',                label: 'Campeonatos',    icon: 'ti-trophy',         grupo: 'competicao' },
-  { href: '/convocacao',                label: 'Convocações',    icon: 'ti-megaphone',      grupo: 'competicao' },
+  { href: '/convocacao',                label: 'Convocações',    icon: 'ti-megaphone',      grupo: 'comissao' },
   { href: '/mensagens',                 label: 'Mensagens',      icon: 'ti-message-circle', grupo: 'outros' },
   { href: '/matriculas',                label: 'Matrículas',     icon: 'ti-clipboard-list', grupo: 'outros' },
   { href: '/fotos',                     label: 'Fotos',          icon: 'ti-photo',          grupo: 'outros' },
   { href: '/estoque',                   label: 'Loja',           icon: 'ti-shopping-bag',   grupo: 'outros' },
-  { href: '/comissao',                  label: 'Comissão',       icon: 'ti-users-group',    grupo: 'outros' },
+  { href: '/comissao',                  label: 'Comissão Técnica', icon: 'ti-users-group',  grupo: 'comissao' },
   { href: '/locais',                     label: 'Locais',         icon: 'ti-map-pin',        grupo: 'elenco' },
-  { href: '/treinamentos',               label: 'Treinamentos',   icon: 'ti-ball-football',  grupo: 'elenco' },
+  { href: '/treinamentos',               label: 'Treinamentos',   icon: 'ti-chalkboard',     grupo: 'comissao' },
   { href: '/atletas/importar',          label: 'Importar',       icon: 'ti-download',       grupo: 'outros' },
   { href: '/configuracoes',             label: 'Config',         icon: 'ti-settings',       grupo: 'outros' },
 ]
@@ -41,6 +41,7 @@ const MODULOS_PROFESSOR = [
 const GRUPOS = [
   { key: 'elenco',      label: 'Elenco',      icon: 'ti-users' },
   { key: 'financeiro',  label: 'Financeiro',  icon: 'ti-wallet' },
+  { key: 'comissao',    label: 'Comissão Técnica', icon: 'ti-whistle' },
   { key: 'competicao',  label: 'Competição',  icon: 'ti-trophy' },
   { key: 'outros',      label: 'Ferramentas', icon: 'ti-tool' },
 ]
@@ -65,7 +66,7 @@ export default function Dashboard() {
   const [presenca, setPresenca] = useState({ p: 0, t: 0 })
   const [pagasV, setPagasV] = useState(0)
   const [loading, setLoading] = useState(true)
-  const [gruposAbertos, setGruposAbertos] = useState<Record<string, boolean>>({ elenco: true, financeiro: false, competicao: false, outros: false })
+  const [gruposAbertos, setGruposAbertos] = useState<Record<string, boolean>>({ elenco: true, financeiro: false, competicao: false, outros: false, comissao: false })
 
   const hoje = new Date()
 
