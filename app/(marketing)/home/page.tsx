@@ -71,7 +71,7 @@ export default function LandingPage() {
     { icon: 'ti-device-mobile-off', titulo: 'Comunicacao desorganizada', desc: 'Mensagens espalhadas em grupos de WhatsApp, pais sem informacao sobre treinos, convocacoes e o desenvolvimento do filho.' },
     { icon: 'ti-puzzle', titulo: 'Varias ferramentas, nenhuma integrada', desc: 'Planilha para atletas, outro app para financeiro, grupo de WhatsApp para comunicacao. Tudo separado, nada funcionando junto.' },
     { icon: 'ti-users', titulo: 'Sendo tudo ao mesmo tempo', desc: 'Voce e professor, financeiro, secretario e administrador. O tempo que deveria ser dedicado a formar atletas e consumido por burocracia.' },
-    { icon: 'ti-chart-line-off', titulo: 'Sem dados para decidir', desc: 'Voce nao sabe quantos atletas tem hoje, qual a taxa de inadimplencia, qual turma esta crescendo. Voce administra no escuro.' },
+    { icon: 'ti-chart-off', titulo: 'Sem dados para decidir', desc: 'Voce nao sabe quantos atletas tem hoje, qual a taxa de inadimplencia, qual turma esta crescendo. Voce administra no escuro.' },
   ]
 
   const funcionalidades = [
@@ -175,7 +175,7 @@ export default function LandingPage() {
             O GestaoFC foi criado por um treinador que viveu esses problemas.
           </h2>
           <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.75)', lineHeight: 1.7, marginBottom: 24 }}>
-            Thales Cruz, ex-jogador profissional com passagens por Japan, Tailandia e Indonesia, fundou a TLFA em Iturama-MG e sentiu na pele a falta de um sistema feito para a realidade das escolinhas brasileiras. O GestaoFC nasceu dessa necessidade real.
+            Thales Cruz, ex-jogador profissional com passagens por Brasil, Japao (Roasso Kumamoto), Tailandia e Indonesia, fundou a TLFA em Iturama-MG apos encerrar sua carreira. Viveu na pele a falta de um sistema feito para a realidade das escolinhas brasileiras. O GestaoFC nasceu dessa necessidade real.
           </p>
           <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', borderRadius: 12, padding: '12px 24px', fontSize: 15, color: '#fff', fontStyle: 'italic', lineHeight: 1.6 }}>
             "Menos tempo administrando, mais tempo formando atletas."

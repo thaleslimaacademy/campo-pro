@@ -1,206 +1,159 @@
-"use client";
+'use client'
+import { useState } from 'react'
 
-import { useState } from "react";
-import Link from "next/link";
+const SYNE = 'Syne, sans-serif'
+const INTER = 'Inter, sans-serif'
 
 const plans = [
   {
-    id: "basico",
-    name: "Básico",
-    color: "border-gray-600",
-    badge: null,
-    monthly: 79,
-    annual: 65,
-    description: "Ideal para academias em fase inicial",
-    limits: "Até 50 atletas",
+    id: 'basico', name: 'Basico', monthly: 79, annual: 65,
+    desc: 'Para quem esta comecando a organizar a escolinha',
+    limite: 'Ate 50 atletas',
+    color: '#7DD3FC', badge: null, destaque: false,
     features: [
-      { label: "Até 50 atletas", ok: true },
-      { label: "1 usuário", ok: true },
-      { label: "Até 3 turmas", ok: true },
-      { label: "Só futebol", ok: true },
-      { label: "WhatsApp automático", ok: false },
-      { label: "Relatórios PDF", ok: false },
-      { label: "Avaliação física", ok: false },
-      { label: "Campeonatos", ok: false },
-      { label: "App dos pais", ok: false },
-      { label: "IA + automações", ok: false },
+      { ok: true,  label: 'Ate 50 atletas' },
+      { ok: true,  label: '1 usuario admin' },
+      { ok: true,  label: 'Ate 3 turmas' },
+      { ok: true,  label: 'Controle de presenca' },
+      { ok: true,  label: 'Mensalidades basicas' },
+      { ok: false, label: 'WhatsApp automatico' },
+      { ok: false, label: 'App dos pais' },
+      { ok: false, label: 'Multiplas modalidades' },
+      { ok: false, label: 'Dashboard financeiro' },
+      { ok: false, label: 'Premiacoes e conquistas' },
     ],
   },
   {
-    id: "pro",
-    name: "Pro",
-    color: "border-orange-500",
-    badge: "MAIS POPULAR",
-    monthly: 129,
-    annual: 107,
-    description: "Para academias em crescimento",
-    limits: "Até 150 atletas",
+    id: 'pro', name: 'Pro', monthly: 129, annual: 107,
+    desc: 'Para academias em crescimento que querem profissionalizar',
+    limite: 'Ate 150 atletas',
+    color: '#00BFFF', badge: 'MAIS POPULAR', destaque: true,
     features: [
-      { label: "Até 150 atletas", ok: true },
-      { label: "3 usuários", ok: true },
-      { label: "Até 10 turmas", ok: true },
-      { label: "Até 3 modalidades", ok: true },
-      { label: "WhatsApp automático", ok: true },
-      { label: "Relatórios PDF", ok: true },
-      { label: "Avaliação física", ok: true },
-      { label: "Campeonatos", ok: true },
-      { label: "App dos pais", ok: false },
-      { label: "IA + automações", ok: false },
+      { ok: true,  label: 'Ate 150 atletas' },
+      { ok: true,  label: '3 usuarios (admin + professores)' },
+      { ok: true,  label: 'Turmas ilimitadas' },
+      { ok: true,  label: 'WhatsApp automatico' },
+      { ok: true,  label: 'Dashboard financeiro' },
+      { ok: true,  label: 'Ate 3 modalidades' },
+      { ok: true,  label: 'Campeonatos e convocacoes' },
+      { ok: true,  label: 'Relatorios PDF' },
+      { ok: false, label: 'App dos pais' },
+      { ok: false, label: 'Premiacoes e conquistas' },
     ],
   },
   {
-    id: "elite",
-    name: "Elite",
-    color: "border-yellow-400",
-    badge: "COMPLETO",
-    monthly: 199,
-    annual: 165,
-    description: "Para clubes e academias consolidadas",
-    limits: "Atletas ilimitados",
+    id: 'elite', name: 'Elite', monthly: 199, annual: 165,
+    desc: 'O sistema operacional completo para sua academia',
+    limite: 'Atletas ilimitados',
+    color: '#FFD700', badge: 'COMPLETO', destaque: false,
     features: [
-      { label: "Atletas ilimitados", ok: true },
-      { label: "Usuários ilimitados", ok: true },
-      { label: "Turmas ilimitadas", ok: true },
-      { label: "Modalidades ilimitadas", ok: true },
-      { label: "WhatsApp automático", ok: true },
-      { label: "Relatórios PDF", ok: true },
-      { label: "Avaliação física", ok: true },
-      { label: "Campeonatos", ok: true },
-      { label: "App dos pais", ok: true },
-      { label: "IA + automações", ok: true },
+      { ok: true, label: 'Atletas ilimitados' },
+      { ok: true, label: 'Usuarios ilimitados' },
+      { ok: true, label: 'Todas as modalidades' },
+      { ok: true, label: 'WhatsApp automatico' },
+      { ok: true, label: 'App dos pais' },
+      { ok: true, label: 'Premiacoes e conquistas' },
+      { ok: true, label: 'Dashboard financeiro avancado' },
+      { ok: true, label: 'Biblioteca de treinamentos' },
+      { ok: true, label: 'Multiplos nucleos/unidades' },
+      { ok: true, label: 'Suporte prioritario' },
     ],
   },
-];
+]
 
 export default function PlanosPage() {
-  const [anual, setAnual] = useState(false);
+  const [anual, setAnual] = useState(false)
 
   return (
-    <div className="min-h-screen bg-[#0F0F1A] text-white font-[Inter,sans-serif]">
+    <div style={{ minHeight: '100vh', background: '#080810', color: '#F0F4FF', fontFamily: INTER }}>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;900&family=Inter:wght@400;500;600&display=swap" />
 
-      {/* Header */}
-      <div className="pt-16 pb-10 text-center px-4">
-        <div className="inline-block bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs font-semibold px-4 py-1.5 rounded-full mb-6 tracking-widest uppercase">
-          Planos e Preços
+      {/* NAV */}
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(8,8,16,0.95)', borderBottom: '1px solid rgba(65,105,225,0.2)', backdropFilter: 'blur(12px)', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <a href="/home" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+          <img src="/gestaofc-icon.svg" alt="GestaoFC" style={{ width: 40, height: 40, borderRadius: 10 }} />
+          <span style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 18, color: '#F0F4FF', textTransform: 'uppercase', letterSpacing: 1 }}>GestaoFC</span>
+        </a>
+        <a href="/login" style={{ background: 'rgba(65,105,225,0.15)', color: '#7DD3FC', padding: '8px 20px', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none', border: '1px solid rgba(65,105,225,0.3)' }}>Entrar</a>
+      </nav>
+
+      {/* HEADER */}
+      <div style={{ padding: '64px 24px 48px', textAlign: 'center', maxWidth: 720, margin: '0 auto' }}>
+        <div style={{ display: 'inline-block', background: 'rgba(65,105,225,0.12)', border: '1px solid rgba(65,105,225,0.3)', borderRadius: 20, padding: '6px 16px', fontSize: 11, color: '#7DD3FC', fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 20 }}>
+          Planos e Precos
         </div>
-        <h1 className="text-4xl md:text-5xl font-bold font-[Syne,sans-serif] mb-4">
-          Escolha o plano{" "}
-          <span className="text-[#FF6B00]">certo para sua academia</span>
+        <h1 style={{ fontFamily: SYNE, fontSize: 'clamp(28px, 5vw, 48px)', fontWeight: 900, color: '#F0F4FF', marginBottom: 12, lineHeight: 1.1 }}>
+          Escolha o plano <span style={{ color: '#4169E1' }}>certo para sua academia</span>
         </h1>
-        <p className="text-gray-400 text-lg max-w-xl mx-auto">
-          Tudo que você precisa para gerenciar, crescer e profissionalizar sua academia de futebol.
+        <p style={{ fontSize: 16, color: 'rgba(240,244,255,0.5)', marginBottom: 32, lineHeight: 1.6 }}>
+          Tudo que voce precisa para gerenciar, crescer e profissionalizar sua academia de futebol.
         </p>
 
-        {/* Toggle mensal/anual */}
-        <div className="flex items-center justify-center gap-4 mt-8">
-          <span className={`text-sm font-medium ${!anual ? "text-white" : "text-gray-500"}`}>Mensal</span>
-          <button
-            onClick={() => setAnual(!anual)}
-            className={`relative w-14 h-7 rounded-full transition-colors duration-300 ${anual ? "bg-[#FF6B00]" : "bg-gray-700"}`}
-          >
-            <span
-              className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow transition-transform duration-300 ${anual ? "translate-x-7" : "translate-x-0"}`}
-            />
+        {/* Toggle */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+          <span style={{ fontSize: 14, color: anual ? 'rgba(240,244,255,0.35)' : '#F0F4FF', fontWeight: 500 }}>Mensal</span>
+          <button onClick={() => setAnual(!anual)} style={{ width: 52, height: 28, borderRadius: 14, background: anual ? '#4169E1' : '#1A1A28', border: 'none', cursor: 'pointer', position: 'relative', transition: 'background 0.3s' }}>
+            <span style={{ position: 'absolute', top: 4, left: anual ? 26 : 4, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left 0.3s', display: 'block' }} />
           </button>
-          <span className={`text-sm font-medium ${anual ? "text-white" : "text-gray-500"}`}>
-            Anual{" "}
-            <span className="bg-green-500/20 text-green-400 text-xs px-2 py-0.5 rounded-full ml-1">-18%</span>
+          <span style={{ fontSize: 14, color: anual ? '#F0F4FF' : 'rgba(240,244,255,0.35)', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 8 }}>
+            Anual
+            <span style={{ background: 'rgba(74,222,128,0.15)', color: '#4ADE80', fontSize: 11, padding: '2px 8px', borderRadius: 10, fontWeight: 700 }}>-18%</span>
           </span>
         </div>
       </div>
 
-      {/* Cards */}
-      <div className="max-w-6xl mx-auto px-4 pb-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {plans.map((plan) => (
-            <div
-              key={plan.id}
-              className={`relative rounded-2xl border-2 ${plan.color} bg-[#1A1A2E] p-6 flex flex-col transition-transform hover:-translate-y-1 duration-200 ${plan.id === "pro" ? "shadow-[0_0_40px_rgba(255,107,0,0.15)]" : ""}`}
-            >
-              {/* Badge */}
-              {plan.badge && (
-                <div className={`absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-4 py-1 rounded-full ${plan.id === "pro" ? "bg-[#FF6B00] text-white" : "bg-[#FFD700] text-[#0F0F1A]"}`}>
-                  {plan.badge}
-                </div>
-              )}
-
-              {/* Nome + desc */}
-              <div className="mb-6">
-                <h2 className={`text-2xl font-bold font-[Syne,sans-serif] mb-1 ${plan.id === "elite" ? "text-[#FFD700]" : plan.id === "pro" ? "text-[#FF6B00]" : "text-white"}`}>
-                  {plan.name}
-                </h2>
-                <p className="text-gray-400 text-sm">{plan.description}</p>
+      {/* CARDS */}
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px 80px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, alignItems: 'start' }}>
+        {plans.map(plan => (
+          <div key={plan.id} style={{ background: '#0F0F18', border: `2px solid ${plan.destaque ? '#4169E1' : plan.id === 'elite' ? '#FFD70033' : '#1A1A28'}`, borderRadius: 20, padding: '28px 24px', position: 'relative', boxShadow: plan.destaque ? '0 0 40px rgba(65,105,225,0.15)' : 'none', display: 'flex', flexDirection: 'column', marginTop: plan.destaque ? 0 : 0 }}>
+            {plan.badge && (
+              <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: plan.destaque ? '#4169E1' : '#FFD700', color: plan.id === 'elite' ? '#0A0E1A' : '#fff', fontSize: 11, fontWeight: 800, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap', fontFamily: SYNE, letterSpacing: 0.5 }}>
+                {plan.badge}
               </div>
+            )}
 
-              {/* Preço */}
-              <div className="mb-6">
-                <div className="flex items-end gap-1">
-                  <span className="text-gray-400 text-sm self-start mt-1">R$</span>
-                  <span className="text-5xl font-bold font-[Syne,sans-serif] leading-none">
-                    {anual ? plan.annual : plan.monthly}
-                  </span>
-                  <span className="text-gray-400 text-sm self-end mb-1">/mês</span>
-                </div>
-                {anual && (
-                  <p className="text-gray-500 text-xs mt-1">
-                    Cobrado anualmente — R$ {plan.annual * 12}/ano
-                  </p>
-                )}
-              </div>
-
-              {/* CTA */}
-              <Link
-                href={`/cadastro?plano=${plan.id}${anual ? "&periodo=anual" : ""}`}
-                className={`block w-full text-center py-3 rounded-xl font-semibold text-sm transition-all duration-200 mb-6 ${
-                  plan.id === "pro"
-                    ? "bg-[#FF6B00] text-white hover:bg-orange-600"
-                    : plan.id === "elite"
-                    ? "bg-[#FFD700] text-[#0F0F1A] hover:bg-yellow-300"
-                    : "bg-white/10 text-white hover:bg-white/20 border border-white/10"
-                }`}
-              >
-                Começar agora
-              </Link>
-
-              {/* Limite destaque */}
-              <p className="text-xs text-center text-gray-500 mb-4 -mt-3">{plan.limits}</p>
-
-              {/* Divisor */}
-              <div className="border-t border-white/10 mb-4"></div>
-
-              {/* Features */}
-              <ul className="space-y-2.5 flex-1">
-                {plan.features.map((f, i) => (
-                  <li key={i} className="flex items-center gap-2.5">
-                    {f.ok ? (
-                      <span className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-3 h-3 text-green-400" viewBox="0 0 12 12" fill="none">
-                          <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </span>
-                    ) : (
-                      <span className="w-5 h-5 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-3 h-3 text-red-400" viewBox="0 0 12 12" fill="none">
-                          <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                        </svg>
-                      </span>
-                    )}
-                    <span className={`text-sm ${f.ok ? "text-gray-200" : "text-gray-600"}`}>
-                      {f.label}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontFamily: SYNE, fontSize: 26, fontWeight: 900, color: plan.color, marginBottom: 6 }}>{plan.name}</div>
+              <div style={{ fontSize: 13, color: 'rgba(240,244,255,0.45)', lineHeight: 1.5 }}>{plan.desc}</div>
             </div>
-          ))}
-        </div>
 
-        {/* Trial note */}
-        <p className="text-center text-gray-500 text-sm mt-10">
-          Sem fidelidade no plano mensal · Cancele quando quiser ·{" "}
-          <Link href="/contato" className="text-orange-400 hover:underline">Falar com vendas</Link>
-        </p>
+            <div style={{ marginBottom: 24 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4 }}>
+                <span style={{ fontSize: 14, color: 'rgba(240,244,255,0.4)', marginBottom: 8 }}>R$</span>
+                <span style={{ fontFamily: SYNE, fontSize: 56, fontWeight: 900, color: '#F0F4FF', lineHeight: 1 }}>{anual ? plan.annual : plan.monthly}</span>
+                <span style={{ fontSize: 13, color: 'rgba(240,244,255,0.35)', marginBottom: 10 }}>/mes</span>
+              </div>
+              {anual && <div style={{ fontSize: 12, color: 'rgba(240,244,255,0.3)', marginTop: 4 }}>Cobrado anualmente — R$ {(plan.annual) * 12}/ano</div>}
+            </div>
+
+            <a href={`/cadastro?plano=${plan.id}${anual ? '&periodo=anual' : ''}`} style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: 10, fontFamily: SYNE, fontWeight: 800, fontSize: 14, textDecoration: 'none', marginBottom: 8, letterSpacing: 0.5, background: plan.destaque ? '#4169E1' : plan.id === 'elite' ? '#FFD700' : 'rgba(65,105,225,0.12)', color: plan.id === 'elite' ? '#0A0E1A' : '#fff', border: plan.id === 'basico' ? '1px solid rgba(65,105,225,0.25)' : 'none' }}>
+              Comecar agora
+            </a>
+            <p style={{ fontSize: 11, color: 'rgba(240,244,255,0.25)', textAlign: 'center', marginBottom: 20 }}>{plan.limite}</p>
+
+            <div style={{ borderTop: '1px solid #1A1A28', paddingTop: 20, flex: 1 }}>
+              {plan.features.map((f, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                  <div style={{ width: 20, height: 20, borderRadius: '50%', background: f.ok ? 'rgba(74,222,128,0.12)' : 'rgba(255,107,107,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {f.ok
+                      ? <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#4ADE80" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      : <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 3l6 6M9 3l-6 6" stroke="#FF6B6B" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                    }
+                  </div>
+                  <span style={{ fontSize: 13, color: f.ok ? 'rgba(240,244,255,0.8)' : 'rgba(240,244,255,0.2)' }}>{f.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
+
+      <p style={{ textAlign: 'center', color: 'rgba(240,244,255,0.25)', fontSize: 13, paddingBottom: 48 }}>
+        Sem fidelidade no plano mensal · Cancele quando quiser
+      </p>
+
+      <style>{`* { box-sizing: border-box; margin: 0; padding: 0; }`}</style>
     </div>
-  );
+  )
 }

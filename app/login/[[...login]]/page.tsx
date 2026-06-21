@@ -1,10 +1,10 @@
 import { SignIn } from '@clerk/nextjs'
 import { dark } from '@clerk/themes'
-
 export default function LoginPage() {
   return (
     <div style={{
       minHeight: '100vh',
+      background: 'linear-gradient(135deg, #0A0E1A 0%, #0D1535 100%)',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -14,45 +14,44 @@ export default function LoginPage() {
       position: 'relative',
       overflow: 'hidden',
     }}>
-      <div style={{ position: 'absolute', top: '-100px', left: '50%', transform: 'translateX(-50%)', width: '300px', height: '300px', background: 'radial-gradient(circle,rgba(57,255,20,0.1) 0%,transparent 70%)', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', bottom: '-60px', right: '-60px', width: '200px', height: '200px', background: 'radial-gradient(circle,rgba(212,175,55,0.08) 0%,transparent 70%)', pointerEvents: 'none' }} />
-
+      <div style={{ position: 'absolute', top: '-120px', left: '50%', transform: 'translateX(-50%)', width: '400px', height: '400px', background: 'radial-gradient(circle,rgba(65,105,225,0.12) 0%,transparent 70%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', bottom: '-80px', right: '-80px', width: '300px', height: '300px', background: 'radial-gradient(circle,rgba(0,191,255,0.08) 0%,transparent 70%)', pointerEvents: 'none' }} />
       <div style={{ marginBottom: '32px', textAlign: 'center' }}>
-        <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'linear-gradient(135deg,#39FF14,#00aa00)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', fontWeight: 800, color: '#000', fontFamily: 'Syne, sans-serif', boxShadow: '0 0 24px rgba(57,255,20,0.4)', margin: '0 auto 16px' }}>G</div>
-        <h1 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: '28px', color: '#F0F0F0', margin: '0 0 4px', letterSpacing: '-0.5px' }}>GestaoFC</h1>
-        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', margin: 0 }}>Gestao profissional de escolinhas</p>
+        <img src="/gestaofc-icon.svg" alt="GestaoFC" style={{ width: 64, height: 64, borderRadius: 16, marginBottom: 16, boxShadow: '0 0 32px rgba(65,105,225,0.4)' }} />
+        <h1 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 900, fontSize: '28px', color: '#F0F4FF', margin: '0 0 4px', letterSpacing: '1px', textTransform: 'uppercase' }}>GestaoFC</h1>
+        <p style={{ fontSize: '13px', color: 'rgba(125,211,252,0.6)', margin: 0 }}>Gestao profissional de escolinhas</p>
       </div>
-
       <SignIn
         appearance={{
           baseTheme: dark,
           variables: {
-            colorPrimary: '#39FF14',
-            colorBackground: '#0a0a0a',
-            colorText: '#F0F0F0',
-            colorTextSecondary: 'rgba(255,255,255,0.5)',
-            colorInputBackground: '#1a1a1a',
-            colorInputText: '#F0F0F0',
-            colorNeutral: '#888',
+            colorPrimary: '#4169E1',
+            colorBackground: '#0D1020',
+            colorText: '#F0F4FF',
+            colorTextSecondary: 'rgba(240,244,255,0.5)',
+            colorInputBackground: '#141830',
+            colorInputText: '#F0F4FF',
+            colorNeutral: '#7DD3FC',
             borderRadius: '12px',
           },
           elements: {
-            card: { background: '#111111', border: '1px solid rgba(255,255,255,0.08)', boxShadow: 'none' },
+            card: { background: '#0F1428', border: '1px solid rgba(65,105,225,0.25)', boxShadow: '0 8px 32px rgba(65,105,225,0.1)' },
             headerTitle: { display: 'none' },
             headerSubtitle: { display: 'none' },
-            socialButtonsBlockButton: { background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', color: '#F0F0F0' },
-            socialButtonsBlockButtonText: { color: '#F0F0F0' },
-            formButtonPrimary: { background: 'linear-gradient(135deg,#39FF14,#00cc00)', color: '#000', fontWeight: 800, fontFamily: 'Syne, sans-serif', boxShadow: '0 0 16px rgba(57,255,20,0.3)' },
-            footerActionLink: { color: '#39FF14' },
-            formFieldInput: { background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', color: '#F0F0F0' },
-            formFieldLabel: { color: 'rgba(255,255,255,0.5)' },
-            dividerLine: { background: 'rgba(255,255,255,0.08)' },
-            dividerText: { color: 'rgba(255,255,255,0.3)' },
-            identityPreviewText: { color: '#F0F0F0' },
-            formResendCodeLink: { color: '#39FF14' },
+            socialButtonsBlockButton: { background: '#141830', border: '1px solid rgba(65,105,225,0.2)', color: '#F0F4FF' },
+            socialButtonsBlockButtonText: { color: '#F0F4FF' },
+            formButtonPrimary: { background: 'linear-gradient(135deg,#4169E1,#1A3FA8)', color: '#fff', fontWeight: 800, fontFamily: 'Syne, sans-serif', boxShadow: '0 0 20px rgba(65,105,225,0.35)' },
+            footerActionLink: { color: '#00BFFF' },
+            formFieldInput: { background: '#141830', border: '1px solid rgba(65,105,225,0.25)', color: '#F0F4FF' },
+            formFieldLabel: { color: 'rgba(240,244,255,0.5)' },
+            dividerLine: { background: 'rgba(65,105,225,0.2)' },
+            dividerText: { color: 'rgba(240,244,255,0.3)' },
+            identityPreviewText: { color: '#F0F4FF' },
+            formResendCodeLink: { color: '#00BFFF' },
           }
         }}
       />
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;900&family=Inter:wght@400;500&display=swap" />
     </div>
   )
 }
