@@ -23,7 +23,7 @@ const MODULOS_ADMIN = [
   { href: '/matriculas',                label: 'Matrículas',     icon: 'ti-clipboard-list', grupo: 'outros' },
   { href: '/fotos',                     label: 'Fotos',          icon: 'ti-photo',          grupo: 'outros' },
   { href: '/estoque',                   label: 'Loja',           icon: 'ti-shopping-bag',   grupo: 'outros' },
-  { href: '/comissao',                  label: 'Comissão Técnica', icon: 'ti-user-cog',     grupo: 'comissao' },
+  { href: '/comissao',                  label: 'Comissão Técnica', icon: 'ti-user-star',     grupo: 'comissao' },
   { href: '/locais',                     label: 'Locais',         icon: 'ti-map-pin',        grupo: 'elenco' },
   { href: '/treinamentos',               label: 'Treinamentos',   icon: 'ti-chalkboard',     grupo: 'comissao' },
   { href: '/atletas/importar',          label: 'Importar',       icon: 'ti-download',       grupo: 'outros' },
@@ -41,7 +41,7 @@ const MODULOS_PROFESSOR = [
 const GRUPOS = [
   { key: 'elenco',      label: 'Elenco',      icon: 'ti-users' },
   { key: 'financeiro',  label: 'Financeiro',  icon: 'ti-wallet' },
-  { key: 'comissao',    label: 'Comissão Técnica', icon: 'ti-whistle' },
+  { key: 'comissao',    label: 'Comissão Técnica', icon: 'ti-clipboard-check' },
   { key: 'competicao',  label: 'Competição',  icon: 'ti-trophy' },
   { key: 'outros',      label: 'Ferramentas', icon: 'ti-tool' },
 ]
