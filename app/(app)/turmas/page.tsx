@@ -43,8 +43,7 @@ export default function Turmas() {
   }
 
   const MODALIDADES = [
-    { slug: 'todas', label: 'Todas' }, { slug: 'futebol', label: 'Futebol' }, { slug: 'futsal', label: 'Futsal' },
-    { slug: 'volei', label: 'Vôlei' }, { slug: 'basquete', label: 'Basquete' }, { slug: 'artes-marciais', label: 'Artes Marciais' },
+    { slug: 'todas', label: 'Todas' }, { slug: 'futebol', label: 'Futebol' }, { slug: 'futsal', label: 'Futsal' }, { slug: 'futvolei', label: 'Futvolei' },
   ]
 
   return (
@@ -67,8 +66,7 @@ export default function Turmas() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div><label style={LBL}>Modalidade</label>
               <select value={form.modalidade} onChange={e => setForm(p => ({ ...p, modalidade: e.target.value }))} style={INP}>
-                <option value="futebol">Futebol</option><option value="futsal">Futsal</option><option value="volei">Vôlei</option>
-                <option value="basquete">Basquete</option><option value="artes-marciais">Artes Marciais</option><option value="outras">Outras</option>
+                <option value="futebol">Futebol</option><option value="futsal">Futsal</option><option value="futvolei">Futvolei</option>
               </select>
             </div>
             <div><label style={LBL}>Nome da turma *</label><input value={form.nome} onChange={e => setForm(p => ({ ...p, nome: e.target.value }))} style={INP} placeholder="Ex: Sub-10, Iniciante..." /></div>
