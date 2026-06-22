@@ -16,7 +16,7 @@ export async function GET() {
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const perfil = await getPerfil(userId)
   if (!perfil?.escolaId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  if (perfil.perfil !== 'admin' && perfil.perfil !== 'superadmin')
+  if (perfil.perfil !== 'admin' && perfil.perfil !== 'superadmin' && perfil.perfil !== 'diretor')
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const { data } = await supabaseAdmin
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const perfil = await getPerfil(userId)
   if (!perfil?.escolaId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  if (perfil.perfil !== 'admin' && perfil.perfil !== 'superadmin')
+  if (perfil.perfil !== 'admin' && perfil.perfil !== 'superadmin' && perfil.perfil !== 'diretor')
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const { nome, email, perfilNovo } = await req.json()
@@ -65,7 +65,7 @@ export async function PATCH(req: Request) {
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const perfil = await getPerfil(userId)
   if (!perfil?.escolaId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  if (perfil.perfil !== 'admin' && perfil.perfil !== 'superadmin')
+  if (perfil.perfil !== 'admin' && perfil.perfil !== 'superadmin' && perfil.perfil !== 'diretor')
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const { id, ...updates } = await req.json()
