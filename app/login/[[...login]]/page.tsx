@@ -21,7 +21,7 @@ export default function LoginPage() {
         <h1 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 900, fontSize: '28px', color: '#F0F4FF', margin: '0 0 4px', letterSpacing: '1px', textTransform: 'uppercase' }}>GestaoFC</h1>
         <p style={{ fontSize: '13px', color: 'rgba(125,211,252,0.6)', margin: 0 }}>Gestao profissional de escolinhas</p>
       </div>
-      <SignIn
+      <SignIn forceRedirectUrl='/dashboard'
         appearance={{
           baseTheme: dark,
           variables: {
