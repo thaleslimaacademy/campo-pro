@@ -36,8 +36,9 @@ export async function POST(req: Request) {
   if (perfil.perfil !== 'admin' && perfil.perfil !== 'superadmin' && perfil.perfil !== 'diretor')
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  const { nome, email, perfilNovo } = await req.json()
-  if (!nome || !email || !perfilNovo)
+  const { nome, email, perfilNovo, perfil: perfilForm } = await req.json()
+  const perfilFinal = perfilNovo || perfilForm
+  if (!nome || !email || !perfilFinal)
     return NextResponse.json({ error: 'Campos obrigatórios' }, { status: 400 })
 
   const emailLower = email.toLowerCase()
@@ -52,7 +53,7 @@ export async function POST(req: Request) {
 
   const { data, error } = await supabaseAdmin
     .from('PerfilUsuario')
-    .insert({ nome, email: emailLower, perfil: perfilNovo, escolaId: perfil.escolaId, ativo: true })
+    .insert({ nome, email: emailLower, perfil: perfilFinal, escolaId: perfil.escolaId, ativo: true })
     .select()
     .single()
 
