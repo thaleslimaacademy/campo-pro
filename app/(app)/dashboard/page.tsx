@@ -140,7 +140,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* STATS STRIP */}
+            {/* STATS STRIP */}
       <div style={{ display: 'flex', background: '#111115', borderBottom: '1px solid #1E1E24' }}>
         {(isAdmin ? [
           { label: 'Atletas',  value: loading ? '...' : String(totalAtletas), color: C.sky },
@@ -149,6 +149,7 @@ export default function Dashboard() {
           { label: 'Inadimp.', value: loading ? '...' : String(inadimplentes), color: inadimplentes > 0 ? '#FF6B6B' : C.muted },
         ] : [
           { label: 'Presenca', value: loading ? '...' : presenca.t === 0 ? '-' : pct + '%', color: pct >= 75 ? '#4ADE80' : pct > 0 ? '#FBBF24' : C.muted },
+        ]).map((s, i, arr) => (
           <div key={s.label} style={{ flex: 1, padding: '14px 0 12px', textAlign: 'center', borderRight: i < arr.length - 1 ? '1px solid #1E1E24' : 'none' }}>
             <div style={{ fontFamily: 'Syne, sans-serif', fontSize: 18, fontWeight: 900, color: s.color, letterSpacing: -0.5, lineHeight: 1 }}>{s.value}</div>
             <div style={{ fontSize: 9, color: C.sky, textTransform: 'uppercase', letterSpacing: 0.8, fontWeight: 600, marginTop: 4, opacity: 0.7 }}>{s.label}</div>
