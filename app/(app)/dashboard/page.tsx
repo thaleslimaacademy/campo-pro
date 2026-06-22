@@ -31,11 +31,13 @@ const MODULOS_ADMIN = [
 ]
 
 const MODULOS_PROFESSOR = [
-  { href: '/atletas',    label: 'Atletas',     icon: 'ti-users',   grupo: 'elenco' },
-  { href: '/presenca',   label: 'Presenca',    icon: 'ti-check',   grupo: 'elenco' },
-  { href: '/turmas',     label: 'Turmas',      icon: 'ti-run',     grupo: 'elenco' },
-  { href: '/campeonato', label: 'Campeonatos', icon: 'ti-trophy',  grupo: 'competicao' },
-  { href: '/convocacao', label: 'Convocacoes', icon: 'ti-megaphone', grupo: 'competicao' },
+  { href: '/atletas',      label: 'Atletas',      icon: 'ti-users',          grupo: 'elenco' },
+  { href: '/presenca',     label: 'Presenca',     icon: 'ti-check',          grupo: 'elenco' },
+  { href: '/turmas',       label: 'Turmas',       icon: 'ti-run',            grupo: 'elenco' },
+  { href: '/campeonato',   label: 'Campeonatos',  icon: 'ti-trophy',         grupo: 'competicao' },
+  { href: '/convocacao',   label: 'Convocacoes',  icon: 'ti-clipboard-list', grupo: 'comissao' },
+  { href: '/premios',      label: 'Premiacoes',   icon: 'ti-medal',          grupo: 'comissao' },
+  { href: '/treinamentos', label: 'Treinamentos', icon: 'ti-chalkboard',     grupo: 'comissao' },
 ]
 
 const GRUPOS = [
