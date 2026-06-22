@@ -27,7 +27,7 @@ export function usePerfil() {
     isLoaded: isLoaded && perfilLoaded,
     escolaId: perfil?.escolaId,
     role: perfil?.perfil,
-    isAdmin: perfil?.perfil === 'admin' || perfil?.perfil === 'superadmin',
+    isAdmin: perfil?.perfil === 'admin' || perfil?.perfil === 'superadmin' || perfil?.perfil === 'diretor',
     nome: perfil?.nome,
   }
 }

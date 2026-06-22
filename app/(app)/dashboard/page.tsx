@@ -63,12 +63,13 @@ const C = {
 export default function Dashboard() {
   const { isAdmin, isLoaded, escolaId, role } = usePerfil()
   const MODULOS = role === 'diretor'
-    ? MODULOS_ADMIN.filter(m => m.href !== '/configuracoes')
+    ? MODULOS_ADMIN.filter(m => m.href !== '/configuracoes' && m.href !== '/atletas/importar')
     : role === 'preparador'
     ? [
-        { href: '/atletas',  label: 'Atletas',  icon: 'ti-users', grupo: 'elenco' },
-        { href: '/presenca', label: 'Presenca', icon: 'ti-check', grupo: 'elenco' },
-        { href: '/turmas',   label: 'Turmas',   icon: 'ti-run',   grupo: 'elenco' },
+        { href: '/atletas',      label: 'Atletas',      icon: 'ti-users',      grupo: 'elenco' },
+        { href: '/presenca',     label: 'Presenca',     icon: 'ti-check',      grupo: 'elenco' },
+        { href: '/turmas',       label: 'Turmas',       icon: 'ti-run',        grupo: 'elenco' },
+        { href: '/treinamentos', label: 'Treinamentos', icon: 'ti-chalkboard', grupo: 'elenco' },
       ]
     : role === 'professor' ? MODULOS_PROFESSOR
     : MODULOS_ADMIN
@@ -231,7 +232,7 @@ export default function Dashboard() {
       </div>
 
       {/* LINK PRE-MATRICULA */}
-      {isAdmin && (
+      {(isAdmin || role === 'preparador') && (
         <div style={{ margin: '16px 16px 0' }}>
           <div style={{ background: '#141418', border: '1px solid #1E1E24', borderLeft: '3px solid #00BFFF', borderRadius: 12, padding: '14px 16px' }}>
             <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 11, color: C.cyan, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>Link de Pre-Matricula</div>
