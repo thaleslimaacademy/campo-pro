@@ -71,7 +71,7 @@ export default function LandingPage() {
     { icon: 'ti-device-mobile-off', titulo: 'Comunicação desorganizada', desc: 'Mensagens espalhadas em grupos de WhatsApp, pais sem informação sobre treinos, convocações e o desenvolvimento do filho.' },
     { icon: 'ti-puzzle', titulo: 'Várias ferramentas, nenhuma integrada', desc: 'Planilha para atletas, outro app para financeiro, grupo de WhatsApp para comunicação. Tudo separado, nada funcionando junto.' },
     { icon: 'ti-users', titulo: 'Sendo tudo ao mesmo tempo', desc: 'Você é professor, financeiro, secretário e administrador. O tempo que deveria ser dedicado a formar atletas é consumido por burocracia.' },
-    { icon: 'ti-chart-off', titulo: 'Sem dados para decidir', desc: 'Você não sabe quantos atletas tem hoje, qual a taxa de inadimplência, qual turma está crescendo. Você administra no escuro.' },
+    { icon: 'ti-chart-bar-off', titulo: 'Sem dados para decidir', desc: 'Você não sabe quantos atletas tem hoje, qual a taxa de inadimplência, qual turma está crescendo. Você administra no escuro.' },
   ]
 
   const funcionalidades = [
