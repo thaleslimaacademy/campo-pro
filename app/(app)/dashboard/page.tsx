@@ -141,11 +141,14 @@ export default function Dashboard() {
       {/* STATS STRIP */}
       <div style={{ display: 'flex', background: '#111115', borderBottom: '1px solid #1E1E24' }}>
         {[
-          { label: 'Atletas',  value: loading ? '...' : String(totalAtletas), color: C.sky },
-          { label: 'Receita',  value: loading ? '...' : brl(pagasV).replace('R$ ','R$'), color: '#4ADE80' },
-          { label: 'Presenca', value: loading ? '...' : presenca.t === 0 ? '-' : pct + '%', color: pct >= 75 ? '#4ADE80' : pct > 0 ? '#FBBF24' : C.muted },
-          { label: 'Inadimp.', value: loading ? '...' : String(inadimplentes), color: inadimplentes > 0 ? '#FF6B6B' : C.muted },
-        ].map((s, i, arr) => (
+          ...(isAdmin ? [
+            { label: 'Atletas',  value: loading ? '...' : String(totalAtletas), color: C.sky },
+            { label: 'Receita',  value: loading ? '...' : brl(pagasV).replace('R\u00a0','R$'), color: '#4ADE80' },
+            { label: 'Presenca', value: loading ? '...' : presenca.t === 0 ? '-' : pct + '%', color: pct >= 75 ? '#4ADE80' : pct > 0 ? '#FBBF24' : C.muted },
+            { label: 'Inadimp.', value: loading ? '...' : String(inadimplentes), color: inadimplentes > 0 ? '#FF6B6B' : C.muted },
+          ] : [
+            { label: 'Presenca', value: loading ? '...' : presenca.t === 0 ? '-' : pct + '%', color: pct >= 75 ? '#4ADE80' : pct > 0 ? '#FBBF24' : C.muted },
+          ]),
           <div key={s.label} style={{ flex: 1, padding: '14px 0 12px', textAlign: 'center', borderRight: i < arr.length - 1 ? '1px solid #1E1E24' : 'none' }}>
             <div style={{ fontFamily: 'Syne, sans-serif', fontSize: 18, fontWeight: 900, color: s.color, letterSpacing: -0.5, lineHeight: 1 }}>{s.value}</div>
             <div style={{ fontSize: 9, color: C.sky, textTransform: 'uppercase', letterSpacing: 0.8, fontWeight: 600, marginTop: 4, opacity: 0.7 }}>{s.label}</div>
@@ -155,7 +158,7 @@ export default function Dashboard() {
 
       {/* ALERTAS */}
       <div style={{ padding: '12px 16px 0' }}>
-        {inadimplentes > 0 && (
+        {isAdmin && inadimplentes > 0 && (
           <a href="/financeiro/mensalidades?status=VENCIDO" style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(255,107,107,0.08)', border: '1px solid rgba(255,107,107,0.25)', borderRadius: 10, padding: '10px 14px', marginBottom: 8, textDecoration: 'none' }}>
             <i className="ti ti-alert-triangle" style={{ fontSize: 16, color: '#FF6B6B' }} />
             <span style={{ fontSize: 12, color: '#FF6B6B', fontWeight: 700 }}>{inadimplentes} aluno{inadimplentes > 1 ? 's' : ''} inadimplente{inadimplentes > 1 ? 's' : ''}</span>
@@ -232,7 +235,7 @@ export default function Dashboard() {
       </div>
 
       {/* LINK PRE-MATRICULA */}
-      {(isAdmin || role === 'preparador') && (
+      {(isAdmin || role === 'preparador' || role === 'professor') && (
         <div style={{ margin: '16px 16px 0' }}>
           <div style={{ background: '#141418', border: '1px solid #1E1E24', borderLeft: '3px solid #00BFFF', borderRadius: 12, padding: '14px 16px' }}>
             <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 11, color: C.cyan, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>Link de Pre-Matricula</div>
