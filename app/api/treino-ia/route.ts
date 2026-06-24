@@ -64,9 +64,24 @@ REGRAS:
   const texto = data.content?.[0]?.text ?? ''
 
   try {
-    const json = JSON.parse(texto.replace(/```json|```/g, '').trim())
-    return NextResponse.json({ plano: json, tipo: 'estruturado' })
-  } catch {
+    // Limpar o texto antes de parsear
+    let limpo = texto
+      .replace(/```json/g, '').replace(/```/g, '') // remover markdown
+      .replace(/[\u201C\u201D]/g, '"')            // aspas tipográficas esquerda/direita → "
+      .replace(/[\u2018\u2019]/g, "'")            // aspas simples tipográficas → '
+      .trim()
+
+    // Extrair JSON se vier com texto ao redor
+    const match = limpo.match(/\{[\s\S]*\}/)
+    if (match) limpo = match[0]
+
+    const json = JSON.parse(limpo)
+    if (json.fases && Array.isArray(json.fases)) {
+      return NextResponse.json({ plano: json, tipo: 'estruturado' })
+    }
+    return NextResponse.json({ plano: texto, tipo: 'texto' })
+  } catch (e: any) {
+    console.error('[treino-ia] JSON parse error:', e.message, '| texto:', texto.slice(0, 200))
     return NextResponse.json({ plano: texto, tipo: 'texto' })
   }
 }
