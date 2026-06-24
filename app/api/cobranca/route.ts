@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     if (!atletaId || !valor || !vencimento) return NextResponse.json({ error: 'Campos obrigatórios: atletaId, valor, vencimento' }, { status: 400 })
     const escolaId = await getEscolaIdServer()
     const apiKey = await getAsaasKey(escolaId)
-    const { data: escola } = await supabaseAdmin.from('Escola').select('multaAtraso, jurosAoMes').eq('id', escolaId).single()
+    const { data: escola } = await supabaseAdmin.from('Escola').select('multaAtraso, jurosAoMes, nome').eq('id', escolaId).single()
     const multaAtraso = Number(escola?.multaAtraso || 0)
     const jurosAoMes = Number(escola?.jurosAoMes || 0)
     const { data: atleta } = await supabaseAdmin.from('Atleta').select('*').eq('id', atletaId).single()
@@ -21,7 +21,15 @@ export async function POST(req: NextRequest) {
     const responsavel = responsaveis?.[0] || null
     let asaasCustomerId = atleta.asaasCustomerId
     if (!asaasCustomerId) {
-      const cliente = await criarClienteAsaas(apiKey, { name: atleta.nome, cpfCnpj: atleta.cpf || '00000000000', phone: atleta.telefone || '', address: atleta.endereco || '', addressNumber: atleta.numero || '', province: atleta.bairro || '', postalCode: atleta.cep || '' })
+      const dadosCliente: Record<string, string> = { name: atleta.nome }
+      const cpfLimpo = (atleta.cpf || '').replace(/\D/g, '')
+      if (cpfLimpo.length >= 11) dadosCliente.cpfCnpj = cpfLimpo
+      if (atleta.telefone) dadosCliente.phone = atleta.telefone.replace(/\D/g, '')
+      if (atleta.endereco) dadosCliente.address = atleta.endereco
+      if (atleta.numero) dadosCliente.addressNumber = atleta.numero
+      if (atleta.bairro) dadosCliente.province = atleta.bairro
+      if (atleta.cep) dadosCliente.postalCode = atleta.cep.replace(/\D/g, '')
+      const cliente = await criarClienteAsaas(apiKey, dadosCliente as any)
       if (cliente.errors) return NextResponse.json({ error: 'Erro ao criar cliente Asaas', detalhes: cliente.errors }, { status: 400 })
       asaasCustomerId = cliente.id
       await supabaseAdmin.from('Atleta').update({ asaasCustomerId }).eq('id', atletaId)

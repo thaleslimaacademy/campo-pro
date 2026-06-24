@@ -86,14 +86,17 @@ function ConfiguracoesInner() {
     setAsaasStatus('verificando')
     setAsaasMsgErro('')
     try {
-      const res = await fetch('https://api.asaas.com/v3/customers?limit=1', {
-        headers: { 'access_token': chave.trim(), 'Content-Type': 'application/json' },
+      const res = await fetch('/api/asaas/verificar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chave: chave.trim() }),
       })
-      if (res.ok) {
+      const data = await res.json()
+      if (data.ok) {
         setAsaasStatus('ok')
       } else {
         setAsaasStatus('erro')
-        setAsaasMsgErro('Chave inválida ou sem permissão. Verifique no painel Asaas.')
+        setAsaasMsgErro(data.erro || 'Chave inválida. Verifique no painel Asaas.')
       }
     } catch {
       setAsaasStatus('erro')
