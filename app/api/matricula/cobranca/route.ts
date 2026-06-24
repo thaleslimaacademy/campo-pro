@@ -32,14 +32,14 @@ export async function POST(req: NextRequest) {
 
     // Tenta buscar cliente existente pelo CPF
     const busca = await fetch(
-      `https://api-sandbox.asaas.com/api/v3/customers?cpfCnpj=${cpf}`,
+      `https://api.asaas.com/v3/customers?cpfCnpj=${cpf}`,
       { headers: { access_token: apiKey }, signal: AbortSignal.timeout(8000) }
     )
     const buscaData = await busca.json()
     if (buscaData.data && buscaData.data.length > 0) {
       asaasCustomerId = buscaData.data[0].id
     } else {
-      const clienteRes = await fetch('https://api-sandbox.asaas.com/api/v3/customers', {
+      const clienteRes = await fetch('https://api.asaas.com/v3/customers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', access_token: apiKey },
         body: JSON.stringify({
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
 
     // CARTÃO DE CRÉDITO — gera link de pagamento
     if (metodoPagamento === 'CARTAO') {
-      const linkRes = await fetch('https://api-sandbox.asaas.com/api/v3/payments', {
+      const linkRes = await fetch('https://api.asaas.com/v3/payments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', access_token: apiKey },
         body: JSON.stringify({
