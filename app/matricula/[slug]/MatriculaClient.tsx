@@ -1,7 +1,6 @@
 
 'use client'
 import { useState, useRef, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
 
 const CONTRATO = `CONTRATO DE PRESTAÇÃO DE SERVIÇOS ESPORTIVOS
 
@@ -335,32 +334,36 @@ export default function MatriculaClient({ escolaId, escolaNome, escolaLogoUrl, v
   async function confirmarMatricula() {
     if (!aceito || !assinaturaImg || !nomeAssinatura.trim()) return
     setLoading(true)
-    const { data, error } = await supabase.from('Matricula').insert({
-      escolaId,
-      nomeAtleta: dados.nome,
-      dataNascimento: dados.nascimento,
-      cpf: dados.cpf || null,
-      rg: dados.rg || null,
-      posicao: dados.posicao || 'Goleiro',
-      telefone: dados.telefone || null,
-      cep: dados.cep || null,
-      endereco: dados.endereco || null,
-      numero: dados.numero || null,
-      bairro: dados.bairro || null,
-      cidade: dados.cidade || null,
-      estado: dados.estado || null,
-      nomeResponsavel: dados.responsavel,
-      whatsappResponsavel: dados.whatsapp,
-      emailResponsavel: dados.email || null,
-      cpfResponsavel: dados.cpfResponsavel,
-      contratoAceito: true,
-      nomeAssinatura: nomeAssinatura.trim(),
-      dataAssinatura: new Date().toISOString(),
-      status: 'PENDENTE',
-    }).select('id').single()
-
-    if (error || !data) { alert('Erro ao enviar matrícula: ' + (error?.message || 'Tente novamente')); setLoading(false); return }
-    setMatriculaId(data.id)
+    const resMatricula = await fetch('/api/matricula/criar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        escolaId,
+        nomeAtleta: dados.nome,
+        dataNascimento: dados.nascimento,
+        cpf: dados.cpf || null,
+        rg: dados.rg || null,
+        posicao: dados.posicao || 'Goleiro',
+        telefone: dados.telefone || null,
+        cep: dados.cep || null,
+        endereco: dados.endereco || null,
+        numero: dados.numero || null,
+        bairro: dados.bairro || null,
+        cidade: dados.cidade || null,
+        estado: dados.estado || null,
+        nomeResponsavel: dados.responsavel,
+        whatsappResponsavel: dados.whatsapp,
+        emailResponsavel: dados.email || null,
+        cpfResponsavel: dados.cpfResponsavel,
+        contratoAceito: true,
+        nomeAssinatura: nomeAssinatura.trim(),
+        dataAssinatura: new Date().toISOString(),
+        status: 'PENDENTE',
+      }),
+    })
+    const matData = await resMatricula.json()
+    if (!matData.ok || !matData.id) { alert('Erro ao enviar matrícula: ' + (matData.error || 'Tente novamente')); setLoading(false); return }
+    setMatriculaId(matData.id)
     setNomeAtleta(dados.nome)
     setLoading(false)
 
