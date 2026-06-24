@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import EditorDiagrama from './EditorDiagrama'
 import { useRouter } from 'next/navigation'
 
 const SYNE = 'Syne, sans-serif'
@@ -331,6 +332,7 @@ export default function TreinamentosPage() {
   const [gerandoPlano, setGerandoPlano] = useState(false)
   const [plano, setPlano] = useState<string | null>(null)
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<Categoria>('Sub-11')
+  const [exercicioEditando, setExercicioEditando] = useState<string | null>(null)
 
   const fundamentosFiltrados = filtro === 'todos'
     ? FUNDAMENTOS
@@ -354,6 +356,8 @@ export default function TreinamentosPage() {
   }
 
   return (
+    <>
+    {exercicioEditando && <EditorDiagrama exercicioId={exercicioEditando} onFechar={() => setExercicioEditando(null)} />}
     <div style={{ minHeight: '100vh', background: NAVY, paddingBottom: 88, fontFamily: 'Inter, sans-serif', color: OFF }}>
 
       {/* Header */}
@@ -430,8 +434,14 @@ export default function TreinamentosPage() {
               {fund.exercicios.map(ex => (
                 <div key={ex.id} style={{ background: CARD, border: BORDER, borderRadius: 14, overflow: 'hidden' }}>
 
-                  {/* Diagrama SVG */}
-                  <div dangerouslySetInnerHTML={{ __html: ex.diagrama }} style={{ width: '100%' }} />
+                  {/* Diagrama SVG + Editor */}
+                  <div style={{ position: 'relative' }}>
+                    <div dangerouslySetInnerHTML={{ __html: ex.diagrama }} style={{ width: '100%' }} />
+                    <button onClick={() => setExercicioEditando(ex.id)}
+                      style={{ position: 'absolute', bottom: 8, right: 8, background: 'rgba(65,105,225,0.9)', border: 'none', borderRadius: 8, padding: '5px 10px', color: '#fff', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+                      ✏️ Editar
+                    </button>
+                  </div>
 
                   {/* Info */}
                   <div style={{ padding: '14px 14px 0' }}>
@@ -486,5 +496,6 @@ export default function TreinamentosPage() {
         ))}
       </div>
     </div>
+    </>
   )
 }
