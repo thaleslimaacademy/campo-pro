@@ -13,7 +13,7 @@ export async function GET() {
   const [escola, atletas, pendentes, cobrancas, treino] = await Promise.all([
     supabaseAdmin.from('Escola').select('nome, slug').eq('id', escolaId).single(),
     supabaseAdmin.from('Atleta').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('ativo', true),
-    supabaseAdmin.from('Matricula').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('status', 'PENDENTE').eq('tipo', 'matricula'),
+    supabaseAdmin.from('Matricula').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('status', 'PENDENTE'),
     supabaseAdmin.from('Cobranca').select('valor, status').eq('escolaId', escolaId).gte('vencimento', di).lte('vencimento', df),
     supabaseAdmin.from('Treino').select('id').eq('escolaId', escolaId).gte('data', hojeStr).limit(1).single(),
   ])

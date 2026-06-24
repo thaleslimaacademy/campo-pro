@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
     const { data, error } = await supabaseAdmin
       .from('Matricula')
-      .insert({ escolaId, ...campos })
+      .insert({ escolaId, tipo: 'matricula', ...campos })
       .select('id')
       .single()
 
