@@ -19,6 +19,10 @@
     {
       "path": "/api/cobranca-reemissao",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/nps/enviar",
+      "schedule": "0 10 * * *"
     }
   ]
 }

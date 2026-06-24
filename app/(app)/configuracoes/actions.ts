@@ -6,7 +6,7 @@ import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 export interface ConfiguracaoForm {
   nome: string; telefone: string; whatsapp: string; email: string
   endereco: string; cidade: string; estado: string; cep: string
-  valorMensalidade: number; diaVencimento: number; valorMatricula?: number
+  valorMensalidade: number; diaVencimento: number; valorMatricula?: number; diasNPS?: number
   instagramUrl: string; facebookUrl: string
   multaAtraso: number; jurosAoMes: number; valorDesconto: number
   asaasApiKey?: string
@@ -20,6 +20,7 @@ export async function salvarConfiguracoes(form: ConfiguracaoForm): Promise<{ ok:
     estado: form.estado, cep: form.cep,
     valorMensalidade: form.valorMensalidade, diaVencimento: form.diaVencimento,
     valorMatricula: form.valorMatricula ?? 0,
+    diasNPS: form.diasNPS ?? 0,
     instagramUrl: form.instagramUrl, facebookUrl: form.facebookUrl,
     multaAtraso: form.multaAtraso, jurosAoMes: form.jurosAoMes,
     valorDesconto: form.valorDesconto, updatedAt: new Date().toISOString(),

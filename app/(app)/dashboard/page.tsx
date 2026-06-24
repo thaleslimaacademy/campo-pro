@@ -16,6 +16,7 @@ const MODULOS_ADMIN = [
   { href: '/financeiro/caixa',          label: 'Caixa',            icon: 'ti-cash',           grupo: 'financeiro' },
   { href: '/financeiro/boleto',         label: 'Boleto',           icon: 'ti-file-invoice',   grupo: 'financeiro' },
   { href: '/financeiro/mensalidades',   label: 'Mensalidades',     icon: 'ti-credit-card',    grupo: 'financeiro' },
+  { href: '/nps',                         label: 'NPS',               icon: 'ti-mood-happy',     grupo: 'financeiro' },
   { href: '/financeiro/patrocinadores', label: 'Patrocinadores',   icon: 'ti-building-bank',  grupo: 'financeiro' },
   { href: '/premios',                   label: 'Premiacoes',       icon: 'ti-medal',          grupo: 'comissao' },
   { href: '/convocacao',                label: 'Convocacoes',      icon: 'ti-clipboard-list', grupo: 'comissao' },
