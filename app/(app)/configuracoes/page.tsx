@@ -27,7 +27,7 @@ function ConfiguracoesInner() {
   const [form, setForm] = useState({
     nome: '', telefone: '', whatsapp: '', email: '',
     endereco: '', cidade: '', estado: '', cep: '',
-    valorMensalidade: '150', diaVencimento: '10',
+    valorMensalidade: '150', diaVencimento: '10', valorMatricula: '0',
     instagramUrl: '', facebookUrl: '',
     multaAtraso: 0, jurosAoMes: 0, valorDesconto: 0,
   })
@@ -63,6 +63,7 @@ function ConfiguracoesInner() {
           endereco: data.endereco || '', cidade: data.cidade || '',
           estado: data.estado || '', cep: data.cep || '',
           valorMensalidade: data.valorMensalidade?.toString() || '150',
+          valorMatricula: data.valorMatricula?.toString() || '0',
           diaVencimento: data.diaVencimento?.toString() || '10',
           instagramUrl: data.instagramUrl || '', facebookUrl: data.facebookUrl || '',
           multaAtraso: Number(data.multaAtraso || 0),
@@ -106,6 +107,7 @@ function ConfiguracoesInner() {
     const result = await salvarConfiguracoes({
       ...form,
       valorMensalidade: parseFloat(form.valorMensalidade) || 0,
+        valorMatricula: parseFloat((form as any).valorMatricula) || 0,
       diaVencimento: parseInt(form.diaVencimento) || 10,
       asaasApiKey: asaasKey.trim(),
     })
@@ -128,6 +130,7 @@ function ConfiguracoesInner() {
       email: form.email, endereco: form.endereco, cidade: form.cidade,
       estado: form.estado, cep: form.cep,
       valorMensalidade: parseFloat(form.valorMensalidade) || 0,
+        valorMatricula: parseFloat((form as any).valorMatricula) || 0,
       diaVencimento: parseInt(form.diaVencimento) || 10,
       instagramUrl: form.instagramUrl, facebookUrl: form.facebookUrl,
       multaAtraso: form.multaAtraso, jurosAoMes: form.jurosAoMes,
@@ -208,6 +211,7 @@ function ConfiguracoesInner() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
               <div><label style={labelStyle}>Mensalidade (R$)</label><input name="valorMensalidade" value={form.valorMensalidade} onChange={handleChange} type="number" style={inputStyle} /></div>
+              <div><label style={labelStyle}>Taxa de Matrícula (R$)</label><input name="valorMatricula" value={(form as any).valorMatricula || '0'} onChange={handleChange} type="number" style={inputStyle} /></div>
               <div>
                 <label style={labelStyle}>Dia de vencimento</label>
                 <select name="diaVencimento" value={form.diaVencimento} onChange={handleChange} style={inputStyle}>

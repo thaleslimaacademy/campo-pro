@@ -6,7 +6,7 @@ import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 export interface ConfiguracaoForm {
   nome: string; telefone: string; whatsapp: string; email: string
   endereco: string; cidade: string; estado: string; cep: string
-  valorMensalidade: number; diaVencimento: number
+  valorMensalidade: number; diaVencimento: number; valorMatricula?: number
   instagramUrl: string; facebookUrl: string
   multaAtraso: number; jurosAoMes: number; valorDesconto: number
   asaasApiKey?: string
@@ -19,6 +19,7 @@ export async function salvarConfiguracoes(form: ConfiguracaoForm): Promise<{ ok:
     email: form.email, endereco: form.endereco, cidade: form.cidade,
     estado: form.estado, cep: form.cep,
     valorMensalidade: form.valorMensalidade, diaVencimento: form.diaVencimento,
+    valorMatricula: form.valorMatricula ?? 0,
     instagramUrl: form.instagramUrl, facebookUrl: form.facebookUrl,
     multaAtraso: form.multaAtraso, jurosAoMes: form.jurosAoMes,
     valorDesconto: form.valorDesconto, updatedAt: new Date().toISOString(),
@@ -35,7 +36,7 @@ export async function carregarConfiguracoes() {
   const escolaId = await getEscolaIdServer()
   const { data } = await supabaseAdmin
     .from('Escola')
-    .select('nome, telefone, whatsapp, email, endereco, cidade, estado, cep, valorMensalidade, diaVencimento, instagramUrl, facebookUrl, multaAtraso, jurosAoMes, valorDesconto, asaasApiKey')
+    .select('nome, telefone, whatsapp, email, endereco, cidade, estado, cep, valorMensalidade, diaVencimento, instagramUrl, facebookUrl, multaAtraso, jurosAoMes, valorDesconto, valorMatricula, asaasApiKey')
     .eq('id', escolaId).single()
   return data
 }
