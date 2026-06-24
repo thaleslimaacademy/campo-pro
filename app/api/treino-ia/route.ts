@@ -4,7 +4,8 @@ export async function POST(req: NextRequest) {
   const userId = req.headers.get('x-clerk-user-id')
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { categoria } = await req.json()
+  const { categoria, ideia } = await req.json()
+  const contextoIdeia = ideia ? `\n\nIDEIA DO TREINADOR: ${ideia}\nAdapte o plano inteiro para refletir esta ideia, mantendo a estrutura de 5 fases.` : ''
 
   const prompt = `Voce e um especialista em metodologia de futebol de base com 20+ anos de experiencia.
 
@@ -43,7 +44,7 @@ REGRAS:
 - Crie exatamente 5 fases: AQUECIMENTO (15min), PARTE TECNICA (20min), PARTE TATICA (20min), JOGO REDUZIDO (25min), VOLTA A CALMA (10min)
 - Adapte numero de jogadores para a faixa etaria ${categoria}
 - Posicionamentos devem ser REALISTAS e DIFERENTES em cada fase
-- Retorne APENAS o JSON, nada mais`
+- Retorne APENAS o JSON, nada mais${contextoIdeia}`
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',

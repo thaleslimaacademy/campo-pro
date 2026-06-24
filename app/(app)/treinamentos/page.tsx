@@ -333,6 +333,7 @@ export default function TreinamentosPage() {
   const [gerandoPlano, setGerandoPlano] = useState(false)
   const [plano, setPlano] = useState<string | null>(null)
   const [planoEstruturado, setPlanoEstruturado] = useState<any>(null)
+  const [ideiaTreino, setIdeiaTreino] = useState('')
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<Categoria>('Sub-11')
   const [exercicioEditando, setExercicioEditando] = useState<string | null>(null)
 
@@ -348,7 +349,7 @@ export default function TreinamentosPage() {
       const res = await fetch('/api/treino-ia', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ categoria: categoriaSelecionada }),
+        body: JSON.stringify({ categoria: categoriaSelecionada, ideia: ideiaTreino.trim() }),
       })
       const data = await res.json()
       if (data.tipo === 'estruturado' && typeof data.plano === 'object') {
@@ -389,7 +390,7 @@ export default function TreinamentosPage() {
             <div style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 14, color: OFF, textTransform: 'uppercase', letterSpacing: 0.5 }}>Plano de Treino IA</div>
           </div>
           <div style={{ fontSize: 12, color: SKY, marginBottom: 12 }}>Selecione a categoria e gere um plano de treino completo com IA</div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 10 }}>
             <select
               value={categoriaSelecionada}
               onChange={e => setCategoriaSelecionada(e.target.value as Categoria)}
@@ -399,15 +400,22 @@ export default function TreinamentosPage() {
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>
-            <button
-              onClick={gerarPlanoIA}
-              disabled={gerandoPlano}
-              style={{ background: gerandoPlano ? 'rgba(65,105,225,0.3)' : BLUE, border: 'none', borderRadius: 8, padding: '8px 16px', color: '#fff', fontSize: 13, fontWeight: 700, cursor: gerandoPlano ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
-            >
-              <i className="ti ti-sparkles" style={{ fontSize: 14 }} />
-              {gerandoPlano ? 'Gerando...' : 'Gerar Plano'}
-            </button>
           </div>
+          <textarea
+            value={ideiaTreino}
+            onChange={e => setIdeiaTreino(e.target.value)}
+            placeholder="Descreva a ideia do treino (opcional)... Ex: Foco em pressão alta e transição rápida, trabalhar saída de bola pelo goleiro"
+            rows={3}
+            style={{ width: '100%', background: 'rgba(65,105,225,0.08)', border: '1px solid rgba(65,105,225,0.3)', borderRadius: 10, padding: '10px 12px', color: OFF, fontSize: 13, resize: 'none', marginBottom: 10, fontFamily: 'Inter, sans-serif', lineHeight: 1.5, boxSizing: 'border-box' }}
+          />
+          <button
+            onClick={gerarPlanoIA}
+            disabled={gerandoPlano}
+            style={{ width: '100%', background: gerandoPlano ? 'rgba(65,105,225,0.3)' : BLUE, border: 'none', borderRadius: 8, padding: '10px 16px', color: '#fff', fontSize: 13, fontWeight: 700, cursor: gerandoPlano ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+          >
+            <i className="ti ti-sparkles" style={{ fontSize: 14 }} />
+            {gerandoPlano ? 'Gerando plano...' : 'Gerar Plano com IA'}
+          </button>
           {plano && (
             <div style={{ marginTop: 14, background: 'rgba(10,14,26,0.6)', borderRadius: 10, padding: 14, fontSize: 13, color: OFF, lineHeight: 1.7, whiteSpace: 'pre-wrap', border: '1px solid rgba(65,105,225,0.2)' }}>
               {plano}
