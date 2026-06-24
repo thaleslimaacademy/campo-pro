@@ -11,7 +11,7 @@ export async function GET() {
   const hojeStr = hoje.toISOString().slice(0, 10)
 
   const [escola, atletas, pendentes, cobrancas, treino] = await Promise.all([
-    supabaseAdmin.from('Escola').select('nome').eq('id', escolaId).single(),
+    supabaseAdmin.from('Escola').select('nome, slug').eq('id', escolaId).single(),
     supabaseAdmin.from('Atleta').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('ativo', true),
     supabaseAdmin.from('Matricula').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('status', 'PENDENTE').eq('tipo', 'matricula'),
     supabaseAdmin.from('Cobranca').select('valor, status').eq('escolaId', escolaId).gte('vencimento', di).lte('vencimento', df),
@@ -33,6 +33,7 @@ export async function GET() {
 
   return NextResponse.json({
     escola: escola.data?.nome ?? '',
+    escolaSlug: escola.data?.slug ?? '',
     totalAtletas: atletas.count ?? 0,
     matriculasPendentes: pendentes.count ?? 0,
     pagasV,

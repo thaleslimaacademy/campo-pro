@@ -77,6 +77,7 @@ export default function Dashboard() {
     : MODULOS_ADMIN
 
   const [escola, setEscola] = useState('GestaoFC')
+  const [escolaSlug, setEscolaSlug] = useState('')
   const [totalAtletas, setTotalAtletas] = useState(0)
   const [inadimplentes, setInadimplentes] = useState(0)
   const [pendentes, setPendentes] = useState(0)
@@ -240,14 +241,14 @@ export default function Dashboard() {
         <div style={{ margin: '16px 16px 0' }}>
           <div style={{ background: '#141418', border: '1px solid #1E1E24', borderLeft: '3px solid #00BFFF', borderRadius: 12, padding: '14px 16px' }}>
             <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 11, color: C.cyan, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>Link de Pre-Matricula</div>
-            <div style={{ fontSize: 11, color: C.sky, marginBottom: 12, opacity: 0.7 }}>gestaofc.com.br/matricula</div>
+            <div style={{ fontSize: 11, color: C.sky, marginBottom: 12, opacity: 0.7 }}>{escolaSlug ? `gestaofc.com.br/matricula/${escolaSlug}` : 'gestaofc.com.br/matricula'}</div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button
-                onClick={() => navigator.clipboard.writeText('https://gestaofc.com.br/matricula').then(() => alert('Copiado!'))}
+                onClick={() => navigator.clipboard.writeText(`https://gestaofc.com.br/matricula/${escolaSlug}`).then(() => alert('Copiado!'))}
                 style={{ flex: 1, background: C.blue, color: '#fff', border: 'none', borderRadius: 8, padding: '10px', fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 12, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 Copiar
               </button>
-              <a href="https://gestaofc.com.br/matricula" target="_blank" rel="noreferrer"
+              <a href={`https://gestaofc.com.br/matricula/${escolaSlug}`} target="_blank" rel="noreferrer"
                 style={{ flex: 1, background: 'transparent', color: C.cyan, border: `1px solid rgba(0,191,255,0.3)`, borderRadius: 8, padding: '10px', fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 12, textDecoration: 'none', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 Ver
               </a>
