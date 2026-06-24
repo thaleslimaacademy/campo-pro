@@ -6,27 +6,44 @@ export async function POST(req: NextRequest) {
 
   const { categoria } = await req.json()
 
-  const prompt = `Voce e um especialista em metodologia de futebol de base com mais de 20 anos de experiencia.
+  const prompt = `Voce e um especialista em metodologia de futebol de base com 20+ anos de experiencia.
 
-Crie um plano de treino completo para a categoria ${categoria} com as seguintes especificacoes:
+Crie um plano de treino completo para a categoria ${categoria} (90 minutos) e retorne SOMENTE um JSON valido, sem texto antes ou depois, sem markdown, sem backticks.
 
-- Duracao total: 90 minutos
-- Formato: Lista estruturada com horarios
-- Incluir: aquecimento, parte tecnica, parte tatica, jogo reduzido, volta a calma
-- Adaptar complexidade para a faixa etaria da categoria ${categoria}
-- Linguagem simples e direta para o treinador aplicar
-- Incluir dicas especificas de coaching para cada etapa
+O JSON deve ter exatamente este formato:
+{
+  "categoria": "${categoria}",
+  "contexto": "Semana livre - foco tecnico-tatico",
+  "fases": [
+    {
+      "id": "fase_1",
+      "tempo": "00:00 - 00:15",
+      "nome": "AQUECIMENTO",
+      "subtitulo": "Nome criativo do exercicio",
+      "descricao": "Descricao clara do exercicio em 2-3 frases",
+      "dica": "Dica de coaching especifica para esta faixa etaria",
+      "diagrama": {
+        "jogadores_azuis": [{"x": 150, "y": 200, "label": "1"}, {"x": 200, "y": 150, "label": "2"}],
+        "jogadores_vermelhos": [{"x": 350, "y": 200, "label": "1"}],
+        "goleiros": [],
+        "cones": [{"x": 100, "y": 100}, {"x": 200, "y": 300}],
+        "bolas": [{"x": 300, "y": 200}],
+        "setas": [{"x1": 150, "y1": 200, "x2": 200, "y2": 150}]
+      }
+    }
+  ],
+  "objetivos": ["objetivo 1", "objetivo 2", "objetivo 3"],
+  "pontos_atencao": ["ponto 1", "ponto 2"]
+}
 
-Formato da resposta:
-PLANO DE TREINO - ${categoria}
-Data/Contexto: [sugerir tipo de semana: pre-jogo, pos-jogo, semana livre]
-
-00:00 - 00:15 | AQUECIMENTO
-[descricao]
-Dica: [orientacao de coaching]
-
-Continue no mesmo formato para cada parte do treino.
-Finalize com OBJETIVOS DO TREINO e PONTOS DE ATENCAO para o treinador.`
+REGRAS:
+- Campo tem 600x400 pixels. Posicione elementos de forma realista.
+- Area esquerda (x:20-100): gol esquerdo. Area direita (x:500-580): gol direito.
+- Linha do meio: x=300.
+- Crie exatamente 5 fases: AQUECIMENTO (15min), PARTE TECNICA (20min), PARTE TATICA (20min), JOGO REDUZIDO (25min), VOLTA A CALMA (10min)
+- Adapte numero de jogadores para a faixa etaria ${categoria}
+- Posicionamentos devem ser REALISTAS e DIFERENTES em cada fase
+- Retorne APENAS o JSON, nada mais`
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -37,12 +54,18 @@ Finalize com OBJETIVOS DO TREINO e PONTOS DE ATENCAO para o treinador.`
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
-      max_tokens: 1500,
+      max_tokens: 4000,
       messages: [{ role: 'user', content: prompt }],
     }),
   })
 
   const data = await response.json()
-  const plano = data.content?.[0]?.text ?? 'Erro ao gerar plano.'
-  return NextResponse.json({ plano })
+  const texto = data.content?.[0]?.text ?? ''
+
+  try {
+    const json = JSON.parse(texto.replace(/```json|```/g, '').trim())
+    return NextResponse.json({ plano: json, tipo: 'estruturado' })
+  } catch {
+    return NextResponse.json({ plano: texto, tipo: 'texto' })
+  }
 }

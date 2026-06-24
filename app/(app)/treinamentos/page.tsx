@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import EditorDiagrama from './EditorDiagrama'
+import DiagramaFase from './DiagramaFase'
 import { useRouter } from 'next/navigation'
 
 const SYNE = 'Syne, sans-serif'
@@ -331,6 +332,7 @@ export default function TreinamentosPage() {
   const [exercicioAberto, setExercicioAberto] = useState<string | null>(null)
   const [gerandoPlano, setGerandoPlano] = useState(false)
   const [plano, setPlano] = useState<string | null>(null)
+  const [planoEstruturado, setPlanoEstruturado] = useState<any>(null)
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<Categoria>('Sub-11')
   const [exercicioEditando, setExercicioEditando] = useState<string | null>(null)
 
@@ -341,6 +343,7 @@ export default function TreinamentosPage() {
   async function gerarPlanoIA() {
     setGerandoPlano(true)
     setPlano(null)
+    setPlanoEstruturado(null)
     try {
       const res = await fetch('/api/treino-ia', {
         method: 'POST',
@@ -348,7 +351,11 @@ export default function TreinamentosPage() {
         body: JSON.stringify({ categoria: categoriaSelecionada }),
       })
       const data = await res.json()
-      setPlano(data.plano)
+      if (data.tipo === 'estruturado' && typeof data.plano === 'object') {
+        setPlanoEstruturado(data.plano)
+      } else {
+        setPlano(typeof data.plano === 'string' ? data.plano : JSON.stringify(data.plano, null, 2))
+      }
     } catch {
       setPlano('Erro ao gerar plano. Tente novamente.')
     }
@@ -404,6 +411,49 @@ export default function TreinamentosPage() {
           {plano && (
             <div style={{ marginTop: 14, background: 'rgba(10,14,26,0.6)', borderRadius: 10, padding: 14, fontSize: 13, color: OFF, lineHeight: 1.7, whiteSpace: 'pre-wrap', border: '1px solid rgba(65,105,225,0.2)' }}>
               {plano}
+            </div>
+          )}
+
+          {planoEstruturado && (
+            <div style={{ marginTop: 14 }}>
+              <div style={{ background: 'rgba(10,14,26,0.8)', borderRadius: 10, padding: '10px 14px', marginBottom: 12, border: '1px solid rgba(0,191,255,0.3)' }}>
+                <div style={{ fontSize: 11, color: CYAN, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Plano — {planoEstruturado.categoria}</div>
+                <div style={{ fontSize: 12, color: SKY, marginTop: 2 }}>{planoEstruturado.contexto}</div>
+              </div>
+              {(planoEstruturado.fases || []).map((fase: any) => (
+                <div key={fase.id} style={{ background: 'rgba(10,14,26,0.7)', border: '1px solid rgba(65,105,225,0.2)', borderRadius: 12, marginBottom: 14, overflow: 'hidden' }}>
+                  {fase.diagrama && <DiagramaFase dados={fase.diagrama} />}
+                  <div style={{ padding: '12px 14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                      <span style={{ fontSize: 10, color: CYAN, background: 'rgba(0,191,255,0.15)', padding: '2px 8px', borderRadius: 10, fontWeight: 700 }}>{fase.tempo}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: OFF, fontFamily: SYNE, textTransform: 'uppercase' }}>{fase.nome}</span>
+                    </div>
+                    {fase.subtitulo && <div style={{ fontSize: 12, color: SKY, marginBottom: 8, fontStyle: 'italic' }}>"{fase.subtitulo}"</div>}
+                    <div style={{ fontSize: 13, color: 'rgba(240,244,255,0.8)', lineHeight: 1.6, marginBottom: 10 }}>{fase.descricao}</div>
+                    {fase.dica && (
+                      <div style={{ background: 'rgba(65,105,225,0.1)', border: '1px solid rgba(65,105,225,0.25)', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: SKY }}>
+                        <span style={{ fontWeight: 700, color: CYAN }}>💡 Dica: </span>{fase.dica}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {planoEstruturado.objetivos?.length > 0 && (
+                <div style={{ background: 'rgba(10,14,26,0.7)', border: '1px solid rgba(65,105,225,0.2)', borderRadius: 10, padding: '12px 14px', marginBottom: 10 }}>
+                  <div style={{ fontSize: 11, color: CYAN, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>Objetivos do Treino</div>
+                  {planoEstruturado.objetivos.map((o: string, i: number) => (
+                    <div key={i} style={{ fontSize: 12, color: OFF, marginBottom: 4 }}>• {o}</div>
+                  ))}
+                </div>
+              )}
+              {planoEstruturado.pontos_atencao?.length > 0 && (
+                <div style={{ background: 'rgba(251,191,36,0.05)', border: '1px solid rgba(251,191,36,0.2)', borderRadius: 10, padding: '12px 14px' }}>
+                  <div style={{ fontSize: 11, color: '#FBBF24', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>⚠️ Pontos de Atenção</div>
+                  {planoEstruturado.pontos_atencao.map((p: string, i: number) => (
+                    <div key={i} style={{ fontSize: 12, color: OFF, marginBottom: 4 }}>• {p}</div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
