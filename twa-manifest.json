@@ -4,24 +4,24 @@
   "name": "GestaoFC",
   "launcherName": "GestaoFC",
   "display": "standalone",
-  "themeColor": "#16A34A",
+  "themeColor": "#4169E1",
   "themeColorDark": "#000000",
   "navigationColor": "#000000",
   "navigationColorDark": "#000000",
   "navigationDividerColor": "#000000",
   "navigationDividerColorDark": "#000000",
-  "backgroundColor": "#030712",
+  "backgroundColor": "#0A0E1A",
   "enableNotifications": true,
   "startUrl": "/dashboard",
   "iconUrl": "https://gestaofc.com.br/icon-512.png",
-  "maskableIconUrl": "https://gestaofc.com.br/icon-512.png",
+  "maskableIconUrl": "https://gestaofc.com.br/icon-maskable-512.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "/Users/thales/Desktop/campo-pro/android.keystore",
     "alias": "android"
   },
-  "appVersionName": "1",
-  "appVersionCode": 1,
+  "appVersionName": "1.0.1",
+  "appVersionCode": 2,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://gestaofc.com.br/manifest.webmanifest",
@@ -43,5 +43,5 @@
   "fileHandlers": [],
   "launchHandlerClientMode": "",
   "displayOverride": [],
-  "appVersion": "1"
+  "appVersion": "1.0.1"
 }
