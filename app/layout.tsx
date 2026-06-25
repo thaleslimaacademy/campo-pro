@@ -20,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
           <meta name="apple-mobile-web-app-title" content="GestaoFC" />
           <meta name="mobile-web-app-capable" content="yes" />
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
           <link rel="icon" href="/gestaofc-icon.svg" type="image/svg+xml" />
           <link rel="apple-touch-icon" href="/icon-512.png" />
         </head>
