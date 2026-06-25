@@ -20,8 +20,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
           <meta name="apple-mobile-web-app-title" content="GestaoFC" />
           <meta name="mobile-web-app-capable" content="yes" />
-          <link rel="icon" href="/gestaofc-icon.svg" type="image/png" />
-          <link rel="apple-touch-icon" href="/gestaofc-icon.svg" />
+          <link rel="icon" href="/gestaofc-icon.svg" type="image/svg+xml" />
+          <link rel="apple-touch-icon" href="/icon-512.png" />
         </head>
         <body style={{ margin: 0, padding: 0, background: '#0A0E1A' }}>
           <BrandingProvider>{children}</BrandingProvider>
