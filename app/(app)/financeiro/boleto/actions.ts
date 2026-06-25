@@ -3,9 +3,11 @@
 import { supabaseAdmin } from '@/lib/supabase'
 import { buscarClienteAsaas, criarClienteAsaas, criarCobrancaBoleto, cancelarCobrancaAsaas } from '@/lib/asaas'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
+import { requireFinanceiro } from '@/lib/auth'
 import { getAsaasKey } from '@/lib/getAsaasKey'
 
 export async function listarAtletasBoleto() {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const { data } = await supabaseAdmin.from('Atleta').select('id, nome')
     .eq('escolaId', ESCOLA_ID).eq('ativo', true).order('nome')
@@ -15,6 +17,7 @@ export async function listarAtletasBoleto() {
 export async function gerarBoleto(params: {
   atletaId: string; cpf: string; valor: number; vencimento: string; descricao: string
 }) {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const apiKey = await getAsaasKey(ESCOLA_ID)
   const { atletaId, cpf, valor, vencimento, descricao } = params
@@ -41,6 +44,7 @@ export async function gerarBoleto(params: {
 }
 
 export async function getCpfResponsavel(atletaId: string) {
+  await requireFinanceiro()
   const { data: resp } = await supabaseAdmin.from('Responsavel')
     .select('cpf').eq('atletaId', atletaId).eq('principal', true).limit(1)
   if (resp?.[0]?.cpf) return resp[0].cpf as string
@@ -53,18 +57,21 @@ export async function getCpfResponsavel(atletaId: string) {
 }
 
 export async function salvarCpfResponsavel(atletaId: string, cpf: string) {
+  await requireFinanceiro()
   await supabaseAdmin.from('Responsavel')
     .update({ cpf: cpf.replace(/\D/g, '') }).eq('atletaId', atletaId).eq('principal', true)
   return { ok: true }
 }
 
 export async function getTelefoneResponsavel(atletaId: string) {
+  await requireFinanceiro()
   const { data } = await supabaseAdmin.from('Responsavel')
     .select('telefone').eq('atletaId', atletaId).eq('principal', true).limit(1)
   return data?.[0]?.telefone as string | null
 }
 
 export async function listarBoletos() {
+  await requireFinanceiro()
   const escolaId = await getEscolaIdServer()
   const { data } = await supabaseAdmin.from('Cobranca')
     .select('id, atletaId, atletaNome, valor, valorPago, vencimento, status, pagoEm, bankSlipUrl, descricao, asaasId, createdAt')
@@ -74,6 +81,7 @@ export async function listarBoletos() {
 }
 
 export async function cancelarBoleto(cobrancaId: string, asaasId: string) {
+  await requireFinanceiro()
   const escolaId = await getEscolaIdServer()
   const apiKey = await getAsaasKey(escolaId)
   await cancelarCobrancaAsaas(apiKey, asaasId)

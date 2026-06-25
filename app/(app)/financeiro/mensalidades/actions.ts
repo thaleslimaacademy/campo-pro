@@ -2,6 +2,7 @@
 
 import { randomUUID } from 'crypto'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
+import { requireFinanceiro } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 
 // ⚙️ Tabela/colunas reais do seu banco:
@@ -13,6 +14,7 @@ export type Status = 'PENDENTE' | 'PAGO' | 'VENCIDO' | 'CANCELADO'
 export async function gerarMensalidades(params: {
   atletaId: string; quantidade: number; mesInicial: string; valor: number; diaVencimento: number; descricaoBase?: string
 }) {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const { atletaId, quantidade, mesInicial, valor, diaVencimento } = params
   const [anoStr, mesStr] = mesInicial.split('-')
@@ -38,6 +40,7 @@ export async function gerarMensalidades(params: {
 }
 
 export async function listarMensalidades(opts?: { status?: Status | 'todas'; incluirExcluidas?: boolean }) {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   let q = supabaseAdmin.from(TABELA)
     .select('id, atletaId, valor, status, competencia, vencimento, descricao, excluidaEm')
@@ -55,6 +58,7 @@ export async function listarMensalidades(opts?: { status?: Status | 'todas'; inc
 }
 
 export async function listarAtletas() {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const { data, error } = await supabaseAdmin.from(TABELA_ATLETAS)
     .select('id, nome').eq('escolaId', ESCOLA_ID).order('nome')
@@ -63,6 +67,7 @@ export async function listarAtletas() {
 }
 
 export async function softDeleteCobranca(id: string) {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from(TABELA)
     .update({ excluidaEm: new Date().toISOString() }).eq('id', id).eq('escolaId', ESCOLA_ID)
@@ -71,6 +76,7 @@ export async function softDeleteCobranca(id: string) {
 }
 
 export async function restaurarCobranca(id: string) {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from(TABELA)
     .update({ excluidaEm: null }).eq('id', id).eq('escolaId', ESCOLA_ID)
@@ -79,6 +85,7 @@ export async function restaurarCobranca(id: string) {
 }
 
 export async function excluirDefinitivo(id: string) {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from(TABELA).delete().eq('id', id).eq('escolaId', ESCOLA_ID)
   if (error) throw new Error(error.message)
@@ -86,6 +93,7 @@ export async function excluirDefinitivo(id: string) {
 }
 
 export async function marcarPago(id: string) {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from(TABELA)
     .update({ status: 'PAGO' as Status })
@@ -145,6 +153,7 @@ export async function marcarPago(id: string) {
 }
 
 export async function cancelarCobranca(id: string) {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from(TABELA)
     .update({ status: 'CANCELADO' as Status })

@@ -3,10 +3,12 @@
 import { supabaseAdmin } from '@/lib/supabase'
 import { DEFAULT_TEMPLATE } from './constants'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
+import { requireFinanceiro } from '@/lib/auth'
 
 export type { Patrocinador } from './constants'
 
 export async function listarPatrocinadores() {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const { data, error } = await supabaseAdmin
     .from('Patrocinador')
@@ -21,6 +23,7 @@ export async function criarPatrocinador(p: {
   nome: string; empresa?: string; telefone?: string; valor: number
   vencimento: string; descricao?: string; mensagemCobranca?: string
 }) {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from('Patrocinador').insert({
     escolaId: ESCOLA_ID, ...p,
@@ -31,6 +34,7 @@ export async function criarPatrocinador(p: {
 }
 
 export async function renovarPatrocinador(id: string, novoVencimento: string) {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from('Patrocinador')
     .update({ vencimento: novoVencimento, status: 'ATIVO' })
@@ -40,6 +44,7 @@ export async function renovarPatrocinador(id: string, novoVencimento: string) {
 }
 
 export async function atualizarMensagem(id: string, mensagemCobranca: string) {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from('Patrocinador')
     .update({ mensagemCobranca }).eq('id', id).eq('escolaId', ESCOLA_ID)
@@ -48,6 +53,7 @@ export async function atualizarMensagem(id: string, mensagemCobranca: string) {
 }
 
 export async function excluirPatrocinador(id: string) {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from('Patrocinador')
     .delete().eq('id', id).eq('escolaId', ESCOLA_ID)
@@ -56,6 +62,7 @@ export async function excluirPatrocinador(id: string) {
 }
 
 export async function enviarCobrancaWhatsApp(id: string) {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const { data, error } = await supabaseAdmin.from('Patrocinador')
     .select('nome, telefone, valor, vencimento, mensagemCobranca')

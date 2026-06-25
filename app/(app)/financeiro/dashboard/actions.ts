@@ -2,6 +2,7 @@
 
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
+import { requireFinanceiro } from '@/lib/auth'
 
 export type ResumoFinanceiro = {
   previsto: number
@@ -38,6 +39,7 @@ export type DashboardFinanceiroData = {
 const MESES_PT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
 
 export async function getDashboardFinanceiro(): Promise<DashboardFinanceiroData> {
+  await requireFinanceiro()
   const escolaId = await getEscolaIdServer()
 
   const agora = new Date()

@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { supabaseAdmin } from '@/lib/supabase'
 
-export type Papel = 'admin' | 'professor' | 'responsavel'
+export type Papel = 'admin' | 'superadmin' | 'diretor' | 'professor' | 'preparador' | 'responsavel'
 
 export interface Sessao {
   clerkUserId: string
@@ -59,4 +59,19 @@ export async function getAtletasDoResponsavel(clerkUserId: string, escolaId: str
     .eq('status', 'ativo')
 
   return data ?? []
+}
+
+export const PAPEIS_FINANCEIRO: Papel[] = ['admin', 'superadmin', 'diretor']
+
+export async function podeFinanceiro(): Promise<boolean> {
+  const sessao = await getSessao()
+  return !!sessao && sessao.ativo && PAPEIS_FINANCEIRO.includes(sessao.perfil)
+}
+
+export async function requireFinanceiro(): Promise<Sessao> {
+  const sessao = await getSessao()
+  if (!sessao) throw new Error('NAO_AUTENTICADO')
+  if (!sessao.ativo) throw new Error('CONTA_INATIVA')
+  if (!PAPEIS_FINANCEIRO.includes(sessao.perfil)) throw new Error('SEM_PERMISSAO')
+  return sessao
 }

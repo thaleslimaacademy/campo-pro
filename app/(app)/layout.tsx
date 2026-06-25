@@ -62,7 +62,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* BOTTOM NAV */}
       <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(10,14,26,0.97)', backdropFilter: 'blur(16px)', borderTop: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-around', padding: '8px 0 20px', zIndex: 50 }}>
-        {NAV.map(item => {
+        {NAV.filter(i => ['admin','superadmin','diretor'].includes(role || '') || !i.href.startsWith('/financeiro')).map(item => {
           const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
           return (
             <Link key={item.href} href={item.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, textDecoration: 'none', minWidth: 64, position: 'relative' }}>

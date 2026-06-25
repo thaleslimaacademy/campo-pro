@@ -2,8 +2,10 @@
 
 import { supabaseAdmin } from '@/lib/supabase'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
+import { requireFinanceiro } from '@/lib/auth'
 
 export async function carregarCaixa(mes: string) {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const [anoStr, mesStr] = mes.split('-')
   const ano = Number(anoStr), m = Number(mesStr)
@@ -30,6 +32,7 @@ export async function carregarCaixa(mes: string) {
 }
 
 export async function criarReceita(p: { valor: number; descricao: string; categoria: string; data: string }) {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from('Receita').insert({ escolaId: ESCOLA_ID, ...p })
   if (error) throw new Error(error.message)
@@ -37,6 +40,7 @@ export async function criarReceita(p: { valor: number; descricao: string; catego
 }
 
 export async function excluirReceita(id: string) {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from('Receita').delete().eq('id', id).eq('escolaId', ESCOLA_ID)
   if (error) throw new Error(error.message)
@@ -44,6 +48,7 @@ export async function excluirReceita(id: string) {
 }
 
 export async function criarDespesa(p: { valor: number; descricao: string; categoria: string; data: string }) {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from('Despesa').insert({ escolaId: ESCOLA_ID, ...p })
   if (error) throw new Error(error.message)
@@ -51,6 +56,7 @@ export async function criarDespesa(p: { valor: number; descricao: string; catego
 }
 
 export async function excluirDespesa(id: string) {
+  await requireFinanceiro()
   const ESCOLA_ID = await getEscolaIdServer()
   const { error } = await supabaseAdmin.from('Despesa').delete().eq('id', id).eq('escolaId', ESCOLA_ID)
   if (error) throw new Error(error.message)
