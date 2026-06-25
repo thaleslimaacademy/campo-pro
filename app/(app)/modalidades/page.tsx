@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { listarModalidadesEscola, toggleModalidade, getInfoEscola } from './actions'
 import { MODALIDADES, PLANOS_GESTAOFC } from './constants'
 
-const C = { bg: '#0F0F1A', surface: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.07)', orange: '#FF6B00', gold: '#FFD700', muted: 'rgba(255,255,255,0.4)', text: '#F0F0F0' }
+const C = { bg: '#0A0E1A', surface: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.07)', orange: '#4169E1', gold: '#FFD700', muted: 'rgba(255,255,255,0.4)', text: '#F0F4FF' }
 const SYNE = 'Syne, sans-serif'
 
 export default function ModalidadesPage() {

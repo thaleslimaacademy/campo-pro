@@ -177,7 +177,7 @@ export default function EditarAtleta() {
     router.push('/atletas')
   }
 
-  const inp = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px', color: '#F0F0F0', fontFamily: 'Inter, sans-serif', fontSize: '13px', marginTop: '4px', boxSizing: 'border-box' as const }
+  const inp = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px', color: '#F0F4FF', fontFamily: 'Inter, sans-serif', fontSize: '13px', marginTop: '4px', boxSizing: 'border-box' as const }
   const lbl = { fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const, letterSpacing: '0.8px' }
   const card = { background: 'rgba(255,255,255,0.04)', borderRadius: '16px', padding: '16px', border: '1px solid rgba(255,255,255,0.07)', marginBottom: '16px' }
 
@@ -190,7 +190,7 @@ export default function EditarAtleta() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', color: '#F0F0F0', padding: '20px 20px 80px', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ minHeight: '100vh', color: '#F0F4FF', padding: '20px 20px 80px', fontFamily: 'Inter, sans-serif' }}>
       <div className="flex items-center gap-3 mb-6">
         <a href={`/atletas/${id}`} className="text-gray-400">← Voltar</a>
         <h1 className="text-xl font-bold">✏️ Editar Atleta</h1>
@@ -210,7 +210,7 @@ export default function EditarAtleta() {
 
       {/* DADOS DO ATLETA */}
       <div style={card}>
-        <p style={{ color: '#00C896', fontWeight: 700, fontSize: '13px', marginBottom: '16px' }}>⚽ Dados do Atleta</p>
+        <p style={{ color: '#00D67A', fontWeight: 700, fontSize: '13px', marginBottom: '16px' }}>⚽ Dados do Atleta</p>
         <div className="space-y-3">
           <div><label style={lbl}>Nome completo *</label><input name="nome" value={form.nome} onChange={handleChange} style={inp} /></div>
           <div><label style={lbl}>Data de nascimento</label><input name="dataNascimento" value={form.dataNascimento} onChange={handleChange} type="date" style={inp} /></div>
@@ -252,13 +252,13 @@ export default function EditarAtleta() {
       <div style={{ ...card, background: bolsista ? 'rgba(0,200,150,0.06)' : 'rgba(255,255,255,0.04)', border: bolsista ? '1px solid rgba(0,200,150,0.25)' : '1px solid rgba(255,255,255,0.07)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: bolsista ? '14px' : '0' }}>
           <div>
-            <p style={{ color: bolsista ? '#00C896' : 'rgba(255,255,255,0.5)', fontWeight: 700, fontSize: '13px', margin: 0 }}>🎓 Aluno Bolsista</p>
+            <p style={{ color: bolsista ? '#00D67A' : 'rgba(255,255,255,0.5)', fontWeight: 700, fontSize: '13px', margin: 0 }}>🎓 Aluno Bolsista</p>
             <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px', marginTop: '2px' }}>Mensalidade 100% gratuita — nenhuma cobrança gerada</p>
           </div>
           {/* Toggle */}
           <div
             onClick={() => setBolsista(b => !b)}
-            style={{ width: '48px', height: '26px', borderRadius: '13px', background: bolsista ? '#00C896' : '#1A1A1A', border: bolsista ? '1px solid #00C896' : '1px solid #2A2A2A', cursor: 'pointer', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}
+            style={{ width: '48px', height: '26px', borderRadius: '13px', background: bolsista ? '#00D67A' : '#0D1220', border: bolsista ? '1px solid #00D67A' : '1px solid #0D1220', cursor: 'pointer', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}
           >
             <div style={{ position: 'absolute', top: '3px', left: bolsista ? '24px' : '3px', width: '18px', height: '18px', borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
           </div>
@@ -278,7 +278,7 @@ export default function EditarAtleta() {
 
       {/* ENDEREÇO */}
       <div style={card}>
-        <p style={{ color: '#00C896', fontWeight: 700, fontSize: '13px', marginBottom: '16px' }}>📍 Endereço</p>
+        <p style={{ color: '#00D67A', fontWeight: 700, fontSize: '13px', marginBottom: '16px' }}>📍 Endereço</p>
         <div className="space-y-3">
           <div>
             <label style={lbl}>CEP</label>
@@ -299,7 +299,7 @@ export default function EditarAtleta() {
 
       {/* RESPONSÁVEL */}
       <div style={card}>
-        <p style={{ color: '#00C896', fontWeight: 700, fontSize: '13px', marginBottom: '16px' }}>👤 Responsável</p>
+        <p style={{ color: '#00D67A', fontWeight: 700, fontSize: '13px', marginBottom: '16px' }}>👤 Responsável</p>
         <div className="space-y-3">
           <div><label style={lbl}>Nome do responsável</label><input name="nomeResponsavel" value={form.nomeResponsavel} onChange={handleChange} style={inp} /></div>
           <div><label style={lbl}>WhatsApp</label><input name="whatsappResponsavel" value={form.whatsappResponsavel} onChange={handleChange} type="tel" style={inp} /></div>
@@ -307,7 +307,7 @@ export default function EditarAtleta() {
       </div>
 
       <button onClick={salvar} disabled={salvando}
-        style={{ width: '100%', background: 'linear-gradient(135deg,#FF6B00,#00cc00)', color: '#000', padding: '16px', borderRadius: '14px', fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: '14px', border: 'none', cursor: 'pointer', marginBottom: '16px', opacity: salvando ? 0.7 : 1 }}>
+        style={{ width: '100%', background: 'linear-gradient(135deg,#4169E1,#00D67A)', color: '#000', padding: '16px', borderRadius: '14px', fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: '14px', border: 'none', cursor: 'pointer', marginBottom: '16px', opacity: salvando ? 0.7 : 1 }}>
         {salvando ? 'Salvando...' : '💾 Salvar Alterações'}
       </button>
 
@@ -328,7 +328,7 @@ export default function EditarAtleta() {
 
       <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-around', padding: '12px 0 20px', borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(5,5,5,0.95)', backdropFilter: 'blur(10px)' }}>
         <a href="/dashboard" style={{ textDecoration: 'none', color: 'rgba(255,255,255,0.4)', fontSize: '9px', textTransform: 'uppercase', fontFamily: 'Syne, sans-serif' }}>Inicio</a>
-        <a href="/atletas" style={{ textDecoration: 'none', color: '#FF6B00', fontSize: '9px', textTransform: 'uppercase', fontFamily: 'Syne, sans-serif', fontWeight: 700 }}>Atletas</a>
+        <a href="/atletas" style={{ textDecoration: 'none', color: '#4169E1', fontSize: '9px', textTransform: 'uppercase', fontFamily: 'Syne, sans-serif', fontWeight: 700 }}>Atletas</a>
         <a href="/presenca" style={{ textDecoration: 'none', color: 'rgba(255,255,255,0.4)', fontSize: '9px', textTransform: 'uppercase', fontFamily: 'Syne, sans-serif' }}>Presenca</a>
         <a href="/financeiro" style={{ textDecoration: 'none', color: 'rgba(255,255,255,0.4)', fontSize: '9px', textTransform: 'uppercase', fontFamily: 'Syne, sans-serif' }}>Financeiro</a>
       </nav>
