@@ -1,50 +1,47 @@
 'use client'
-import { usePerfil } from '@/lib/usePerfil'
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useEffect, useState, useTransition } from 'react'
+import BottomNav from '@/components/ui/BottomNav'
+import { getTurmasComContagem, criarTurma } from './actions'
 
 const T = { bg: '#0A0E1A', surface: '#0D1220', primary: '#4169E1', accent: '#00BFFF', sky: '#7DD3FC', text: '#F0F4FF', muted: 'rgba(240,244,255,0.4)', border: 'rgba(240,244,255,0.08)', green: '#00D67A' }
 const SYNE = 'Syne, sans-serif'
 const INP: React.CSSProperties = { width: '100%', background: '#080C15', border: '1px solid rgba(240,244,255,0.1)', borderRadius: 8, padding: '11px 14px', color: T.text, fontFamily: 'Inter, sans-serif', fontSize: 13, marginTop: 4, boxSizing: 'border-box' }
 const LBL: React.CSSProperties = { fontSize: 10, color: T.muted, textTransform: 'uppercase', letterSpacing: '0.8px' }
 
-type Turma = { id: string; nome: string; modalidade: string; descricao: string | null; diasSemana: string | null; horario: string | null; ativa: boolean; totalAtletas?: number }
+type Turma = { id: string; nome: string; modalidade: string; descricao: string | null; diasSemana: string | null; horario: string | null; ativa: boolean; totalAtletas: number }
+
+const MODALIDADES = [
+  { slug: 'todas', label: 'Todas' }, { slug: 'futebol', label: 'Futebol' },
+  { slug: 'futsal', label: 'Futsal' }, { slug: 'futvolei', label: 'Futvolei' },
+  { slug: 'artes-marciais', label: 'Artes Marciais' }, { slug: 'outras', label: 'Outras' },
+]
 
 export default function Turmas() {
-  const { escolaId } = usePerfil()
   const [turmas, setTurmas] = useState<Turma[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, startLoad] = useTransition()
+  const [salvando, startSave] = useTransition()
   const [criando, setCriando] = useState(false)
-  const [salvando, setSalvando] = useState(false)
   const [filtroModal, setFiltroModal] = useState('todas')
   const [form, setForm] = useState({ nome: '', descricao: '', diasSemana: '', horario: '', modalidade: 'futebol' })
 
-  async function carregar() {
-    const { data } = await supabase.from('Turma').select('*').eq('escolaId', escolaId!).eq('ativa', true).order('nome')
-    if (data) {
-      const countsRes = await fetch('/api/atleta-turma/counts?escolaId=' + escolaId)
-      const counts: Record<string, number> = countsRes.ok ? await countsRes.json() : {}
-      const com = data.map(t => ({ ...t, totalAtletas: counts[t.id] ?? 0 }))
-      setTurmas(com)
-    }
-    setLoading(false)
+  function carregar() {
+    startLoad(async () => {
+      const data = await getTurmasComContagem()
+      setTurmas(data as Turma[])
+    })
   }
 
-  useEffect(() => { if (escolaId) carregar() }, [escolaId])
+  useEffect(() => { carregar() }, [])
 
-  async function salvar() {
+  function salvar() {
     if (!form.nome) return
-    setSalvando(true)
-    await supabase.from('Turma').insert({ escolaId: escolaId!, nome: form.nome, modalidade: form.modalidade, descricao: form.descricao || null, diasSemana: form.diasSemana || null, horario: form.horario || null })
-    setForm({ nome: '', descricao: '', diasSemana: '', horario: '', modalidade: 'futebol' })
-    setCriando(false)
-    await carregar()
-    setSalvando(false)
+    startSave(async () => {
+      await criarTurma(form)
+      setForm({ nome: '', descricao: '', diasSemana: '', horario: '', modalidade: 'futebol' })
+      setCriando(false)
+      carregar()
+    })
   }
-
-  const MODALIDADES = [
-    { slug: 'todas', label: 'Todas' }, { slug: 'futebol', label: 'Futebol' }, { slug: 'futsal', label: 'Futsal' }, { slug: 'futvolei', label: 'Futvolei' },
-  ]
 
   return (
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, fontFamily: 'Inter, sans-serif', paddingBottom: 80 }}>
@@ -64,7 +61,7 @@ export default function Turmas() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div><label style={LBL}>Modalidade</label>
               <select value={form.modalidade} onChange={e => setForm(p => ({ ...p, modalidade: e.target.value }))} style={INP}>
-                <option value="futebol">Futebol</option><option value="futsal">Futsal</option><option value="futvolei">Futvolei</option>
+                {MODALIDADES.filter(m => m.slug !== 'todas').map(m => <option key={m.slug} value={m.slug}>{m.label}</option>)}
               </select>
             </div>
             <div><label style={LBL}>Nome da turma *</label><input value={form.nome} onChange={e => setForm(p => ({ ...p, nome: e.target.value }))} style={INP} placeholder="Ex: Sub-10, Iniciante..." /></div>
@@ -103,15 +100,7 @@ export default function Turmas() {
           </a>
         ))}
       </div>
-
-      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-around', padding: '10px 0 20px', borderTop: `1px solid ${T.border}`, background: 'rgba(10,14,26,0.97)', backdropFilter: 'blur(12px)', zIndex: 50 }}>
-        {[{ href: '/dashboard', label: 'Início', icon: 'ti-home' }, { href: '/atletas', label: 'Atletas', icon: 'ti-users' }, { href: '/presenca', label: 'Presença', icon: 'ti-check' }, { href: '/financeiro/caixa', label: 'Financeiro', icon: 'ti-wallet' }].map(item => (
-          <a key={item.href} href={item.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, textDecoration: 'none' }}>
-            <i className={`ti ${item.icon}`} style={{ fontSize: 22, color: T.muted }} aria-hidden="true"></i>
-            <span style={{ fontSize: 9, fontFamily: SYNE, fontWeight: 700, color: T.muted, letterSpacing: '0.5px', textTransform: 'uppercase' }}>{item.label}</span>
-          </a>
-        ))}
-      </nav>
+      <BottomNav />
     </div>
   )
 }
