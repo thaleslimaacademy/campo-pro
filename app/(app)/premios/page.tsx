@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { listarAtletasParaPremio, listarPremiacoes, concederPremio, removerPremio } from './actions'
 import { CATALOGO, NIVEL_POR_CONQUISTAS } from './constants'
 
-const C = { bg:'#0F0F1A', surface:'#1A1A2E', orange:'#FF6B00', gold:'#FFD700', green:'#00C896', muted:'rgba(255,255,255,0.4)', border:'rgba(255,255,255,0.08)' }
+const C = { bg:'#0A0E1A', surface:'#1A1A2E', orange:'#4169E1', gold:'#FFD700', green:'#00D67A', muted:'rgba(255,255,255,0.4)', border:'rgba(255,255,255,0.08)' }
 const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
 
@@ -56,7 +56,7 @@ export default function PremiosPage() {
   const atletasFiltrados = atletas.filter(a => a.nome.toLowerCase().includes(busca.toLowerCase()))
 
   return (
-    <div style={{ minHeight:'100vh', background:C.bg, color:'#F0F0F0', fontFamily:INTER, paddingBottom:80 }}>
+    <div style={{ minHeight:'100vh', background:C.bg, color:'#F0F4FF', fontFamily:INTER, paddingBottom:80 }}>
 
       <div style={{ padding:'20px 20px 16px' }}>
         <p style={{ color:C.muted, fontSize:11, textTransform:'uppercase', letterSpacing:1, marginBottom:4 }}>Sistema de Conquistas</p>

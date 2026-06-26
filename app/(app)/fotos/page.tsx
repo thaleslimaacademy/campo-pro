@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Plus, Trash2, Image, ChevronRight } from 'lucide-react'
 import { listarAlbuns, criarAlbum, excluirAlbum } from './actions'
 
-const C = { bg: '#0F0F1A', surface: '#1A1A2E', orange: '#FF6B00', gold: '#FFD700', text: '#F0F0F0', muted: 'rgba(240,240,240,0.45)', border: 'rgba(255,255,255,0.08)' }
+const C = { bg: '#0A0E1A', surface: '#1A1A2E', orange: '#4169E1', gold: '#FFD700', text: '#F0F4FF', muted: 'rgba(240,240,240,0.45)', border: 'rgba(255,255,255,0.08)' }
 const SYNE = 'Syne, sans-serif'
 
 type Album = { id: string; titulo: string; descricao: string | null; dataEvento: string | null; capa: string | null; ativo: boolean }
@@ -120,4 +120,4 @@ function Campo({ label, children }: { label: string; children: React.ReactNode }
   return <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12, color: 'rgba(240,240,240,0.45)' }}>{label}{children}</label>
 }
 
-const inp: React.CSSProperties = { background: '#0F0F1A', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '10px 14px', color: '#F0F0F0', fontSize: 14, width: '100%', boxSizing: 'border-box' }
+const inp: React.CSSProperties = { background: '#0A0E1A', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '10px 14px', color: '#F0F4FF', fontSize: 14, width: '100%', boxSizing: 'border-box' }

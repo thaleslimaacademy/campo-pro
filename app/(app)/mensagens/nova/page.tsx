@@ -33,12 +33,12 @@ function NovaMensagemForm() {
 
   // ── Tokens visuais ──
   const syne = 'Syne, sans-serif'
-  const neon = '#FF6B00'
+  const neon = '#4169E1'
   const gold = '#FFD700'
-  const bg = 'linear-gradient(160deg,#0F0F1A,#0F0F1A,#111003)'
+  const bg = 'linear-gradient(160deg,#0A0E1A,#0A0E1A,#0A0E1A)'
   const cardBg = 'rgba(255,255,255,0.03)'
   const cardBorder = '1px solid rgba(255,255,255,0.07)'
-  const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 12px', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '6px', outline: 'none', boxSizing: 'border-box' as const }
+  const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 12px', color: '#F0F4FF', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '6px', outline: 'none', boxSizing: 'border-box' as const }
 
   useEffect(() => {
     if (!escolaId) return
@@ -109,7 +109,7 @@ function NovaMensagemForm() {
         {resultado.erros > 0 && <p style={{ color: '#F87171', fontSize: '13px' }}>{resultado.erros} erro{resultado.erros !== 1 ? 's' : ''}</p>}
         <button
           onClick={() => router.push('/mensagens')}
-          style={{ width: '100%', background: 'linear-gradient(135deg,#FF6B00,#2bcc0f)', color: '#0F0F1A', padding: '14px', borderRadius: '12px', fontSize: '14px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', marginTop: '24px', boxShadow: '0 0 20px rgba(57,255,20,0.25)' }}
+          style={{ width: '100%', background: 'linear-gradient(135deg,#4169E1,#2bcc0f)', color: '#0A0E1A', padding: '14px', borderRadius: '12px', fontSize: '14px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', marginTop: '24px', boxShadow: '0 0 20px rgba(57,255,20,0.25)' }}
         >
           Ver histórico
         </button>
@@ -121,12 +121,12 @@ function NovaMensagemForm() {
   const totalParaEnviar = tipo === 'TODOS' ? atletas.length : tipo === 'TURMA' && turmaId ? atletas.filter(a => a.turmaId === turmaId).length : atletasSelecionados.length
 
   return (
-    <div style={{ minHeight: '100vh', background: bg, color: '#F0F0F0', fontFamily: 'Inter,sans-serif', paddingBottom: '96px' }}>
+    <div style={{ minHeight: '100vh', background: bg, color: '#F0F4FF', fontFamily: 'Inter,sans-serif', paddingBottom: '96px' }}>
 
       {/* ── HEADER ── */}
       <div style={{ padding: '20px 20px 0', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
         <a href="/mensagens" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', textDecoration: 'none' }}>← Voltar</a>
-        <h1 style={{ fontFamily: syne, fontWeight: 800, fontSize: '20px', color: '#F0F0F0', margin: 0 }}>📲 Nova Mensagem</h1>
+        <h1 style={{ fontFamily: syne, fontWeight: 800, fontSize: '20px', color: '#F0F4FF', margin: 0 }}>📲 Nova Mensagem</h1>
       </div>
 
       <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -143,7 +143,7 @@ function NovaMensagemForm() {
               <button
                 key={t.value}
                 onClick={() => setTipo(t.value)}
-                style={{ flex: 1, padding: '10px 4px', borderRadius: '10px', fontSize: '11px', fontWeight: 700, fontFamily: syne, border: 'none', cursor: 'pointer', transition: 'all 0.2s', background: tipo === t.value ? 'linear-gradient(135deg,#FF6B00,#2bcc0f)' : 'rgba(255,255,255,0.05)', color: tipo === t.value ? '#0F0F1A' : 'rgba(255,255,255,0.5)' }}
+                style={{ flex: 1, padding: '10px 4px', borderRadius: '10px', fontSize: '11px', fontWeight: 700, fontFamily: syne, border: 'none', cursor: 'pointer', transition: 'all 0.2s', background: tipo === t.value ? 'linear-gradient(135deg,#4169E1,#2bcc0f)' : 'rgba(255,255,255,0.05)', color: tipo === t.value ? '#0A0E1A' : 'rgba(255,255,255,0.5)' }}
               >
                 {t.label}
               </button>
@@ -185,14 +185,14 @@ function NovaMensagemForm() {
                     onClick={() => toggleAtleta(a.id)}
                     style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '10px', cursor: 'pointer', background: sel ? 'rgba(57,255,20,0.07)' : 'rgba(255,255,255,0.03)', border: sel ? '1px solid rgba(57,255,20,0.25)' : '1px solid rgba(255,255,255,0.05)', transition: 'all 0.15s' }}
                   >
-                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: sel ? '2px solid #FF6B00' : '2px solid rgba(255,255,255,0.2)', background: sel ? '#FF6B00' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      {sel && <span style={{ color: '#0F0F1A', fontSize: '10px', fontWeight: 900 }}>✓</span>}
+                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: sel ? '2px solid #4169E1' : '2px solid rgba(255,255,255,0.2)', background: sel ? '#4169E1' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      {sel && <span style={{ color: '#0A0E1A', fontSize: '10px', fontWeight: 900 }}>✓</span>}
                     </div>
                     {a.fotoUrl
                       ? <img src={a.fotoUrl} alt={a.nome} style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                       : <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'rgba(57,255,20,0.1)', border: '1px solid rgba(57,255,20,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, color: neon, flexShrink: 0 }}>{a.nome[0]}</div>
                     }
-                    <p style={{ fontSize: '13px', color: '#F0F0F0', margin: 0 }}>{a.nome}</p>
+                    <p style={{ fontSize: '13px', color: '#F0F4FF', margin: 0 }}>{a.nome}</p>
                   </div>
                 )
               })}
@@ -213,7 +213,7 @@ function NovaMensagemForm() {
               onChange={e => setConteudo(e.target.value)}
               rows={5}
               placeholder="Digite a mensagem que será enviada via WhatsApp..."
-              style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 12px', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '6px', outline: 'none', boxSizing: 'border-box' as const, resize: 'vertical' as const }}
+              style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 12px', color: '#F0F4FF', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '6px', outline: 'none', boxSizing: 'border-box' as const, resize: 'vertical' as const }}
             />
             <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '4px', textAlign: 'right' as const }}>{conteudo.length} caracteres</p>
           </div>
@@ -234,7 +234,7 @@ function NovaMensagemForm() {
         <button
           onClick={enviar}
           disabled={enviando || !conteudo}
-          style={{ width: '100%', background: (enviando || !conteudo) ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg,#FF6B00,#2bcc0f)', color: (enviando || !conteudo) ? 'rgba(255,255,255,0.3)' : '#0F0F1A', padding: '16px', borderRadius: '14px', fontSize: '15px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: (enviando || !conteudo) ? 'not-allowed' : 'pointer', boxShadow: (enviando || !conteudo) ? 'none' : '0 0 24px rgba(57,255,20,0.25)', transition: 'all 0.3s' }}
+          style={{ width: '100%', background: (enviando || !conteudo) ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg,#4169E1,#2bcc0f)', color: (enviando || !conteudo) ? 'rgba(255,255,255,0.3)' : '#0A0E1A', padding: '16px', borderRadius: '14px', fontSize: '15px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: (enviando || !conteudo) ? 'not-allowed' : 'pointer', boxShadow: (enviando || !conteudo) ? 'none' : '0 0 24px rgba(57,255,20,0.25)', transition: 'all 0.3s' }}
         >
           {enviando ? 'Enviando...' : '📲 Enviar Mensagem'}
         </button>
@@ -262,7 +262,7 @@ function NovaMensagemForm() {
 export default function NovaMensagem() {
   return (
     <Suspense fallback={
-      <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0F0F1A,#0F0F1A,#111003)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0A0E1A,#0A0E1A,#0A0E1A)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <p style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter,sans-serif' }}>Carregando...</p>
       </div>
     }>

@@ -4,7 +4,7 @@ import { use, useEffect, useState, useRef } from 'react'
 import { ArrowLeft, Upload, Trash2, Loader2, DollarSign, Link } from 'lucide-react'
 import { listarFotos, uploadFoto, excluirFoto, atualizarValorFoto } from '../actions'
 
-const C = { bg: '#0F0F1A', surface: '#1A1A2E', orange: '#FF6B00', gold: '#FFD700', text: '#F0F0F0', muted: 'rgba(240,240,240,0.45)', border: 'rgba(255,255,255,0.08)' }
+const C = { bg: '#0A0E1A', surface: '#1A1A2E', orange: '#4169E1', gold: '#FFD700', text: '#F0F4FF', muted: 'rgba(240,240,240,0.45)', border: 'rgba(255,255,255,0.08)' }
 const SYNE = 'Syne, sans-serif'
 
 type Foto = { id: string; urlWatermark: string; valor: number }
@@ -112,7 +112,7 @@ export default function AlbumAdminPage({ params }: { params: Promise<{ albumId: 
             <span style={{ fontSize: 13, color: C.muted }}>Valor padrão por foto:</span>
             <span style={{ color: C.muted, fontSize: 13 }}>R$</span>
             <input type="number" value={valorPadrao} onChange={e => setValorPadrao(Number(e.target.value))} min={1} step={0.5}
-              style={{ width: 70, background: '#0F0F1A', border: `1px solid ${C.border}`, borderRadius: 8, padding: '6px 10px', color: C.text, fontSize: 13, textAlign: 'center' }} />
+              style={{ width: 70, background: '#0A0E1A', border: `1px solid ${C.border}`, borderRadius: 8, padding: '6px 10px', color: C.text, fontSize: 13, textAlign: 'center' }} />
           </div>
 
           {processando ? (

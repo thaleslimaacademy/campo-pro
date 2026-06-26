@@ -79,10 +79,10 @@ export default function ModalidadesPage() {
             const carregando = salvando === m.slug
             return (
               <div key={m.slug} onClick={() => !carregando && toggle(m.slug)}
-                style={{ background: ativa ? 'rgba(255,107,0,0.1)' : C.surface, border: `1px solid ${ativa ? 'rgba(255,107,0,0.4)' : C.border}`, borderRadius: '14px', padding: '16px', cursor: 'pointer', transition: 'all 0.2s', opacity: carregando ? 0.6 : 1 }}>
+                style={{ background: ativa ? 'rgba(65,105,225,0.1)' : C.surface, border: `1px solid ${ativa ? 'rgba(65,105,225,0.4)' : C.border}`, borderRadius: '14px', padding: '16px', cursor: 'pointer', transition: 'all 0.2s', opacity: carregando ? 0.6 : 1 }}>
                 <div style={{ fontSize: '28px', marginBottom: '8px' }}>{m.emoji}</div>
                 <div style={{ fontFamily: SYNE, fontWeight: 700, fontSize: '14px', color: ativa ? C.orange : C.text, marginBottom: '6px' }}>{m.label}</div>
-                <div style={{ display: 'inline-block', fontSize: '10px', fontWeight: 700, padding: '3px 10px', borderRadius: '20px', background: ativa ? 'rgba(255,107,0,0.2)' : 'rgba(255,255,255,0.05)', color: ativa ? C.orange : C.muted }}>
+                <div style={{ display: 'inline-block', fontSize: '10px', fontWeight: 700, padding: '3px 10px', borderRadius: '20px', background: ativa ? 'rgba(65,105,225,0.2)' : 'rgba(255,255,255,0.05)', color: ativa ? C.orange : C.muted }}>
                   {carregando ? '...' : ativa ? '✓ Ativa' : 'Inativa'}
                 </div>
               </div>

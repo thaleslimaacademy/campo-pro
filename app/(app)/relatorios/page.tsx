@@ -164,7 +164,7 @@ export default function Relatorios() {
 
   return (
     <PlanoGate feature="relatorios" planoMinimo="PRO">
-    <div style={{ minHeight: "100vh", color: "#F0F0F0", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
+    <div style={{ minHeight: "100vh", color: "#F0F4FF", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
         <a href="/dashboard" className="text-gray-400">Voltar</a>
         <h1 className="text-xl font-bold">Relatorios</h1>

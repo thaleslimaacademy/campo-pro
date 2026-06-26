@@ -249,7 +249,7 @@ export default function EditarAtleta() {
       </div>
 
       {/* BOLSISTA */}
-      <div style={{ ...card, background: bolsista ? 'rgba(0,200,150,0.06)' : 'rgba(255,255,255,0.04)', border: bolsista ? '1px solid rgba(0,200,150,0.25)' : '1px solid rgba(255,255,255,0.07)' }}>
+      <div style={{ ...card, background: bolsista ? 'rgba(0,214,122,0.06)' : 'rgba(255,255,255,0.04)', border: bolsista ? '1px solid rgba(0,214,122,0.25)' : '1px solid rgba(255,255,255,0.07)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: bolsista ? '14px' : '0' }}>
           <div>
             <p style={{ color: bolsista ? '#00D67A' : 'rgba(255,255,255,0.5)', fontWeight: 700, fontSize: '13px', margin: 0 }}>🎓 Aluno Bolsista</p>

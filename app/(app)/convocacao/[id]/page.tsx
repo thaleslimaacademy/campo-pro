@@ -30,9 +30,9 @@ export default function ConvocacaoDetalhes() {
   const [loading, setLoading] = useState(true)
 
   const syne = 'Syne, sans-serif'
-  const neon = '#FF6B00'
+  const neon = '#4169E1'
   const gold = '#FFD700'
-  const bg = 'linear-gradient(160deg,#0F0F1A,#0F0F1A,#111003)'
+  const bg = 'linear-gradient(160deg,#0A0E1A,#0A0E1A,#0A0E1A)'
   const cardBg = 'rgba(255,255,255,0.03)'
   const cardBorder = '1px solid rgba(255,255,255,0.07)'
 
@@ -78,13 +78,13 @@ export default function ConvocacaoDetalhes() {
     : null
 
   return (
-    <div style={{ minHeight: '100vh', background: bg, color: '#F0F0F0', fontFamily: 'Inter,sans-serif', paddingBottom: '40px' }}>
+    <div style={{ minHeight: '100vh', background: bg, color: '#F0F4FF', fontFamily: 'Inter,sans-serif', paddingBottom: '40px' }}>
 
       {/* HEADER */}
       <div style={{ padding: '24px 20px 0', marginBottom: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
           <span style={{ fontSize: '22px' }}>📣</span>
-          <h1 style={{ fontFamily: syne, fontWeight: 800, fontSize: '22px', color: '#F0F0F0', margin: 0 }}>
+          <h1 style={{ fontFamily: syne, fontWeight: 800, fontSize: '22px', color: '#F0F4FF', margin: 0 }}>
             {convocacao.titulo || 'Convocação'}
           </h1>
         </div>
@@ -106,7 +106,7 @@ export default function ConvocacaoDetalhes() {
                 <span style={{ fontSize: '16px', flexShrink: 0 }}>📅</span>
                 <div>
                   <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 2px' }}>Data</p>
-                  <p style={{ fontSize: '14px', color: '#F0F0F0', margin: 0, fontWeight: 600 }}>{dataFormatada}</p>
+                  <p style={{ fontSize: '14px', color: '#F0F4FF', margin: 0, fontWeight: 600 }}>{dataFormatada}</p>
                 </div>
               </div>
             )}
@@ -115,7 +115,7 @@ export default function ConvocacaoDetalhes() {
                 <span style={{ fontSize: '16px', flexShrink: 0 }}>🕐</span>
                 <div>
                   <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 2px' }}>Horário</p>
-                  <p style={{ fontSize: '14px', color: '#F0F0F0', margin: 0, fontWeight: 600 }}>{convocacao.horario}</p>
+                  <p style={{ fontSize: '14px', color: '#F0F4FF', margin: 0, fontWeight: 600 }}>{convocacao.horario}</p>
                 </div>
               </div>
             )}
@@ -124,7 +124,7 @@ export default function ConvocacaoDetalhes() {
                 <span style={{ fontSize: '16px', flexShrink: 0 }}>📍</span>
                 <div>
                   <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 2px' }}>Local</p>
-                  <p style={{ fontSize: '14px', color: '#F0F0F0', margin: 0, fontWeight: 600 }}>{convocacao.local}</p>
+                  <p style={{ fontSize: '14px', color: '#F0F4FF', margin: 0, fontWeight: 600 }}>{convocacao.local}</p>
                 </div>
               </div>
             )}
@@ -159,7 +159,7 @@ export default function ConvocacaoDetalhes() {
                     </div>
                   )}
                   <div>
-                    <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '13px', color: '#F0F0F0', margin: 0 }}>{a.nome}</p>
+                    <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '13px', color: '#F0F4FF', margin: 0 }}>{a.nome}</p>
                     {a.posicao && <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: '1px 0 0' }}>{a.posicao}</p>}
                   </div>
                 </div>

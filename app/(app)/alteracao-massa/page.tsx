@@ -141,7 +141,7 @@ function AlteracaoMassaInner() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", color: "#F0F0F0", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
+    <div style={{ minHeight: "100vh", color: "#F0F4FF", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
       <div className="flex items-center gap-3 mb-6">
         <a href="/dashboard" className="text-gray-400">Voltar</a>
         <h1 className="text-xl font-bold">Alteracao em Massa</h1>
@@ -227,7 +227,7 @@ function AlteracaoMassaInner() {
             </p>
 
             {aba === 'vencimento' && (
-              <select value={novoVencimento} onChange={e => setNovoVencimento(e.target.value)} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", boxSizing: "border-box" }}>
+              <select value={novoVencimento} onChange={e => setNovoVencimento(e.target.value)} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", boxSizing: "border-box" }}>
                 {[1, 5, 10, 15, 20, 25, 30].map(d => (
                   <option key={d} value={d}>Dia {d}</option>
                 ))}
@@ -239,13 +239,13 @@ function AlteracaoMassaInner() {
                 type="number"
                 value={novaMensalidade}
                 onChange={e => setNovaMensalidade(e.target.value)}
-                style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", boxSizing: "border-box" }}
+                style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", boxSizing: "border-box" }}
                 placeholder="Ex: 150.00"
               />
             )}
 
             {aba === 'turma' && (
-              <select value={novaTurma} onChange={e => setNovaTurma(e.target.value)} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F0F0", fontFamily: "Inter, sans-serif", fontSize: "13px", boxSizing: "border-box" }}>
+              <select value={novaTurma} onChange={e => setNovaTurma(e.target.value)} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", boxSizing: "border-box" }}>
                 <option value="">Selecione uma turma</option>
                 {turmas.map(t => (
                   <option key={t.id} value={t.id}>{t.nome}</option>

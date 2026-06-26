@@ -68,8 +68,8 @@ export default function BoletoPage() {
     if (b.status === 'CANCELADO') return { label: 'Cancelado', cor: '#666' }
     if (b.status === 'PAGO') {
       return calcularJuros(b.valor, b.vencimento, b.pagoEm) > 0
-        ? { label: 'Pago com atraso', cor: '#FF6B00' }
-        : { label: 'Pago', cor: '#00C896' }
+        ? { label: 'Pago com atraso', cor: '#4169E1' }
+        : { label: 'Pago', cor: '#00D67A' }
     }
     return new Date(b.vencimento) < new Date()
       ? { label: 'Vencido', cor: '#FF4444' }
@@ -98,14 +98,14 @@ export default function BoletoPage() {
   const fmtDate = (d: string) => d ? new Date(d.length === 10 ? d + 'T12:00:00' : d).toLocaleDateString('pt-BR') : '-'
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #0F0F1A, #0F0F1A, #111003)', color: '#fff', padding: 24, display: 'flex', justifyContent: 'center' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #0A0E1A, #0A0E1A, #0A0E1A)', color: '#fff', padding: 24, display: 'flex', justifyContent: 'center' }}>
       <div style={{ width: '100%', maxWidth: 560 }}>
-        <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 28, fontWeight: 800, color: '#FF6B00', margin: '0 0 16px' }}>Boleto</h1>
+        <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 28, fontWeight: 800, color: '#4169E1', margin: '0 0 16px' }}>Boleto</h1>
 
         <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
           {(['novo', 'historico'] as const).map(a => (
             <button key={a} onClick={() => setAba(a)}
-              style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 13, background: aba === a ? '#FF6B00' : 'rgba(255,255,255,0.06)', color: aba === a ? '#fff' : 'rgba(255,255,255,0.4)' }}>
+              style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 13, background: aba === a ? '#4169E1' : 'rgba(255,255,255,0.06)', color: aba === a ? '#fff' : 'rgba(255,255,255,0.4)' }}>
               {a === 'novo' ? '➕ Novo Boleto' : '📋 Enviados (' + boletos.length + ')'}
             </button>
           ))}
@@ -138,22 +138,22 @@ export default function BoletoPage() {
                       <p style={{ color: '#fff', fontWeight: 600, fontSize: 13, margin: 0 }}>{fmtDate(b.vencimento)}</p>
                     </div>
                     {b.pagoEm && (
-                      <div style={{ background: 'rgba(0,200,150,0.08)', borderRadius: 8, padding: '8px 10px' }}>
+                      <div style={{ background: 'rgba(0,214,122,0.08)', borderRadius: 8, padding: '8px 10px' }}>
                         <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, margin: 0 }}>Pago em</p>
-                        <p style={{ color: '#00C896', fontWeight: 600, fontSize: 13, margin: 0 }}>{fmtDate(b.pagoEm)}</p>
+                        <p style={{ color: '#00D67A', fontWeight: 600, fontSize: 13, margin: 0 }}>{fmtDate(b.pagoEm)}</p>
                       </div>
                     )}
                     {juros > 0 && (
-                      <div style={{ background: 'rgba(255,107,0,0.08)', borderRadius: 8, padding: '8px 10px' }}>
+                      <div style={{ background: 'rgba(65,105,225,0.08)', borderRadius: 8, padding: '8px 10px' }}>
                         <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, margin: 0 }}>Juros/Multa</p>
-                        <p style={{ color: '#FF6B00', fontWeight: 700, fontSize: 13, margin: 0 }}>{'+ R$ ' + juros.toFixed(2)}</p>
+                        <p style={{ color: '#4169E1', fontWeight: 700, fontSize: 13, margin: 0 }}>{'+ R$ ' + juros.toFixed(2)}</p>
                       </div>
                     )}
                   </div>
                   <div style={{ display: 'flex', gap: 8 }}>
                     {b.bankSlipUrl && (
                       <a href={b.bankSlipUrl} target="_blank" rel="noreferrer"
-                        style={{ flex: 1, background: 'rgba(255,107,0,0.1)', border: '1px solid rgba(255,107,0,0.3)', color: '#FF6B00', borderRadius: 8, padding: '8px', textAlign: 'center' as const, fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>
+                        style={{ flex: 1, background: 'rgba(65,105,225,0.1)', border: '1px solid rgba(65,105,225,0.3)', color: '#4169E1', borderRadius: 8, padding: '8px', textAlign: 'center' as const, fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>
                         {'📄 Ver boleto'}
                       </a>
                     )}
@@ -177,13 +177,13 @@ export default function BoletoPage() {
             {estado === 'resultado' && resultado ? (
               <div style={card}>
                 <div style={{ textAlign: 'center', marginBottom: 24 }}>
-                  <CheckCircle size={48} color="#FF6B00" />
-                  <h2 style={{ fontFamily: 'Syne, sans-serif', color: '#FF6B00', margin: '12px 0 4px' }}>Boleto gerado!</h2>
+                  <CheckCircle size={48} color="#4169E1" />
+                  <h2 style={{ fontFamily: 'Syne, sans-serif', color: '#4169E1', margin: '12px 0 4px' }}>Boleto gerado!</h2>
                   <p style={{ color: '#9aa', fontSize: 13 }}>Vencimento: {vencimento.split('-').reverse().join('/')}</p>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   <a href={resultado.bankSlipUrl} target="_blank" rel="noreferrer"
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#FF6B00', color: '#04130a', borderRadius: 12, padding: '14px 20px', fontWeight: 700, fontFamily: 'Syne, sans-serif', textDecoration: 'none', fontSize: 15 }}>
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#4169E1', color: '#04130a', borderRadius: 12, padding: '14px 20px', fontWeight: 700, fontFamily: 'Syne, sans-serif', textDecoration: 'none', fontSize: 15 }}>
                     <ExternalLink size={18} /> Abrir Boleto
                   </a>
                   <button onClick={copiar}
@@ -232,7 +232,7 @@ export default function BoletoPage() {
                 </Campo>
                 {erro && <p style={{ color: '#FF4757', fontSize: 13, margin: '8px 0 0' }}>{erro}</p>}
                 <button onClick={gerar} disabled={estado === 'loading'}
-                  style={{ marginTop: 20, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#FF6B00', color: '#04130a', border: 'none', borderRadius: 12, padding: '14px 20px', fontWeight: 700, fontFamily: 'Syne, sans-serif', fontSize: 15, cursor: 'pointer', opacity: estado === 'loading' ? 0.7 : 1 }}>
+                  style={{ marginTop: 20, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#4169E1', color: '#04130a', border: 'none', borderRadius: 12, padding: '14px 20px', fontWeight: 700, fontFamily: 'Syne, sans-serif', fontSize: 15, cursor: 'pointer', opacity: estado === 'loading' ? 0.7 : 1 }}>
                   {estado === 'loading' ? <><Loader2 size={18} className="spin" /> Gerando…</> : 'Gerar Boleto'}
                 </button>
                 <p style={{ color: '#9aa', fontSize: 11, marginTop: 12, textAlign: 'center' }}>

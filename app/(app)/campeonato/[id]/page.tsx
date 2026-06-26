@@ -60,19 +60,19 @@ export default function CampeonatoDetalhes() {
 
   // ── Tokens visuais ──
   const syne = 'Syne, sans-serif'
-  const neon = '#FF6B00'
+  const neon = '#4169E1'
   const gold = '#FFD700'
-  const bg = 'linear-gradient(160deg,#0F0F1A,#0F0F1A,#111003)'
+  const bg = 'linear-gradient(160deg,#0A0E1A,#0A0E1A,#0A0E1A)'
   const cardBg = 'rgba(255,255,255,0.03)'
   const cardBorder = '1px solid rgba(255,255,255,0.07)'
-  const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 12px', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '6px', outline: 'none', boxSizing: 'border-box' as const }
+  const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 12px', color: '#F0F4FF', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '6px', outline: 'none', boxSizing: 'border-box' as const }
 
   // Helper: estilo do badge de status do campeonato
   function statusBadgeStyle(status: string) {
     const map: { [k: string]: { background: string; color: string; border: string } } = {
       rascunho:  { background: 'rgba(107,114,128,0.15)', color: '#9CA3AF', border: '1px solid rgba(107,114,128,0.2)' },
       inscricoes: { background: 'rgba(59,130,246,0.12)',  color: '#60A5FA', border: '1px solid rgba(59,130,246,0.2)'  },
-      andamento:  { background: 'rgba(57,255,20,0.08)',   color: '#FF6B00', border: '1px solid rgba(57,255,20,0.2)'   },
+      andamento:  { background: 'rgba(57,255,20,0.08)',   color: '#4169E1', border: '1px solid rgba(57,255,20,0.2)'   },
       encerrado:  { background: 'rgba(239,68,68,0.12)',   color: '#F87171', border: '1px solid rgba(239,68,68,0.2)'   },
     }
     return map[status] || {}
@@ -302,12 +302,12 @@ export default function CampeonatoDetalhes() {
   )
 
   return (
-    <div style={{ minHeight: '100vh', background: bg, color: '#F0F0F0', fontFamily: 'Inter,sans-serif', paddingBottom: '96px' }}>
+    <div style={{ minHeight: '100vh', background: bg, color: '#F0F4FF', fontFamily: 'Inter,sans-serif', paddingBottom: '96px' }}>
 
       {/* ── HEADER ── */}
       <div style={{ padding: '20px 20px 0', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
         <a href="/campeonato" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', textDecoration: 'none' }}>← Voltar</a>
-        <h1 style={{ fontFamily: syne, fontWeight: 800, fontSize: '20px', color: '#F0F0F0', margin: 0 }}>🏆 {campeonato.nome}</h1>
+        <h1 style={{ fontFamily: syne, fontWeight: 800, fontSize: '20px', color: '#F0F4FF', margin: 0 }}>🏆 {campeonato.nome}</h1>
       </div>
 
       <div style={{ padding: '0 20px' }}>
@@ -375,7 +375,7 @@ export default function CampeonatoDetalhes() {
         {/* ── TABS ── */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
           {(['times', 'jogos', 'classificacao'] as const).map(a => (
-            <button key={a} onClick={() => setAba(a)} style={{ flex: 1, padding: '10px', borderRadius: '12px', fontSize: '12px', fontWeight: 700, fontFamily: syne, border: 'none', cursor: 'pointer', background: aba === a ? 'linear-gradient(135deg,#FF6B00,#2bcc0f)' : 'rgba(255,255,255,0.05)', color: aba === a ? '#0F0F1A' : 'rgba(255,255,255,0.5)', transition: 'all 0.2s' }}>
+            <button key={a} onClick={() => setAba(a)} style={{ flex: 1, padding: '10px', borderRadius: '12px', fontSize: '12px', fontWeight: 700, fontFamily: syne, border: 'none', cursor: 'pointer', background: aba === a ? 'linear-gradient(135deg,#4169E1,#2bcc0f)' : 'rgba(255,255,255,0.05)', color: aba === a ? '#0A0E1A' : 'rgba(255,255,255,0.5)', transition: 'all 0.2s' }}>
               {a === 'times' ? '⚽ Times' : a === 'jogos' ? '📋 Jogos' : '🏅 Classificação'}
             </button>
           ))}
@@ -414,7 +414,7 @@ export default function CampeonatoDetalhes() {
                     <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>WhatsApp</label>
                     <input value={formTime.responsavelWhatsapp} onChange={e => setFormTime(p => ({ ...p, responsavelWhatsapp: e.target.value }))} placeholder="5534999999999" style={inputStyle} />
                   </div>
-                  <button onClick={adicionarTime} disabled={salvandoTime} style={{ width: '100%', background: salvandoTime ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg,#FF6B00,#2bcc0f)', color: salvandoTime ? 'rgba(255,255,255,0.3)' : '#0F0F1A', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer' }}>
+                  <button onClick={adicionarTime} disabled={salvandoTime} style={{ width: '100%', background: salvandoTime ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg,#4169E1,#2bcc0f)', color: salvandoTime ? 'rgba(255,255,255,0.3)' : '#0A0E1A', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer' }}>
                     {salvandoTime ? 'Salvando...' : 'Adicionar Time ✓'}
                   </button>
                 </div>
@@ -429,7 +429,7 @@ export default function CampeonatoDetalhes() {
                     {times.filter(t => t.grupo === grupo).map(t => (
                       <div key={t.id} style={{ background: cardBg, border: cardBorder, borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div>
-                          <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '13px', color: '#F0F0F0', margin: 0 }}>{t.nome}</p>
+                          <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '13px', color: '#F0F4FF', margin: 0 }}>{t.nome}</p>
                           <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: '2px 0 0' }}>{t.tipo}{t.responsavelNome ? ' · ' + t.responsavelNome : ''}</p>
                         </div>
                         <div style={{ display: 'flex', gap: '6px' }}>
@@ -448,7 +448,7 @@ export default function CampeonatoDetalhes() {
                 {times.map(t => (
                   <div key={t.id} style={{ background: cardBg, border: cardBorder, borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div>
-                      <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '13px', color: '#F0F0F0', margin: 0 }}>{t.nome}</p>
+                      <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '13px', color: '#F0F4FF', margin: 0 }}>{t.nome}</p>
                       <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: '2px 0 0' }}>{t.tipo}{t.responsavelNome ? ' · ' + t.responsavelNome : ''}</p>
                     </div>
                     <div style={{ display: 'flex', gap: '6px' }}>
@@ -482,11 +482,11 @@ export default function CampeonatoDetalhes() {
                           {jogos.filter(j => j.fase === 'Fase de Grupos' && j.grupo === grupo).map(j => (
                             <div key={j.id} style={{ background: cardBg, border: cardBorder, borderRadius: '14px', padding: '12px' }}>
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '10px' }}>
-                                <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: '#F0F0F0', flex: 1, textAlign: 'right', margin: 0 }}>{nomeTime(j.timeAId)}</p>
+                                <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: '#F0F4FF', flex: 1, textAlign: 'right', margin: 0 }}>{nomeTime(j.timeAId)}</p>
                                 <div style={{ background: 'rgba(57,255,20,0.08)', border: '1px solid rgba(57,255,20,0.2)', borderRadius: '10px', padding: '5px 12px', minWidth: '60px', textAlign: 'center' }}>
                                   <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '15px', color: neon, margin: 0 }}>{j.golsA} × {j.golsB}</p>
                                 </div>
-                                <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: '#F0F0F0', flex: 1, margin: 0 }}>{nomeTime(j.timeBId)}</p>
+                                <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: '#F0F4FF', flex: 1, margin: 0 }}>{nomeTime(j.timeBId)}</p>
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <span style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '20px', fontWeight: 600, ...jogoBadgeStyle(j.status) }}>{j.status}</span>
@@ -512,11 +512,11 @@ export default function CampeonatoDetalhes() {
                       {jogos.filter(j => j.fase === fase).map(j => (
                         <div key={j.id} style={{ background: cardBg, border: '1px solid rgba(249,115,22,0.15)', borderRadius: '14px', padding: '12px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '10px' }}>
-                            <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: '#F0F0F0', flex: 1, textAlign: 'right', margin: 0 }}>{nomeTime(j.timeAId)}</p>
+                            <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: '#F0F4FF', flex: 1, textAlign: 'right', margin: 0 }}>{nomeTime(j.timeAId)}</p>
                             <div style={{ background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.25)', borderRadius: '10px', padding: '5px 12px', minWidth: '60px', textAlign: 'center' }}>
                               <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '15px', color: '#FB923C', margin: 0 }}>{j.golsA} × {j.golsB}</p>
                             </div>
-                            <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: '#F0F0F0', flex: 1, margin: 0 }}>{nomeTime(j.timeBId)}</p>
+                            <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: '#F0F4FF', flex: 1, margin: 0 }}>{nomeTime(j.timeBId)}</p>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <span style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '20px', fontWeight: 600, ...jogoBadgeStyle(j.status) }}>{j.status}</span>
@@ -558,7 +558,7 @@ export default function CampeonatoDetalhes() {
                       <tbody>
                         {tms.map((t, i) => (
                           <tr key={t.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: i < classificadosPorGrupo ? 'rgba(57,255,20,0.04)' : 'transparent' }}>
-                            <td style={{ padding: '8px 8px 8px 14px', fontFamily: syne, fontWeight: 700, fontSize: '12px', color: '#F0F0F0', whiteSpace: 'nowrap' as const }}>{t.nome}</td>
+                            <td style={{ padding: '8px 8px 8px 14px', fontFamily: syne, fontWeight: 700, fontSize: '12px', color: '#F0F4FF', whiteSpace: 'nowrap' as const }}>{t.nome}</td>
                             <td style={{ padding: '8px', textAlign: 'center' as const, color: 'rgba(255,255,255,0.5)' }}>{t.jogos}</td>
                             <td style={{ padding: '8px', textAlign: 'center' as const, color: 'rgba(255,255,255,0.5)' }}>{t.v}</td>
                             <td style={{ padding: '8px', textAlign: 'center' as const, color: 'rgba(255,255,255,0.5)' }}>{t.e}</td>

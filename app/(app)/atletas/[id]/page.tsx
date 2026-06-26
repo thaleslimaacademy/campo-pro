@@ -136,10 +136,10 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
             <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "20px", color: "#F0F4FF", margin: "0 0 4px" }}>{atleta.nome}</p>
             <p style={{ color: "#4169E1", fontSize: "13px", fontWeight: 600 }}>{atleta.posicao || 'Sem posição'}</p>
             {atleta.bolsista && (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '6px', background: 'rgba(0,200,150,0.12)', border: '1px solid rgba(0,200,150,0.3)', color: '#00D67A', borderRadius: '20px', padding: '3px 10px', fontSize: '11px', fontWeight: 700 }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '6px', background: 'rgba(0,214,122,0.12)', border: '1px solid rgba(0,214,122,0.3)', color: '#00D67A', borderRadius: '20px', padding: '3px 10px', fontSize: '11px', fontWeight: 700 }}>
                 🎓 Bolsista 100%
                 {atleta.motivoBolsa && (
-                  <span style={{ color: 'rgba(0,200,150,0.7)', fontWeight: 400 }}>· {atleta.motivoBolsa}</span>
+                  <span style={{ color: 'rgba(0,214,122,0.7)', fontWeight: 400 }}>· {atleta.motivoBolsa}</span>
                 )}
               </span>
             )}
@@ -177,10 +177,10 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
       {!atleta.bolsista && <GerarCobranca atletaId={atleta.id} atletaNome={atleta.nome} />}
 
       {atleta.bolsista ? (
-        <div style={{ background: 'rgba(0,200,150,0.06)', border: '1px solid rgba(0,200,150,0.2)', borderRadius: '16px', padding: '14px', marginBottom: '12px', textAlign: 'center' }}>
+        <div style={{ background: 'rgba(0,214,122,0.06)', border: '1px solid rgba(0,214,122,0.2)', borderRadius: '16px', padding: '14px', marginBottom: '12px', textAlign: 'center' }}>
           <p style={{ color: '#00D67A', fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: '14px', marginBottom: '4px' }}>🎓 Aluno Bolsista</p>
           <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>Mensalidade 100% gratuita — nenhuma cobrança gerada.</p>
-          {atleta.motivoBolsa && <p style={{ color: 'rgba(0,200,150,0.7)', fontSize: '11px', marginTop: '4px' }}>Motivo: {atleta.motivoBolsa}</p>}
+          {atleta.motivoBolsa && <p style={{ color: 'rgba(0,214,122,0.7)', fontSize: '11px', marginTop: '4px' }}>Motivo: {atleta.motivoBolsa}</p>}
         </div>
       ) : (
         <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
