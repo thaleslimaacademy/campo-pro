@@ -1,18 +1,17 @@
 'use client'
 import PlanoGate from '@/components/PlanoGate'
-import { usePerfil } from '@/lib/usePerfil'
-
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { supabase } from '@/lib/supabase'
+import { getAtletasETurmas } from './actions'
 
 interface Atleta { id: string; nome: string; posicao: string; turmaId: string }
 interface Turma { id: string; nome: string }
 
 export default function Relatorios() {
-  const { escolaId } = usePerfil()
+  const [escolaId, setEscolaId] = useState('')
   const [atletas, setAtletas] = useState<Atleta[]>([])
   const [turmas, setTurmas] = useState<Turma[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, startLoad] = useTransition()
   const [gerando, setGerando] = useState(false)
   const [aba, setAba] = useState<'presenca' | 'financeiro' | 'atletas'>('presenca')
   const [atletaSelecionado, setAtletaSelecionado] = useState('')
@@ -22,14 +21,12 @@ export default function Relatorios() {
   const [turmaSelecionada, setTurmaSelecionada] = useState('')
 
   useEffect(() => {
-    async function carregar() {
-      const { data: ats } = await supabase.from('Atleta').select('id, nome, posicao, turmaId').eq('escolaId', escolaId!).eq('ativo', true).order('nome')
-      setAtletas(ats || [])
-      const { data: tms } = await supabase.from('Turma').select('id, nome').eq('escolaId', escolaId!).order('nome')
-      setTurmas(tms || [])
-      setLoading(false)
-    }
-    carregar()
+    startLoad(async () => {
+      const d = await getAtletasETurmas()
+      setEscolaId(d.escolaId)
+      setAtletas(d.atletas as Atleta[])
+      setTurmas(d.turmas as Turma[])
+    })
   }, [])
 
   async function gerarPresenca() {
