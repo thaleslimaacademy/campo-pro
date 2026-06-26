@@ -284,7 +284,7 @@ export default function Carteirinha() {
             <div style={{ flexShrink: 0 }}>
               {atleta.fotoUrl ? (
                 <img src={atleta.fotoUrl} alt={atleta.nome}
-                  style={{ width: '16mm', height: '21.3mm', objectFit: 'cover', objectPosition: 'center top', borderRadius: '3px', border: `1.5px solid ${accentColor}60` }} />
+                  style={{ width: '16mm', height: '21.3mm', objectFit: 'cover', objectPosition: 'center center', borderRadius: '3px', border: `1.5px solid ${accentColor}60` }} />
               ) : (
                 <div style={{ width: '16mm', height: '21.3mm', background: accentColor + '15', borderRadius: '3px', border: `1.5px dashed ${accentColor}40`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
                   <span style={{ color: accentColor, fontSize: '10px' }}>👤</span>
