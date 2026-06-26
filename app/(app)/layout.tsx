@@ -11,7 +11,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   if (!isLoaded) return (
     <div style={{ minHeight: '100vh', background: T.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ textAlign: 'center' }}>
-        <img src="/gestaofc-icon.svg" alt="GestaoFC" style={{ width: 64, height: 64, borderRadius: 16, objectFit: 'cover', display: 'block', margin: '0 auto 16px' }} />
+        <img src="/gestaofc-icon.svg" alt="GestaoFC" style={{ width: 80, height: 80, borderRadius: 18, objectFit: 'cover', display: 'block', margin: '0 auto 16px' }} />
         <p style={{ color: T.muted, fontFamily: INTER, fontSize: 12, letterSpacing: '0.08em', margin: 0 }}>Verificando acesso…</p>
       </div>
     </div>

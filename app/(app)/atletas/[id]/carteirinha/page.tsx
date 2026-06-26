@@ -178,9 +178,9 @@ export default function Carteirinha() {
             <p style={{ fontSize: 10, color: 'rgba(240,244,255,0.5)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>Logo da escolinha</p>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               {logoPreview ? (
-                <img src={logoPreview} alt="Logo" style={{ width: 48, height: 48, objectFit: 'contain', background: '#fff', borderRadius: 6, padding: 4 }} />
+                <img src={logoPreview} alt="Logo" style={{ width: 64, height: 64, objectFit: 'contain', background: '#fff', borderRadius: 8, padding: 4 }} />
               ) : (
-                <div style={{ width: 48, height: 48, background: '#121A2E', border: '1px dashed rgba(65,105,225,0.4)', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>⚽</div>
+                <div style={{ width: 64, height: 64, background: '#121A2E', border: '1px dashed rgba(65,105,225,0.4)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>⚽</div>
               )}
               <label style={{ background: '#4169E1', color: '#F0F4FF', borderRadius: 6, padding: '8px 14px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 {uploadingLogo ? 'Enviando...' : 'Escolher logo'}
@@ -262,9 +262,9 @@ export default function Carteirinha() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '2mm' }}>
               {logoPreview ? (
-                <img src={logoPreview} alt="Logo" style={{ width: '8mm', height: '8mm', objectFit: 'contain', background: 'white', borderRadius: 2, padding: 1 }} />
+                <img src={logoPreview} alt="Logo" style={{ width: '12mm', height: '12mm', objectFit: 'contain', background: 'white', borderRadius: 3, padding: 2 }} />
               ) : (
-                <div style={{ width: '8mm', height: '8mm', background: accentColor + '20', border: `0.5px solid ${accentColor}50`, borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 6 }}>⚽</div>
+                <div style={{ width: '12mm', height: '12mm', background: accentColor + '20', border: `0.5px solid ${accentColor}50`, borderRadius: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>⚽</div>
               )}
               <div>
                 <p style={{ color: mutedColor, fontSize: '4.5px', fontWeight: 'bold', letterSpacing: '0.8px', margin: 0 }}>ASSOCIAÇÃO ESPORTIVA</p>
