@@ -1,5 +1,7 @@
 'use client'
-import { usePerfil } from '@/lib/usePerfil'
+import { useTransition } from 'react'
+import BottomNav from '@/components/ui/BottomNav'
+import { getLocais, salvarLocal, excluirLocal } from './actions'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
@@ -31,7 +33,8 @@ type Local = {
 const FORM_VAZIO = { nome: '', tipo: 'campo', endereco: '', numero: '', bairro: '', cidade: '', estado: '', cep: '', capacidade: '' }
 
 export default function LocaisTreino() {
-  const { escolaId } = usePerfil()
+  const [escolaId, setEscolaId] = useState('')
+  const [, startLoad] = useTransition()
   const [locais, setLocais] = useState<Local[]>([])
   const [loading, setLoading] = useState(true)
   const [criando, setCriando] = useState(false)
@@ -39,13 +42,16 @@ export default function LocaisTreino() {
   const [editando, setEditando] = useState<Local | null>(null)
   const [form, setForm] = useState(FORM_VAZIO)
 
-  async function carregar() {
-    const { data } = await supabase.from('LocalTreino').select('*').eq('escolaId', escolaId!).eq('ativo', true).order('nome')
-    setLocais(data || [])
-    setLoading(false)
+  function carregar() {
+    startLoad(async () => {
+      const d = await getLocais()
+      setEscolaId(d.escolaId)
+      setLocais(d.locais as any[])
+      setLoading(false)
+    })
   }
 
-  useEffect(() => { if (escolaId) carregar() }, [escolaId])
+  useEffect(() => { carregar() }, [])
 
   async function buscarCep(cep: string) {
     if (cep.replace(/\D/g, '').length !== 8) return
@@ -85,9 +91,9 @@ export default function LocaisTreino() {
       capacidade: form.capacidade ? Number(form.capacidade) : null,
     }
     if (editando) {
-      await supabase.from('LocalTreino').update(payload).eq('id', editando.id)
+      await salvarLocal(escolaId, payload as Record<string,unknown>, editando.id)
     } else {
-      await supabase.from('LocalTreino').insert({ ...payload, escolaId: escolaId!, ativo: true })
+      await salvarLocal(escolaId, payload as Record<string,unknown>)
     }
     fecharForm()
     await carregar()
@@ -96,7 +102,7 @@ export default function LocaisTreino() {
 
   async function excluir(id: string) {
     if (!confirm('Excluir este local?')) return
-    await supabase.from('LocalTreino').update({ ativo: false }).eq('id', id)
+    await excluirLocal(id)
     carregar()
   }
 
