@@ -1,5 +1,6 @@
 'use client'
-import { usePerfil } from '@/lib/usePerfil'
+import { useTransition } from 'react'
+import { getTurmaDetalhe, adicionarAtletaTurma, removerAtletaTurma, editarTurma, arquivarTurma } from './actions'
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
@@ -23,7 +24,8 @@ type Turma = {
 }
 
 export default function TurmaDetalhes() {
-  const { escolaId } = usePerfil()
+  const [escolaId, setEscolaId] = useState('')
+  const [, startLoad] = useTransition()
   const params = useParams()
   const router = useRouter()
   const id = params.id as string
@@ -53,60 +55,30 @@ export default function TurmaDetalhes() {
   const iniciais = (nome: string) =>
     nome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
 
-  async function carregar() {
+  function carregar() {
     setLoading(true)
-    const { data: t } = await supabase.from('Turma').select('*').eq('id', id).single()
-    if (t) {
-      setTurma(t)
-      setFormEdit({ nome: t.nome || '', diasSemana: t.diasSemana || '', horario: t.horario || '', descricao: t.descricao || '' })
-    }
-
-    const res = await fetch('/api/atleta-turma?turmaId=' + id)
-    const json = res.ok ? await res.json() : { ids: [] }
-    const idsNaTurma: string[] = json.ids ?? []
-
-    if (idsNaTurma.length > 0) {
-      const { data: comTurma } = await supabase
-        .from('Atleta')
-        .select('id, nome, posicao, fotoUrl, turmaId, dataNascimento')
-        .in('id', idsNaTurma)
-        .eq('ativo', true)
-        .order('nome')
-      setAtletasTurma(comTurma || [])
-    } else {
-      setAtletasTurma([])
-    }
-
-    if (escolaId) {
-      const { data: todos } = await supabase
-        .from('Atleta')
-        .select('id, nome, posicao, fotoUrl, turmaId, dataNascimento')
-        .eq('escolaId', escolaId)
-        .eq('ativo', true)
-        .order('nome')
-      setAtletasSemTurma((todos || []).filter(a => !idsNaTurma.includes(a.id)))
-    }
-
-    setLoading(false)
+    startLoad(async () => {
+      const d = await getTurmaDetalhe(id)
+      setEscolaId(d.escolaId)
+      if (d.turma) {
+        setTurma(d.turma as any)
+        setFormEdit({ nome: (d.turma as any).nome || '', diasSemana: (d.turma as any).diasSemana || '', horario: (d.turma as any).horario || '', descricao: (d.turma as any).descricao || '' })
+      }
+      setAtletasTurma(d.atletasTurma as any[])
+      setAtletasSemTurma(d.atletasSemTurma as any[])
+      setLoading(false)
+    })
   }
 
-  useEffect(() => { if (escolaId) carregar() }, [id, escolaId])
+  useEffect(() => { carregar() }, [id])
 
   async function adicionarAtleta(atletaId: string) {
-    await fetch('/api/atleta-turma', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ atletaId, turmaId: id, escolaId }),
-    })
+    await adicionarAtletaTurma(atletaId, id)
     await carregar()
   }
 
   async function removerAtleta(atletaId: string) {
-    await fetch('/api/atleta-turma', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ atletaId, turmaId: id }),
-    })
+    await removerAtletaTurma(atletaId, id)
     await carregar()
   }
 
@@ -128,7 +100,7 @@ export default function TurmaDetalhes() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ turmaId: id, atletaId: '__all__' }),
     })
-    await supabase.from('Turma').update({ ativa: false }).eq('id', id)
+    await arquivarTurma(id)
     router.push('/turmas')
   }
 

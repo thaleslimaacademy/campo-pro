@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
+import { useTransition } from 'react'
+import { getCampeonatoDetalhe, atualizarStatusCampeonato } from './actions'
 import { supabase } from '@/lib/supabase'
 
 interface Campeonato {
@@ -85,15 +87,16 @@ export default function CampeonatoDetalhes() {
     return { background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.4)' }
   }
 
-  // ── Data fetching ──
-  async function carregar() {
-    const { data: camp } = await supabase.from('Campeonato').select('*').eq('id', id).single()
-    setCampeonato(camp)
-    const { data: tms } = await supabase.from('CampeonatoTime').select('*').eq('campeonatoId', id).order('nome')
-    setTimes(tms || [])
-    const { data: jgs } = await supabase.from('CampeonatoJogo').select('*').eq('campeonatoId', id).order('data')
-    setJogos(jgs || [])
-    setLoading(false)
+  const [, startLoad] = useTransition()
+  function carregar() {
+    setLoading(true)
+    startLoad(async () => {
+      const d = await getCampeonatoDetalhe(id)
+      setCampeonato(d.campeonato as any)
+      setTimes(d.times as any[])
+      setJogos(d.jogos as any[])
+      setLoading(false)
+    })
   }
 
   useEffect(() => { carregar() }, [id])
@@ -147,7 +150,7 @@ export default function CampeonatoDetalhes() {
   }
 
   async function atualizarStatus(novoStatus: string) {
-    await supabase.from('Campeonato').update({ status: novoStatus }).eq('id', id)
+    await atualizarStatusCampeonato(id, novoStatus)
     carregar()
   }
 

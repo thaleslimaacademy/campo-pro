@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
+import { useTransition } from 'react'
+import { getJogoDetalhe, atualizarStatusJogo } from './actions'
 import { supabase } from '@/lib/supabase'
 
 interface Jogo {
@@ -40,42 +42,42 @@ export default function Sumula() {
 
   // ── Tokens visuais ──
   const syne = 'Syne, sans-serif'
-  const neon = '#4169E1'
+  const neon = '#FF6B00'
   const gold = '#FFD700'
-  const bg = 'linear-gradient(160deg,#0A0E1A,#0A0E1A,#0A0E1A)'
+  const bg = 'linear-gradient(160deg,#0F0F1A,#0F0F1A,#111003)'
   const cardBg = 'rgba(255,255,255,0.03)'
   const cardBorder = '1px solid rgba(255,255,255,0.07)'
-  const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 12px', color: '#F0F4FF', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '6px', outline: 'none', boxSizing: 'border-box' as const }
+  const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 12px', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '6px', outline: 'none', boxSizing: 'border-box' as const }
 
   const tipoIcon: Record<string, string> = { gol: '⚽', cartao_amarelo: '🟨', cartao_vermelho: '🟥' }
   const tipoLabel: Record<string, string> = { gol: 'Gol', cartao_amarelo: 'Cartão Amarelo', cartao_vermelho: 'Cartão Vermelho' }
 
-  async function carregar() {
-    const { data: j } = await supabase.from('CampeonatoJogo').select('*').eq('id', id).single()
-    setJogo(j)
-    if (!j) { setLoading(false); return }
-    const { data: tA } = await supabase.from('CampeonatoTime').select('id, nome').eq('id', j.timeAId).single()
-    const { data: tB } = await supabase.from('CampeonatoTime').select('id, nome').eq('id', j.timeBId).single()
-    setTimeA(tA); setTimeB(tB)
-    const { data: atsA } = await supabase.from('CampeonatoAtleta').select('id, nome').eq('timeId', j.timeAId)
-    setAtletasA(atsA || [])
-    const { data: atsB } = await supabase.from('CampeonatoAtleta').select('id, nome').eq('timeId', j.timeBId)
-    setAtletasB(atsB || [])
-    const { data: evs } = await supabase.from('SumulaEvento').select('*').eq('jogoId', id).order('minuto')
-    setEventos(evs || [])
-    setLoading(false)
+  const [, startLoad] = useTransition()
+  function carregar() {
+    setLoading(true)
+    startLoad(async () => {
+      const d = await getJogoDetalhe(id)
+      if (!d) { setLoading(false); return }
+      setJogo(d.jogo as any)
+      setTimeA(d.timeA as any)
+      setTimeB(d.timeB as any)
+      setAtletasA(d.atletasA as any[])
+      setAtletasB(d.atletasB as any[])
+      setEventos(d.eventos as any[])
+      setLoading(false)
+    })
   }
 
   useEffect(() => { carregar() }, [id])
 
   async function iniciarJogo() {
-    await supabase.from('CampeonatoJogo').update({ status: 'andamento' }).eq('id', id)
+    await atualizarStatusJogo(id, 'andamento')
     carregar()
   }
 
   async function encerrarJogo() {
     if (!confirm('Encerrar este jogo? O placar será finalizado.')) return
-    await supabase.from('CampeonatoJogo').update({ status: 'encerrado' }).eq('id', id)
+    await atualizarStatusJogo(id, 'encerrado')
     carregar()
   }
 
@@ -133,12 +135,12 @@ export default function Sumula() {
   const scoreColor = isAndamento ? neon : isEncerrado ? gold : 'rgba(255,255,255,0.6)'
 
   return (
-    <div style={{ minHeight: '100vh', background: bg, color: '#F0F4FF', fontFamily: 'Inter,sans-serif', paddingBottom: '96px' }}>
+    <div style={{ minHeight: '100vh', background: bg, color: '#F0F0F0', fontFamily: 'Inter,sans-serif', paddingBottom: '96px' }}>
 
       {/* ── HEADER ── */}
       <div style={{ padding: '20px 20px 0', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
         <a href={'/campeonato/' + jogo.campeonatoId} style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', textDecoration: 'none' }}>← Voltar</a>
-        <h1 style={{ fontFamily: syne, fontWeight: 800, fontSize: '20px', color: '#F0F4FF', margin: 0 }}>📋 Súmula</h1>
+        <h1 style={{ fontFamily: syne, fontWeight: 800, fontSize: '20px', color: '#F0F0F0', margin: 0 }}>📋 Súmula</h1>
       </div>
 
       <div style={{ padding: '0 20px' }}>
@@ -163,19 +165,19 @@ export default function Sumula() {
 
           {/* Times + Placar */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '20px' }}>
-            <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '15px', color: '#F0F4FF', flex: 1, textAlign: 'right', margin: 0 }}>{timeA.nome}</p>
+            <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '15px', color: '#F0F0F0', flex: 1, textAlign: 'right', margin: 0 }}>{timeA.nome}</p>
             <div style={{ background: 'rgba(0,0,0,0.3)', borderRadius: '16px', padding: '12px 20px', textAlign: 'center', border: '1px solid rgba(255,255,255,0.08)' }}>
               <p style={{ fontFamily: syne, fontWeight: 900, fontSize: '42px', color: scoreColor, margin: 0, lineHeight: 1, textShadow: isAndamento ? '0 0 20px rgba(57,255,20,0.5)' : 'none' }}>
                 {jogo.golsA} × {jogo.golsB}
               </p>
             </div>
-            <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '15px', color: '#F0F4FF', flex: 1, textAlign: 'left', margin: 0 }}>{timeB.nome}</p>
+            <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '15px', color: '#F0F0F0', flex: 1, textAlign: 'left', margin: 0 }}>{timeB.nome}</p>
           </div>
 
           {/* Botões de ação */}
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
             {jogo.status === 'agendado' && (
-              <button onClick={iniciarJogo} style={{ background: 'linear-gradient(135deg,#4169E1,#2bcc0f)', color: '#0A0E1A', padding: '10px 24px', borderRadius: '12px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', boxShadow: '0 0 16px rgba(57,255,20,0.3)' }}>
+              <button onClick={iniciarJogo} style={{ background: 'linear-gradient(135deg,#FF6B00,#2bcc0f)', color: '#0F0F1A', padding: '10px 24px', borderRadius: '12px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', boxShadow: '0 0 16px rgba(57,255,20,0.3)' }}>
                 ▶ Iniciar Jogo
               </button>
             )}
@@ -241,7 +243,7 @@ export default function Sumula() {
                 <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Minuto (opcional)</label>
                 <input value={formEvento.minuto} onChange={e => setFormEvento(p => ({ ...p, minuto: e.target.value }))} type="number" placeholder="Ex: 23" style={inputStyle} />
               </div>
-              <button onClick={adicionarEvento} disabled={salvando} style={{ width: '100%', background: salvando ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg,#4169E1,#2bcc0f)', color: salvando ? 'rgba(255,255,255,0.3)' : '#0A0E1A', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer' }}>
+              <button onClick={adicionarEvento} disabled={salvando} style={{ width: '100%', background: salvando ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg,#FF6B00,#2bcc0f)', color: salvando ? 'rgba(255,255,255,0.3)' : '#0F0F1A', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer' }}>
                 {salvando ? 'Salvando...' : 'Registrar Evento'}
               </button>
             </div>
@@ -257,9 +259,9 @@ export default function Sumula() {
               onChange={e => setRelatorio(e.target.value)}
               rows={5}
               placeholder="Descreva ocorrências, incidentes, observações do jogo..."
-              style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px', color: '#F0F4FF', fontFamily: 'Inter,sans-serif', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const, resize: 'vertical' as const }}
+              style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const, resize: 'vertical' as const }}
             />
-            <button onClick={salvarRelatorio} disabled={salvando} style={{ width: '100%', background: salvando ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg,#FFD700,#a88520)', color: salvando ? 'rgba(255,255,255,0.3)' : '#0A0E1A', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', marginTop: '10px' }}>
+            <button onClick={salvarRelatorio} disabled={salvando} style={{ width: '100%', background: salvando ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg,#FFD700,#a88520)', color: salvando ? 'rgba(255,255,255,0.3)' : '#0F0F1A', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', marginTop: '10px' }}>
               {salvando ? 'Salvando...' : 'Salvar Relatório'}
             </button>
           </div>
@@ -279,7 +281,7 @@ export default function Sumula() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <span style={{ fontSize: '20px' }}>{tipoIcon[e.tipo]}</span>
                     <div>
-                      <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '13px', color: '#F0F4FF', margin: 0 }}>{e.atletaNome}</p>
+                      <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '13px', color: '#F0F0F0', margin: 0 }}>{e.atletaNome}</p>
                       <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: '2px 0 0' }}>
                         {tipoLabel[e.tipo]} · {e.timeId === timeA.id ? timeA.nome : timeB.nome}
                         {e.minuto ? " · " + e.minuto + "'" : ''}
@@ -311,7 +313,7 @@ export default function Sumula() {
                   <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>Sem gols</p>
                 ) : (
                   gols.map(e => (
-                    <p key={e.id} style={{ fontSize: '12px', color: '#F0F4FF', margin: '3px 0' }}>
+                    <p key={e.id} style={{ fontSize: '12px', color: '#F0F0F0', margin: '3px 0' }}>
                       {'⚽ ' + e.atletaNome + (e.minuto ? " " + e.minuto + "'" : '')}
                     </p>
                   ))
