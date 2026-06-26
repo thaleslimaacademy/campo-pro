@@ -33,11 +33,11 @@ function ConfiguracoesInner() {
   })
 
   const syne = 'Syne, sans-serif'
-  const neon = '#FF6B00'
+  const neon = '#4169E1'
   const gold = '#FFD700'
   const muted = 'rgba(255,255,255,0.4)'
   const card = { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '16px', marginBottom: '12px' }
-  const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px', color: '#F0F0F0', fontFamily: 'Inter, sans-serif', fontSize: '13px', marginTop: '4px', boxSizing: 'border-box' as const }
+  const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px', color: '#F0F4FF', fontFamily: 'Inter, sans-serif', fontSize: '13px', marginTop: '4px', boxSizing: 'border-box' as const }
   const labelStyle = { fontSize: '10px', color: muted, textTransform: 'uppercase' as const, letterSpacing: '0.8px' }
   const sectionTitle = { fontFamily: syne, fontWeight: 700, fontSize: '13px', color: neon, marginBottom: '14px' }
 
@@ -159,14 +159,14 @@ function ConfiguracoesInner() {
     : ''
 
   return (
-    <div style={{ minHeight: '100vh', paddingBottom: '80px', color: '#F0F0F0', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ minHeight: '100vh', paddingBottom: '80px', color: '#F0F4FF', fontFamily: 'Inter, sans-serif' }}>
 
       <div style={{ padding: '20px 20px 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
           <a href="/dashboard" style={{ color: muted, fontSize: '13px', textDecoration: 'none' }}>Voltar</a>
           <div>
             <div style={{ fontSize: '10px', color: muted, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '2px' }}>Escola</div>
-            <div style={{ fontFamily: syne, fontSize: '24px', fontWeight: 800, color: '#F0F0F0' }}>Configuracoes</div>
+            <div style={{ fontFamily: syne, fontSize: '24px', fontWeight: 800, color: '#F0F4FF' }}>Configuracoes</div>
           </div>
         </div>
       </div>
@@ -174,8 +174,8 @@ function ConfiguracoesInner() {
       <div style={{ padding: '0 20px' }}>
 
         {sucesso && (
-          <div style={{ background: 'rgba(0,200,150,0.1)', border: '1px solid rgba(0,200,150,0.3)', borderRadius: '12px', padding: '12px', textAlign: 'center', marginBottom: '16px' }}>
-            <p style={{ color: '#00C896', fontFamily: syne, fontWeight: 800, margin: 0 }}>✅ Salvo com sucesso!</p>
+          <div style={{ background: 'rgba(0,214,122,0.1)', border: '1px solid rgba(0,214,122,0.3)', borderRadius: '12px', padding: '12px', textAlign: 'center', marginBottom: '16px' }}>
+            <p style={{ color: '#00D67A', fontFamily: syne, fontWeight: 800, margin: 0 }}>✅ Salvo com sucesso!</p>
           </div>
         )}
 
@@ -249,7 +249,7 @@ function ConfiguracoesInner() {
             <span style={{ fontSize: '20px' }}>🏦</span>
             <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '14px', color: '#38bdf8', margin: 0 }}>Integração Asaas</p>
             {asaasStatus === 'ok' && (
-              <span style={{ marginLeft: 'auto', background: 'rgba(0,200,150,0.15)', border: '1px solid rgba(0,200,150,0.4)', color: '#00C896', borderRadius: '20px', padding: '3px 10px', fontSize: '10px', fontWeight: 700 }}>✅ ATIVO</span>
+              <span style={{ marginLeft: 'auto', background: 'rgba(0,214,122,0.15)', border: '1px solid rgba(0,214,122,0.4)', color: '#00D67A', borderRadius: '20px', padding: '3px 10px', fontSize: '10px', fontWeight: 700 }}>✅ ATIVO</span>
             )}
             {asaasStatus === 'erro' && (
               <span style={{ marginLeft: 'auto', background: 'rgba(255,68,68,0.15)', border: '1px solid rgba(255,68,68,0.4)', color: '#FF4444', borderRadius: '20px', padding: '3px 10px', fontSize: '10px', fontWeight: 700 }}>❌ ERRO</span>
@@ -282,11 +282,11 @@ function ConfiguracoesInner() {
 
           {/* Chave atual */}
           {asaasKeyAtual && (
-            <div style={{ background: 'rgba(0,200,150,0.06)', border: '1px solid rgba(0,200,150,0.2)', borderRadius: '10px', padding: '10px 12px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ background: 'rgba(0,214,122,0.06)', border: '1px solid rgba(0,214,122,0.2)', borderRadius: '10px', padding: '10px 12px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <span style={{ fontSize: '14px' }}>🔑</span>
               <div style={{ flex: 1 }}>
                 <p style={{ fontSize: '10px', color: muted, margin: '0 0 2px', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Chave atual</p>
-                <p style={{ fontSize: '12px', color: '#00C896', fontFamily: 'monospace', margin: 0 }}>{keyMasked}</p>
+                <p style={{ fontSize: '12px', color: '#00D67A', fontFamily: 'monospace', margin: 0 }}>{keyMasked}</p>
               </div>
             </div>
           )}
@@ -301,7 +301,7 @@ function ConfiguracoesInner() {
               onChange={e => { setAsaasKey(e.target.value); setAsaasStatus('idle'); setAsaasMsgErro('') }}
               placeholder="Cole aqui sua chave Asaas — começa com $aact_..."
               rows={3}
-              style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: asaasStatus === 'erro' ? '1px solid rgba(255,68,68,0.5)' : asaasStatus === 'ok' && asaasKey ? '1px solid rgba(0,200,150,0.5)' : '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px', color: '#F0F0F0', fontFamily: 'monospace', fontSize: '12px', resize: 'none', boxSizing: 'border-box' as const, lineHeight: '1.5' }}
+              style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: asaasStatus === 'erro' ? '1px solid rgba(255,68,68,0.5)' : asaasStatus === 'ok' && asaasKey ? '1px solid rgba(0,214,122,0.5)' : '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px', color: '#F0F4FF', fontFamily: 'monospace', fontSize: '12px', resize: 'none', boxSizing: 'border-box' as const, lineHeight: '1.5' }}
             />
             {asaasMsgErro && <p style={{ color: '#FF4444', fontSize: '11px', marginTop: '4px' }}>{asaasMsgErro}</p>}
           </div>
@@ -311,19 +311,19 @@ function ConfiguracoesInner() {
             <button
               onClick={() => verificarChaveAsaas(asaasKey)}
               disabled={!asaasKey.trim() || asaasStatus === 'verificando'}
-              style={{ flex: 1, background: asaasStatus === 'ok' && asaasKey ? 'rgba(0,200,150,0.15)' : 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.3)', color: asaasStatus === 'ok' && asaasKey ? '#00C896' : '#38bdf8', borderRadius: '10px', padding: '12px', fontSize: '13px', fontFamily: syne, fontWeight: 700, cursor: asaasKey.trim() ? 'pointer' : 'not-allowed', opacity: !asaasKey.trim() ? 0.5 : 1 }}>
+              style={{ flex: 1, background: asaasStatus === 'ok' && asaasKey ? 'rgba(0,214,122,0.15)' : 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.3)', color: asaasStatus === 'ok' && asaasKey ? '#00D67A' : '#38bdf8', borderRadius: '10px', padding: '12px', fontSize: '13px', fontFamily: syne, fontWeight: 700, cursor: asaasKey.trim() ? 'pointer' : 'not-allowed', opacity: !asaasKey.trim() ? 0.5 : 1 }}>
               {asaasStatus === 'verificando' ? '⏳ Verificando...' : asaasStatus === 'ok' && asaasKey ? '✅ Chave válida!' : '⚡ Verificar chave'}
             </button>
             <button
               onClick={salvarChaveAsaas}
               disabled={!asaasKey.trim() || asaasStatus !== 'ok' || salvandoAsaas}
-              style={{ flex: 1, background: asaasStatus === 'ok' && asaasKey ? '#FF6B00' : 'rgba(255,255,255,0.05)', border: 'none', color: asaasStatus === 'ok' && asaasKey ? '#000' : muted, borderRadius: '10px', padding: '12px', fontSize: '13px', fontFamily: syne, fontWeight: 800, cursor: asaasStatus === 'ok' && asaasKey ? 'pointer' : 'not-allowed', opacity: salvandoAsaas ? 0.6 : 1 }}>
+              style={{ flex: 1, background: asaasStatus === 'ok' && asaasKey ? '#4169E1' : 'rgba(255,255,255,0.05)', border: 'none', color: asaasStatus === 'ok' && asaasKey ? '#000' : muted, borderRadius: '10px', padding: '12px', fontSize: '13px', fontFamily: syne, fontWeight: 800, cursor: asaasStatus === 'ok' && asaasKey ? 'pointer' : 'not-allowed', opacity: salvandoAsaas ? 0.6 : 1 }}>
               {salvandoAsaas ? 'Salvando...' : '💾 Salvar chave'}
             </button>
           </div>
 
           {asaasStatus === 'ok' && !asaasKey && (
-            <p style={{ fontSize: '11px', color: '#00C896', textAlign: 'center', marginTop: '10px' }}>
+            <p style={{ fontSize: '11px', color: '#00D67A', textAlign: 'center', marginTop: '10px' }}>
               ✅ Integração ativa — cobranças PIX e boletos funcionando normalmente.
             </p>
           )}
@@ -334,7 +334,7 @@ function ConfiguracoesInner() {
           <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '13px', color: gold, marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.8px' }}>💰 Planos de Mensalidade</p>
           {planos.map(p => (
             <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-              <div style={{ flex: 1, fontSize: '13px', color: '#F0F0F0', fontWeight: 600 }}>{p.nome}</div>
+              <div style={{ flex: 1, fontSize: '13px', color: '#F0F4FF', fontWeight: 600 }}>{p.nome}</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span style={{ fontSize: '11px', color: muted }}>R$</span>
                 <input
@@ -357,8 +357,8 @@ function ConfiguracoesInner() {
             </div>
           ))}
           <div style={{ display: 'flex', gap: '8px', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-            <input value={novoPlanoNome} onChange={e => setNovoPlanoNome(e.target.value)} placeholder="Nome do plano" style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '8px 10px', color: '#F0F0F0', fontSize: '12px' }} />
-            <input value={novoPlanoValor} onChange={e => setNovoPlanoValor(e.target.value)} type="number" placeholder="R$" style={{ width: '70px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '8px', color: '#F0F0F0', fontSize: '12px' }} />
+            <input value={novoPlanoNome} onChange={e => setNovoPlanoNome(e.target.value)} placeholder="Nome do plano" style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '8px 10px', color: '#F0F4FF', fontSize: '12px' }} />
+            <input value={novoPlanoValor} onChange={e => setNovoPlanoValor(e.target.value)} type="number" placeholder="R$" style={{ width: '70px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '8px', color: '#F0F4FF', fontSize: '12px' }} />
             <button onClick={async () => {
               if (!novoPlanoNome || !novoPlanoValor) return
               await criarPlano(novoPlanoNome, Number(novoPlanoValor))
@@ -370,7 +370,7 @@ function ConfiguracoesInner() {
 
         {/* Links Publicos */}
         {slug && (
-          <div style={{ background: 'rgba(255,107,0,0.06)', border: '1px solid rgba(255,107,0,0.2)', borderRadius: '16px', padding: '16px', marginBottom: '12px' }}>
+          <div style={{ background: 'rgba(65,105,225,0.06)', border: '1px solid rgba(65,105,225,0.2)', borderRadius: '16px', padding: '16px', marginBottom: '12px' }}>
             <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '13px', color: neon, marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.8px' }}>🔗 Links Públicos</p>
             <p style={{ fontSize: '11px', color: muted, marginBottom: '12px' }}>Compartilhe estes links com os responsáveis e clientes.</p>
             {[
@@ -382,7 +382,7 @@ function ConfiguracoesInner() {
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   <div style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 12px', fontSize: '11px', color: 'rgba(255,255,255,0.6)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{url}</div>
                   <button onClick={() => { navigator.clipboard.writeText(url) }}
-                    style={{ background: 'rgba(255,107,0,0.15)', border: '1px solid rgba(255,107,0,0.3)', color: neon, borderRadius: '10px', padding: '10px 14px', fontSize: '11px', fontFamily: syne, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+                    style={{ background: 'rgba(65,105,225,0.15)', border: '1px solid rgba(65,105,225,0.3)', color: neon, borderRadius: '10px', padding: '10px 14px', fontSize: '11px', fontFamily: syne, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
                     Copiar
                   </button>
                 </div>
@@ -392,7 +392,7 @@ function ConfiguracoesInner() {
         )}
 
         {/* Botao salvar */}
-        <button onClick={salvar} disabled={salvando} style={{ width: '100%', background: 'linear-gradient(135deg,#FF6B00,#FF8C00)', color: '#000', padding: '16px', borderRadius: '14px', fontFamily: syne, fontWeight: 800, fontSize: '15px', border: 'none', cursor: 'pointer', boxShadow: '0 0 20px rgba(255,107,0,0.3)', marginBottom: '10px', opacity: salvando ? 0.6 : 1 }}>
+        <button onClick={salvar} disabled={salvando} style={{ width: '100%', background: 'linear-gradient(135deg,#4169E1,#1A3FA8)', color: '#000', padding: '16px', borderRadius: '14px', fontFamily: syne, fontWeight: 800, fontSize: '15px', border: 'none', cursor: 'pointer', boxShadow: '0 0 20px rgba(65,105,225,0.3)', marginBottom: '10px', opacity: salvando ? 0.6 : 1 }}>
           {salvando ? 'Salvando...' : 'Salvar Configuracoes'}
         </button>
 

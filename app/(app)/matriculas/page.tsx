@@ -82,9 +82,7 @@ function MatriculasInner() {
   if (selecionada) {
     const st = STATUS_COR[selecionada.status]
     return (
-      <div style={{ minHeight: '100vh', background: T.bg, color: T.text, padding: '20px 20px 80px', fontFamily: 'Inter, sans-serif' }}>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+      <div style={{ minHeight: '100vh', background: T.bg, color: T.text, padding: '20px 20px 80px', fontFamily: 'Inter, sans-serif' }}>        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
           <button onClick={() => setSelecionada(null)} style={{ background: 'none', border: 'none', color: T.muted, cursor: 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', gap: 4 }}>
             <i className="ti ti-arrow-left" aria-hidden="true"></i> Voltar
           </button>
@@ -127,8 +125,6 @@ function MatriculasInner() {
 
   return (
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, padding: '0 0 80px', fontFamily: 'Inter, sans-serif' }}>
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
-
       <div style={{ background: T.primary, padding: '20px 20px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div>

@@ -74,8 +74,6 @@ export default function ComissaoPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: NAVY, paddingBottom: 88, fontFamily: INTER, color: OFF }}>
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
-
       {/* Header */}
       <div style={{ background: 'linear-gradient(135deg, #1A3FA8 0%, #4169E1 100%)', padding: '16px 16px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>

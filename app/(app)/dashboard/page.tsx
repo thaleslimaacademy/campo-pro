@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { UserButton } from '@clerk/nextjs'
+import BottomNav from '@/components/ui/BottomNav'
 import { usePerfil } from '@/lib/usePerfil'
 
 const brl = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n || 0)
@@ -257,25 +258,7 @@ export default function Dashboard() {
           </div>
         </div>
       )}
-
-      {/* BOTTOM NAV */}
-      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#0A0A0C', borderTop: '1px solid #1A1A22', display: 'flex', justifyContent: 'space-around', padding: '10px 0 20px', zIndex: 50 }}>
-        {[
-          { href: '/dashboard',           label: 'Inicio',     icon: 'ti-home',   active: true  },
-          { href: '/atletas',             label: 'Atletas',    icon: 'ti-users',  active: false },
-          { href: '/presenca',            label: 'Presenca',   icon: 'ti-check',  active: false },
-          { href: '/financeiro/dashboard',label: 'Financeiro', icon: 'ti-wallet', active: false },
-        ].filter(item => isAdmin || !item.href.startsWith('/financeiro')).map(item => (
-          <a key={item.href} href={item.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textDecoration: 'none', minWidth: 60 }}>
-            <i className={'ti ' + item.icon} style={{ fontSize: 22, color: item.active ? C.cyan : 'rgba(125,211,252,0.3)' }} />
-            <span style={{ fontSize: 9, fontFamily: 'Syne, sans-serif', fontWeight: 700, color: item.active ? C.cyan : 'rgba(125,211,252,0.3)', letterSpacing: 0.5, textTransform: 'uppercase' }}>{item.label}</span>
-            {item.active && <div style={{ width: 4, height: 4, borderRadius: '50%', background: C.cyan }} />}
-          </a>
-        ))}
-      </nav>
-
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
-      <style>{`* { box-sizing: border-box; } a:hover { opacity: 0.9; }`}</style>
+      <BottomNav />      <style>{`* { box-sizing: border-box; } a:hover { opacity: 0.9; }`}</style>
     </div>
   )
 }
