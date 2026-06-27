@@ -1,11 +1,33 @@
-import { supabase } from '@/lib/supabase'
 import { supabaseAdmin } from '@/lib/supabase'
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
+import { podeFinanceiro } from '@/lib/auth'
 import CopiarLink from './CopiarLink'
 import GraficoPresenca from './GraficoPresenca'
 import FotoAtleta from './FotoAtleta'
 import GerarCobranca from './GerarCobranca'
+import BottomNav from '@/components/ui/BottomNav'
+
+const T = {
+  bg:      '#0A0E1A',
+  surface: '#0D1220',
+  surface2:'#121A2E',
+  primary: '#4169E1',
+  accent:  '#00BFFF',
+  sky:     '#7DD3FC',
+  text:    '#F0F4FF',
+  muted:   'rgba(240,244,255,0.4)',
+  border:  'rgba(240,244,255,0.07)',
+  green:   '#00D67A',
+  red:     '#FF4444',
+  gold:    '#FFD700',
+}
+const SYNE = 'Syne, sans-serif'
+const INTER = 'Inter, sans-serif'
+
+const CARD: React.CSSProperties = { background: T.surface, borderRadius: 14, padding: 16, border: `1px solid ${T.border}`, marginBottom: 10 }
+const LABEL: React.CSSProperties = { fontFamily: SYNE, fontWeight: 700, fontSize: 11, color: T.primary, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }
+const ROW: React.CSSProperties  = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 8, marginBottom: 8, borderBottom: `1px solid ${T.border}` }
 
 export default async function PerfilAtleta({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -13,280 +35,239 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
   if (!userId) redirect('/login')
 
   const { data: perfil } = await supabaseAdmin
-    .from('PerfilUsuario')
-    .select('escolaId')
-    .eq('clerkUserId', userId)
-    .single()
-
+    .from('PerfilUsuario').select('escolaId').eq('clerkUserId', userId).single()
   const escolaId = perfil?.escolaId
   if (!escolaId) redirect('/onboarding')
 
-  const { data: atleta } = await supabase
-    .from('Atleta')
-    .select('*')
-    .eq('id', id)
-    .eq('escolaId', escolaId)
-    .single()
+  const [atletaRes, financeiroOk] = await Promise.all([
+    supabaseAdmin.from('Atleta').select('*').eq('id', id).eq('escolaId', escolaId).single(),
+    podeFinanceiro(),
+  ])
+  const atleta = atletaRes.data
+  if (!atleta) return (
+    <div style={{ minHeight: '100vh', background: T.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: T.muted, fontFamily: INTER }}>Atleta não encontrado.</p>
+    </div>
+  )
 
-  if (!atleta) {
-    return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <p>Atleta não encontrado.</p>
-      </div>
-    )
-  }
-
-  const { data: responsaveis } = await supabase
-    .from('Responsavel')
-    .select('*')
-    .eq('atletaId', id)
-
+  // Busca paralela de todos os dados
   const agora = new Date()
   const seisAtras = new Date(agora.getFullYear(), agora.getMonth() - 5, 1)
 
-  const { data: presencas } = await supabase
-    .from('Presenca')
-    .select('status, criadoEm')
-    .eq('atletaId', id)
-    .gte('criadoEm', seisAtras.toISOString())
-    .order('criadoEm', { ascending: true })
+  const [responsaveisRes, presencasRes, cobrancasRes, turmaRes] = await Promise.all([
+    supabaseAdmin.from('Responsavel').select('*').eq('atletaId', id),
+    supabaseAdmin.from('Presenca').select('status, criadoEm').eq('atletaId', id).gte('criadoEm', seisAtras.toISOString()).order('criadoEm', { ascending: true }),
+    financeiroOk ? supabaseAdmin.from('Cobranca').select('id, valor, vencimento, status, descricao').eq('atletaId', id).order('vencimento', { ascending: false }).limit(12) : Promise.resolve({ data: null }),
+    atleta.turmaId ? supabaseAdmin.from('Turma').select('id, nome').eq('id', atleta.turmaId).single() : Promise.resolve({ data: null }),
+  ])
 
+  const responsaveis = responsaveisRes.data || []
+  const presencas    = presencasRes.data || []
+  const cobrancas    = cobrancasRes.data || []
+  const turma        = turmaRes.data
+
+  // Presença por mês
   const meses: Record<string, { presentes: number; total: number }> = {}
   for (let i = 5; i >= 0; i--) {
     const d = new Date(agora.getFullYear(), agora.getMonth() - i, 1)
-    const chave = d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' })
-    meses[chave] = { presentes: 0, total: 0 }
+    meses[d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' })] = { presentes: 0, total: 0 }
   }
+  presencas.forEach((p: { status: string; criadoEm: string }) => {
+    const chave = new Date(p.criadoEm).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' })
+    if (meses[chave]) { meses[chave].total++; if (p.status === 'PRESENTE') meses[chave].presentes++ }
+  })
+  const dadosGrafico = Object.entries(meses).map(([mes, d]) => ({ mes, presentes: d.presentes, total: d.total, percentual: d.total > 0 ? Math.round((d.presentes / d.total) * 100) : 0 }))
+  const totalPresentes = presencas.filter((p: { status: string }) => p.status === 'PRESENTE').length
+  const pct = presencas.length > 0 ? Math.round((totalPresentes / presencas.length) * 100) : 0
 
-  if (presencas) {
-    presencas.forEach(p => {
-      const d = new Date(p.criadoEm)
-      const chave = d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' })
-      if (meses[chave] !== undefined) {
-        meses[chave].total++
-        if (p.status === 'PRESENTE') meses[chave].presentes++
-      }
-    })
-  }
+  // Financeiro
+  const totalPago     = cobrancas.filter((c: { status: string }) => c.status === 'PAGO').reduce((s: number, c: { valor: number }) => s + Number(c.valor), 0)
+  const totalPendente = cobrancas.filter((c: { status: string }) => c.status === 'PENDENTE').reduce((s: number, c: { valor: number }) => s + Number(c.valor), 0)
+  const totalVencido  = cobrancas.filter((c: { status: string }) => c.status === 'VENCIDO').reduce((s: number, c: { valor: number }) => s + Number(c.valor), 0)
 
-  const dadosGrafico = Object.entries(meses).map(([mes, dados]) => ({
-    mes,
-    presentes: dados.presentes,
-    total: dados.total,
-    percentual: dados.total > 0 ? Math.round((dados.presentes / dados.total) * 100) : 0,
-  }))
+  const nascimento = atleta.dataNascimento
+    ? new Date(atleta.dataNascimento.includes('T') ? atleta.dataNascimento : atleta.dataNascimento + 'T12:00:00').toLocaleDateString('pt-BR')
+    : null
 
-  const totalPresencas = presencas ? presencas.length : 0
-  const totalPresentes = presencas ? presencas.filter(p => p.status === 'PRESENTE').length : 0
-  const percentualGeral = totalPresencas > 0 ? Math.round((totalPresentes / totalPresencas) * 100) : 0
-
-  const { data: cobrancas } = await supabase
-    .from('Cobranca')
-    .select('id, valor, vencimento, status, descricao')
-    .eq('atletaId', id)
-    .order('vencimento', { ascending: false })
-    .limit(12)
-
-  const totalPago = cobrancas ? cobrancas.filter(c => c.status === 'PAGO').reduce((s, c) => s + Number(c.valor), 0) : 0
-  const totalPendente = cobrancas ? cobrancas.filter(c => c.status === 'PENDENTE').reduce((s, c) => s + Number(c.valor), 0) : 0
-  const totalVencido = cobrancas ? cobrancas.filter(c => c.status === 'VENCIDO').reduce((s, c) => s + Number(c.valor), 0) : 0
-
-  const statusCor: Record<string, string> = {
-    PAGO: 'text-green-400',
-    PENDENTE: 'text-yellow-400',
-    VENCIDO: 'text-red-400',
-    CANCELADO: 'text-gray-400',
-  }
-
-  const statusBg: Record<string, string> = {
-    PAGO: 'bg-green-400/10',
-    PENDENTE: 'bg-yellow-400/10',
-    VENCIDO: 'bg-red-400/10',
-    CANCELADO: 'bg-gray-400/10',
-  }
-
-  const linkPais = 'https://gestaofc.com.br/pais/' + atleta.tokenPais
-  const linkRematricula = 'https://gestaofc.com.br/rematricula/' + atleta.id
+  const STATUS_COR: Record<string, string> = { PAGO: T.green, PENDENTE: T.gold, VENCIDO: T.red, CANCELADO: T.muted }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6 pb-24">
+    <div style={{ minHeight: '100vh', background: T.bg, color: T.text, fontFamily: INTER, paddingBottom: 80 }}>
 
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <a href="/atletas" className="text-gray-400">← Voltar</a>
-          <h1 className="text-xl font-bold">Perfil do Atleta</h1>
-        </div>
-        <div className="flex gap-2">
-          <a href={'/atletas/' + atleta.id + '/carteirinha'} className="bg-green-700 hover:bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition">
-            🪪
-          </a>
-          <a href={'/atletas/' + atleta.id + '/avaliacao'} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition">
-            📋
-          </a>
-          <a href={'/atletas/' + atleta.id + '/editar'} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", color: "#F0F4FF", padding: "8px 14px", borderRadius: "10px", fontSize: "13px", textDecoration: "none" }}>
-            ✏️
-          </a>
-        </div>
-      </div>
-
-      <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-        <div className="flex items-center gap-4 mb-4">
-          <FotoAtleta atletaId={atleta.id} fotoUrl={atleta.fotoUrl || null} nome={atleta.nome} />
-          <div>
-            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "20px", color: "#F0F4FF", margin: "0 0 4px" }}>{atleta.nome}</p>
-            <p style={{ color: "#4169E1", fontSize: "13px", fontWeight: 600 }}>{atleta.posicao || 'Sem posição'}</p>
-            {atleta.bolsista && (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '6px', background: 'rgba(0,214,122,0.12)', border: '1px solid rgba(0,214,122,0.3)', color: '#00D67A', borderRadius: '20px', padding: '3px 10px', fontSize: '11px', fontWeight: 700 }}>
-                🎓 Bolsista 100%
-                {atleta.motivoBolsa && (
-                  <span style={{ color: 'rgba(0,214,122,0.7)', fontWeight: 400 }}>· {atleta.motivoBolsa}</span>
-                )}
-              </span>
-            )}
-          </div>
-        </div>
-        <div className="space-y-2 text-sm">
-          {atleta.dataNascimento && (
-            <div className="flex justify-between">
-              <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>Nascimento</span>
-              <span>{new Date((atleta.dataNascimento || '').includes('T') ? atleta.dataNascimento : atleta.dataNascimento + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
-            </div>
-          )}
-          {atleta.cpf && (
-            <div className="flex justify-between">
-              <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>CPF</span>
-              <span>{atleta.cpf}</span>
-            </div>
-          )}
-          {atleta.rg && (
-            <div className="flex justify-between">
-              <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>RG</span>
-              <span>{atleta.rg}</span>
-            </div>
-          )}
-          {atleta.telefone && (
-            <div className="flex justify-between">
-              <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>Telefone</span>
-              <span>{atleta.telefone}</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Bloco financeiro — oculto para bolsistas */}
-      {!atleta.bolsista && <GerarCobranca atletaId={atleta.id} atletaNome={atleta.nome} />}
-
-      {atleta.bolsista ? (
-        <div style={{ background: 'rgba(0,214,122,0.06)', border: '1px solid rgba(0,214,122,0.2)', borderRadius: '16px', padding: '14px', marginBottom: '12px', textAlign: 'center' }}>
-          <p style={{ color: '#00D67A', fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: '14px', marginBottom: '4px' }}>🎓 Aluno Bolsista</p>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>Mensalidade 100% gratuita — nenhuma cobrança gerada.</p>
-          {atleta.motivoBolsa && <p style={{ color: 'rgba(0,214,122,0.7)', fontSize: '11px', marginTop: '4px' }}>Motivo: {atleta.motivoBolsa}</p>}
-        </div>
-      ) : (
-        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#4169E1", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Historico Financeiro</p>
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            <div style={{ background: "rgba(57,255,20,0.07)", border: "1px solid rgba(57,255,20,0.15)", borderRadius: "12px", padding: "10px", textAlign: "center" }}>
-              <p style={{ color: "#4169E1", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px" }}>{'R$ ' + totalPago.toFixed(0)}</p>
-              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "10px", marginTop: "4px" }}>Pago</p>
-            </div>
-            <div style={{ background: "rgba(212,175,55,0.07)", border: "1px solid rgba(212,175,55,0.15)", borderRadius: "12px", padding: "10px", textAlign: "center" }}>
-              <p style={{ color: "#FFD700", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px" }}>{'R$ ' + totalPendente.toFixed(0)}</p>
-              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "10px", marginTop: "4px" }}>Pendente</p>
-            </div>
-            <div style={{ background: "rgba(255,70,70,0.07)", border: "1px solid rgba(255,70,70,0.15)", borderRadius: "12px", padding: "10px", textAlign: "center" }}>
-              <p style={{ color: "#ff5555", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px" }}>{'R$ ' + totalVencido.toFixed(0)}</p>
-              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "10px", marginTop: "4px" }}>Vencido</p>
+      {/* HEADER */}
+      <div style={{ background: T.primary, padding: '20px 20px 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <a href="/atletas" style={{ color: 'rgba(240,244,255,0.7)', textDecoration: 'none', fontSize: 13, display: 'flex', alignItems: 'center', gap: 4 }}>
+              <i className="ti ti-arrow-left" style={{ fontSize: 16 }} aria-hidden="true"></i>
+            </a>
+            <div>
+              <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 2 }}>Elenco</div>
+              <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 20, color: T.text, letterSpacing: -0.5, textTransform: 'uppercase' }}>Perfil do Atleta</div>
             </div>
           </div>
-          {!cobrancas || cobrancas.length === 0 ? (
-            <p className="text-gray-500 text-sm text-center py-4">Nenhuma cobrança registrada</p>
-          ) : (
-            <div className="space-y-2">
-              {cobrancas.map(c => (
-                <div key={c.id} className={'flex justify-between items-center rounded-xl p-3 ' + (statusBg[c.status] || 'bg-gray-800')}>
-                  <div>
-                    <p className="text-sm font-medium">{c.descricao || 'Mensalidade'}</p>
-                    <p className="text-xs text-gray-400">{new Date((c.vencimento || '').includes('T') ? c.vencimento : c.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-sm">{'R$ ' + Number(c.valor).toFixed(2)}</p>
-                    <p className={'text-xs font-bold ' + (statusCor[c.status] || 'text-gray-400')}>{c.status}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-        <div className="flex justify-between items-center mb-4">
-          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#4169E1", textTransform: "uppercase", letterSpacing: "1px" }}>Historico de Presenca</p>
-          <div className="text-right">
-            <p className={'text-lg font-bold ' + (percentualGeral >= 75 ? 'text-green-400' : percentualGeral >= 50 ? 'text-yellow-400' : 'text-red-400')}>
-              {percentualGeral}%
-            </p>
-            <p className="text-xs text-gray-500">{totalPresentes}/{totalPresencas} treinos</p>
-          </div>
-        </div>
-        {totalPresencas === 0 ? (
-          <p className="text-gray-500 text-sm text-center py-4">Nenhuma presença registrada</p>
-        ) : (
-          <GraficoPresenca dados={dadosGrafico} />
-        )}
-        <div className="flex gap-4 mt-3 justify-center">
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-green-500"></div>
-            <span className="text-xs text-gray-400">Presente</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-gray-600"></div>
-            <span className="text-xs text-gray-400">Total</span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <a href={`/atletas/${atleta.id}/carteirinha`} style={{ background: 'rgba(240,244,255,0.15)', border: '1px solid rgba(240,244,255,0.2)', color: T.text, borderRadius: 8, padding: '8px 12px', textDecoration: 'none', fontSize: 15 }}>🪪</a>
+            <a href={`/atletas/${atleta.id}/avaliacao`}   style={{ background: 'rgba(240,244,255,0.15)', border: '1px solid rgba(240,244,255,0.2)', color: T.text, borderRadius: 8, padding: '8px 12px', textDecoration: 'none', fontSize: 15 }}>📋</a>
+            <a href={`/atletas/${atleta.id}/editar`}      style={{ background: 'rgba(240,244,255,0.15)', border: '1px solid rgba(240,244,255,0.2)', color: T.text, borderRadius: 8, padding: '8px 12px', textDecoration: 'none', fontSize: 15 }}>✏️</a>
           </div>
         </div>
       </div>
 
-      {atleta.endereco && (
-        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#4169E1", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "1px" }}>Endereco</p>
-          <p className="text-sm">{atleta.endereco}, {atleta.numero}</p>
-          <p className="text-sm text-gray-400">{atleta.bairro} — {atleta.cidade}/{atleta.estado}</p>
-          <p className="text-sm text-gray-400">CEP: {atleta.cep}</p>
-        </div>
-      )}
+      <div style={{ padding: '14px 16px' }}>
 
-      {responsaveis && responsaveis.length > 0 && (
-        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-          <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#4169E1", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "1px" }}>Responsavel</p>
-          {responsaveis.map((r: { id: string; nome: string; whatsapp: string; telefone: string }) => (
-            <div key={r.id}>
-              <p className="font-bold">{r.nome}</p>
-              <p className="text-gray-400 text-sm">{r.whatsapp || r.telefone}</p>
+        {/* CARD IDENTIDADE */}
+        <div style={CARD}>
+          <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', marginBottom: 14 }}>
+            <FotoAtleta atletaId={atleta.id} fotoUrl={atleta.fotoUrl || null} nome={atleta.nome} />
+            <div style={{ flex: 1 }}>
+              <p style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 18, color: T.text, margin: '0 0 4px', letterSpacing: -0.3 }}>{atleta.nome}</p>
+              <p style={{ color: T.primary, fontSize: 13, fontWeight: 700, margin: '0 0 6px' }}>{atleta.posicao || 'Sem posição'}</p>
+              {turma && (
+                <span style={{ display: 'inline-block', background: `${T.gold}18`, border: `1px solid ${T.gold}40`, color: T.gold, borderRadius: 6, padding: '2px 10px', fontSize: 11, fontWeight: 700 }}>{turma.nome}</span>
+              )}
+              {atleta.bolsista && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginLeft: turma ? 6 : 0, background: `${T.green}12`, border: `1px solid ${T.green}30`, color: T.green, borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 700 }}>
+                  🎓 Bolsista
+                </span>
+              )}
+            </div>
+          </div>
+
+          {[
+            nascimento && ['Nascimento', nascimento],
+            atleta.cpf && ['CPF', atleta.cpf],
+            atleta.rg && ['RG', atleta.rg],
+            atleta.telefone && ['Telefone', atleta.telefone],
+          ].filter(Boolean).map((row) => (
+            <div key={row![0] as string} style={{ ...ROW }}>
+              <span style={{ fontSize: 12, color: T.muted }}>{row![0]}</span>
+              <span style={{ fontSize: 12, color: T.text, fontWeight: 600 }}>{row![1]}</span>
             </div>
           ))}
         </div>
-      )}
 
-      <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "14px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-        <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#4169E1", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "1px" }}>Link Area dos Pais</p>
-        <p className="text-xs text-gray-400 break-all mb-3">{linkPais}</p>
-        <CopiarLink link={linkPais} />
+        {/* GERAR COBRANÇA (só pra não-bolsistas e quem pode financeiro) */}
+        {!atleta.bolsista && financeiroOk && <GerarCobranca atletaId={atleta.id} atletaNome={atleta.nome} />}
+
+        {/* BOLSISTA BANNER */}
+        {atleta.bolsista && (
+          <div style={{ background: `${T.green}08`, border: `1px solid ${T.green}25`, borderRadius: 14, padding: 14, marginBottom: 10, textAlign: 'center' }}>
+            <p style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 13, color: T.green, marginBottom: 4 }}>🎓 Aluno Bolsista</p>
+            <p style={{ color: T.muted, fontSize: 12 }}>Mensalidade 100% gratuita — nenhuma cobrança gerada.</p>
+            {atleta.motivoBolsa && <p style={{ color: `${T.green}90`, fontSize: 11, marginTop: 4 }}>Motivo: {atleta.motivoBolsa}</p>}
+          </div>
+        )}
+
+        {/* HISTÓRICO FINANCEIRO */}
+        {financeiroOk && !atleta.bolsista && (
+          <div style={CARD}>
+            <p style={LABEL}>Histórico Financeiro</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 14 }}>
+              {[
+                { label: 'Pago',     valor: totalPago,     color: T.green },
+                { label: 'Pendente', valor: totalPendente, color: T.gold  },
+                { label: 'Vencido',  valor: totalVencido,  color: T.red   },
+              ].map(s => (
+                <div key={s.label} style={{ background: s.color + '10', border: `1px solid ${s.color}20`, borderRadius: 10, padding: '10px 8px', textAlign: 'center' }}>
+                  <p style={{ color: s.color, fontFamily: SYNE, fontWeight: 800, fontSize: 13, margin: '0 0 3px' }}>R$ {s.valor.toFixed(0)}</p>
+                  <p style={{ color: T.muted, fontSize: 10, margin: 0 }}>{s.label}</p>
+                </div>
+              ))}
+            </div>
+            {cobrancas.length === 0 ? (
+              <p style={{ color: T.muted, fontSize: 13, textAlign: 'center', padding: '16px 0' }}>Nenhuma cobrança registrada</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {(cobrancas as { id: string; descricao: string | null; vencimento: string; valor: number; status: string }[]).map(c => (
+                  <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: T.surface2, borderRadius: 8, padding: '10px 12px' }}>
+                    <div>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: T.text, margin: '0 0 2px' }}>{c.descricao || 'Mensalidade'}</p>
+                      <p style={{ fontSize: 11, color: T.muted, margin: 0 }}>{new Date(c.vencimento.includes('T') ? c.vencimento : c.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ fontSize: 13, fontWeight: 700, color: T.text, margin: '0 0 2px' }}>R$ {Number(c.valor).toFixed(2)}</p>
+                      <p style={{ fontSize: 10, fontWeight: 800, color: STATUS_COR[c.status] || T.muted, margin: 0 }}>{c.status}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* HISTÓRICO DE PRESENÇA */}
+        <div style={CARD}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+            <p style={{ ...LABEL, marginBottom: 0 }}>Histórico de Presença</p>
+            <div style={{ textAlign: 'right' }}>
+              <p style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 18, color: pct >= 75 ? T.green : pct >= 50 ? T.gold : T.red, margin: 0, lineHeight: 1 }}>{pct}%</p>
+              <p style={{ fontSize: 11, color: T.muted, margin: '2px 0 0' }}>{totalPresentes}/{presencas.length} treinos</p>
+            </div>
+          </div>
+          {presencas.length === 0 ? (
+            <p style={{ color: T.muted, fontSize: 13, textAlign: 'center', padding: '16px 0' }}>Nenhuma presença registrada</p>
+          ) : (
+            <GraficoPresenca dados={dadosGrafico} />
+          )}
+          <div style={{ display: 'flex', gap: 16, marginTop: 10, justifyContent: 'center' }}>
+            {[{ color: T.green, label: 'Presente' }, { color: T.border, label: 'Total' }].map(l => (
+              <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ width: 10, height: 10, borderRadius: 3, background: l.color }}></div>
+                <span style={{ fontSize: 11, color: T.muted }}>{l.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ENDEREÇO */}
+        {atleta.endereco && (
+          <div style={CARD}>
+            <p style={LABEL}>Endereço</p>
+            <p style={{ fontSize: 13, color: T.text, margin: '0 0 4px' }}>{atleta.endereco}, {atleta.numero}</p>
+            <p style={{ fontSize: 12, color: T.muted, margin: '0 0 2px' }}>{atleta.bairro} — {atleta.cidade}/{atleta.estado}</p>
+            <p style={{ fontSize: 12, color: T.muted, margin: 0 }}>CEP: {atleta.cep}</p>
+          </div>
+        )}
+
+        {/* RESPONSÁVEL */}
+        {responsaveis.length > 0 && (
+          <div style={CARD}>
+            <p style={LABEL}>Responsável</p>
+            {(responsaveis as { id: string; nome: string; whatsapp: string | null; telefone: string | null }[]).map(r => (
+              <div key={r.id} style={{ ...ROW, marginBottom: 0, paddingBottom: 0, borderBottom: 'none' }}>
+                <div>
+                  <p style={{ fontWeight: 700, fontSize: 13, color: T.text, margin: '0 0 2px' }}>{r.nome}</p>
+                  <p style={{ fontSize: 12, color: T.muted, margin: 0 }}>{r.whatsapp || r.telefone}</p>
+                </div>
+                {(r.whatsapp || r.telefone) && (
+                  <a href={`https://wa.me/55${(r.whatsapp || r.telefone || '').replace(/\D/g, '')}`} target="_blank" rel="noreferrer"
+                    style={{ background: `${T.green}15`, border: `1px solid ${T.green}30`, color: T.green, borderRadius: 8, padding: '6px 12px', fontSize: 11, fontWeight: 700, textDecoration: 'none' }}>
+                    WhatsApp
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* LINKS */}
+        <div style={CARD}>
+          <p style={LABEL}>Link Área dos Pais</p>
+          <p style={{ fontSize: 11, color: T.muted, wordBreak: 'break-all', marginBottom: 10 }}>{'https://gestaofc.com.br/pais/' + atleta.tokenPais}</p>
+          <CopiarLink link={'https://gestaofc.com.br/pais/' + atleta.tokenPais} />
+        </div>
+
+        <div style={{ background: `${T.gold}08`, border: `1px solid ${T.gold}25`, borderRadius: 14, padding: 16, marginBottom: 10 }}>
+          <p style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 11, color: T.gold, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>Link de Rematrícula</p>
+          <p style={{ fontSize: 11, color: T.muted, marginBottom: 8 }}>Envie para o responsável renovar a matrícula.</p>
+          <p style={{ fontSize: 11, color: T.muted, wordBreak: 'break-all', marginBottom: 10 }}>{'https://gestaofc.com.br/rematricula/' + atleta.id}</p>
+          <CopiarLink link={'https://gestaofc.com.br/rematricula/' + atleta.id} />
+        </div>
+
       </div>
 
-      <div style={{ background: "rgba(212,175,55,0.07)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: "16px", padding: "14px", marginBottom: "12px" }}>
-        <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#FFD700", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "1px" }}>Link de Rematricula</p>
-        <p className="text-xs text-gray-500 mb-3">Envie para o responsável renovar a matrícula do atleta.</p>
-        <p className="text-xs text-gray-400 break-all mb-3">{linkRematricula}</p>
-        <CopiarLink link={linkRematricula} />
-      </div>
-
-      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
-        <a href="/dashboard" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Inicio</a>
-        <a href="/atletas" style={{ textDecoration: "none", color: "#4169E1", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif", fontWeight: 700 }}>Atletas</a>
-        <a href="/presenca" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Presenca</a>
-        <a href="/financeiro" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Financeiro</a>
-      </nav>
+      <BottomNav />
     </div>
   )
 }
