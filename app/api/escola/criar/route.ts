@@ -20,8 +20,9 @@ export async function POST(req: NextRequest) {
       id: escolaId, slug, nome: nomeEscola, cidade, estado,
       telefone: telefone || null, whatsapp, email,
       clerkUserId: userId, plano, ativo: true,
-      planoGestaoFC: plano,
-      maxModalidades: plano === 'ELITE' ? 99 : plano === 'PRO' ? 3 : 1,
+      planoGestaoFC: 'BASICO',
+      maxModalidades: 1,
+      trialEndsAt: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
     })
     if (escolaError) return NextResponse.json({ ok: false, message: escolaError.message })
 

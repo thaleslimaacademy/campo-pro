@@ -3,6 +3,7 @@
 import { usePerfil } from '@/lib/usePerfil'
 import AccountButton from '@/components/AccountButton'
 import BottomNav from '@/components/ui/BottomNav'
+import TrialBanner from '@/components/TrialBanner'
 import { T, SYNE, INTER } from '@/lib/theme'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -33,7 +34,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, fontFamily: INTER }}>
-      <div style={{ paddingBottom: 80 }}>{children}</div>
+      <div style={{ paddingBottom: 80 }}>
+        <TrialBanner />
+        {children}
+      </div>
       <BottomNav />
     </div>
   )
