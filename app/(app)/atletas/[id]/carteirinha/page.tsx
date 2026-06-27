@@ -134,7 +134,7 @@ export default function Carteirinha() {
   )
 
   const nascimento = atleta.dataNascimento
-    ? new Date(atleta.dataNascimento + 'T12:00:00').toLocaleDateString('pt-BR')
+    ? new Date(atleta.dataNascimento.includes('T') ? atleta.dataNascimento : atleta.dataNascimento + 'T12:00:00').toLocaleDateString('pt-BR')
     : null
 
   const validade = new Date()
