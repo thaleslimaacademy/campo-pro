@@ -1,9 +1,7 @@
 'use client'
-import { usePerfil } from '@/lib/usePerfil'
-
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { getAvaliacaoData, salvarAvaliacao, recarregarAvaliacoes } from './actions'
 
 function calcularGordura(tricipal: number, subescapular: number, suprailiaca: number, abdominal: number) {
   const soma = tricipal + subescapular + suprailiaca + abdominal
@@ -30,12 +28,12 @@ function calcularIMC(peso: number, altura: number) {
 
 function NotaSelector({ label, name, value, onChange }: { label: string; name: string; value: number; onChange: (name: string, val: number) => void }) {
   return (
-    <div className="flex justify-between items-center py-2 border-b border-gray-800">
-      <span className="text-sm text-gray-300">{label}</span>
-      <div className="flex gap-1">
+    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 0", borderBottom:"1px solid rgba(240,244,255,0.07)" }}>
+      <span style={{ fontSize:13, color:"rgba(240,244,255,0.7)" }}>{label}</span>
+      <div style={{ display:"flex", gap:4 }}>
         {[1, 2, 3, 4, 5].map(n => (
           <button key={n} type="button" onClick={() => onChange(name, n)}
-            className={"w-8 h-8 rounded-full text-xs font-bold transition " + (value === n ? (n <= 2 ? 'bg-red-500 text-white' : n === 3 ? 'bg-yellow-500 text-black' : 'bg-green-500 text-white') : 'bg-gray-800 text-gray-400')}>
+            style={{ width:32, height:32, borderRadius:"50%", fontSize:12, fontWeight:"bold", border:"none", cursor:"pointer", background: value === n ? (n <= 2 ? "#FF4444" : n === 3 ? "#FFD700" : "#00D67A") : "rgba(240,244,255,0.1)", color: value === n ? (n === 3 ? "#000" : "#fff") : "rgba(240,244,255,0.4)" }}>
             {n}
           </button>
         ))}
@@ -53,18 +51,18 @@ function GraficoEvolucao({ avaliacoes }: { avaliacoes: any[] }) {
   return (
     <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginTop: "16px" }}>
       <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#4169E1", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Evolucao do Atleta</p>
-      <div className="space-y-4">
+      <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
         {dados[0]?.peso && (
           <div>
-            <p className="text-xs text-gray-400 mb-2">Peso (kg)</p>
-            <div className="flex items-end gap-2 h-16">
+            <p style={{ fontSize:11, color:"rgba(240,244,255,0.4)", marginBottom:8 }}>Peso (kg)</p>
+            <div style={{ display:"flex", alignItems:"flex-end", gap:8, height:64 }}>
               {dados.map((a, i) => {
                 const h = maxPeso > 0 ? Math.round((a.peso / maxPeso) * 100) : 50
                 return (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                    <span className="text-xs text-gray-400">{a.peso}</span>
-                    <div className="w-full bg-green-500 rounded-t" style={{ height: h + '%', minHeight: '8px' }} />
-                    <span className="text-xs text-gray-500">{new Date(a.dataAvaliacao + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'short' })}</span>
+                  <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
+                    <span style={{ fontSize:11, color:"rgba(240,244,255,0.5)" }}>{a.peso}</span>
+                    <div style={{ width:"100%", background:"#00D67A", borderRadius:"3px 3px 0 0", height: h + "%", minHeight:8 }} />
+                    <span style={{ fontSize:10, color:"rgba(240,244,255,0.3)" }}>{new Date(a.dataAvaliacao + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'short' })}</span>
                   </div>
                 )
               })}
@@ -73,16 +71,16 @@ function GraficoEvolucao({ avaliacoes }: { avaliacoes: any[] }) {
         )}
         {dados[0]?.percentualGordura && (
           <div>
-            <p className="text-xs text-gray-400 mb-2">% Gordura</p>
-            <div className="flex items-end gap-2 h-16">
+            <p style={{ fontSize:11, color:"rgba(240,244,255,0.4)", marginBottom:8 }}>% Gordura</p>
+            <div style={{ display:"flex", alignItems:"flex-end", gap:8, height:64 }}>
               {dados.map((a, i) => {
                 const h = Math.round((a.percentualGordura / 30) * 100)
-                const cor = a.percentualGordura <= 10 ? 'bg-green-500' : a.percentualGordura <= 15 ? 'bg-yellow-500' : 'bg-red-500'
+                const cor = a.percentualGordura <= 10 ? "#00D67A" : a.percentualGordura <= 15 ? "#FFD700" : "#FF4444"
                 return (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                    <span className="text-xs text-gray-400">{a.percentualGordura}%</span>
-                    <div className={"w-full rounded-t " + cor} style={{ height: h + '%', minHeight: '8px' }} />
-                    <span className="text-xs text-gray-500">{new Date(a.dataAvaliacao + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'short' })}</span>
+                  <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
+                    <span style={{ fontSize:11, color:"rgba(240,244,255,0.5)" }}>{a.percentualGordura}%</span>
+                    <div style={{ width:"100%", background:cor, borderRadius:"3px 3px 0 0", height: h + "%", minHeight:8 }} />
+                    <span style={{ fontSize:10, color:"rgba(240,244,255,0.3)" }}>{new Date(a.dataAvaliacao + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'short' })}</span>
                   </div>
                 )
               })}
@@ -91,16 +89,16 @@ function GraficoEvolucao({ avaliacoes }: { avaliacoes: any[] }) {
         )}
         {dados[0]?.notaGeral && (
           <div>
-            <p className="text-xs text-gray-400 mb-2">Nota Geral</p>
-            <div className="flex items-end gap-2 h-16">
+            <p style={{ fontSize:11, color:"rgba(240,244,255,0.4)", marginBottom:8 }}>Nota Geral</p>
+            <div style={{ display:"flex", alignItems:"flex-end", gap:8, height:64 }}>
               {dados.map((a, i) => {
                 const h = Math.round((a.notaGeral / 10) * 100)
-                const cor = a.notaGeral >= 7 ? 'bg-green-500' : a.notaGeral >= 5 ? 'bg-yellow-500' : 'bg-red-500'
+                const cor = a.notaGeral >= 7 ? "#00D67A" : a.notaGeral >= 5 ? "#FFD700" : "#FF4444"
                 return (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                    <span className="text-xs text-gray-400">{a.notaGeral}</span>
-                    <div className={"w-full rounded-t " + cor} style={{ height: h + '%', minHeight: '8px' }} />
-                    <span className="text-xs text-gray-500">{new Date(a.dataAvaliacao + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'short' })}</span>
+                  <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
+                    <span style={{ fontSize:11, color:"rgba(240,244,255,0.5)" }}>{a.notaGeral}</span>
+                    <div style={{ width:"100%", background:cor, borderRadius:"3px 3px 0 0", height: h + "%", minHeight:8 }} />
+                    <span style={{ fontSize:10, color:"rgba(240,244,255,0.3)" }}>{new Date(a.dataAvaliacao + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'short' })}</span>
                   </div>
                 )
               })}
@@ -113,7 +111,8 @@ function GraficoEvolucao({ avaliacoes }: { avaliacoes: any[] }) {
 }
 
 export default function AvaliacaoAtleta() {
-  const { escolaId } = usePerfil()
+  const [escolaId, setEscolaId] = useState('')
+  const [, startLoad] = useTransition()
   const params = useParams()
   const router = useRouter()
   const id = params.id as string
@@ -124,6 +123,7 @@ export default function AvaliacaoAtleta() {
   const [sucesso, setSucesso] = useState(false)
   const [gerando, setGerando] = useState(false)
   const [avaliacoes, setAvaliacoes] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [aba, setAba] = useState<'form' | 'historico'>('form')
 
   const [form, setForm] = useState({
@@ -153,13 +153,13 @@ export default function AvaliacaoAtleta() {
   const notaGeral = notas.length > 0 ? Math.round((notas.reduce((s, n) => s + n, 0) / notas.length) * 2 * 10) / 10 : 0
 
   useEffect(() => {
-    async function carregar() {
-      const { data: atleta } = await supabase.from('Atleta').select('nome, posicao').eq('id', id).single()
-      if (atleta) { setAtletaNome(atleta.nome); setAtletaPos(atleta.posicao || '') }
-      const { data } = await supabase.from('Avaliacao').select('*').eq('atletaId', id).order('dataAvaliacao', { ascending: false }).limit(6)
-      setAvaliacoes(data || [])
-    }
-    carregar()
+    startLoad(async () => {
+      const d = await getAvaliacaoData(id)
+      setEscolaId(d.escolaId)
+      if (d.atleta) { setAtletaNome((d.atleta as any).nome); setAtletaPos((d.atleta as any).posicao || '') }
+      setAvaliacoes(d.avaliacoes)
+      setLoading(false)
+    })
   }, [id])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
@@ -173,8 +173,8 @@ export default function AvaliacaoAtleta() {
 
   async function salvar() {
     setSalvando(true)
-    const { error } = await supabase.from('Avaliacao').insert({
-      atletaId: id, escolaId: escolaId!,
+    await salvarAvaliacao({
+      atletaId: id,
       dataAvaliacao: form.dataAvaliacao,
       peso: form.peso ? parseFloat(form.peso) : null,
       altura: form.altura ? parseFloat(form.altura) : null,
@@ -207,13 +207,10 @@ export default function AvaliacaoAtleta() {
       praticaOutroEsporte: form.praticaOutroEsporte || null,
       observacoes: form.observacoes || null,
     })
-    if (error) alert('Erro: ' + error.message)
-    else {
-      setSucesso(true)
-      const { data } = await supabase.from('Avaliacao').select('*').eq('atletaId', id).order('dataAvaliacao', { ascending: false }).limit(6)
-      setAvaliacoes(data || [])
-      setTimeout(() => setSucesso(false), 3000)
-    }
+    setSucesso(true)
+    const novas = await recarregarAvaliacoes(id)
+    setAvaliacoes(novas)
+    setTimeout(() => setSucesso(false), 3000)
     setSalvando(false)
   }
 
@@ -384,9 +381,9 @@ export default function AvaliacaoAtleta() {
             </div>
             {imc && <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: "12px", padding: "12px", marginBottom: "12px" }}><div className="flex justify-between"><span className="text-sm text-gray-400">IMC</span><span className="font-bold">{imc.imc} - {imc.classificacao}</span></div></div>}
             <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: "8px", marginTop: "12px" }}>Dobras Cutaneas (mm)</p>
-            <div className="grid grid-cols-2 gap-3">
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
               {[{name:'dobraTricipal',label:'Triceps'},{name:'dobraSubescapular',label:'Subescapular'},{name:'dobraSuprailiaca',label:'Suprailiaca'},{name:'dobraAbdominal',label:'Abdominal'},{name:'dobraPeitoral',label:'Peitoral'},{name:'dobraCoxa',label:'Coxa'}].map(d => (
-                <div key={d.name}><label className="text-xs text-gray-400">{d.label}</label><input name={d.name} value={(form as any)[d.name]} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "10px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="mm" /></div>
+                <div key={d.name}><label style={{ fontSize:11, color:"rgba(240,244,255,0.5)" }}>{d.label}</label><input name={d.name} value={(form as any)[d.name]} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "10px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="mm" /></div>
               ))}
             </div>
             {gordura && (
@@ -403,11 +400,11 @@ export default function AvaliacaoAtleta() {
 
           <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
             <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#4169E1", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Testes Fisicos</p>
-            <div className="grid grid-cols-2 gap-3">
-              <div><label className="text-xs text-gray-400">Velocidade 40m (seg)</label><input name="velocidade40m" value={form.velocidade40m} onChange={handleChange} type="number" step="0.01" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="5.20" /></div>
-              <div><label className="text-xs text-gray-400">Cooper (metros)</label><input name="cooper" value={form.cooper} onChange={handleChange} type="number" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="2800" /></div>
-              <div><label className="text-xs text-gray-400">Salto Vertical (cm)</label><input name="saltoVertical" value={form.saltoVertical} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="45" /></div>
-              <div><label className="text-xs text-gray-400">Salto Horizontal (cm)</label><input name="saltoHorizontal" value={form.saltoHorizontal} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="180" /></div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+              <div><label style={{ fontSize:11, color:"rgba(240,244,255,0.5)" }}>Velocidade 40m (seg)</label><input name="velocidade40m" value={form.velocidade40m} onChange={handleChange} type="number" step="0.01" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="5.20" /></div>
+              <div><label style={{ fontSize:11, color:"rgba(240,244,255,0.5)" }}>Cooper (metros)</label><input name="cooper" value={form.cooper} onChange={handleChange} type="number" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="2800" /></div>
+              <div><label style={{ fontSize:11, color:"rgba(240,244,255,0.5)" }}>Salto Vertical (cm)</label><input name="saltoVertical" value={form.saltoVertical} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="45" /></div>
+              <div><label style={{ fontSize:11, color:"rgba(240,244,255,0.5)" }}>Salto Horizontal (cm)</label><input name="saltoHorizontal" value={form.saltoHorizontal} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="180" /></div>
             </div>
           </div>
 
@@ -442,7 +439,7 @@ export default function AvaliacaoAtleta() {
             <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#4169E1", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Anamnese</p>
             {[{name:'historicoCirurgias',label:'Historico de cirurgias'},{name:'historicoLesoes',label:'Historico de lesoes'},{name:'medicamentosUso',label:'Medicamentos em uso'},{name:'doencasCronicas',label:'Doencas cronicas'},{name:'praticaOutroEsporte',label:'Pratica outro esporte?'},{name:'observacoes',label:'Observacoes gerais'}].map(f => (
               <div key={f.name} className="mb-3">
-                <label className="text-xs text-gray-400">{f.label}</label>
+                <label style={{ fontSize:11, color:"rgba(240,244,255,0.5)" }}>{f.label}</label>
                 <textarea name={f.name} value={(form as any)[f.name]} onChange={handleChange} rows={2} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "10px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", resize: "none", boxSizing: "border-box" }} placeholder="Digite aqui..." />
               </div>
             ))}
