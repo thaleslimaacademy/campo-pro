@@ -14,10 +14,22 @@ export default function Onboarding() {
   const [step, setStep] = useState(1)
   const [salvando, setSalvando] = useState(false)
   const [erro, setErro] = useState('')
-  const [form, setForm] = useState({ nomeEscola:'', cidade:'', estado:'MG', telefone:'', whatsapp:'', responsavel:'' })
+  const [form, setForm] = useState({ nomeEscola:'', slug:'', cidade:'', estado:'MG', telefone:'', whatsapp:'', responsavel:'' })
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
-    setForm(p => ({ ...p, [e.target.name]: e.target.value }))
+    const { name, value } = e.target
+    setForm(p => {
+      const updated = { ...p, [name]: value }
+      // auto-gera slug a partir do nome se slug ainda não foi editado manualmente
+      if (name === 'nomeEscola') {
+        const auto = value.toLowerCase()
+          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9\s-]/g, '').trim()
+          .replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 30)
+        updated.slug = auto
+      }
+      return updated
+    })
     setErro('')
   }
 
@@ -28,7 +40,7 @@ export default function Onboarding() {
     const res = await fetch('/api/escola/criar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nomeEscola: form.nomeEscola, cidade: form.cidade, estado: form.estado, telefone: form.telefone, whatsapp: form.whatsapp, responsavel: form.responsavel, plano: 'BASICO' }),
+      body: JSON.stringify({ nomeEscola: form.nomeEscola, slug: form.slug || undefined, cidade: form.cidade, estado: form.estado, telefone: form.telefone, whatsapp: form.whatsapp, responsavel: form.responsavel, plano: 'BASICO' }),
     })
     const data = await res.json()
     if (!data.ok) { setErro('Erro: ' + data.message); setSalvando(false); return }
@@ -77,7 +89,14 @@ export default function Onboarding() {
           <div style={{ background:T.surface, border:`1px solid ${T.border}`, borderLeft:`3px solid ${T.primary}`, borderRadius:14, padding:20, marginBottom:16 }}>
             <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:12, color:T.primary, textTransform:'uppercase', letterSpacing:1, marginBottom:18 }}>🏟️ Dados da Escola</p>
             <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
-              <div><label style={LBL}>Nome da escolinha *</label><input name="nomeEscola" value={form.nomeEscola} onChange={handleChange} placeholder="Ex: Alexandrita FC" style={INP} /></div>
+              <div><label style={LBL}>Nome da escolinha *</label><input name="nomeEscola" value={form.nomeEscola} onChange={handleChange} placeholder="Ex: TLFA Iturama" style={INP} /></div>
+              <div>
+                <label style={LBL}>Link da matrícula (slug)</label>
+                <div style={{ display:'flex', alignItems:'center', marginTop:6 }}>
+                  <span style={{ fontSize:11, color:T.muted, whiteSpace:'nowrap', paddingRight:6 }}>gestaofc.com.br/matricula/</span>
+                  <input name="slug" value={form.slug} onChange={handleChange} placeholder="tlfa-iturama" style={{ ...INP, marginTop:0, flex:1 }} />
+                </div>
+              </div>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 80px', gap:10 }}>
                 <div><label style={LBL}>Cidade</label><input name="cidade" value={form.cidade} onChange={handleChange} placeholder="Cidade" style={INP} /></div>
                 <div><label style={LBL}>Estado</label>
