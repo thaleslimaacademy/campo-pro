@@ -1,187 +1,209 @@
 'use client'
-
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { usePerfil } from '@/lib/usePerfil'
 
-interface Escola {
-  id: string
-  nome: string
-  slug: string
-  plano: string
-  ativa: boolean
-  statusPlano: string
-  cidade: string
-  estado: string
-  email: string
-  whatsapp: string
-  valorMensalidade: number
-  createdAt: string
-  clerkUserId: string | null
+const T = { bg:'#0A0E1A', surface:'#0D1220', surface2:'#121A2E', primary:'#4169E1', accent:'#00BFFF', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', border:'rgba(240,244,255,0.08)', green:'#00D67A', gold:'#FFD700', red:'#FF4444' }
+const SYNE = 'Syne, sans-serif'
+const INTER = 'Inter, sans-serif'
+const CARD: React.CSSProperties = { background:T.surface, border:`1px solid ${T.border}`, borderRadius:14, padding:16, marginBottom:12 }
+
+type EscolaStats = {
+  id: string; nome: string; slug: string; cidade: string; estado: string
+  planoGestaoFC: string; statusPlano: string; trialAtivo: boolean; diasTrial: number
+  trialEndsAt: string | null; ativo: boolean; adminEmail: string | null
+  totalAtletas: number; receitaMes: number; totalCobrancas: number; createdAt: string
 }
 
-interface EscolaStats extends Escola {
-  totalAtletas: number
-  totalCobrancas: number
-  receitaMes: number
-}
-
-const PLANO_LABELS: Record<string, string> = {
-  SOCIAL: 'Social',
-  STARTER: 'Básico',
-  PRO: 'Pro',
-  ELITE: 'Elite',
-}
-
-function planoBadgeStyle(plano: string) {
-  if (plano === 'ELITE') return { background: 'rgba(139,92,246,0.15)', color: '#A78BFA', border: '1px solid rgba(139,92,246,0.3)' }
-  if (plano === 'PRO')   return { background: 'rgba(57,255,20,0.08)',  color: '#39FF14', border: '1px solid rgba(57,255,20,0.25)' }
-  if (plano === 'STARTER') return { background: 'rgba(59,130,246,0.12)', color: '#60A5FA', border: '1px solid rgba(59,130,246,0.2)' }
-  return { background: 'rgba(107,114,128,0.15)', color: '#9CA3AF', border: '1px solid rgba(107,114,128,0.2)' }
-}
+const COR_PLANO: Record<string, string> = { ELITE: T.gold, PRO: T.primary, BASICO: T.accent, STARTER: T.accent, SOCIAL: T.muted }
 
 export default function SuperAdmin() {
-  const { escolaId, role, isLoaded } = usePerfil()
-  const router = useRouter()
   const [escolas, setEscolas] = useState<EscolaStats[]>([])
   const [loading, setLoading] = useState(true)
-  const [busca, setBusca] = useState('')
+  const [erro, setErro] = useState('')
+  const [acao, setAcao] = useState<{ escolaId: string; tipo: 'plano' | 'trial' } | null>(null)
+  const [novoPlano, setNovoPlano] = useState('ELITE')
+  const [diasTrial, setDiasTrial] = useState('15')
+  const [salvando, setSalvando] = useState(false)
 
-  // ── Tokens visuais ──
-  const syne = 'Syne, sans-serif'
-  const neon = '#39FF14'
-  const gold = '#D4AF37'
-  const bg = 'linear-gradient(160deg,#0a1a06,#050505,#111003)'
-  const cardBg = 'rgba(255,255,255,0.03)'
-  const cardBorder = '1px solid rgba(255,255,255,0.07)'
-
-  useEffect(() => {
-    if (!isLoaded) return
-    if (role !== 'superadmin') { router.replace('/dashboard'); return }
-    carregarEscolas()
-  }, [isLoaded, role])
-
-  async function carregarEscolas() {
+  async function carregar() {
+    setLoading(true)
     const res = await fetch('/api/super-admin/escolas')
+    if (!res.ok) { setErro('Acesso negado. Você precisa ser super-admin.'); setLoading(false); return }
     const data = await res.json()
     setEscolas(data)
     setLoading(false)
   }
 
-  if (!isLoaded) return (
-    <div style={{ minHeight: '100vh', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter,sans-serif' }}>Carregando...</p>
-    </div>
-  )
+  useEffect(() => { carregar() }, [])
 
-  if (role !== 'superadmin') return null
-
-  const filtradas = escolas.filter(e =>
-    e.nome.toLowerCase().includes(busca.toLowerCase()) ||
-    e.cidade.toLowerCase().includes(busca.toLowerCase()) ||
-    e.email.toLowerCase().includes(busca.toLowerCase())
-  )
+  async function aplicarAcao() {
+    if (!acao) return
+    setSalvando(true)
+    const body: Record<string, unknown> = { escolaId: acao.escolaId }
+    if (acao.tipo === 'plano') body.plano = novoPlano
+    if (acao.tipo === 'trial') body.trialDias = Number(diasTrial)
+    await fetch('/api/super-admin/escolas', { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })
+    setAcao(null)
+    setSalvando(false)
+    carregar()
+  }
 
   const totalAtletas = escolas.reduce((s, e) => s + e.totalAtletas, 0)
   const totalReceita = escolas.reduce((s, e) => s + e.receitaMes, 0)
-  const totalEscolas = escolas.length
+  const trialsAtivos = escolas.filter(e => e.trialAtivo).length
+  const pagantes     = escolas.filter(e => !e.trialAtivo && e.statusPlano === 'ATIVO').length
+
+  if (loading) return (
+    <div style={{ minHeight:'100vh', background:T.bg, display:'flex', alignItems:'center', justifyContent:'center' }}>
+      <p style={{ color:T.muted, fontFamily:INTER }}>Carregando...</p>
+    </div>
+  )
+
+  if (erro) return (
+    <div style={{ minHeight:'100vh', background:T.bg, display:'flex', alignItems:'center', justifyContent:'center', padding:24 }}>
+      <div style={{ textAlign:'center' }}>
+        <p style={{ fontSize:32, marginBottom:12 }}>🔒</p>
+        <p style={{ color:T.red, fontFamily:SYNE, fontWeight:800, fontSize:16 }}>{erro}</p>
+      </div>
+    </div>
+  )
 
   return (
-    <div style={{ minHeight: '100vh', background: bg, color: '#F0F0F0', fontFamily: 'Inter,sans-serif', paddingBottom: '40px' }}>
+    <div style={{ minHeight:'100vh', background:T.bg, color:T.text, fontFamily:INTER, padding:'0 0 40px' }}>
 
-      {/* ── HEADER ── */}
-      <div style={{ position: 'relative', overflow: 'hidden', padding: '28px 20px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-          <div style={{ width: '200px', height: '80px', borderRadius: '50%', filter: 'blur(50px)', opacity: 0.12, background: gold }} />
-        </div>
-        <div style={{ position: 'relative' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-            <span style={{ fontSize: '24px' }}>👑</span>
-            <h1 style={{ fontFamily: syne, fontWeight: 900, fontSize: '24px', color: gold, margin: 0 }}>Super Admin</h1>
+      {/* HEADER */}
+      <div style={{ background:T.surface, borderBottom:`1px solid ${T.border}`, padding:'20px 24px' }}>
+        <div style={{ maxWidth:900, margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <div>
+            <p style={{ fontFamily:SYNE, fontWeight:900, fontSize:24, color:T.text, margin:'0 0 4px', letterSpacing:-0.5 }}>⚡ Super Admin</p>
+            <p style={{ fontSize:12, color:T.muted, margin:0 }}>GestãoFC · Painel de controle</p>
           </div>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', margin: 0 }}>Painel de controle global — GestaoFC</p>
+          <button onClick={carregar} style={{ background:`${T.primary}18`, border:`1px solid ${T.primary}44`, color:T.primary, padding:'8px 16px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:12, cursor:'pointer', textTransform:'uppercase' }}>
+            🔄 Atualizar
+          </button>
         </div>
       </div>
 
-      <div style={{ padding: '20px' }}>
+      <div style={{ maxWidth:900, margin:'0 auto', padding:'20px 24px' }}>
 
-        {/* ── STATS GLOBAIS ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginBottom: '20px' }}>
+        {/* KPIs */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:12, marginBottom:24 }}>
           {[
-            { label: 'Escolas', value: loading ? '...' : String(totalEscolas), color: gold },
-            { label: 'Atletas', value: loading ? '...' : String(totalAtletas), color: neon },
-            { label: 'Receita/mês', value: loading ? '...' : 'R$' + totalReceita.toFixed(0), color: neon, small: true },
-          ].map(s => (
-            <div key={s.label} style={{ background: cardBg, border: cardBorder, borderRadius: '14px', padding: '12px' }}>
-              <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>{s.label}</p>
-              <p style={{ fontFamily: syne, fontWeight: 800, fontSize: s.small ? '16px' : '22px', color: s.color, margin: 0 }}>{s.value}</p>
+            { label:'Escolas', valor:escolas.length, color:T.primary },
+            { label:'Atletas', valor:totalAtletas, color:T.accent },
+            { label:'Trials ativos', valor:trialsAtivos, color:T.gold },
+            { label:'Pagantes', valor:pagantes, color:T.green },
+          ].map(k => (
+            <div key={k.label} style={{ background:T.surface, border:`1px solid ${T.border}`, borderTop:`2px solid ${k.color}`, borderRadius:12, padding:'14px 16px' }}>
+              <p style={{ fontFamily:SYNE, fontWeight:900, fontSize:28, color:k.color, margin:'0 0 4px', lineHeight:1 }}>{k.valor}</p>
+              <p style={{ fontSize:11, color:T.muted, margin:0, textTransform:'uppercase', letterSpacing:0.8 }}>{k.label}</p>
             </div>
           ))}
         </div>
 
-        {/* ── BUSCA ── */}
-        <input
-          type="text"
-          placeholder="Buscar escola, cidade ou email..."
-          value={busca}
-          onChange={e => setBusca(e.target.value)}
-          style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '12px 16px', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const, marginBottom: '16px' }}
-        />
+        {/* Receita do mês */}
+        <div style={{ background:`${T.green}08`, border:`1px solid ${T.green}25`, borderRadius:12, padding:'14px 18px', marginBottom:24, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <div>
+            <p style={{ fontSize:11, color:T.muted, margin:'0 0 2px', textTransform:'uppercase', letterSpacing:0.8 }}>Receita total do mês</p>
+            <p style={{ fontFamily:SYNE, fontWeight:900, fontSize:28, color:T.green, margin:0 }}>R$ {totalReceita.toLocaleString('pt-BR', { minimumFractionDigits:2 })}</p>
+          </div>
+          <span style={{ fontSize:32 }}>💰</span>
+        </div>
 
-        {/* ── LISTA DE ESCOLAS ── */}
-        {loading ? (
-          <p style={{ color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: '40px 0' }}>Carregando escolas...</p>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {filtradas.length === 0 && (
-              <p style={{ color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: '40px 0', fontSize: '13px' }}>Nenhuma escola encontrada.</p>
-            )}
-            {filtradas.map(escola => (
-              <div key={escola.id} style={{ background: cardBg, border: escola.ativa ? cardBorder : '1px solid rgba(239,68,68,0.15)', borderRadius: '16px', padding: '16px' }}>
-
-                {/* Nome + Badges */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                  <div>
-                    <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '15px', color: '#F0F0F0', margin: '0 0 2px' }}>{escola.nome}</p>
-                    <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: 0 }}>{escola.cidade}, {escola.estado}</p>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-                    <span style={{ fontSize: '10px', padding: '3px 8px', borderRadius: '20px', fontWeight: 700, fontFamily: syne, ...planoBadgeStyle(escola.plano) }}>
-                      {PLANO_LABELS[escola.plano] || escola.plano}
-                    </span>
-                    <span style={{ fontSize: '10px', padding: '3px 8px', borderRadius: '20px', fontWeight: 600, background: escola.ativa ? 'rgba(57,255,20,0.08)' : 'rgba(239,68,68,0.1)', color: escola.ativa ? neon : '#F87171' }}>
-                      {escola.ativa ? 'Ativa' : 'Inativa'}
-                    </span>
-                  </div>
+        {/* Modal de ação */}
+        {acao && (
+          <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:100, padding:24 }}>
+            <div style={{ background:T.surface, border:`1px solid ${T.border}`, borderRadius:16, padding:24, width:'100%', maxWidth:380 }}>
+              <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:16, color:T.text, marginBottom:16 }}>
+                {acao.tipo === 'plano' ? '🔼 Alterar plano' : '⏱️ Adicionar trial'}
+              </p>
+              {acao.tipo === 'plano' ? (
+                <div>
+                  <p style={{ fontSize:11, color:T.muted, marginBottom:8, textTransform:'uppercase', letterSpacing:0.8 }}>Novo plano</p>
+                  <select value={novoPlano} onChange={e => setNovoPlano(e.target.value)} style={{ width:'100%', background:'#080C15', border:`1px solid ${T.border}`, borderRadius:8, padding:'11px 14px', color:T.text, fontFamily:INTER, fontSize:13, marginBottom:16 }}>
+                    <option value="ELITE">Elite — R$199/mês</option>
+                    <option value="PRO">Pro — R$129/mês</option>
+                    <option value="STARTER">Starter — R$79/mês</option>
+                  </select>
                 </div>
-
-                {/* Stats */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', padding: '12px 0', borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '10px' }}>
-                  <div>
-                    <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', marginBottom: '2px' }}>Atletas</p>
-                    <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '16px', color: '#F0F0F0', margin: 0 }}>{escola.totalAtletas}</p>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', marginBottom: '2px' }}>Receita/mês</p>
-                    <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '16px', color: neon, margin: 0 }}>R${escola.receitaMes.toFixed(0)}</p>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', marginBottom: '2px' }}>Mensalidade</p>
-                    <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '16px', color: gold, margin: 0 }}>R${escola.valorMensalidade}</p>
-                  </div>
+              ) : (
+                <div>
+                  <p style={{ fontSize:11, color:T.muted, marginBottom:8, textTransform:'uppercase', letterSpacing:0.8 }}>Dias de trial</p>
+                  <input type="number" value={diasTrial} onChange={e => setDiasTrial(e.target.value)} style={{ width:'100%', background:'#080C15', border:`1px solid ${T.border}`, borderRadius:8, padding:'11px 14px', color:T.text, fontFamily:INTER, fontSize:13, marginBottom:16, boxSizing:'border-box' }} />
                 </div>
-
-                {/* Email + Data */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', margin: 0 }}>{escola.email}</p>
-                  <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.2)', margin: 0 }}>
-                    {new Date(escola.createdAt).toLocaleDateString('pt-BR')}
-                  </p>
-                </div>
+              )}
+              <div style={{ display:'flex', gap:10 }}>
+                <button onClick={() => setAcao(null)} style={{ flex:1, background:'transparent', border:`1px solid ${T.border}`, color:T.muted, padding:'12px', borderRadius:8, fontFamily:SYNE, fontWeight:600, fontSize:13, cursor:'pointer' }}>Cancelar</button>
+                <button onClick={aplicarAcao} disabled={salvando} style={{ flex:2, background:T.primary, color:T.text, padding:'12px', borderRadius:8, fontFamily:SYNE, fontWeight:800, fontSize:13, border:'none', cursor:'pointer', textTransform:'uppercase' }}>
+                  {salvando ? 'Salvando...' : 'Confirmar'}
+                </button>
               </div>
-            ))}
+            </div>
           </div>
         )}
+
+        {/* Lista de escolas */}
+        <p style={{ fontFamily:SYNE, fontWeight:700, fontSize:11, color:T.muted, textTransform:'uppercase', letterSpacing:1, marginBottom:12 }}>{escolas.length} escola{escolas.length !== 1 ? 's' : ''} cadastrada{escolas.length !== 1 ? 's' : ''}</p>
+
+        {escolas.map(e => (
+          <div key={e.id} style={{ ...CARD, borderLeft:`3px solid ${COR_PLANO[e.planoGestaoFC] || T.border}` }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:12 }}>
+              <div style={{ flex:1 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:4 }}>
+                  <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:16, color:T.text, margin:0 }}>{e.nome}</p>
+                  {!e.ativo && <span style={{ fontSize:9, color:T.red, background:`${T.red}18`, padding:'2px 8px', borderRadius:4, fontWeight:700 }}>INATIVA</span>}
+                </div>
+                <p style={{ fontSize:12, color:T.muted, margin:'0 0 2px' }}>{e.cidade}/{e.estado} · /{e.slug}</p>
+                {e.adminEmail && <p style={{ fontSize:11, color:T.muted, margin:0 }}>📧 {e.adminEmail}</p>}
+              </div>
+              <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6, flexShrink:0 }}>
+                <span style={{ fontSize:10, fontWeight:800, color:COR_PLANO[e.planoGestaoFC] || T.muted, background:`${COR_PLANO[e.planoGestaoFC] || T.muted}18`, padding:'3px 10px', borderRadius:6, textTransform:'uppercase', letterSpacing:0.5 }}>
+                  {e.planoGestaoFC}
+                </span>
+                {e.trialAtivo && (
+                  <span style={{ fontSize:10, fontWeight:700, color:T.gold, background:`${T.gold}15`, padding:'2px 8px', borderRadius:4 }}>
+                    ⏱️ Trial: {e.diasTrial}d
+                  </span>
+                )}
+                {!e.trialAtivo && e.statusPlano === 'ATIVO' && (
+                  <span style={{ fontSize:10, fontWeight:700, color:T.green, background:`${T.green}15`, padding:'2px 8px', borderRadius:4 }}>✅ Pago</span>
+                )}
+              </div>
+            </div>
+
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8, marginBottom:12 }}>
+              {[
+                { label:'Atletas', valor:e.totalAtletas, color:T.accent },
+                { label:'Cobranças/mês', valor:e.totalCobrancas, color:T.muted },
+                { label:'Receita/mês', valor:`R$${e.receitaMes.toFixed(0)}`, color:T.green },
+              ].map(s => (
+                <div key={s.label} style={{ background:T.surface2, borderRadius:8, padding:'8px 10px', textAlign:'center' }}>
+                  <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:16, color:s.color, margin:'0 0 2px', lineHeight:1 }}>{s.valor}</p>
+                  <p style={{ fontSize:10, color:T.muted, margin:0 }}>{s.label}</p>
+                </div>
+              ))}
+            </div>
+
+            <p style={{ fontSize:10, color:T.muted, margin:'0 0 10px' }}>
+              Criada em {new Date(e.createdAt).toLocaleDateString('pt-BR')}
+              {e.trialEndsAt && !e.trialAtivo && ` · Trial encerrou em ${new Date(e.trialEndsAt).toLocaleDateString('pt-BR')}`}
+            </p>
+
+            <div style={{ display:'flex', gap:8 }}>
+              <button onClick={() => { setAcao({ escolaId:e.id, tipo:'plano' }); setNovoPlano('ELITE') }}
+                style={{ flex:1, background:`${T.primary}15`, border:`1px solid ${T.primary}33`, color:T.primary, padding:'9px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:11, cursor:'pointer', textTransform:'uppercase' }}>
+                🔼 Alterar plano
+              </button>
+              <button onClick={() => { setAcao({ escolaId:e.id, tipo:'trial' }); setDiasTrial('15') }}
+                style={{ flex:1, background:`${T.gold}10`, border:`1px solid ${T.gold}30`, color:T.gold, padding:'9px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:11, cursor:'pointer', textTransform:'uppercase' }}>
+                ⏱️ +Trial
+              </button>
+              <a href={`/atletas?escola=${e.id}`}
+                style={{ flex:1, background:`${T.green}10`, border:`1px solid ${T.green}25`, color:T.green, padding:'9px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:11, cursor:'pointer', textTransform:'uppercase', textDecoration:'none', textAlign:'center' }}>
+                👁️ Ver escola
+              </a>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )
