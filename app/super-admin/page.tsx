@@ -23,6 +23,19 @@ export default function SuperAdmin() {
   const [novoPlano, setNovoPlano] = useState('ELITE')
   const [diasTrial, setDiasTrial] = useState('15')
   const [salvando, setSalvando] = useState(false)
+  const [escolaAtiva, setEscolaAtiva] = useState<string | null>(null)
+  const [trocando, setTrocando] = useState<string | null>(null)
+
+  async function trocarEscola(escolaId: string | null) {
+    setTrocando(escolaId || 'limpar')
+    await fetch('/api/super-admin/switch-escola', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ escolaId }),
+    })
+    setEscolaAtiva(escolaId)
+    setTrocando(null)
+    if (escolaId) window.location.href = '/dashboard'
+  }
 
   async function carregar() {
     setLoading(true)
@@ -84,6 +97,19 @@ export default function SuperAdmin() {
       </div>
 
       <div style={{ maxWidth:900, margin:'0 auto', padding:'20px 24px' }}>
+
+        {/* Banner escola ativa */}
+        {escolaAtiva && (
+          <div style={{ background:`${T.gold}10`, border:`1px solid ${T.gold}30`, borderRadius:12, padding:'12px 16px', marginBottom:20, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+            <div>
+              <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:12, color:T.gold, margin:'0 0 2px', textTransform:'uppercase' }}>⚡ Modo gestor ativo</p>
+              <p style={{ fontSize:12, color:T.muted, margin:0 }}>Você está visualizando outra escola. Dashboard e dados refletem essa escola.</p>
+            </div>
+            <button onClick={() => trocarEscola(null)} style={{ background:'rgba(255,68,68,0.1)', border:'1px solid rgba(255,68,68,0.3)', color:'#FF4444', padding:'8px 14px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:11, cursor:'pointer', textTransform:'uppercase', flexShrink:0, marginLeft:12 }}>
+              ✕ Sair
+            </button>
+          </div>
+        )}
 
         {/* KPIs */}
         <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:12, marginBottom:24 }}>
@@ -197,10 +223,10 @@ export default function SuperAdmin() {
                 style={{ flex:1, background:`${T.gold}10`, border:`1px solid ${T.gold}30`, color:T.gold, padding:'9px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:11, cursor:'pointer', textTransform:'uppercase' }}>
                 ⏱️ +Trial
               </button>
-              <a href={`/atletas?escola=${e.id}`}
-                style={{ flex:1, background:`${T.green}10`, border:`1px solid ${T.green}25`, color:T.green, padding:'9px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:11, cursor:'pointer', textTransform:'uppercase', textDecoration:'none', textAlign:'center' }}>
-                👁️ Ver escola
-              </a>
+              <button onClick={() => trocarEscola(e.id)} disabled={trocando === e.id}
+                style={{ flex:1, background:escolaAtiva === e.id ? `${T.gold}15` : `${T.green}10`, border:`1px solid ${escolaAtiva === e.id ? T.gold+'30' : T.green+'25'}`, color: escolaAtiva === e.id ? T.gold : T.green, padding:'9px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:11, cursor:'pointer', textTransform:'uppercase', opacity: trocando === e.id ? 0.6 : 1 }}>
+                {trocando === e.id ? '...' : escolaAtiva === e.id ? '⚡ Ativa' : '👁️ Entrar'}
+              </button>
             </div>
           </div>
         ))}
