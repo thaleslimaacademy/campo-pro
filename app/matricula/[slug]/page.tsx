@@ -11,7 +11,7 @@ export default async function MatriculaSlugPage({ params }: Props) {
 
   const { data: escola } = await supabaseAdmin
     .from('Escola')
-    .select('id, nome, slug, logoUrl, valorMatricula')
+    .select('id, nome, slug, logoUrl, valorMatricula, corPrimaria, corSecundaria')
     .eq('slug', slug)
     .single()
 
@@ -23,6 +23,8 @@ export default async function MatriculaSlugPage({ params }: Props) {
       escolaNome={escola.nome}
       escolaLogoUrl={escola.logoUrl}
       valorMatricula={Number(escola.valorMatricula || 0)}
+      corPrimaria={escola.corPrimaria || '#0A0E1A'}
+      corSecundaria={escola.corSecundaria || '#4169E1'}
     />
   )
 }
