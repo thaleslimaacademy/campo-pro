@@ -40,7 +40,7 @@ export default function Onboarding() {
     const res = await fetch('/api/escola/criar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nomeEscola: form.nomeEscola, slug: form.slug || undefined, cidade: form.cidade, estado: form.estado, telefone: form.telefone, whatsapp: form.whatsapp, responsavel: form.responsavel, plano: 'BASICO' }),
+      body: JSON.stringify({ nomeEscola: form.nomeEscola, slug: form.slug || undefined, cidade: form.cidade, estado: form.estado, telefone: form.telefone, whatsapp: form.whatsapp, responsavel: form.responsavel, plano: 'STARTER' }),
     })
     const data = await res.json()
     if (!data.ok) { setErro('Erro: ' + data.message); setSalvando(false); return }

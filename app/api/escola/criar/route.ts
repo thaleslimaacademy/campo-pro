@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       id: escolaId, slug, nome: nomeEscola, cidade, estado,
       telefone: telefone || null, whatsapp, email,
       clerkUserId: userId, plano, ativo: true,
-      planoGestaoFC: 'BASICO',
+      planoGestaoFC: 'STARTER',
       maxModalidades: 1,
       trialEndsAt: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
     })
