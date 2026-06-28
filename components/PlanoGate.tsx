@@ -35,7 +35,7 @@ export default function PlanoGate({ feature, planoMinimo, children }: Props) {
             : `Esta funcionalidade está disponível a partir do plano `}
           <strong style={{ color: cor }}>{label}</strong>.
         </p>
-        <Link href="/planos" style={{ display:'block', width:'100%', padding:'14px 0', background: cor, color: planoMinimo === 'ELITE' ? '#0A0E1A' : '#fff', borderRadius:12, fontFamily:'Syne,sans-serif', fontWeight:800, fontSize:14, textDecoration:'none', textTransform:'uppercase', letterSpacing:0.5 }}>
+        <Link href="/financeiro/planos" style={{ display:'block', width:'100%', padding:'14px 0', background: cor, color: planoMinimo === 'ELITE' ? '#0A0E1A' : '#fff', borderRadius:12, fontFamily:'Syne,sans-serif', fontWeight:800, fontSize:14, textDecoration:'none', textTransform:'uppercase', letterSpacing:0.5 }}>
           Ver planos e fazer upgrade
         </Link>
         <Link href="/dashboard" style={{ display:'block', marginTop:12, color:'rgba(240,244,255,0.35)', fontFamily:'Inter,sans-serif', fontSize:13, textDecoration:'none' }}>

@@ -21,7 +21,7 @@ export default function TrialBanner() {
           {diasRestantes === 1 ? 'Último dia!' : `${diasRestantes} dias restantes`} — todas as funcionalidades liberadas
         </p>
       </div>
-      <Link href="/planos" style={{ background: '#4169E1', color: '#F0F4FF', borderRadius: 6, padding: '6px 12px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: 0.3, flexShrink: 0 }}>
+      <Link href="/financeiro/planos" style={{ background: '#4169E1', color: '#F0F4FF', borderRadius: 6, padding: '6px 12px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: 0.3, flexShrink: 0 }}>
         Assinar
       </Link>
     </div>
@@ -32,7 +32,7 @@ export default function TrialBanner() {
     <div style={{ background: 'rgba(255,68,68,0.12)', border: '1px solid rgba(255,68,68,0.35)', borderRadius: 10, padding: '12px 14px', margin: '0 16px 12px', textAlign: 'center' }}>
       <p style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 13, color: '#FF4444', margin: '0 0 6px', textTransform: 'uppercase' }}>⛔ Período de Teste Encerrado</p>
       <p style={{ fontFamily: INTER, fontSize: 12, color: 'rgba(240,244,255,0.5)', margin: '0 0 10px' }}>Assine um plano para continuar usando todas as funcionalidades.</p>
-      <Link href="/planos" style={{ display: 'inline-block', background: '#4169E1', color: '#F0F4FF', borderRadius: 8, padding: '10px 20px', fontFamily: SYNE, fontWeight: 800, fontSize: 13, textDecoration: 'none', textTransform: 'uppercase' }}>
+      <Link href="/financeiro/planos" style={{ display: 'inline-block', background: '#4169E1', color: '#F0F4FF', borderRadius: 8, padding: '10px 20px', fontFamily: SYNE, fontWeight: 800, fontSize: 13, textDecoration: 'none', textTransform: 'uppercase' }}>
         Ver planos
       </Link>
     </div>
