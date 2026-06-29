@@ -13,6 +13,7 @@ const MODULOS_ADMIN = [
   { href: '/turmas',                    label: 'Turmas',           icon: 'ti-run',            grupo: 'elenco' },
   { href: '/modalidades',               label: 'Modalidades',      icon: 'ti-ball-football',  grupo: 'elenco' },
   { href: '/locais',                    label: 'Locais',           icon: 'ti-map-pin',        grupo: 'elenco' },
+  { href: '/categorias',               label: 'Categorias',       icon: 'ti-tag',            grupo: 'elenco' },
   { href: '/financeiro/dashboard',      label: 'Dashboard',        icon: 'ti-chart-bar',      grupo: 'financeiro' },
   { href: '/financeiro/caixa',          label: 'Caixa',            icon: 'ti-cash',           grupo: 'financeiro' },
   { href: '/financeiro/boleto',         label: 'Boleto',           icon: 'ti-file-invoice',   grupo: 'financeiro' },
@@ -73,6 +74,7 @@ export default function Dashboard() {
         { href: '/atletas',      label: 'Atletas',      icon: 'ti-users',      grupo: 'elenco' },
         { href: '/presenca',     label: 'Presenca',     icon: 'ti-check',      grupo: 'elenco' },
         { href: '/turmas',       label: 'Turmas',       icon: 'ti-run',        grupo: 'elenco' },
+        { href: '/categorias',   label: 'Categorias',   icon: 'ti-tag',        grupo: 'elenco' },
         { href: '/treinamentos', label: 'Treinamentos', icon: 'ti-chalkboard', grupo: 'elenco' },
       ]
     : role === 'professor' ? MODULOS_PROFESSOR
