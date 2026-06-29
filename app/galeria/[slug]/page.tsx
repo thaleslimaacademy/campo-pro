@@ -1,62 +1,93 @@
 'use client'
 import { use, useEffect, useState } from 'react'
-import { listarAlbunsPublicos } from './actions'
+import { listarAlbunsPublicos, getEscolaInfo } from './actions'
 
-const C = { bg: '#0F0F1A', surface: '#1A1A2E', orange: '#FF6B00', text: '#F0F0F0', muted: 'rgba(240,240,240,0.45)', border: 'rgba(255,255,255,0.08)' }
 const SYNE = 'Syne, sans-serif'
+const INTER = 'Inter, sans-serif'
 type Album = { id: string; titulo: string; descricao: string | null; dataEvento: string | null; capa: string | null }
+type EscolaInfo = { id: string; nome: string; logoUrl: string | null; corPrimaria: string | null; corSecundaria: string | null; cidade: string | null }
 
 export default function GaleriaPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params)
   const [albuns, setAlbuns] = useState<Album[]>([])
+  const [escola, setEscola] = useState<EscolaInfo | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    listarAlbunsPublicos(slug).then(d => setAlbuns(d as Album[])).finally(() => setLoading(false))
+    Promise.all([
+      listarAlbunsPublicos(slug),
+      getEscolaInfo(slug),
+    ]).then(([a, e]) => {
+      setAlbuns(a as Album[])
+      setEscola(e as EscolaInfo)
+    }).finally(() => setLoading(false))
   }, [slug])
 
+  const bg     = escola?.corPrimaria  || '#0A0E1A'
+  const accent = escola?.corSecundaria || '#4169E1'
+  const isDark = bg !== '#FFFFFF' && bg !== '#F0F4FF'
+  const textCol = isDark ? '#F0F4FF' : '#0A0E1A'
+  const muted   = isDark ? 'rgba(240,244,255,0.45)' : 'rgba(10,14,26,0.5)'
+
   return (
-    <div style={{ minHeight: '100vh', background: C.bg, color: C.text }}>
-      <div style={{ background: 'linear-gradient(135deg, #FF6B00 0%, #1A1A2E 60%, #0F0F1A 100%)', padding: '20px 20px 28px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <img src="/gestaofc-logo.png" style={{ width: 40, height: 40, borderRadius: 10 }} alt="logo"
-            onError={e => (e.currentTarget.style.display = 'none')} />
+    <div style={{ minHeight: '100vh', background: bg, color: textCol, fontFamily: INTER }}>
+
+      {/* HEADER */}
+      <div style={{ background: `linear-gradient(135deg, ${accent}22 0%, ${bg} 100%)`, borderBottom: `1px solid ${accent}25`, padding: '20px 20px 24px' }}>
+        <div style={{ maxWidth: 800, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 14 }}>
+          {escola?.logoUrl ? (
+            <img src={escola.logoUrl} alt={escola.nome} style={{ width: 52, height: 52, borderRadius: 12, objectFit: 'contain', background: 'white', padding: 3 }} />
+          ) : (
+            <div style={{ width: 52, height: 52, borderRadius: 12, background: `${accent}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>📸</div>
+          )}
           <div>
-            <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 18, color: '#fff' }}>Galeria de Fotos</div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)' }}>{slug}</div>
+            <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 20, color: accent, letterSpacing: -0.3 }}>Galeria de Fotos</div>
+            <div style={{ fontSize: 12, color: muted, marginTop: 2 }}>{escola?.nome || slug} {escola?.cidade ? `· ${escola.cidade}` : ''}</div>
           </div>
         </div>
       </div>
-      <div style={{ padding: 20, maxWidth: 800, margin: '0 auto' }}>
+
+      {/* CONTENT */}
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: '24px 20px' }}>
         {loading ? (
-          <p style={{ color: C.muted, textAlign: 'center', padding: 40 }}>Carregando...</p>
+          <div style={{ textAlign: 'center', padding: '60px 0' }}>
+            <p style={{ color: muted, fontSize: 14 }}>Carregando álbuns...</p>
+          </div>
         ) : albuns.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: 60 }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>📷</div>
-            <p style={{ color: C.muted }}>Nenhum álbum disponível ainda.</p>
+          <div style={{ textAlign: 'center', padding: '60px 0' }}>
+            <div style={{ fontSize: 52, marginBottom: 16 }}>📷</div>
+            <p style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 16, color: textCol, margin: '0 0 8px' }}>Nenhum álbum disponível ainda</p>
+            <p style={{ fontSize: 13, color: muted }}>Em breve novas fotos serão publicadas aqui.</p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
-            {albuns.map(a => (
-              <a key={a.id} href={`/galeria/${slug}/${a.id}`} style={{ background: C.surface, borderRadius: 16, overflow: 'hidden', textDecoration: 'none', border: `1px solid ${C.border}`, display: 'block' }}>
-                <div style={{ aspectRatio: '16/9', background: `${C.orange}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                  {a.capa
-                    ? <img src={a.capa} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={a.titulo} />
-                    : <span style={{ fontSize: 40 }}>📸</span>
-                  }
-                </div>
-                <div style={{ padding: '14px 16px' }}>
-                  <div style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 15, color: C.text, marginBottom: 4 }}>{a.titulo}</div>
-                  {a.descricao && <div style={{ fontSize: 12, color: C.muted, marginBottom: 4 }}>{a.descricao}</div>}
-                  {a.dataEvento && <div style={{ fontSize: 11, color: C.orange }}>📅 {a.dataEvento.slice(0, 10).split('-').reverse().join('/')}</div>}
-                  <div style={{ marginTop: 10, display: 'inline-block', background: `${C.orange}18`, color: C.orange, borderRadius: 8, padding: '4px 10px', fontSize: 11, fontWeight: 600 }}>
-                    Ver fotos →
+          <>
+            <p style={{ fontSize: 11, color: muted, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16, fontFamily: SYNE, fontWeight: 700 }}>{albuns.length} álbum{albuns.length !== 1 ? 's' : ''}</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
+              {albuns.map(a => (
+                <a key={a.id} href={`/galeria/${slug}/${a.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+                  <div style={{ background: `${accent}08`, border: `1px solid ${accent}20`, borderRadius: 14, overflow: 'hidden', transition: 'transform 0.15s' }}
+                    onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
+                    onMouseLeave={e => (e.currentTarget.style.transform = 'none')}>
+                    {a.capa ? (
+                      <img src={a.capa} alt={a.titulo} style={{ width: '100%', height: 160, objectFit: 'cover', display: 'block' }} />
+                    ) : (
+                      <div style={{ width: '100%', height: 160, background: `${accent}10`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40 }}>📷</div>
+                    )}
+                    <div style={{ padding: '12px 14px 14px' }}>
+                      <p style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 14, color: textCol, margin: '0 0 4px', lineHeight: 1.3 }}>{a.titulo}</p>
+                      {a.dataEvento && <p style={{ fontSize: 11, color: muted, margin: 0 }}>{new Date(a.dataEvento + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}</p>}
+                      {a.descricao && <p style={{ fontSize: 12, color: muted, margin: '6px 0 0', lineHeight: 1.5 }}>{a.descricao}</p>}
+                    </div>
                   </div>
-                </div>
-              </a>
-            ))}
-          </div>
+                </a>
+              ))}
+            </div>
+          </>
         )}
+      </div>
+
+      <div style={{ textAlign: 'center', padding: '20px 0 32px', borderTop: `1px solid ${accent}15`, marginTop: 20 }}>
+        <p style={{ fontSize: 11, color: muted }}>Powered by <span style={{ color: accent, fontWeight: 700 }}>GestãoFC</span></p>
       </div>
     </div>
   )

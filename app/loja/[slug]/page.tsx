@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import { ShoppingCart, Check, Loader2, Copy, CreditCard, Plus, Minus, X } from 'lucide-react'
-import { listarProdutosPublicos, criarPedido } from './actions'
+import { listarProdutosPublicos, criarPedido, getEscolaInfo } from './actions'
+type EscolaInfo = { id: string; nome: string; logoUrl: string | null; corPrimaria: string | null; corSecundaria: string | null }
 import { use } from 'react'
 
-const C = { bg: '#0F0F1A', surface: '#1A1A2E', orange: '#FF6B00', gold: '#FFD700', green: '#00C896', text: '#F0F0F0', muted: 'rgba(240,240,240,0.45)', border: 'rgba(255,255,255,0.08)' }
+const C = { bg: '#0A0E1A', surface: '#0D1220', surface2: '#121A2E', orange: '#4169E1', gold: '#FFD700', green: '#00D67A', text: '#F0F4FF', muted: 'rgba(240,244,255,0.45)', border: 'rgba(240,244,255,0.08)' }
 const SYNE = 'Syne, sans-serif'
 const brl = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n)
 
@@ -28,9 +29,12 @@ export default function LojaPage({ params }: { params: Promise<{ slug: string }>
   const [pixData, setPixData] = useState<{ copiaCola: string; qrCodeImage: string } | null>(null)
   const [creditCardUrl, setCreditCardUrl] = useState<string | null>(null)
   const [valorTotal, setValorTotal] = useState(0); const [copiado, setCopiado] = useState(false)
+  const [escola, setEscola] = useState<EscolaInfo | null>(null)
+
+  const accent = escola?.corSecundaria || '#4169E1'
 
   useEffect(() => {
-    listarProdutosPublicos(slug).then(d => setProdutos(d as Produto[])).finally(() => setLoading(false))
+    Promise.all([listarProdutosPublicos(slug), getEscolaInfo(slug)]).then(([p, e]) => { setProdutos(p as Produto[]); setEscola(e as EscolaInfo) }).finally(() => setLoading(false))
   }, [])
 
   const totalCarrinho = carrinho.reduce((s, i) => s + i.preco * i.qtd, 0)
@@ -89,7 +93,7 @@ export default function LojaPage({ params }: { params: Promise<{ slug: string }>
             <button onClick={() => setEtapa('carrinho')}
               style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 12, padding: '8px 16px', color: '#fff', cursor: 'pointer', fontFamily: SYNE, fontWeight: 700 }}>
               <ShoppingCart size={18} />
-              <span style={{ background: C.orange, borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>{qtdCarrinho}</span>
+              <span style={{ background: accent, borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>{qtdCarrinho}</span>
               {brl(totalCarrinho)}
             </button>
           )}
@@ -136,7 +140,7 @@ export default function LojaPage({ params }: { params: Promise<{ slug: string }>
                       )}
 
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
-                        <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 16, color: C.orange }}>
+                        <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 16, color: accent }}>
                           {varAtual ? brl(varAtual.preco) : p.ProdutoVariacao.length > 0 ? `A partir de ${brl(Math.min(...p.ProdutoVariacao.map(v => v.preco)))}` : '—'}
                         </div>
                         <button onClick={() => adicionarAoCarrinho(p)} disabled={!temEstoque}
@@ -158,7 +162,7 @@ export default function LojaPage({ params }: { params: Promise<{ slug: string }>
         <div style={{ padding: 20, maxWidth: 480, margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
             <button onClick={() => setEtapa('loja')} style={{ background: 'transparent', border: 'none', color: C.muted, cursor: 'pointer', fontSize: 20 }}>←</button>
-            <h2 style={{ fontFamily: SYNE, fontSize: 20, fontWeight: 800, color: C.orange, margin: 0 }}>Carrinho</h2>
+            <h2 style={{ fontFamily: SYNE, fontSize: 20, fontWeight: 800, color: accent, margin: 0 }}>Carrinho</h2>
           </div>
           {carrinho.map(item => (
             <div key={item.variacaoId} style={{ background: C.surface, borderRadius: 12, padding: 14, marginBottom: 10, display: 'flex', gap: 12, alignItems: 'center' }}>
@@ -168,7 +172,7 @@ export default function LojaPage({ params }: { params: Promise<{ slug: string }>
               <div style={{ flex: 1 }}>
                 <div style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 13 }}>{item.nome}</div>
                 <div style={{ fontSize: 11, color: C.muted }}>{[item.tamanho, item.cor].filter(Boolean).join(' · ')}</div>
-                <div style={{ fontSize: 13, color: C.orange, fontWeight: 700 }}>{brl(item.preco)}</div>
+                <div style={{ fontSize: 13, color: accent, fontWeight: 700 }}>{brl(item.preco)}</div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <button onClick={() => setCarrinho(prev => prev.map(i => i.variacaoId === item.variacaoId ? { ...i, qtd: Math.max(1, i.qtd - 1) } : i))}
@@ -189,9 +193,9 @@ export default function LojaPage({ params }: { params: Promise<{ slug: string }>
           ))}
           <div style={{ background: C.surface, borderRadius: 12, padding: '14px 16px', marginTop: 16, display: 'flex', justifyContent: 'space-between' }}>
             <span style={{ color: C.muted }}>Total</span>
-            <span style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 18, color: C.orange }}>{brl(totalCarrinho)}</span>
+            <span style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 18, color: accent }}>{brl(totalCarrinho)}</span>
           </div>
-          <button onClick={() => setEtapa('form')} style={{ width: '100%', marginTop: 16, background: C.orange, color: '#fff', border: 'none', borderRadius: 12, padding: '14px', fontFamily: SYNE, fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
+          <button onClick={() => setEtapa('form')} style={{ width: '100%', marginTop: 16, background: accent, color: '#fff', border: 'none', borderRadius: 12, padding: '14px', fontFamily: SYNE, fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
             Finalizar pedido →
           </button>
         </div>
@@ -202,7 +206,7 @@ export default function LojaPage({ params }: { params: Promise<{ slug: string }>
         <div style={{ padding: 20, maxWidth: 480, margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
             <button onClick={() => setEtapa('carrinho')} style={{ background: 'transparent', border: 'none', color: C.muted, cursor: 'pointer', fontSize: 20 }}>←</button>
-            <h2 style={{ fontFamily: SYNE, fontSize: 20, fontWeight: 800, color: C.orange, margin: 0 }}>Seus dados</h2>
+            <h2 style={{ fontFamily: SYNE, fontSize: 20, fontWeight: 800, color: accent, margin: 0 }}>Seus dados</h2>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <Campo label="Nome completo *"><input value={nome} onChange={e => setNome(e.target.value)} placeholder="Seu nome" style={inp} /></Campo>
@@ -240,7 +244,7 @@ export default function LojaPage({ params }: { params: Promise<{ slug: string }>
             )}
           </div>
           <button onClick={confirmarPedido} disabled={enviando}
-            style={{ width: '100%', marginTop: 20, background: C.orange, color: '#fff', border: 'none', borderRadius: 12, padding: '14px', fontFamily: SYNE, fontWeight: 700, fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: enviando ? 0.7 : 1 }}>
+            style={{ width: '100%', marginTop: 20, background: accent, color: '#fff', border: 'none', borderRadius: 12, padding: '14px', fontFamily: SYNE, fontWeight: 700, fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: enviando ? 0.7 : 1 }}>
             {enviando ? <><Loader2 size={18} className="spin" /> Processando...</> : `Pagar ${brl(totalCarrinho)}`}
           </button>
         </div>
@@ -250,7 +254,7 @@ export default function LojaPage({ params }: { params: Promise<{ slug: string }>
       {etapa === 'pix' && pixData && (
         <div style={{ padding: 20, maxWidth: 420, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontSize: 48, marginBottom: 12 }}>⚡</div>
-          <h2 style={{ fontFamily: SYNE, fontSize: 20, fontWeight: 800, color: C.orange, marginBottom: 6 }}>Pague via Pix</h2>
+          <h2 style={{ fontFamily: SYNE, fontSize: 20, fontWeight: 800, color: accent, marginBottom: 6 }}>Pague via Pix</h2>
           <p style={{ color: C.muted, fontSize: 13, marginBottom: 20 }}>Após o pagamento você receberá a confirmação no WhatsApp.</p>
           {pixData.qrCodeImage && (
             <img src={`data:image/png;base64,${pixData.qrCodeImage}`}
@@ -271,10 +275,10 @@ export default function LojaPage({ params }: { params: Promise<{ slug: string }>
       {etapa === 'cartao' && creditCardUrl && (
         <div style={{ padding: 20, maxWidth: 420, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontSize: 48, marginBottom: 12 }}>💳</div>
-          <h2 style={{ fontFamily: SYNE, fontSize: 20, fontWeight: 800, color: C.orange, marginBottom: 6 }}>Pagamento por Cartão</h2>
+          <h2 style={{ fontFamily: SYNE, fontSize: 20, fontWeight: 800, color: accent, marginBottom: 6 }}>Pagamento por Cartão</h2>
           <p style={{ color: C.muted, fontSize: 13, marginBottom: 24 }}>Clique abaixo para pagar. Após confirmação, você receberá no WhatsApp.</p>
           <a href={creditCardUrl} target="_blank" rel="noreferrer"
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: C.orange, color: '#fff', borderRadius: 14, padding: '16px 24px', fontFamily: SYNE, fontWeight: 800, fontSize: 15, textDecoration: 'none' }}>
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: accent, color: '#fff', borderRadius: 14, padding: '16px 24px', fontFamily: SYNE, fontWeight: 800, fontSize: 15, textDecoration: 'none' }}>
             <CreditCard size={20} /> Pagar {brl(valorTotal)}
           </a>
         </div>

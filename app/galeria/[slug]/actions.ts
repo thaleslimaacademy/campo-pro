@@ -11,6 +11,11 @@ async function getEscolaBySlug(slug: string) {
   return data
 }
 
+export async function getEscolaInfo(slug: string) {
+  const { data } = await supabaseAdmin.from('Escola').select('id, nome, logoUrl, corPrimaria, corSecundaria, cidade, estado').eq('slug', slug).single()
+  return data
+}
+
 export async function listarAlbunsPublicos(slug: string) {
   const escola = await getEscolaBySlug(slug)
   const { data } = await supabaseAdmin.from('Album')
