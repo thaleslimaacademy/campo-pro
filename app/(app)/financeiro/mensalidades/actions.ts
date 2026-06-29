@@ -1,163 +1,117 @@
 'use server'
-
-import { randomUUID } from 'crypto'
-import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
-import { requireFinanceiro } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
+import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
+import { revalidatePath } from 'next/cache'
 
-// ⚙️ Tabela/colunas reais do seu banco:
-const TABELA = 'Cobranca'
-const TABELA_ATLETAS = 'Atleta'
-
-export type Status = 'PENDENTE' | 'PAGO' | 'VENCIDO' | 'CANCELADO'
-
-export async function gerarMensalidades(params: {
-  atletaId: string; quantidade: number; mesInicial: string; valor: number; diaVencimento: number; descricaoBase?: string
-}) {
-  await requireFinanceiro()
-  const ESCOLA_ID = await getEscolaIdServer()
-  const { atletaId, quantidade, mesInicial, valor, diaVencimento } = params
-  const [anoStr, mesStr] = mesInicial.split('-')
-  let ano = Number(anoStr); let mes = Number(mesStr)
-  const linhas: Record<string, unknown>[] = []
-  for (let i = 0; i < quantidade; i++) {
-    const mm = String(mes).padStart(2, '0'); const dd = String(diaVencimento).padStart(2, '0')
-    linhas.push({
-      id: randomUUID(),
-      escolaId: ESCOLA_ID,
-      atletaId,
-      valor,
-      status: 'PENDENTE' as Status,
-      competencia: `${ano}-${mm}-01`,
-      vencimento: `${ano}-${mm}-${dd}T12:00:00`,
-      descricao: params.descricaoBase ?? `Mensalidade ${mm}/${ano}`,
-    })
-    mes++; if (mes > 12) { mes = 1; ano++ }
+export async function getMensalidades() {
+  const escolaId = await getEscolaIdServer()
+  const [atletasRes, planosRes, cobrancasRes] = await Promise.all([
+    supabaseAdmin.from('Atleta').select('id, nome, diaVencimento, planoMensalidade, valorMensalidade, bolsista, ativo').eq('escolaId', escolaId).eq('ativo', true).order('nome'),
+    supabaseAdmin.from('PlanoMensalidade').select('slug, nome, valor').eq('escolaId', escolaId),
+    supabaseAdmin.from('Cobranca').select('id, atletaId, valor, vencimento, status, descricao, periodo, baixaManual, tipo, pagoEm').eq('escolaId', escolaId).order('vencimento', { ascending: false }).limit(200),
+  ])
+  return {
+    escolaId,
+    atletas: atletasRes.data ?? [],
+    planos: planosRes.data ?? [],
+    cobrancas: cobrancasRes.data ?? [],
   }
-  const { error } = await supabaseAdmin.from(TABELA).insert(linhas)
-  if (error) throw new Error(error.message)
-  return { ok: true, criadas: linhas.length }
 }
 
-export async function listarMensalidades(opts?: { status?: Status | 'todas'; incluirExcluidas?: boolean }) {
-  await requireFinanceiro()
-  const ESCOLA_ID = await getEscolaIdServer()
-  let q = supabaseAdmin.from(TABELA)
-    .select('id, atletaId, valor, status, competencia, vencimento, descricao, excluidaEm')
-    .eq('escolaId', ESCOLA_ID)
-    .order('vencimento', { ascending: false })
-  if (!opts?.incluirExcluidas) q = q.is('excluidaEm', null)
-  if (opts?.status && opts.status !== 'todas') q = q.eq('status', opts.status)
-  const { data, error } = await q
-  if (error) throw new Error(error.message)
+export async function alterarDiaVencimentoAtleta(atletaId: string, dia: number) {
+  await supabaseAdmin.from('Atleta').update({ diaVencimento: dia }).eq('id', atletaId)
+  revalidatePath('/financeiro/mensalidades')
+}
 
-  // anexa o nome do atleta (sem depender de relacionamento PostgREST)
-  const { data: atletas } = await supabaseAdmin.from(TABELA_ATLETAS).select('id, nome').eq('escolaId', ESCOLA_ID)
-  const mapa = new Map((atletas ?? []).map((a: { id: string; nome: string }) => [a.id, a.nome]))
-  return (data ?? []).map((c: Record<string, unknown>) => ({ ...c, atleta: { nome: mapa.get(c.atletaId as string) ?? '—' } }))
+export async function alterarDiaVencimentoMassa(atletaIds: string[], dia: number) {
+  await supabaseAdmin.from('Atleta').update({ diaVencimento: dia }).in('id', atletaIds)
+  revalidatePath('/financeiro/mensalidades')
+}
+
+export async function baixaManualCobranca(cobrancaId: string, valorPago: number, formaPagamento: string) {
+  await supabaseAdmin.from('Cobranca').update({
+    status: 'PAGO',
+    pagoEm: new Date().toISOString(),
+    valorPago,
+    baixaManual: true,
+    baixaManualEm: new Date().toISOString(),
+    tipo: formaPagamento,
+  }).eq('id', cobrancaId)
+  revalidatePath('/financeiro/mensalidades')
+}
+
+export async function cancelarCobranca(cobrancaId: string) {
+  await supabaseAdmin.from('Cobranca').update({ status: 'CANCELADO', excluidaEm: new Date().toISOString() }).eq('id', cobrancaId)
+  revalidatePath('/financeiro/mensalidades')
+}
+
+// ── Aliases e funções legadas usadas pela página existente ──
+export async function listarMensalidades(opts?: { status?: string; incluirExcluidas?: boolean }) {
+  const escolaId = await getEscolaIdServer()
+  let q = supabaseAdmin.from('Cobranca').select('id, atletaId, atletaNome, valor, valorPago, vencimento, status, descricao, periodo, baixaManual, tipo, pagoEm, excluidaEm, grupoCobrancaId, qtdParcelas, parcelaAtual').eq('escolaId', escolaId).order('vencimento', { ascending: false }).limit(300)
+  if (opts?.status && opts.status !== 'TODOS') q = q.eq('status', opts.status)
+  if (!opts?.incluirExcluidas) q = q.is('excluidaEm', null)
+  const { data } = await q
+  return data ?? []
 }
 
 export async function listarAtletas() {
-  await requireFinanceiro()
-  const ESCOLA_ID = await getEscolaIdServer()
-  const { data, error } = await supabaseAdmin.from(TABELA_ATLETAS)
-    .select('id, nome').eq('escolaId', ESCOLA_ID).order('nome')
-  if (error) throw new Error(error.message)
-  return (data ?? []) as { id: string; nome: string }[]
+  const escolaId = await getEscolaIdServer()
+  const { data } = await supabaseAdmin.from('Atleta').select('id, nome, diaVencimento, planoMensalidade, valorMensalidade, bolsista').eq('escolaId', escolaId).eq('ativo', true).order('nome')
+  return data ?? []
 }
 
-export async function softDeleteCobranca(id: string) {
-  await requireFinanceiro()
-  const ESCOLA_ID = await getEscolaIdServer()
-  const { error } = await supabaseAdmin.from(TABELA)
-    .update({ excluidaEm: new Date().toISOString() }).eq('id', id).eq('escolaId', ESCOLA_ID)
-  if (error) throw new Error(error.message)
-  return { ok: true }
-}
-
-export async function restaurarCobranca(id: string) {
-  await requireFinanceiro()
-  const ESCOLA_ID = await getEscolaIdServer()
-  const { error } = await supabaseAdmin.from(TABELA)
-    .update({ excluidaEm: null }).eq('id', id).eq('escolaId', ESCOLA_ID)
-  if (error) throw new Error(error.message)
-  return { ok: true }
-}
-
-export async function excluirDefinitivo(id: string) {
-  await requireFinanceiro()
-  const ESCOLA_ID = await getEscolaIdServer()
-  const { error } = await supabaseAdmin.from(TABELA).delete().eq('id', id).eq('escolaId', ESCOLA_ID)
-  if (error) throw new Error(error.message)
-  return { ok: true }
-}
-
-export async function marcarPago(id: string) {
-  await requireFinanceiro()
-  const ESCOLA_ID = await getEscolaIdServer()
-  const { error } = await supabaseAdmin.from(TABELA)
-    .update({ status: 'PAGO' as Status })
-    .eq('id', id).eq('escolaId', ESCOLA_ID)
-  if (error) throw new Error(error.message)
-
-  // Busca dados para enviar recibo WhatsApp
-  try {
-    const { data: cob } = await supabaseAdmin.from(TABELA)
-      .select('atletaId, valor, vencimento, descricao').eq('id', id).single()
-
-    if (cob?.atletaId) {
-      const { data: atleta } = await supabaseAdmin.from('Atleta')
-        .select('nome').eq('id', cob.atletaId).single()
-
-      const { data: resps } = await supabaseAdmin.from('Responsavel')
-        .select('nome, whatsapp').eq('atletaId', cob.atletaId).eq('principal', true).limit(1)
-
-      const resp = resps?.[0]
-      if (resp?.whatsapp && atleta) {
-        const brl = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n)
-        const dataFmt = new Date((cob.vencimento || '').includes('T') ? cob.vencimento : cob.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
-        const nome = resp.nome.split(' ')[0]
-
-        const msg = [
-          '✅ *PAGAMENTO CONFIRMADO*',
-          '',
-          `Olá, *${nome}*!`,
-          '',
-          `O pagamento de *${atleta.nome}* foi confirmado.`,
-          '',
-          `💰 Valor: *${brl(Number(cob.valor))}*`,
-          `📅 Referência: *${dataFmt}*`,
-          `📝 ${cob.descricao || 'Mensalidade'}`,
-          '',
-          '_Obrigado! Thales Lima Football Academy_ ⚽',
-        ].join('\n')
-
-        const numero = resp.whatsapp.replace(/\D/g, '')
-        const numeroFmt = numero.startsWith('55') ? numero : '55' + numero
-
-        await fetch(
-          'https://api.z-api.io/instances/' + process.env.ZAPI_INSTANCE_ID + '/token/' + process.env.ZAPI_TOKEN + '/send-text',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Client-Token': process.env.ZAPI_CLIENT_TOKEN || '' },
-            body: JSON.stringify({ phone: numeroFmt, message: msg }),
-          }
-        )
-      }
+export async function gerarMensalidades(params: { atletaId?: string; atletaIds?: string[]; quantidade?: number; mesInicial?: number; valor?: number; diaVencimento?: number; periodo?: string }) {
+  const { atletaId, atletaIds, quantidade = 1, mesInicial, valor = 85, diaVencimento = 10, periodo = 'mensal' } = params
+  const ids = atletaIds || (atletaId ? [atletaId] : [])
+  if (!ids.length) return { criadas: 0, geradas: 0 }
+  const escolaId = await getEscolaIdServer()
+  const qtd = periodo === 'semestral' ? 6 : periodo === 'anual' ? 12 : 1
+  const agora = new Date()
+  const grupoId = qtd > 1 ? crypto.randomUUID() : null
+  const insertions = []
+  for (const atletaId of ids) {
+    for (let i = 0; i < qtd; i++) {
+      const dataVenc = new Date(agora.getFullYear(), agora.getMonth() + i, diaVencimento)
+      insertions.push({
+        id: crypto.randomUUID(), escolaId, atletaId,
+        valor, vencimento: dataVenc.toISOString().split('T')[0],
+        status: 'PENDENTE', descricao: `Mensalidade${qtd > 1 ? ` (${i+1}/${qtd})` : ''}`,
+        periodo, qtdParcelas: qtd, parcelaAtual: i + 1,
+        grupoCobrancaId: grupoId, tipo: 'MANUAL',
+      })
     }
-  } catch (e) {
-    console.error('Erro ao enviar WhatsApp marcarPago:', e)
   }
-
-  return { ok: true }
+  if (insertions.length > 0) await supabaseAdmin.from('Cobranca').insert(insertions)
+  revalidatePath('/financeiro/mensalidades')
+  return { geradas: insertions.length, criadas: insertions.length }
 }
 
-export async function cancelarCobranca(id: string) {
-  await requireFinanceiro()
-  const ESCOLA_ID = await getEscolaIdServer()
-  const { error } = await supabaseAdmin.from(TABELA)
-    .update({ status: 'CANCELADO' as Status })
-    .eq('id', id).eq('escolaId', ESCOLA_ID)
-  if (error) throw new Error(error.message)
-  return { ok: true }
+export async function softDeleteCobranca(cobrancaId: string) {
+  await supabaseAdmin.from('Cobranca').update({ excluidaEm: new Date().toISOString(), status: 'CANCELADO' }).eq('id', cobrancaId)
+  revalidatePath('/financeiro/mensalidades')
+}
+
+export async function restaurarCobranca(cobrancaId: string) {
+  await supabaseAdmin.from('Cobranca').update({ excluidaEm: null, status: 'PENDENTE' }).eq('id', cobrancaId)
+  revalidatePath('/financeiro/mensalidades')
+}
+
+export async function excluirDefinitivo(cobrancaId: string) {
+  await supabaseAdmin.from('Cobranca').delete().eq('id', cobrancaId)
+  revalidatePath('/financeiro/mensalidades')
+}
+
+export async function marcarPago(cobrancaId: string, valorPago?: number, formaPagamento?: string) {
+  await supabaseAdmin.from('Cobranca').update({
+    status: 'PAGO', pagoEm: new Date().toISOString(),
+    valorPago: valorPago || null, baixaManual: true,
+    baixaManualEm: new Date().toISOString(),
+    tipo: formaPagamento || 'MANUAL',
+  }).eq('id', cobrancaId)
+  revalidatePath('/financeiro/mensalidades')
+}
+
+export async function alterarDiaVencimentoEmMassa(atletaIds: string[], dia: number) {
+  return alterarDiaVencimentoMassa(atletaIds, dia)
 }

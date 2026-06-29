@@ -40,7 +40,7 @@ export default function MensalidadesPage() {
 
   const carregar = useCallback(async () => {
     setCarregando(true)
-    try { setLista((await listarMensalidades({ status: filtro as never, incluirExcluidas: verExcluidas })) as Cobranca[]) }
+    try { setLista((await listarMensalidades({ status: filtro as never, incluirExcluidas: verExcluidas })) as unknown as Cobranca[]) }
     finally { setCarregando(false) }
   }, [filtro, verExcluidas])
 
@@ -50,7 +50,7 @@ export default function MensalidadesPage() {
   const lancar = async () => {
     if (!atletaId) { alert('Selecione um atleta'); return }
     setSalvando(true)
-    try { const r = await gerarMensalidades({ atletaId, quantidade, mesInicial, valor, diaVencimento }); alert(`${r.criadas} mensalidades lançadas`); await carregar() }
+    try { const r = await gerarMensalidades({ atletaId, quantidade, mesInicial: Number(mesInicial), valor, diaVencimento }); alert(`${r.criadas} mensalidades lançadas`); await carregar() }
     catch (e) { alert('Erro: ' + (e as Error).message) }
     finally { setSalvando(false) }
   }
