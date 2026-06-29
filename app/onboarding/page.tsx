@@ -1,7 +1,8 @@
 'use client'
 export const dynamic = 'force-dynamic'
 
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 
 const T = { bg:'#0A0E1A', surface:'#0D1220', primary:'#4169E1', accent:'#00BFFF', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', border:'rgba(240,244,255,0.08)', green:'#00D67A', red:'#FF4444' }
 const SYNE = 'Syne, sans-serif'
@@ -10,7 +11,9 @@ const INP: React.CSSProperties = { width:'100%', background:'#080C15', border:`1
 const LBL: React.CSSProperties = { fontSize:11, color:T.muted, textTransform:'uppercase', letterSpacing:'0.8px' }
 const ESTADOS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO']
 
-export default function Onboarding() {
+function OnboardingContent() {
+  const params = useSearchParams()
+  const planoUrl = params.get('plano') || 'STARTER'
   const [step, setStep] = useState(1)
   const [salvando, setSalvando] = useState(false)
   const [erro, setErro] = useState('')
@@ -49,6 +52,9 @@ export default function Onboarding() {
 
   const progress = (step / 2) * 100
 
+  // badge de plano escolhido
+  const planoLabel = { basico:'Básico', pro:'Pro', elite:'Elite', STARTER:'Básico' }[planoUrl.toLowerCase()] || planoUrl
+
   return (
     <div style={{ minHeight:'100vh', background:T.bg, display:'flex', alignItems:'center', justifyContent:'center', padding:24, fontFamily:INTER }}>
       <div style={{ width:'100%', maxWidth:400 }}>
@@ -62,8 +68,8 @@ export default function Onboarding() {
 
         {/* Trial badge */}
         <div style={{ background:`${T.green}10`, border:`1px solid ${T.green}30`, borderRadius:10, padding:'10px 16px', marginBottom:24, textAlign:'center' }}>
-          <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:12, color:T.green, margin:'0 0 2px', textTransform:'uppercase', letterSpacing:0.5 }}>🎉 15 dias GRÁTIS</p>
-          <p style={{ fontSize:11, color:T.muted, margin:0 }}>Acesso completo ao plano Elite — sem cartão</p>
+          <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:12, color:T.green, margin:'0 0 2px', textTransform:'uppercase', letterSpacing:0.5 }}>🎉 15 dias GRÁTIS — Plano {planoLabel}</p>
+          <p style={{ fontSize:11, color:T.muted, margin:0 }}>Acesso completo — sem cartão de crédito</p>
         </div>
 
         {/* Progress */}
@@ -154,4 +160,9 @@ export default function Onboarding() {
       </div>
     </div>
   )
+}
+
+
+export default function Onboarding() {
+  return <Suspense><OnboardingContent /></Suspense>
 }
