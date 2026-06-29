@@ -124,7 +124,7 @@ export default function Dashboard() {
     <div style={{ minHeight: '100vh', background: C.navy, color: C.off, fontFamily: 'Inter, sans-serif', paddingBottom: 88 }}>
 
       {/* HEADER */}
-      <div style={{ background: 'linear-gradient(135deg, #1A3FA8 0%, #4169E1 100%)', padding: '20px 20px 28px', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ background: 'linear-gradient(135deg, #1A3FA8 0%, #4169E1 100%)', padding: '20px 20px 28px', position: 'relative' }}>
         <div style={{ position: 'absolute', right: -40, top: -40, width: 200, height: 200, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
         <div style={{ position: 'absolute', right: 40, bottom: -60, width: 140, height: 140, borderRadius: '50%', background: 'rgba(0,191,255,0.08)' }} />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
