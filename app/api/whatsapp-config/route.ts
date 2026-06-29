@@ -62,10 +62,21 @@ export async function POST() {
 
   // Busca QR Code
   const qr = await getQrCode(nomeInstancia)
+  // Evolution API retorna QR em formatos diferentes por versão
+  const qrBase64 = qr?.base64 
+    || qr?.qrcode?.base64 
+    || qr?.qrcode 
+    || qr?.code
+    || null
+  
+  // Remove prefixo data:image se já vier com ele
+  const qrLimpo = qrBase64?.replace(/^data:image\/[^;]+;base64,/, '') || null
+
   return NextResponse.json({
     ok: true,
     instancia: nomeInstancia,
-    qrCode: qr?.base64 || qr?.qrcode?.base64 || null,
+    qrCode: qrLimpo,
+    qrCodeRaw: qr, // debug
     pairingCode: qr?.pairingCode || null,
   })
 }

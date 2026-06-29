@@ -100,9 +100,9 @@ export default function WhatsAppConfig() {
         <div style={{ textAlign: 'center' }}>
           <p style={{ fontSize: 13, color: T.muted, marginBottom: 12 }}>Abra o WhatsApp no celular → Menu → Dispositivos conectados → Conectar dispositivo → Escanear QR Code</p>
           <div style={{ background: '#fff', padding: 12, borderRadius: 12, display: 'inline-block', marginBottom: 12 }}>
-            <img src={`data:image/png;base64,${qrCode}`} alt="QR Code WhatsApp" style={{ width: 200, height: 200, display: 'block' }} />
+            <img src={qrCode.startsWith('data:') ? qrCode : `data:image/png;base64,${qrCode}`} alt="QR Code WhatsApp" style={{ width: 200, height: 200, display: 'block' }} />
           </div>
-          {pairingCode && (
+          {!qrCode && pairingCode && (
             <div style={{ background: `${T.gold}10`, border: `1px solid ${T.gold}30`, borderRadius: 10, padding: 12, marginBottom: 12 }}>
               <p style={{ fontSize: 11, color: T.muted, margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: 0.8 }}>Ou use o código de pareamento</p>
               <p style={{ fontFamily: 'monospace', fontSize: 20, fontWeight: 700, color: T.gold, margin: 0, letterSpacing: 4 }}>{pairingCode}</p>
