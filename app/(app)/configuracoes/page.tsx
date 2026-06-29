@@ -4,6 +4,7 @@ import AdminGuard from '@/components/AdminGuard'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { salvarConfiguracoes, listarPlanos, salvarPlano, criarPlano, excluirPlano, carregarConfiguracoes } from './actions'
+import WhatsAppConfig from '@/components/WhatsAppConfig'
 
 function ConfiguracoesInner() {
   const { escolaId } = usePerfil()
@@ -235,6 +236,8 @@ function ConfiguracoesInner() {
         </div>
 
         {/* Redes Sociais */}
+        <WhatsAppConfig />
+
         <div style={card}>
           <p style={sectionTitle}>Redes Sociais</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
