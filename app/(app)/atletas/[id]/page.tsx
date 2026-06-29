@@ -1,7 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase'
-import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { podeFinanceiro } from '@/lib/auth'
+import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 import CopiarLink from './CopiarLink'
 import GraficoPresenca from './GraficoPresenca'
 import FotoAtleta from './FotoAtleta'
@@ -31,13 +31,7 @@ const ROW: React.CSSProperties  = { display: 'flex', justifyContent: 'space-betw
 
 export default async function PerfilAtleta({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const { userId } = await auth()
-  if (!userId) redirect('/login')
-
-  const { data: perfil } = await supabaseAdmin
-    .from('PerfilUsuario').select('escolaId').eq('clerkUserId', userId).single()
-  const escolaId = perfil?.escolaId
-  if (!escolaId) redirect('/onboarding')
+  const escolaId = await getEscolaIdServer()
 
   const [atletaRes, financeiroOk] = await Promise.all([
     supabaseAdmin.from('Atleta').select('*').eq('id', id).eq('escolaId', escolaId).single(),
