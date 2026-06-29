@@ -80,7 +80,7 @@ export default function LojaPage({ params }: { params: Promise<{ slug: string }>
   return (
     <div style={{ minHeight: '100vh', background: C.bg, color: C.text }}>
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg, #FF6B00 0%, #1A1A2E 60%, #0F0F1A 100%)', padding: '16px 20px', position: 'sticky', top: 0, zIndex: 40 }}>
+      <div style={{ background: `linear-gradient(135deg, ${accent}22 0%, #0D1220 60%, #0A0E1A 100%)`, borderBottom: '1px solid rgba(65,105,225,0.2)', padding: '16px 20px', position: 'sticky', top: 0, zIndex: 40 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <img src="/gestaofc-logo.png" style={{ width: 36, height: 36, borderRadius: 10 }} alt="logo" onError={e => (e.currentTarget.style.display = 'none')} />
@@ -292,4 +292,4 @@ export default function LojaPage({ params }: { params: Promise<{ slug: string }>
 function Campo({ label, children }: { label: string; children: React.ReactNode }) {
   return <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12, color: 'rgba(240,240,240,0.45)' }}>{label}{children}</label>
 }
-const inp: React.CSSProperties = { background: '#0F0F1A', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '12px 14px', color: '#F0F0F0', fontSize: 14, width: '100%', boxSizing: 'border-box' }
+const inp: React.CSSProperties = { background: '#080C15', border: '1px solid rgba(240,244,255,0.1)', borderRadius: 10, padding: '12px 14px', color: '#F0F4FF', fontSize: 14, width: '100%', boxSizing: 'border-box' }
