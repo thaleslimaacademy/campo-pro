@@ -98,6 +98,7 @@ export default function Dashboard() {
       .then(r => r.json())
       .then(d => {
         setEscola(d.escola)
+        setEscolaSlug(d.escolaSlug || '')
         setTotalAtletas(d.totalAtletas)
         setPendentes(d.matriculasPendentes)
         setPagasV(d.pagasV)
