@@ -127,7 +127,7 @@ export default function PlanosPage() {
               {anual && <div style={{ fontSize: 12, color: 'rgba(240,244,255,0.3)', marginTop: 4 }}>Cobrado anualmente — R$ {(plan.annual) * 12}/ano</div>}
             </div>
 
-            <a href={`/cadastro?plano=${plan.id}${anual ? '&periodo=anual' : ''}`} style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: 10, fontFamily: SYNE, fontWeight: 800, fontSize: 14, textDecoration: 'none', marginBottom: 8, letterSpacing: 0.5, background: plan.destaque ? '#4169E1' : plan.id === 'elite' ? '#FFD700' : 'rgba(65,105,225,0.12)', color: plan.id === 'elite' ? '#0A0E1A' : '#fff', border: plan.id === 'basico' ? '1px solid rgba(65,105,225,0.25)' : 'none' }}>
+            <a href={`/sign-up?plano=${plan.id}${anual ? '&periodo=anual' : ''}`} style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: 10, fontFamily: SYNE, fontWeight: 800, fontSize: 14, textDecoration: 'none', marginBottom: 8, letterSpacing: 0.5, background: plan.destaque ? '#4169E1' : plan.id === 'elite' ? '#FFD700' : 'rgba(65,105,225,0.12)', color: plan.id === 'elite' ? '#0A0E1A' : '#fff', border: plan.id === 'basico' ? '1px solid rgba(65,105,225,0.25)' : 'none' }}>
               Comecar agora
             </a>
             <p style={{ fontSize: 11, color: 'rgba(240,244,255,0.25)', textAlign: 'center', marginBottom: 20 }}>{plan.limite}</p>

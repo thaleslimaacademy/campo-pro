@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { UserButton } from '@clerk/nextjs'
+import AccountButton from '@/components/AccountButton'
 import BottomNav from '@/components/ui/BottomNav'
 import { usePerfil } from '@/lib/usePerfil'
 
@@ -135,7 +135,7 @@ export default function Dashboard() {
               <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', marginTop: 1, textTransform: 'capitalize' }}>{dia}</div>
             </div>
           </div>
-          <UserButton />
+          <AccountButton />
         </div>
         <div style={{ marginTop: 20, position: 'relative' }}>
           <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Visao geral</div>
