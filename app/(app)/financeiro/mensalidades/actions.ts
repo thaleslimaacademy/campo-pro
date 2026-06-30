@@ -52,7 +52,12 @@ export async function listarMensalidades(opts?: { status?: string; incluirExclui
   if (opts?.status && opts.status !== 'TODOS') q = q.eq('status', opts.status)
   if (!opts?.incluirExcluidas) q = q.is('excluidaEm', null)
   const { data } = await q
-  return data ?? []
+  // Adapta formato: competencia = vencimento, atleta = { nome: atletaNome }
+  return (data ?? []).map(c => ({
+    ...c,
+    competencia: c.vencimento,
+    atleta: c.atletaNome ? { nome: c.atletaNome } : null,
+  }))
 }
 
 export async function listarAtletas() {
