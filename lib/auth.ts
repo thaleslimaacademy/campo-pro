@@ -1,4 +1,5 @@
 import { auth } from '@clerk/nextjs/server'
+import { cookies } from 'next/headers'
 import { supabaseAdmin } from '@/lib/supabase'
 
 export type Papel = 'admin' | 'superadmin' | 'diretor' | 'professor' | 'preparador' | 'responsavel'
@@ -9,6 +10,8 @@ export interface Sessao {
   perfil: Papel
   ativo: boolean
 }
+
+const SUPER_ADMINS = ['user_3EXUg6OJIqPWv0lmQFxafYkeHGR']
 
 export async function getSessao(): Promise<Sessao | null> {
   const { userId } = await auth()
@@ -22,9 +25,17 @@ export async function getSessao(): Promise<Sessao | null> {
 
   if (error || !data) return null
 
+  // Super admin: respeita cookie de override de escola
+  let escolaId = data.escolaId
+  if (SUPER_ADMINS.includes(userId)) {
+    const cookieStore = await cookies()
+    const override = cookieStore.get('escola_override')?.value
+    if (override) escolaId = override
+  }
+
   return {
     clerkUserId: userId,
-    escolaId: data.escolaId,
+    escolaId,
     perfil: data.perfil as Papel,
     ativo: data.ativo,
   }
