@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+
 
 const T = { surface:'#0D1220', primary:'#4169E1', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', border:'rgba(240,244,255,0.08)', green:'#00D67A', red:'#FF4444' }
 const SYNE = 'Syne, sans-serif'
@@ -24,29 +24,27 @@ export default function GerarCobranca({ atletaId, atletaNome, escolaId }: { atle
   const [pix, setPix]             = useState<{ copiaCola: string; qrCode: string } | null>(null)
   const [copiado, setCopiado]     = useState(false)
 
-  // Detecta se a escola tem Asaas (usa escolaId da prop — respeita cookie)
   useEffect(() => {
-    supabase.from('Escola').select('asaasApiKey').eq('id', escolaId).single()
-      .then(({ data }) => setTemAsaas(!!data?.asaasApiKey))
+    fetch('/api/escola-config')
+      .then(r => r.json())
+      .then(d => setTemAsaas(d.temAsaas))
+      .catch(() => setTemAsaas(false))
   }, [escolaId])
 
   async function gerarManual() {
     setGerando(true)
     const qtd = periodo === 'semestral' ? 6 : periodo === 'anual' ? 12 : 1
     const agora = new Date()
-    const cobracas = Array.from({ length: qtd }, (_, i) => {
-      const d = new Date(agora.getFullYear(), agora.getMonth() + i, Number(diaVenc))
-      return {
-        id: crypto.randomUUID(), escolaId, atletaId,
-        valor: Number(valor), vencimento: d.toISOString().split('T')[0],
-        status: 'PENDENTE', descricao: `${descricao}${qtd>1?` (${i+1}/${qtd})`:''}`,
-        periodo, parcelaAtual: i+1, qtdParcelas: qtd, tipo: forma, baixaManual: false,
-      }
+    const res = await fetch('/api/cobranca-manual', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ atletaId, escolaId, valor: Number(valor), diaVencimento: Number(diaVenc), periodo }),
     })
-    await supabase.from('Cobranca').insert(cobracas)
+    const data = await res.json()
     setGerando(false)
     setAberto(false)
-    alert(`✅ ${qtd} cobrança(s) gerada(s) para ${atletaNome}!`)
+    if (data.ok) alert(`✅ ${qtd} cobrança(s) gerada(s) para ${atletaNome}!`)
+    else alert('Erro: ' + (data.error || 'Tente novamente'))
   }
 
   async function gerarAsaas() {
