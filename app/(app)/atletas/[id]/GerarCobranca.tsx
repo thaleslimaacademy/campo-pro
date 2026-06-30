@@ -1,27 +1,63 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { usePerfil } from '@/lib/usePerfil'
+import { supabase } from '@/lib/supabase'
 
-const T = { bg:'#0A0E1A', surface:'#0D1220', surface2:'#121A2E', primary:'#4169E1', accent:'#00BFFF', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', border:'rgba(240,244,255,0.08)', green:'#00D67A', red:'#FF4444' }
+const T = { surface:'#0D1220', primary:'#4169E1', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', border:'rgba(240,244,255,0.08)', green:'#00D67A', red:'#FF4444' }
 const SYNE = 'Syne, sans-serif'
-const INP: React.CSSProperties = { width:'100%', background:'#080C15', border:`1px solid rgba(240,244,255,0.1)`, borderRadius:8, padding:'11px 14px', color:T.text, fontFamily:'Inter,sans-serif', fontSize:13, boxSizing:'border-box' }
+const INTER = 'Inter, sans-serif'
+const INP: React.CSSProperties = { width:'100%', background:'#080C15', border:`1px solid rgba(240,244,255,0.1)`, borderRadius:8, padding:'11px 14px', color:T.text, fontFamily:INTER, fontSize:13, boxSizing:'border-box' }
 const LBL: React.CSSProperties = { fontSize:10, color:T.muted, textTransform:'uppercase', letterSpacing:'0.8px', display:'block', marginBottom:4 }
 
+const DIAS = ['1','5','10','15','20','25','28']
+const FORMAS = ['PIX','Dinheiro','Cartão','Transferência']
+
 export default function GerarCobranca({ atletaId, atletaNome }: { atletaId: string; atletaNome: string }) {
+  const { escolaId } = usePerfil()
+  const [temAsaas, setTemAsaas]   = useState<boolean | null>(null)
   const [aberto, setAberto]       = useState(false)
   const [valor, setValor]         = useState('150')
   const [vencimento, setVencimento] = useState('')
+  const [diaVenc, setDiaVenc]     = useState('10')
+  const [periodo, setPeriodo]     = useState('mensal')
+  const [forma, setForma]         = useState('PIX')
   const [descricao, setDescricao] = useState('Mensalidade')
   const [gerando, setGerando]     = useState(false)
   const [pix, setPix]             = useState<{ copiaCola: string; qrCode: string } | null>(null)
   const [copiado, setCopiado]     = useState(false)
 
-  async function gerar() {
-    if (!vencimento) return
+  // Detecta se a escola tem Asaas configurado
+  useEffect(() => {
+    if (!escolaId) return
+    supabase.from('Escola').select('asaasApiKey').eq('id', escolaId).single()
+      .then(({ data }) => setTemAsaas(!!data?.asaasApiKey))
+  }, [escolaId])
+
+  async function gerarManual() {
     setGerando(true)
-    const res  = await fetch('/api/cobranca', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ atletaId, valor: parseFloat(valor), vencimento, descricao }) })
+    const qtd = periodo === 'semestral' ? 6 : periodo === 'anual' ? 12 : 1
+    const agora = new Date()
+    const cobracas = Array.from({ length: qtd }, (_, i) => {
+      const d = new Date(agora.getFullYear(), agora.getMonth() + i, Number(diaVenc))
+      return {
+        id: crypto.randomUUID(), escolaId, atletaId,
+        valor: Number(valor), vencimento: d.toISOString().split('T')[0],
+        status: 'PENDENTE', descricao: `${descricao}${qtd>1?` (${i+1}/${qtd})`:''}`,
+        periodo, parcelaAtual: i+1, qtdParcelas: qtd, tipo: forma, baixaManual: false,
+      }
+    })
+    await supabase.from('Cobranca').insert(cobracas)
+    setGerando(false)
+    setAberto(false)
+    alert(`✅ ${qtd} cobrança(s) gerada(s) para ${atletaNome}!`)
+  }
+
+  async function gerarAsaas() {
+    setGerando(true)
+    const res  = await fetch('/api/cobranca', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ atletaId, valor: parseFloat(valor), vencimento, descricao, desconto: { value: 15, dueDateLimitDays: 0, type: 'FIXED' } }) })
     const data = await res.json()
     if (data.sucesso) setPix({ copiaCola: data.pixCopiaCola, qrCode: data.pixQrCode })
-    else alert('Erro: ' + JSON.stringify(data.error))
+    else alert('Erro: ' + (data.error || JSON.stringify(data)))
     setGerando(false)
   }
 
@@ -32,45 +68,74 @@ export default function GerarCobranca({ atletaId, atletaNome }: { atletaId: stri
     setTimeout(() => setCopiado(false), 2000)
   }
 
-  /* ── PIX GERADO ── */
+  // PIX gerado
   if (pix) return (
     <div style={{ background:`${T.green}08`, border:`1px solid ${T.green}25`, borderRadius:14, padding:16, marginBottom:12 }}>
-      <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:13, color:T.green, marginBottom:12, textAlign:'center' }}>✅ Cobrança gerada!</p>
-      {pix.qrCode && (
-        <div style={{ display:'flex', justifyContent:'center', marginBottom:14 }}>
-          <img src={`data:image/png;base64,${pix.qrCode}`} alt="QR Code PIX" style={{ width:176, height:176, borderRadius:10, border:`1px solid ${T.border}`, background:'#fff', padding:6 }} />
-        </div>
-      )}
-      <button onClick={copiar} style={{ width:'100%', background:copiado?`${T.green}20`:T.primary, border:`1px solid ${copiado?T.green+'44':T.primary}`, color:T.text, padding:'13px', borderRadius:8, fontFamily:SYNE, fontWeight:800, fontSize:12, cursor:'pointer', textTransform:'uppercase', letterSpacing:0.5, marginBottom:8, transition:'all 0.2s' }}>
+      <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:13, color:T.green, marginBottom:12, textAlign:'center' }}>✅ PIX gerado!</p>
+      {pix.qrCode && <div style={{ display:'flex', justifyContent:'center', marginBottom:14 }}><img src={`data:image/png;base64,${pix.qrCode}`} alt="QR PIX" style={{ width:176, height:176, borderRadius:10, background:'#fff', padding:6 }} /></div>}
+      <button onClick={copiar} style={{ width:'100%', background:copiado?`${T.green}20`:T.primary, border:`1px solid ${copiado?T.green+'44':T.primary}`, color:T.text, padding:'13px', borderRadius:8, fontFamily:SYNE, fontWeight:800, fontSize:12, cursor:'pointer', textTransform:'uppercase', marginBottom:8 }}>
         {copiado ? '✅ Copiado!' : '📋 Copiar PIX Copia e Cola'}
       </button>
-      <button onClick={() => { setPix(null); setAberto(false) }} style={{ width:'100%', background:'transparent', border:`1px solid ${T.border}`, color:T.muted, padding:'10px', borderRadius:8, fontFamily:SYNE, fontWeight:600, fontSize:12, cursor:'pointer' }}>
-        Fechar
-      </button>
+      <button onClick={() => { setPix(null); setAberto(false) }} style={{ width:'100%', background:'transparent', border:`1px solid ${T.border}`, color:T.muted, padding:'10px', borderRadius:8, fontFamily:SYNE, fontWeight:600, fontSize:12, cursor:'pointer' }}>Fechar</button>
     </div>
   )
 
-  /* ── BOTÃO FECHADO ── */
+  // Botão fechado
   if (!aberto) return (
     <button onClick={() => setAberto(true)} style={{ width:'100%', background:`${T.primary}18`, border:`1px solid ${T.primary}44`, color:T.primary, padding:'14px', borderRadius:12, fontFamily:SYNE, fontWeight:800, fontSize:13, cursor:'pointer', textTransform:'uppercase', letterSpacing:0.5, marginBottom:12, display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
-      <span style={{ fontSize:16 }}>💰</span> Gerar Cobrança PIX
+      <span style={{ fontSize:16 }}>💰</span> Gerar Cobrança
     </button>
   )
 
-  /* ── FORM ABERTO ── */
+  // Form
   return (
     <div style={{ background:T.surface, border:`1px solid ${T.border}`, borderLeft:`3px solid ${T.primary}`, borderRadius:12, padding:16, marginBottom:12 }}>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
         <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:13, color:T.primary, textTransform:'uppercase', letterSpacing:0.5 }}>💰 Nova Cobrança</p>
-        <button onClick={() => setAberto(false)} style={{ background:'transparent', border:'none', color:T.muted, fontSize:18, cursor:'pointer', lineHeight:1 }}>✕</button>
+        <button onClick={() => setAberto(false)} style={{ background:'transparent', border:'none', color:T.muted, fontSize:18, cursor:'pointer' }}>✕</button>
       </div>
-      <p style={{ fontSize:11, color:T.muted, marginBottom:14 }}>{atletaNome}</p>
+      <p style={{ fontSize:11, color:T.muted, marginBottom:14 }}>{atletaNome} · {temAsaas ? 'PIX via Asaas' : 'Cobrança manual'}</p>
+
       <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
         <div><label style={LBL}>Valor (R$)</label><input value={valor} onChange={e => setValor(e.target.value)} type="number" style={INP} /></div>
-        <div><label style={LBL}>Vencimento</label><input value={vencimento} onChange={e => setVencimento(e.target.value)} type="date" style={INP} /></div>
+
+        {temAsaas ? (
+          // Asaas: data específica
+          <div><label style={LBL}>Vencimento</label><input value={vencimento} onChange={e => setVencimento(e.target.value)} type="date" style={INP} /></div>
+        ) : (
+          // Manual: dia do mês + período + forma
+          <>
+            <div><label style={LBL}>Dia de vencimento</label>
+              <select value={diaVenc} onChange={e => setDiaVenc(e.target.value)} style={INP}>
+                {DIAS.map(d => <option key={d} value={d}>Dia {d}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={LBL}>Período</label>
+              <div style={{ display:'flex', gap:8 }}>
+                {[['mensal','Mensal'],['semestral','6 meses'],['anual','Anual']].map(([v,l]) => (
+                  <button key={v} onClick={() => setPeriodo(v)} style={{ flex:1, padding:'9px', borderRadius:8, border:`1px solid ${periodo===v?T.primary:T.border}`, background:periodo===v?`${T.primary}18`:'transparent', color:periodo===v?T.primary:T.muted, fontFamily:SYNE, fontWeight:700, fontSize:11, cursor:'pointer' }}>{l}</button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label style={LBL}>Forma de pagamento</label>
+              <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+                {FORMAS.map(f => (
+                  <button key={f} onClick={() => setForma(f)} style={{ flex:1, padding:'9px', borderRadius:8, border:`1px solid ${forma===f?T.green:T.border}`, background:forma===f?`${T.green}15`:'transparent', color:forma===f?T.green:T.muted, fontFamily:SYNE, fontWeight:700, fontSize:11, cursor:'pointer', minWidth:70 }}>{f}</button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
         <div><label style={LBL}>Descrição</label><input value={descricao} onChange={e => setDescricao(e.target.value)} type="text" style={INP} /></div>
-        <button onClick={gerar} disabled={gerando || !vencimento} style={{ background:T.primary, color:T.text, padding:'13px', borderRadius:8, fontFamily:SYNE, fontWeight:800, fontSize:13, border:'none', cursor:gerando||!vencimento?'not-allowed':'pointer', textTransform:'uppercase', letterSpacing:0.5, opacity:gerando||!vencimento?0.5:1, transition:'opacity 0.15s' }}>
-          {gerando ? 'Gerando...' : 'Gerar PIX'}
+
+        <button
+          onClick={temAsaas ? gerarAsaas : gerarManual}
+          disabled={gerando || (temAsaas ? !vencimento : false)}
+          style={{ background:T.primary, color:T.text, padding:'13px', borderRadius:8, fontFamily:SYNE, fontWeight:800, fontSize:13, border:'none', cursor:gerando?'not-allowed':'pointer', textTransform:'uppercase', letterSpacing:0.5, opacity:gerando?0.5:1 }}>
+          {gerando ? 'Gerando...' : temAsaas ? 'Gerar PIX' : `Gerar cobrança${periodo!=='mensal'?` (${periodo==='semestral'?6:12}x)`:''}`}
         </button>
       </div>
     </div>
