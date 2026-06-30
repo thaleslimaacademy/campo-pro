@@ -142,7 +142,7 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
         </div>
 
         {/* GERAR COBRANÇA (só pra não-bolsistas e quem pode financeiro) */}
-        {!atleta.bolsista && financeiroOk && <GerarCobranca atletaId={atleta.id} atletaNome={atleta.nome} />}
+        {!atleta.bolsista && financeiroOk && <GerarCobranca atletaId={atleta.id} atletaNome={atleta.nome} escolaId={escolaId} />}
 
         {/* BOLSISTA BANNER */}
         {atleta.bolsista && (

@@ -1,6 +1,5 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { usePerfil } from '@/lib/usePerfil'
 import { supabase } from '@/lib/supabase'
 
 const T = { surface:'#0D1220', primary:'#4169E1', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', border:'rgba(240,244,255,0.08)', green:'#00D67A', red:'#FF4444' }
@@ -12,8 +11,7 @@ const LBL: React.CSSProperties = { fontSize:10, color:T.muted, textTransform:'up
 const DIAS = ['1','5','10','15','20','25','28']
 const FORMAS = ['PIX','Dinheiro','Cartão','Transferência']
 
-export default function GerarCobranca({ atletaId, atletaNome }: { atletaId: string; atletaNome: string }) {
-  const { escolaId } = usePerfil()
+export default function GerarCobranca({ atletaId, atletaNome, escolaId }: { atletaId: string; atletaNome: string; escolaId: string }) {
   const [temAsaas, setTemAsaas]   = useState<boolean | null>(null)
   const [aberto, setAberto]       = useState(false)
   const [valor, setValor]         = useState('150')
@@ -26,9 +24,8 @@ export default function GerarCobranca({ atletaId, atletaNome }: { atletaId: stri
   const [pix, setPix]             = useState<{ copiaCola: string; qrCode: string } | null>(null)
   const [copiado, setCopiado]     = useState(false)
 
-  // Detecta se a escola tem Asaas configurado
+  // Detecta se a escola tem Asaas (usa escolaId da prop — respeita cookie)
   useEffect(() => {
-    if (!escolaId) return
     supabase.from('Escola').select('asaasApiKey').eq('id', escolaId).single()
       .then(({ data }) => setTemAsaas(!!data?.asaasApiKey))
   }, [escolaId])
