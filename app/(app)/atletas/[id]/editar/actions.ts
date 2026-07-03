@@ -7,7 +7,7 @@ export async function getAtletaParaEditar(id: string) {
   const escolaId = await getEscolaIdServer()
   const [atletaRes, planosRes, turmasRes] = await Promise.all([
     supabaseAdmin.from('Atleta').select('*').eq('id', id).eq('escolaId', escolaId).single(),
-    supabaseAdmin.from('PlanoMensalidade').select('id, nome, valor').eq('escolaId', escolaId).eq('ativo', true),
+    supabaseAdmin.from('PlanoMensalidade').select('id, nome, valor').eq('escolaId', escolaId).order('valor'),
     supabaseAdmin.from('Turma').select('id, nome').eq('escolaId', escolaId).eq('ativa', true).order('nome'),
   ])
   return { escolaId, atleta: atletaRes.data, planos: planosRes.data ?? [], turmas: turmasRes.data ?? [] }
