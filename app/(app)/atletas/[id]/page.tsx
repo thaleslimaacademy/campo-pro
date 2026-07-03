@@ -7,7 +7,6 @@ import GraficoPresenca from './GraficoPresenca'
 import FotoAtleta from './FotoAtleta'
 import GerarCobranca from './GerarCobranca'
 import CobrancaAcoes from './CobrancaAcoes'
-import CobrancaAcoes from './CobrancaAcoes'
 import BottomNav from '@/components/ui/BottomNav'
 
 const T = {
@@ -176,17 +175,19 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {(cobrancas as { id: string; descricao: string | null; vencimento: string; valor: number; status: string }[]).map(c => (
-                  <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: T.surface2, borderRadius: 8, padding: '10px 12px' }}>
-                    <div>
-                      <p style={{ fontSize: 12, fontWeight: 600, color: T.text, margin: '0 0 2px' }}>{c.descricao || 'Mensalidade'}</p>
-                      <p style={{ fontSize: 11, color: T.muted, margin: 0 }}>{new Date(c.vencimento.includes('T') ? c.vencimento : c.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
+                  <div key={c.id} style={{ background: T.surface2, borderRadius: 10, padding: '10px 12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <p style={{ fontSize: 12, fontWeight: 600, color: T.text, margin: '0 0 2px' }}>{c.descricao || 'Mensalidade'}</p>
+                        <p style={{ fontSize: 11, color: T.muted, margin: 0 }}>{new Date(c.vencimento.includes('T') ? c.vencimento : c.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <p style={{ fontSize: 13, fontWeight: 700, color: T.text, margin: '0 0 2px' }}>R$ {Number(c.valor).toFixed(2)}</p>
+                        <p style={{ fontSize: 10, fontWeight: 800, color: STATUS_COR[c.status] || T.muted, margin: 0 }}>{c.status}</p>
+                      </div>
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <p style={{ fontSize: 13, fontWeight: 700, color: T.text, margin: '0 0 2px' }}>R$ {Number(c.valor).toFixed(2)}</p>
-                      <p style={{ fontSize: 10, fontWeight: 800, color: STATUS_COR[c.status] || T.muted, margin: 0 }}>{c.status}</p>
-                    </div>
+                    <CobrancaAcoes cobrancaId={c.id} status={c.status} atletaId={atleta.id} escolaId={escolaId} />
                   </div>
-                  <CobrancaAcoes cobrancaId={c.id} status={c.status} atletaId={atleta.id} escolaId={escolaId} />
                 ))}
               </div>
             )}

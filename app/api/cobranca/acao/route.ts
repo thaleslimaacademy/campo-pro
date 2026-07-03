@@ -54,3 +54,14 @@ export async function POST(req: NextRequest) {
   await enviarWhatsApp(responsavel.whatsapp, mensagem, escolaId)
   return NextResponse.json({ ok: true })
 }
+
+// DELETE - excluir cobrança
+export async function DELETE(req: NextRequest) {
+  const { cobrancaId } = await req.json()
+  if (!cobrancaId) return NextResponse.json({ error: 'cobrancaId obrigatorio' }, { status: 400 })
+  const { error } = await supabaseAdmin.from('Cobranca').update({
+    status: 'CANCELADO', excluidaEm: new Date().toISOString()
+  }).eq('id', cobrancaId)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ ok: true })
+}
