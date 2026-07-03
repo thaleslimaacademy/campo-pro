@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       const nomeResp = responsavel.nome.split(' ')[0]
       const linkPagamento = `https://gestaofc.com.br/pagar/${novoId}`
       const mensagem = `Olá ${nomeResp}! 👋\n\nA cobrança de *${atleta.nome}* foi gerada.\n\n💰 *Valor:* R$ ${Number(valor).toFixed(2)}\n📅 *Vencimento:* ${dataVencimento}\n📝 ${descricao || 'Mensalidade'}\n\nAcesse o link abaixo para pagar com Pix:\n👉 ${linkPagamento}\n\n_Thales Lima Football Academy_ ⚽`
-      await enviarWhatsApp(responsavel.whatsapp, mensagem)
+      await enviarWhatsApp(responsavel.whatsapp, mensagem, escolaId)
     }
     return NextResponse.json({ sucesso: true, pixCopiaCola: qrCode.payload, pixQrCode: qrCode.encodedImage })
   } catch (err: any) { console.error('❌ Erro geral:', err.message); return NextResponse.json({ error: err.message || 'Erro interno' }, { status: 500 }) }

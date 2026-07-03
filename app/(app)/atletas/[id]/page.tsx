@@ -6,6 +6,8 @@ import CopiarLink from './CopiarLink'
 import GraficoPresenca from './GraficoPresenca'
 import FotoAtleta from './FotoAtleta'
 import GerarCobranca from './GerarCobranca'
+import CobrancaAcoes from './CobrancaAcoes'
+import CobrancaAcoes from './CobrancaAcoes'
 import BottomNav from '@/components/ui/BottomNav'
 
 const T = {
@@ -184,6 +186,7 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
                       <p style={{ fontSize: 10, fontWeight: 800, color: STATUS_COR[c.status] || T.muted, margin: 0 }}>{c.status}</p>
                     </div>
                   </div>
+                  <CobrancaAcoes cobrancaId={c.id} status={c.status} atletaId={atleta.id} escolaId={escolaId} />
                 ))}
               </div>
             )}
