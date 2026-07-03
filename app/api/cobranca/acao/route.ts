@@ -35,14 +35,29 @@ export async function POST(req: NextRequest) {
     .eq('id', atletaId)
     .single()
 
-  const { data: responsaveis } = await supabaseAdmin
-    .from('Responsavel')
-    .select('nome, whatsapp')
-    .eq('atletaId', atletaId)
-    .eq('principal', true)
-    .limit(1)
+  // Busca responsável — primeiro na tabela Responsavel, fallback na Matricula
+  let responsavel: { nome: string; whatsapp: string } | null = null
 
-  const responsavel = responsaveis?.[0]
+  const { data: responsaveis } = await supabaseAdmin
+    .from('Responsavel').select('nome, whatsapp').eq('atletaId', atletaId).eq('principal', true).limit(1)
+  
+  if (responsaveis?.[0]?.whatsapp) {
+    responsavel = responsaveis[0]
+  } else {
+    // Fallback: busca na matrícula aprovada
+    const { data: matricula } = await supabaseAdmin
+      .from('Matricula').select('nomeResponsavel, whatsappResponsavel')
+      .eq('atletaId', atletaId).eq('status', 'APROVADO').limit(1).single()
+    if (matricula?.whatsappResponsavel) {
+      responsavel = { nome: matricula.nomeResponsavel, whatsapp: matricula.whatsappResponsavel }
+      // Cria o Responsavel para próximas vezes
+      await supabaseAdmin.from('Responsavel').upsert({
+        id: crypto.randomUUID(), atletaId, nome: matricula.nomeResponsavel,
+        telefone: matricula.whatsappResponsavel, whatsapp: matricula.whatsappResponsavel, principal: true
+      }, { onConflict: 'atletaId' })
+    }
+  }
+
   if (!responsavel?.whatsapp) return NextResponse.json({ error: 'Responsavel sem WhatsApp' }, { status: 400 })
 
   const dataVenc = new Date(cobranca.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')

@@ -26,7 +26,11 @@ export async function aprovarMatricula(matriculaId: string, escolaId: string, at
   const tokenPais  = crypto.randomUUID()
   const { error } = await supabaseAdmin.from('Atleta').insert({ id: atletaId, escolaId, nome: atletaData.nome, dataNascimento: atletaData.dataNascimento, cpf: atletaData.cpf, rg: atletaData.rg, posicao: atletaData.posicao, telefone: atletaData.telefone, cep: atletaData.cep, endereco: atletaData.endereco, numero: atletaData.numero, bairro: atletaData.bairro, cidade: atletaData.cidade, estado: atletaData.estado, tokenPais, ativo: true })
   if (error) throw new Error(error.message)
-  await supabaseAdmin.from('Responsavel').insert({ id: crypto.randomUUID(), atletaId, nome: atletaData.nomeResponsavel, telefone: atletaData.whatsappResponsavel, whatsapp: atletaData.whatsappResponsavel, principal: true })
+  const { error: errResp } = await supabaseAdmin.from('Responsavel').upsert(
+    { id: crypto.randomUUID(), atletaId, nome: atletaData.nomeResponsavel, telefone: atletaData.whatsappResponsavel, whatsapp: atletaData.whatsappResponsavel, principal: true },
+    { onConflict: 'atletaId' }
+  )
+  if (errResp) console.error('Responsavel insert error:', errResp.message)
   await supabaseAdmin.from('Matricula').update({ status: 'APROVADO', atletaId }).eq('id', matriculaId)
   revalidatePath('/matriculas')
   return { atletaId, tokenPais }
