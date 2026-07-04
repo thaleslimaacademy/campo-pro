@@ -60,11 +60,11 @@ export async function POST(req: NextRequest) {
 
   if (!responsavel?.whatsapp) return NextResponse.json({ error: 'Responsavel sem WhatsApp' }, { status: 400 })
 
-  const dataVenc = new Date(cobranca.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
+  const dataVenc = new Date((cobranca.vencimento || '').slice(0, 10) + 'T12:00:00').toLocaleDateString('pt-BR')
   const nomeResp = responsavel.nome.split(' ')[0]
   const linkPag = `https://gestaofc.com.br/pagar/${cobrancaId}`
 
-  const mensagem = `Ola ${nomeResp}! 👋\n\nLembrete de cobranca de *${atleta?.nome}*.\n\n💰 *Valor:* R$ ${Number(cobranca.valor).toFixed(2)}\n📅 *Vencimento:* ${dataVenc}\n📝 ${cobranca.descricao || 'Mensalidade'}\n\nPague pelo link:\n👉 ${linkPag}\n\n_Thales Lima Football Academy_ ⚽`
+  const mensagem = `Ola ${nomeResp}! 👋\n\nLembrete de cobranca de *${atleta?.nome}*.\n\n💰 *Valor:* R$ ${Number(cobranca.valor).toFixed(2)}\n📅 *Vencimento:* ${dataVenc}\n📝 ${cobranca.descricao || 'Mensalidade'}\n\nPague pelo link:\n👉 ${linkPag}\n\n_${atleta?.nome ? atleta.nome.split(' ')[0] : 'TLFA'} - GestãoFC_ ⚽`
 
   await enviarWhatsApp(responsavel.whatsapp, mensagem, escolaId)
   return NextResponse.json({ ok: true })
