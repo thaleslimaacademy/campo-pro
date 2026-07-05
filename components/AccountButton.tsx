@@ -1,48 +1,39 @@
 'use client'
 import { UserButton, useUser } from '@clerk/nextjs'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
 
-const SUPER_ADMINS = ['user_3EXUg6OJIqPWv0lmQFxafYkeHGR']
 const SYNE = 'Syne, sans-serif'
+
 type EscolaOpt = { id: string; nome: string }
+type EscolaAtiva = { id: string; nome: string; logoUrl: string | null }
 
 export default function AccountButton() {
   const { user } = useUser()
-  const [escolaAtiva, setEscolaAtiva] = useState<string | null>(null)
-  const [nomeEscola, setNomeEscola] = useState('GestãoFC')
-  const [logoUrl, setLogoUrl] = useState<string | null>(null)
-  const [open, setOpen] = useState(false)
-  const [escolas, setEscolas] = useState<EscolaOpt[]>([])
-  const [trocando, setTrocando] = useState<string | null>(null)
-  const isSuperAdmin = SUPER_ADMINS.includes(user?.id || '')
+  const [open, setOpen]             = useState(false)
+  const [escola, setEscola]         = useState<EscolaAtiva | null>(null)
+  const [escolaId, setEscolaId]     = useState<string | null>(null)
+  const [escolas, setEscolas]       = useState<EscolaOpt[]>([])
+  const [isSuperAdmin, setIsSuper]  = useState(false)
+  const [trocando, setTrocando]     = useState<string | null>(null)
+  const [carregado, setCarregado]   = useState(false)
 
-  // Busca escola realmente ativa (considerando cookie)
-  useEffect(() => {
+  // Carrega escola ativa da API server-side — respeita cookie
+  function carregar() {
     fetch('/api/escola-ativa')
       .then(r => r.json())
-      .then(({ escolaId }) => {
-        if (!escolaId) return
-        setEscolaAtiva(escolaId)
-        supabase.from('Escola').select('nome, logoUrl').eq('id', escolaId).single()
-          .then(({ data }) => {
-            if (data) {
-              const nome = data.nome?.includes('—') ? data.nome.split('—').pop()?.trim() : data.nome
-              setNomeEscola(nome || 'GestãoFC')
-              setLogoUrl(data.logoUrl)
-            }
-          })
+      .then(d => {
+        setEscolaId(d.escolaId)
+        setEscola(d.escola)
+        setEscolas(d.todasEscolas || [])
+        setIsSuper(d.isSuperAdmin)
+        setCarregado(true)
       })
-  }, [])
+  }
 
-  // Busca lista de escolas quando abre o menu (só super admin)
-  useEffect(() => {
-    if (!isSuperAdmin || !open || escolas.length > 0) return
-    supabase.from('Escola').select('id, nome').order('nome')
-      .then(({ data }) => { if (data) setEscolas(data) })
-  }, [isSuperAdmin, open])
+  useEffect(() => { carregar() }, [])
 
   async function trocarEscola(id: string) {
+    if (id === escolaId) return
     setTrocando(id)
     await fetch('/api/super-admin/switch-escola', {
       method: 'POST',
@@ -53,20 +44,23 @@ export default function AccountButton() {
     window.location.href = '/dashboard'
   }
 
-  function nomeAbrev(nome: string) {
-    return nome?.includes('—') ? nome.split('—').pop()?.trim() || nome : nome
-  }
+  const nomeAbrev = (nome: string) =>
+    nome?.includes('—') ? nome.split('—').pop()?.trim() || nome : nome
+
+  const logoUrl = escola?.logoUrl
 
   return (
     <div style={{ position: 'relative' }}>
-      <button onClick={() => setOpen(v => !v)}
+      <button onClick={() => { setOpen(v => !v); if (!carregado) carregar() }}
         style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 14, padding: '8px 14px 8px 8px', cursor: 'pointer', color: '#fff' }}>
         {logoUrl
           ? <img src={logoUrl} style={{ width: 32, height: 32, borderRadius: 8, objectFit: 'contain', background: 'white', padding: 2 }} alt="logo" />
           : <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(65,105,225,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>⚽</div>
         }
         <div style={{ textAlign: 'left' }}>
-          <div style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 12, color: '#fff', lineHeight: 1.2, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{nomeEscola}</div>
+          <div style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 12, color: '#fff', lineHeight: 1.2, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {escola ? nomeAbrev(escola.nome) : '...'}
+          </div>
           <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', lineHeight: 1.2 }}>{user?.firstName ?? 'Admin'}</div>
         </div>
         <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginLeft: 2 }}>▼</span>
@@ -84,7 +78,9 @@ export default function AccountButton() {
                 : <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(65,105,225,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>⚽</div>
               }
               <div>
-                <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 14, color: '#F0F4FF' }}>{nomeEscola}</div>
+                <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 14, color: '#F0F4FF' }}>
+                  {escola ? nomeAbrev(escola.nome) : '...'}
+                </div>
                 <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{user?.primaryEmailAddress?.emailAddress}</div>
               </div>
             </div>
@@ -95,17 +91,16 @@ export default function AccountButton() {
                 <p style={{ fontSize: 10, color: 'rgba(240,244,255,0.35)', textTransform: 'uppercase', letterSpacing: 1, fontFamily: SYNE, margin: '0 0 8px' }}>Trocar escolinha</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   {escolas.map(e => {
-                    const ativa = e.id === escolaAtiva
-                    const carregando = trocando === e.id
+                    const ativa = e.id === escolaId
                     return (
                       <button key={e.id}
                         onClick={() => !ativa && !trocando && trocarEscola(e.id)}
                         disabled={!!trocando || ativa}
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 10, border: `1px solid ${ativa ? 'rgba(65,105,225,0.5)' : 'rgba(255,255,255,0.07)'}`, background: ativa ? 'rgba(65,105,225,0.18)' : 'rgba(255,255,255,0.02)', cursor: ativa ? 'default' : 'pointer', width: '100%', textAlign: 'left', transition: 'all 0.15s' }}>
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 10, border: `1px solid ${ativa ? 'rgba(65,105,225,0.5)' : 'rgba(255,255,255,0.07)'}`, background: ativa ? 'rgba(65,105,225,0.18)' : 'rgba(255,255,255,0.02)', cursor: ativa ? 'default' : 'pointer', width: '100%', textAlign: 'left' }}>
                         <span style={{ fontSize: 13, color: ativa ? '#7DD3FC' : 'rgba(255,255,255,0.75)', fontWeight: ativa ? 700 : 400, fontFamily: ativa ? SYNE : 'Inter,sans-serif' }}>
-                          {carregando ? 'Entrando...' : nomeAbrev(e.nome)}
+                          {trocando === e.id ? 'Entrando...' : nomeAbrev(e.nome)}
                         </span>
-                        {ativa && <span style={{ fontSize: 9, fontWeight: 800, color: '#4169E1', background: 'rgba(65,105,225,0.2)', padding: '2px 8px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: 0.5, flexShrink: 0 }}>ATIVA</span>}
+                        {ativa && <span style={{ fontSize: 9, fontWeight: 800, color: '#4169E1', background: 'rgba(65,105,225,0.2)', padding: '2px 8px', borderRadius: 4, textTransform: 'uppercase' }}>ATIVA</span>}
                       </button>
                     )
                   })}
@@ -120,7 +115,7 @@ export default function AccountButton() {
               isSuperAdmin ? { href: '/super-admin', label: '⚡  Super Admin' } : null,
             ].filter(Boolean) as { href: string; label: string }[]).map(item => (
               <a key={item.href} href={item.href} onClick={() => setOpen(false)}
-                style={{ display: 'block', padding: '10px 12px', borderRadius: 10, color: 'rgba(255,255,255,0.75)', textDecoration: 'none', fontSize: 13, marginBottom: 2, transition: 'background 0.15s' }}>
+                style={{ display: 'block', padding: '10px 12px', borderRadius: 10, color: 'rgba(255,255,255,0.75)', textDecoration: 'none', fontSize: 13, marginBottom: 2 }}>
                 {item.label}
               </a>
             ))}

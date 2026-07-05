@@ -9,24 +9,36 @@ export async function GET() {
   const { userId } = await auth()
   if (!userId) return NextResponse.json({ escolaId: null })
 
+  const isSuperAdmin = SUPER_ADMINS.includes(userId)
   let escolaId: string | null = null
 
-  // Super admin: verifica cookie de override
-  if (SUPER_ADMINS.includes(userId)) {
+  if (isSuperAdmin) {
     const cookieStore = await cookies()
     const override = cookieStore.get('escola_override')?.value
     if (override) escolaId = override
   }
 
-  // Se não tem override, busca do perfil
   if (!escolaId) {
     const { data } = await supabaseAdmin
-      .from('PerfilUsuario')
-      .select('escolaId')
-      .eq('clerkUserId', userId)
-      .single()
+      .from('PerfilUsuario').select('escolaId').eq('clerkUserId', userId).single()
     escolaId = data?.escolaId || null
   }
 
-  return NextResponse.json({ escolaId, isSuperAdmin: SUPER_ADMINS.includes(userId) })
+  // Busca dados completos da escola ativa
+  const { data: escola } = await supabaseAdmin
+    .from('Escola').select('id, nome, logoUrl, slug').eq('id', escolaId!).single()
+
+  // Super admin: busca lista de todas as escolas para o switcher
+  let todasEscolas: { id: string; nome: string }[] = []
+  if (isSuperAdmin) {
+    const { data } = await supabaseAdmin.from('Escola').select('id, nome').order('nome')
+    todasEscolas = data || []
+  }
+
+  return NextResponse.json({
+    escolaId,
+    isSuperAdmin,
+    escola: escola || null,
+    todasEscolas,
+  })
 }
