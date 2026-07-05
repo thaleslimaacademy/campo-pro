@@ -132,7 +132,7 @@ export default function MatriculaClient({ escolaId, escolaNome, escolaLogoUrl, v
           {escolaLogoUrl ? (
             <img src={escolaLogoUrl} alt={escolaNome} style={{ width:56, height:56, objectFit:'contain', borderRadius:10, background:'white', padding:4, display:'block', margin:'0 auto 12px' }} />
           ) : (
-            <div style={{ width:56, height:56, background:`${accent}20`, border:`1px solid ${accent}40`, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', fontSize:24, margin:'0 auto 12px' }}>⚽</div>
+            <img src="/icon-192.png" alt="GestãoFC" style={{ width:56, height:56, objectFit:'contain', borderRadius:10, display:'block', margin:'0 auto 12px' }} />
           )}
           <h1 style={{ fontFamily:SYNE, fontWeight:900, fontSize:20, color:accent, margin:'0 0 4px', letterSpacing:-0.3 }}>{escolaNome}</h1>
           <p style={{ fontSize:13, color:mutedCol, margin:0 }}>Ficha de Pré-matrícula</p>
