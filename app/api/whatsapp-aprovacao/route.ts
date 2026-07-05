@@ -1,58 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { supabaseAdmin } from '@/lib/supabase'
+import { enviarWhatsApp } from '@/lib/whatsapp'
 
 export async function POST(req: NextRequest) {
   try {
-    const { whatsapp, nomeResponsavel, nomeAtleta, tokenPais, tipo } = await req.json()
+    const { whatsapp, nomeResponsavel, nomeAtleta, tokenPais, tipo, escolaId } = await req.json()
 
-    const baseUrl = process.env.EVOLUTION_API_URL
-    const apiKey = process.env.EVOLUTION_API_KEY
-    const instance = process.env.EVOLUTION_INSTANCE
+    // Busca dados da escola para personalizar a mensagem
+    const { data: escola } = await supabaseAdmin
+      .from('Escola')
+      .select('nome, whatsapp, cidade, estado')
+      .eq('id', escolaId || 'escola-demo')
+      .single()
 
-    if (!baseUrl || !apiKey || !instance) {
-      return NextResponse.json({ error: 'Evolution API nao configurada' }, { status: 500 })
-    }
+    const nomeEscola = escola?.nome?.includes('—')
+      ? escola.nome.split('—').pop()?.trim()
+      : escola?.nome || 'Thales Lima Football Academy'
 
-    const numero = whatsapp.replace(/\D/g, '')
-    const numeroFormatado = numero.startsWith('55') ? numero : '55' + numero
-    const nomeResp = nomeResponsavel.split(' ')[0]
-    const linkPais = 'https://gestaofc.com.br/pais/' + tokenPais
+    const cidadeEstado = escola?.cidade && escola?.estado
+      ? `${escola.cidade}/${escola.estado}`
+      : 'Iturama/MG'
+
+    const whatsappEscola = escola?.whatsapp
+      ? escola.whatsapp.replace(/\D/g, '').replace(/^(\d{2})(\d{2})(\d{5})(\d{4})$/, '($1) $2 $3-$4')
+      : null
+
+    const nomeResp = (nomeResponsavel || '').split(' ')[0]
+    const linkPais = `https://gestaofc.com.br/pais/${tokenPais}`
 
     let mensagem = ''
+
     if (tipo === 'aprovacao') {
       mensagem =
-        'Ola ' + nomeResp + '!\n\n' +
-        'A pre-matricula de *' + nomeAtleta + '* foi *APROVADA*!\n\n' +
-        'Seu filho(a) ja esta matriculado(a) na *Thales Lima Football Academy*.\n\n' +
-        'Acesse o link abaixo para acompanhar presenca e mensalidades:\n' +
-        linkPais + '\n\n' +
-        'Bem-vindo(a) a familia TLFA!\n' +
-        '_Thales Lima Football Academy - Iturama/MG_'
+        `Ola ${nomeResp}! 👋\n\n` +
+        `A pre-matricula de *${nomeAtleta}* foi *APROVADA*! ✅\n\n` +
+        `Seu filho(a) ja esta matriculado(a) na *${nomeEscola}*.\n\n` +
+        `Acesse o link abaixo para acompanhar presenca e mensalidades:\n` +
+        `${linkPais}\n\n` +
+        `Bem-vindo(a) a familia TLFA! ⚽\n` +
+        `_${nomeEscola} - ${cidadeEstado}_`
     } else {
       mensagem =
-        'Ola ' + nomeResp + ',\n\n' +
-        'Informamos que a pre-matricula de *' + nomeAtleta + '* nao foi aprovada no momento.\n\n' +
-        'Entre em contato conosco para mais informacoes:\n' +
-        'WhatsApp: (34) 99xxx-xxxx\n\n' +
-        '_Thales Lima Football Academy - Iturama/MG_'
+        `Ola ${nomeResp},\n\n` +
+        `Informamos que a pre-matricula de *${nomeAtleta}* nao foi aprovada no momento.\n\n` +
+        `Entre em contato conosco para mais informacoes:\n` +
+        (whatsappEscola ? `WhatsApp: ${whatsappEscola}\n\n` : '\n') +
+        `_${nomeEscola} - ${cidadeEstado}_`
     }
 
-    const res = await fetch(`${baseUrl}/message/sendText/${instance}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': apiKey,
-      },
-      body: JSON.stringify({
-        number: numeroFormatado,
-        textMessage: { text: mensagem },
-      }),
-    })
+    await enviarWhatsApp(whatsapp, mensagem, escolaId)
 
-    const data = await res.json()
-    console.log('WhatsApp resultado:', JSON.stringify(data))
-    return NextResponse.json({ ok: true, data, numeroEnviado: numeroFormatado })
-  } catch (err: any) {
+    return NextResponse.json({ ok: true })
+  } catch (err: unknown) {
     console.error('Erro WhatsApp aprovacao:', err)
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }

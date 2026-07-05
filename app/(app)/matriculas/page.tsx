@@ -43,7 +43,7 @@ function MatriculasInner() {
           cidade: matricula.cidade, estado: matricula.estado,
           nomeResponsavel: matricula.nomeResponsavel, whatsappResponsavel: matricula.whatsappResponsavel,
         })
-        await fetch('/api/whatsapp-aprovacao', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ whatsapp: matricula.whatsappResponsavel, nomeResponsavel: matricula.nomeResponsavel, nomeAtleta: matricula.nomeAtleta, tokenPais, tipo: 'aprovacao' }) })
+        await fetch('/api/whatsapp-aprovacao', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ whatsapp: matricula.whatsappResponsavel, nomeResponsavel: matricula.nomeResponsavel, nomeAtleta: matricula.nomeAtleta, tokenPais, tipo: 'aprovacao', escolaId }) })
         setSelecionada(null); carregar()
         alert(`✅ ${matricula.nomeAtleta} aprovado!`)
       } catch (e: unknown) { alert('Erro: ' + (e instanceof Error ? e.message : String(e))) }
@@ -52,7 +52,7 @@ function MatriculasInner() {
 
   function recusar(matricula: Matricula) {
     startProcess(async () => {
-      await fetch('/api/whatsapp-aprovacao', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ whatsapp: matricula.whatsappResponsavel, nomeResponsavel: matricula.nomeResponsavel, nomeAtleta: matricula.nomeAtleta, tokenPais: '', tipo: 'recusa' }) })
+      await fetch('/api/whatsapp-aprovacao', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ whatsapp: matricula.whatsappResponsavel, nomeResponsavel: matricula.nomeResponsavel, nomeAtleta: matricula.nomeAtleta, tokenPais: '', tipo: 'recusa', escolaId }) })
       await recusarMatricula(matricula.id)
       setSelecionada(null); carregar()
     })
