@@ -7,6 +7,18 @@ export async function POST(req: NextRequest) {
     const userId = req.headers.get('x-clerk-user-id')
     if (!userId) return NextResponse.json({ ok: false, message: 'Não autenticado' }, { status: 401 })
 
+    // BLOQUEIO: usuário já tem escola? Não cria nova
+    const { data: perfilExistente } = await supabaseAdmin
+      .from('PerfilUsuario').select('escolaId').eq('clerkUserId', userId).single()
+    
+    if (perfilExistente?.escolaId) {
+      return NextResponse.json({ 
+        ok: false, 
+        message: 'Este usuário já possui uma escola cadastrada.',
+        escolaId: perfilExistente.escolaId 
+      }, { status: 409 })
+    }
+
     const clerk = await clerkClient()
     const clerkUser = await clerk.users.getUser(userId)
     const email = clerkUser.emailAddresses[0]?.emailAddress || ''
@@ -26,10 +38,11 @@ export async function POST(req: NextRequest) {
     })
     if (escolaError) return NextResponse.json({ ok: false, message: escolaError.message })
 
-    const { error: perfilError } = await supabaseAdmin.from('PerfilUsuario').upsert({
+    // INSERT simples (não upsert) — não sobrescreve escola existente
+    const { error: perfilError } = await supabaseAdmin.from('PerfilUsuario').insert({
       clerkUserId: userId, escolaId, nome: responsavel,
       email, perfil: 'admin', ativo: true,
-    }, { onConflict: 'clerkUserId' })
+    })
     if (perfilError) return NextResponse.json({ ok: false, message: perfilError.message })
 
     await clerk.users.updateUserMetadata(userId, {
