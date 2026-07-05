@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     // Seta o cookie de override (expira em 2h)
     res.cookies.set('escola_override', escolaId, {
       httpOnly: true, secure: true, sameSite: 'lax',
-      maxAge: 60 * 60 * 2, path: '/',
+      maxAge: 60 * 60 * 24 * 30, path: '/',
     })
   } else {
     // Limpa o cookie (volta pra escola original)

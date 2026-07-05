@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
+import { cookies } from 'next/headers'
+
+const SUPER_ADMINS = ['user_3EXUg6OJIqPWv0lmQFxafYkeHGR']
 
 export async function GET() {
   const escolaId = await getEscolaIdServer()
@@ -34,6 +37,7 @@ export async function GET() {
   return NextResponse.json({
     escola: escola.data?.nome ?? '',
     escolaSlug: escola.data?.slug ?? '',
+    isOverride: !!(await cookies()).get('escola_override')?.value,
     totalAtletas: atletas.count ?? 0,
     matriculasPendentes: pendentes.count ?? 0,
     pagasV,

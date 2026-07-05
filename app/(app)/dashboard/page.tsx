@@ -82,6 +82,7 @@ export default function Dashboard() {
 
   const [escola, setEscola] = useState('GestaoFC')
   const [escolaSlug, setEscolaSlug] = useState('')
+  const [isOverride, setIsOverride] = useState(false)
   const [totalAtletas, setTotalAtletas] = useState(0)
   const [inadimplentes, setInadimplentes] = useState(0)
   const [pendentes, setPendentes] = useState(0)
@@ -101,6 +102,7 @@ export default function Dashboard() {
       .then(d => {
         setEscola(d.escola)
         setEscolaSlug(d.escolaSlug || '')
+        setIsOverride(d.isOverride || false)
         setTotalAtletas(d.totalAtletas)
         setPendentes(d.matriculasPendentes)
         setPagasV(d.pagasV)
