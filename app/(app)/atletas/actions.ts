@@ -7,7 +7,7 @@ export async function getAtletasComTurmas() {
   const [atletasRes, turmasRes] = await Promise.all([
     supabaseAdmin
       .from('Atleta')
-      .select('id, nome, posicao, fotoUrl, bolsista, dataNascimento, turmaId')
+      .select('id, nome, posicao, fotoUrl, bolsista, dataNascimento, turmaId, ativo, diaVencimento, valorMensalidade, planoMensalidade')
       .eq('escolaId', escolaId)
       .eq('ativo', true)
       .order('nome'),
