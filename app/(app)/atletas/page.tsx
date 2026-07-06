@@ -36,7 +36,10 @@ export default function Atletas() {
               Atletas <span style={{ color: T.accent, fontStyle: 'italic' }}>{atletas.length}</span>
             </div>
           </div>
-          <a href="/atletas/novo" style={{ background: T.text, color: T.primary, borderRadius: 8, padding: '10px 16px', fontFamily: SYNE, fontWeight: 800, fontSize: 12, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: 0.5 }}>+ Novo</a>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <a href="/atletas/importar" style={{ background: 'rgba(255,255,255,0.15)', color: T.text, borderRadius: 8, padding: '10px 14px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: 0.5 }}>⬆ Importar</a>
+            <a href="/atletas/novo" style={{ background: T.text, color: T.primary, borderRadius: 8, padding: '10px 16px', fontFamily: SYNE, fontWeight: 800, fontSize: 12, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: 0.5 }}>+ Novo</a>
+          </div>
         </div>
       </div>
       <div style={{ display: 'flex', background: '#080C15', borderBottom: `1px solid ${T.border}` }}>
