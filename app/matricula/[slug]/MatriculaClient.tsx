@@ -66,7 +66,9 @@ export default function MatriculaClient({ escolaId, escolaNome, escolaLogoUrl, v
   const [form, setForm] = useState({
     nomeAtleta:'', dataNascimento:'', cpf:'', rg:'', posicao:'Goleiro', telefone:'',
     cep:'', endereco:'', numero:'', bairro:'', cidade:'', estado:'',
-    nomeResponsavel:'', whatsappResponsavel:'', emailResponsavel:'',
+    nomeResponsavel:'', whatsappResponsavel:'', emailResponsavel:'', cpfResponsavel:'',
+    nomeResponsavel2:'', whatsappResponsavel2:'', cpfResponsavel2:'', parentesco2:'',
+    unidadeEscolar:'', serieEstuda:'', turnoEstuda:'',
   })
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
@@ -89,6 +91,7 @@ export default function MatriculaClient({ escolaId, escolaNome, escolaLogoUrl, v
     if (!form.dataNascimento)    return 'Data de nascimento é obrigatória.'
     if (!form.cpf && !form.rg)   return 'Pelo menos CPF ou RG é obrigatório.'
     if (!form.nomeResponsavel)   return 'Nome do responsável é obrigatório.'
+    if (!form.cpfResponsavel)    return 'CPF do responsável 1 é obrigatório.'
     if (!form.whatsappResponsavel) return 'WhatsApp do responsável é obrigatório.'
     return null
   }
@@ -107,7 +110,7 @@ export default function MatriculaClient({ escolaId, escolaNome, escolaLogoUrl, v
     try {
       const res = await fetch('/api/matricula/criar', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ escolaId, ...form, nomeAssinatura: assinatura, dataAssinatura: new Date().toISOString() }),
+        body: JSON.stringify({ escolaId, ...form, nomeAssinatura: assinatura, dataAssinatura: new Date().toISOString(), cpfResponsavel: form.cpfResponsavel, nomeResponsavel2: form.nomeResponsavel2 || null, whatsappResponsavel2: form.whatsappResponsavel2 || null, cpfResponsavel2: form.cpfResponsavel2 || null, parentesco2: form.parentesco2 || null, unidadeEscolar: form.unidadeEscolar || null, serieEstuda: form.serieEstuda || null, turnoEstuda: form.turnoEstuda || null }),
       })
       const data = await res.json()
       if (data.ok) {
@@ -207,11 +210,53 @@ export default function MatriculaClient({ escolaId, escolaNome, escolaLogoUrl, v
             </div>
 
             <div style={SEC}>
+              <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:13, color:accent, margin:'0 0 16px', textTransform:'uppercase', letterSpacing:0.5 }}>🏫 Escola que Estuda</p>
+              <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+                <div><label style={LBL}>Unidade escolar</label><input name="unidadeEscolar" value={form.unidadeEscolar} onChange={handleChange} placeholder="Nome da escola que estuda" style={INP} /></div>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+                  <div><label style={LBL}>Série/Ano</label><input name="serieEstuda" value={form.serieEstuda} onChange={handleChange} placeholder="Ex: 5º ano" style={INP} /></div>
+                  <div><label style={LBL}>Turno</label>
+                    <select name="turnoEstuda" value={form.turnoEstuda} onChange={handleChange} style={INP}>
+                      <option value="">Selecionar</option>
+                      <option value="Matutino">Matutino</option>
+                      <option value="Vespertino">Vespertino</option>
+                      <option value="Noturno">Noturno</option>
+                      <option value="Integral">Integral</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={SEC}>
               <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:13, color:accent, margin:'0 0 16px', textTransform:'uppercase', letterSpacing:0.5 }}>👨‍👩‍👦 Responsável</p>
               <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
                 <div><label style={LBL}>Nome completo *</label><input name="nomeResponsavel" value={form.nomeResponsavel} onChange={handleChange} placeholder="Nome do responsável" style={INP} /></div>
                 <div><label style={LBL}>WhatsApp *</label><input name="whatsappResponsavel" value={form.whatsappResponsavel} onChange={handleChange} type="tel" placeholder="(34) 99999-9999" style={INP} /></div>
                 <div><label style={LBL}>E-mail</label><input name="emailResponsavel" value={form.emailResponsavel} onChange={handleChange} type="email" placeholder="email@exemplo.com" style={INP} /></div>
+                <div><label style={LBL}>CPF do responsável *</label><input name="cpfResponsavel" value={form.cpfResponsavel} onChange={handleChange} placeholder="000.000.000-00" style={INP} /></div>
+              </div>
+            </div>
+
+            <div style={SEC}>
+              <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:13, color:accent, margin:'0 0 16px', textTransform:'uppercase', letterSpacing:0.5 }}>👤 Responsável 2 (opcional)</p>
+              <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+                <div><label style={LBL}>Nome completo</label><input name="nomeResponsavel2" value={form.nomeResponsavel2} onChange={handleChange} placeholder="Nome do 2º responsável" style={INP} /></div>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+                  <div><label style={LBL}>WhatsApp</label><input name="whatsappResponsavel2" value={form.whatsappResponsavel2} onChange={handleChange} type="tel" placeholder="(34) 99999-9999" style={INP} /></div>
+                  <div><label style={LBL}>CPF</label><input name="cpfResponsavel2" value={form.cpfResponsavel2} onChange={handleChange} placeholder="000.000.000-00" style={INP} /></div>
+                </div>
+                <div><label style={LBL}>Parentesco</label>
+                  <select name="parentesco2" value={form.parentesco2} onChange={handleChange} style={INP}>
+                    <option value="">Selecionar</option>
+                    <option value="Pai">Pai</option>
+                    <option value="Mãe">Mãe</option>
+                    <option value="Avô/Avó">Avô/Avó</option>
+                    <option value="Tio/Tia">Tio/Tia</option>
+                    <option value="Irmão/Irmã">Irmão/Irmã</option>
+                    <option value="Outro">Outro</option>
+                  </select>
+                </div>
               </div>
             </div>
 

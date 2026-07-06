@@ -16,6 +16,11 @@ export async function getMatriculas() {
   }
 }
 
+export async function getTurmasDaEscola(escolaId: string) {
+  const { data } = await supabaseAdmin.from('Turma').select('id, nome, modalidade').eq('escolaId', escolaId).eq('ativa', true).order('nome')
+  return data ?? []
+}
+
 export async function aprovarMatricula(matriculaId: string, escolaId: string, atletaData: {
   nome: string; dataNascimento: string; cpf: string | null; rg: string | null; posicao: string | null
   telefone: string | null; cep: string | null; endereco: string | null; numero: string | null
