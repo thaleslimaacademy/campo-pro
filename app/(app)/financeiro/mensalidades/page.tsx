@@ -13,7 +13,7 @@ const dataBR = (c: string | null) => (c ? c.slice(0, 10).split('-').reverse().jo
 const labelStatus = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()
 const corStatus = (s: string) => ({ PAGO: T.green, PENDENTE: T.gold, VENCIDO: T.red, CANCELADO: '#555' } as Record<string, string>)[s] ?? '#555'
 
-type Cobranca = { id: string; valor: number; status: string; competencia: string | null; vencimento: string | null; descricao: string | null; excluidaEm: string | null; atleta?: { nome: string } | null }
+type Cobranca = { id: string; valor: number; status: string; competencia: string | null; vencimento: string | null; descricao: string | null; excluidaEm: string | null; atletaNome?: string | null; atleta?: { nome: string } | null }
 const STATUS = [{ key: 'todas', label: 'Todas' }, { key: 'PENDENTE', label: 'Pendentes' }, { key: 'PAGO', label: 'Pagas' }, { key: 'VENCIDO', label: 'Vencidas' }, { key: 'CANCELADO', label: 'Canceladas' }]
 const INP: React.CSSProperties = { background: '#080C15', border: '1px solid rgba(240,244,255,0.1)', borderRadius: 8, padding: '10px 12px', color: T.text, fontSize: 13, width: '100%' }
 
@@ -37,6 +37,15 @@ export default function MensalidadesPage() {
   const [valor, setValor] = useState(85)
   const [diaVencimento, setDiaVencimento] = useState(10)
   const [showForm, setShowForm] = useState(false)
+  const [busca, setBusca] = useState('')
+
+  const filtrados = lista.filter(c => {
+    if (!busca.trim()) return true
+    const b = busca.toLowerCase()
+    const nome = (c.atleta?.nome || c.atletaNome || '').toLowerCase()
+    const comp = (c.competencia || '').toLowerCase()
+    return nome.includes(b) || comp.includes(b)
+  })
 
   const carregar = useCallback(async () => {
     setCarregando(true)

@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
             const qrCode = await getPixQrCode(apiKey, cobranca.id)
             await supabaseAdmin.from('Cobranca').insert({
               id: novoId, escolaId: escola.id, atletaId: atleta.id,
-              atletaNome: atleta.nome, valor, vencimento,
+              atletaNome: atleta.nome?.trim() || atleta.nome, valor, vencimento,
               status: 'PENDENTE', asaasId: cobranca.id,
               pixCopiaCola: qrCode.payload || null,
               pixQrCode: qrCode.encodedImage || null,
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
             // Sem Asaas: cobrança manual
             await supabaseAdmin.from('Cobranca').insert({
               id: novoId, escolaId: escola.id, atletaId: atleta.id,
-              atletaNome: atleta.nome, valor, vencimento,
+              atletaNome: atleta.nome?.trim() || atleta.nome, valor, vencimento,
               status: 'PENDENTE', tipo: 'MANUAL', descricao: 'Mensalidade',
             })
           }

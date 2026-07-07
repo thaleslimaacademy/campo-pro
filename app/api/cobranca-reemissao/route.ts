@@ -22,6 +22,41 @@ export async function GET(req: NextRequest) {
   const hoje = new Date().toISOString().slice(0, 10)
   const amanha = diasAFrente(1)
 
+  // ── D-3: lembrete PRÉ-vencimento ──
+  const diaHoje = new Date().getDate()
+  const diaAlvo3 = diaHoje + 3 <= 28 ? diaHoje + 3 : diaHoje + 3 - 28
+
+  const { data: atletasD3 } = await supabaseAdmin.from('Atleta')
+    .select('id, nome, escolaId, diaVencimento, planoMensalidade, valorMensalidade, bolsista')
+    .eq('ativo', true)
+    .eq('diaVencimento', diaAlvo3)
+
+  for (const atleta of atletasD3 || []) {
+    if (atleta.bolsista) continue
+    try {
+      const { data: escolaD3 } = await supabaseAdmin.from('Escola')
+        .select('nome').eq('id', atleta.escolaId).single()
+      const escolaNomeD3 = escolaD3?.nome?.split('—').pop()?.trim() || 'GestãoFC'
+      const { data: planosD3 } = await supabaseAdmin.from('PlanoMensalidade')
+        .select('slug, valor').eq('escolaId', atleta.escolaId)
+      const PLANOSD3: Record<string, number> = {}
+      for (const p of planosD3 || []) PLANOSD3[p.slug] = Number(p.valor)
+      const valorD3 = PLANOSD3[atleta.planoMensalidade || ''] || atleta.valorMensalidade || 85
+      const { data: respsD3 } = await supabaseAdmin.from('Responsavel')
+        .select('nome, whatsapp').eq('atletaId', atleta.id).eq('principal', true).limit(1)
+      const respD3 = respsD3?.[0]
+      if (!respD3?.whatsapp) continue
+      const nomeRespD3 = respD3.nome.split(' ')[0]
+      const dataVencD3 = new Date()
+      dataVencD3.setDate(diaAlvo3)
+      const dataFmtD3 = dataVencD3.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })
+      await enviarWhatsApp(respD3.whatsapp,
+        `Ola ${nomeRespD3}! 📅\n\nLembrete: a mensalidade de *${atleta.nome?.trim()}* vence em *3 dias* (${dataFmtD3}).\n\n💰 Valor: *R$ ${Number(valorD3).toFixed(2)}*\n\nPague em dia e evite multa e juros!\n\n_${escolaNomeD3}_`,
+        atleta.escolaId)
+      await new Promise(r => setTimeout(r, 400))
+    } catch (err) { console.error('Erro D-3', atleta.id, err) }
+  }
+
   // D+1: venceu ontem → reemite com multa+juros e novo PIX
   // D+4: venceu há 4 dias → lembrete WhatsApp (sem reemitir)
   // D+10: venceu há 10 dias → aviso final WhatsApp (sem reemitir)
