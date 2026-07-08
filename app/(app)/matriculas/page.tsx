@@ -23,6 +23,7 @@ function MatriculasInner() {
   const [processando, startProcess] = useTransition()
   const [gerandoCobranca, setGerandoCobranca] = useState(false)
   const [painelCobranca, setPainelCobranca] = useState(false)
+  const [resultadoPix, setResultadoPix] = useState<{ pixCopiaCola: string; pixQrCode: string; valor: number; vencimento: string } | null>(null)
   const [valorCobranca, setValorCobranca] = useState(85)
   const [diaVencCobranca, setDiaVencCobranca] = useState(10)
   const [dataVencCobranca, setDataVencCobranca] = useState(() => {
@@ -68,10 +69,30 @@ function MatriculasInner() {
 
   async function gerarCobrancaAtleta(atletaId: string, nome: string) {
     setGerandoCobranca(true)
-    const vencimento = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 10).toISOString().split('T')[0]
-    const res = await fetch('/api/cobranca', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ atletaId, valor: valorMensalidade, vencimento, descricao: 'Mensalidade' }) })
+    const diaExtraido = Number(dataVencCobranca.slice(8, 10))
+    // Salva diaVencimento e valorMensalidade no atleta
+    await fetch('/api/atletas/atualizar-pagamento', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ atletaId, diaVencimento: diaExtraido, valorMensalidade: valorCobranca })
+    })
+    const valorTotal = valorCobranca + (taxaMatricula || 0)
+    const descricao = taxaMatricula > 0
+      ? `Mensalidade + Taxa de matrícula (R$${taxaMatricula.toFixed(0)})`
+      : 'Mensalidade'
+    const res = await fetch('/api/cobranca', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ atletaId, valor: valorTotal, vencimento: dataVencCobranca, descricao })
+    })
     const data = await res.json()
-    alert(data.sucesso ? `Cobrança gerada para ${nome}!` : 'Erro: ' + JSON.stringify(data))
+    if (data.sucesso && data.pixCopiaCola) {
+      setResultadoPix({ pixCopiaCola: data.pixCopiaCola, pixQrCode: data.pixQrCode, valor: valorTotal, vencimento: dataVencCobranca })
+      setPainelCobranca(false)
+    } else if (!data.sucesso) {
+      alert('Erro ao gerar cobrança: ' + (data.error || JSON.stringify(data)))
+    } else {
+      alert(`✅ Cobrança gerada para ${nome}!`)
+      setPainelCobranca(false)
+    }
     setGerandoCobranca(false)
   }
 
@@ -173,6 +194,39 @@ function MatriculasInner() {
             )}
           </div>
         )}
+        {/* RESULTADO PIX */}
+        {resultadoPix && (
+          <div style={{ background: `${T.green}08`, border: `1px solid ${T.green}30`, borderRadius: 12, padding: 18, marginTop: 16 }}>
+            <p style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 14, color: T.green, textTransform: 'uppercase', margin: '0 0 12px', textAlign: 'center' }}>✅ PIX gerado com sucesso!</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span style={{ fontSize: 12, color: T.muted }}>Valor</span>
+              <span style={{ fontSize: 14, color: T.green, fontWeight: 800 }}>R$ {resultadoPix.valor.toFixed(2)}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
+              <span style={{ fontSize: 12, color: T.muted }}>Vencimento</span>
+              <span style={{ fontSize: 12, color: T.text }}>{new Date(resultadoPix.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
+            </div>
+            {resultadoPix.pixQrCode && (
+              <div style={{ textAlign: 'center', marginBottom: 14 }}>
+                <img src={`data:image/png;base64,${resultadoPix.pixQrCode}`} alt="QR Code" style={{ width: 160, height: 160, borderRadius: 8, background: 'white', padding: 8, display: 'block', margin: '0 auto' }} />
+              </div>
+            )}
+            <div style={{ background: '#080C15', border: '1px solid rgba(0,214,122,0.2)', borderRadius: 8, padding: 12, marginBottom: 12, wordBreak: 'break-all', fontSize: 11, color: T.green, fontFamily: 'monospace' }}>
+              {resultadoPix.pixCopiaCola}
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={() => { navigator.clipboard.writeText(resultadoPix.pixCopiaCola); alert('Código PIX copiado!') }}
+                style={{ flex: 2, background: T.green, color: '#000', padding: '13px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: SYNE, fontWeight: 900, fontSize: 13, textTransform: 'uppercase' }}>
+                📋 Copiar código PIX
+              </button>
+              <button onClick={() => setResultadoPix(null)}
+                style={{ flex: 1, background: 'transparent', border: `1px solid ${T.border}`, color: T.muted, padding: '13px', borderRadius: 10, cursor: 'pointer', fontFamily: SYNE, fontWeight: 700, fontSize: 12 }}>
+                Fechar
+              </button>
+            </div>
+          </div>
+        )}
+
         <BottomNav />
       </div>
     )
