@@ -100,7 +100,7 @@ export async function enviarWhatsApp(
 ): ReturnType<typeof _enviarWhatsApp_original> {
   const run = _queue_enviarWhatsApp.then(async () => {
     const result = await _enviarWhatsApp_original(...args);
-    const delay = 3000 + Math.random() * 5000;
+    const delay = 15000 + Math.random() * 15000; // 15-30s entre mensagens
     await new Promise((resolve) => setTimeout(resolve, delay));
     return result;
   });
