@@ -22,6 +22,9 @@ function MatriculasInner() {
   const [loading, startLoad] = useTransition()
   const [processando, startProcess] = useTransition()
   const [gerandoCobranca, setGerandoCobranca] = useState(false)
+  const [painelCobranca, setPainelCobranca] = useState(false)
+  const [valorCobranca, setValorCobranca] = useState(85)
+  const [diaVencCobranca, setDiaVencCobranca] = useState(10)
 
   function carregar() {
     startLoad(async () => {
@@ -108,11 +111,44 @@ function MatriculasInner() {
           </div>
         )}
         {selecionada.status === 'APROVADO' && (
-          <div style={{ background: `${T.green}08`, border: `1px solid ${T.green}25`, borderRadius: 8, padding: 16, textAlign: 'center', marginTop: 20 }}>
-            <p style={{ color: T.green, fontFamily: SYNE, fontWeight: 800, marginBottom: 12, textTransform: 'uppercase' }}>Matrícula aprovada</p>
-            <button onClick={() => gerarCobrancaAtleta(selecionada.atletaId || '', selecionada.nomeAtleta)} disabled={gerandoCobranca || !selecionada.atletaId} style={{ background: T.primary, color: T.text, padding: '13px 20px', borderRadius: 8, fontFamily: SYNE, fontWeight: 800, fontSize: 13, border: 'none', cursor: 'pointer', textTransform: 'uppercase', opacity: gerandoCobranca ? 0.6 : 1 }}>
-              {gerandoCobranca ? 'Gerando...' : 'Gerar Cobrança PIX'}
-            </button>
+          <div style={{ background: `${T.green}08`, border: `1px solid ${T.green}25`, borderRadius: 8, padding: 16, marginTop: 20 }}>
+            <p style={{ color: T.green, fontFamily: SYNE, fontWeight: 800, marginBottom: 16, textTransform: 'uppercase', textAlign: 'center' }}>✅ Matrícula aprovada</p>
+            {!painelCobranca ? (
+              <button onClick={() => setPainelCobranca(true)}
+                style={{ width: '100%', background: T.primary, color: T.text, padding: '13px 20px', borderRadius: 8, fontFamily: SYNE, fontWeight: 800, fontSize: 13, border: 'none', cursor: 'pointer', textTransform: 'uppercase' }}>
+                💰 Gerar 1ª mensalidade
+              </button>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <p style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 12, color: T.muted, textTransform: 'uppercase', letterSpacing: 0.5, margin: 0 }}>Configure a mensalidade</p>
+                <div>
+                  <label style={{ fontSize: 10, color: T.muted, textTransform: 'uppercase', letterSpacing: 0.8, display: 'block', marginBottom: 4, fontFamily: SYNE, fontWeight: 700 }}>Valor da mensalidade (R$)</label>
+                  <input type="number" value={valorCobranca} onChange={e => setValorCobranca(Number(e.target.value))}
+                    style={{ width: '100%', background: '#080C15', border: '1px solid rgba(240,244,255,0.15)', borderRadius: 8, padding: '12px 14px', color: T.text, fontSize: 15, fontWeight: 700, boxSizing: 'border-box' as const }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 10, color: T.muted, textTransform: 'uppercase', letterSpacing: 0.8, display: 'block', marginBottom: 4, fontFamily: SYNE, fontWeight: 700 }}>Dia de vencimento todo mês</label>
+                  <select value={diaVencCobranca} onChange={e => setDiaVencCobranca(Number(e.target.value))}
+                    style={{ width: '100%', background: '#080C15', border: '1px solid rgba(240,244,255,0.15)', borderRadius: 8, padding: '12px 14px', color: T.text, fontSize: 14 }}>
+                    {[1,5,10,15,20,25,28].map(d => <option key={d} value={d}>Dia {d} de cada mês</option>)}
+                  </select>
+                </div>
+                <p style={{ fontSize: 11, color: T.muted, margin: 0, textAlign: 'center' }}>
+                  O sistema vai salvar esse valor e dia para os próximos meses automaticamente.
+                </p>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button onClick={() => setPainelCobranca(false)}
+                    style={{ flex: 1, background: 'transparent', border: '1px solid rgba(240,244,255,0.1)', color: T.muted, padding: 12, borderRadius: 8, cursor: 'pointer', fontFamily: SYNE, fontWeight: 700, fontSize: 13 }}>
+                    Cancelar
+                  </button>
+                  <button onClick={() => gerarCobrancaAtleta(selecionada.atletaId || '', selecionada.nomeAtleta)}
+                    disabled={gerandoCobranca || !selecionada.atletaId || valorCobranca <= 0}
+                    style={{ flex: 2, background: T.primary, color: T.text, padding: 12, borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: SYNE, fontWeight: 800, fontSize: 13, textTransform: 'uppercase', opacity: gerandoCobranca ? 0.6 : 1 }}>
+                    {gerandoCobranca ? 'Gerando...' : '⚡ Gerar PIX e salvar'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
         <BottomNav />
