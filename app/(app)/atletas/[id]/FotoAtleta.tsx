@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { salvarFotoAtleta } from './foto-actions'
 
 const T = { primary:'#4169E1', cobalt:'#1A3FA8', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', green:'#00D67A' }
 const SYNE = 'Syne, sans-serif'
@@ -13,14 +14,19 @@ export default function FotoAtleta({ atletaId, fotoUrl, nome }: { atletaId: stri
     const file = e.target.files?.[0]
     if (!file) return
     setUploading(true)
-    const ext  = file.name.split('.').pop()
-    const path = `${atletaId}.${ext}`
-    const { error } = await supabase.storage.from('atletas').upload(path, file, { upsert: true })
-    if (error) { alert('Erro ao enviar foto: ' + error.message); setUploading(false); return }
-    const { data } = supabase.storage.from('atletas').getPublicUrl(path)
-    const novaUrl  = data.publicUrl + '?t=' + Date.now()
-    await supabase.from('Atleta').update({ fotoUrl: novaUrl }).eq('id', atletaId)
-    setFoto(novaUrl)
+    const ext = file.name.split('.').pop() || 'jpg'
+    try {
+      const base64: string = await new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result as string)
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+      const { url } = await salvarFotoAtleta(atletaId, base64, ext)
+      setFoto(url)
+    } catch (err: any) {
+      alert('Erro ao enviar foto: ' + err.message)
+    }
     setUploading(false)
   }
 

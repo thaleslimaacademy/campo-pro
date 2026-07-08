@@ -69,7 +69,7 @@ export default function MensalidadesPage() {
   const apagar = async (id: string) => { if (!confirm('Apagar da lista?')) return; await softDeleteCobranca(id); await carregar() }
   const restaurar = async (id: string) => { await restaurarCobranca(id); await carregar() }
   const definitivo = async (id: string) => { if (!confirm('Excluir DEFINITIVAMENTE?')) return; await excluirDefinitivo(id); await carregar() }
-  const gerarReciboCobranca = (c: Cobranca) => { gerarRecibo({ tipo: 'MENSALIDADE', nome: c.atleta?.nome ?? '—', valor: c.valor, descricao: c.descricao ?? 'Mensalidade', data: c.competencia ? c.competencia.slice(0, 10) : new Date().toISOString().slice(0, 10) }) }
+  const gerarReciboCobranca = (c: Cobranca) => { gerarRecibo({ tipo: 'MENSALIDADE', nome: c.atleta?.nome || c.atletaNome || '—', valor: c.valor, descricao: c.descricao ?? 'Mensalidade', data: c.competencia ? c.competencia.slice(0, 10) : new Date().toISOString().slice(0, 10) }) }
 
   return (
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, paddingBottom: 40 }}>
@@ -144,7 +144,7 @@ export default function MensalidadesPage() {
                     return (
                       <tr key={c.id} style={{ borderTop: `1px solid ${T.border}`, opacity: excluida ? 0.5 : 1 }}>
                         <td style={{ padding: '12px 16px', color: T.text, fontWeight: 600 }}>{competenciaLabel(c.competencia)}</td>
-                        <td style={{ padding: '12px 16px', color: T.text }}>{c.atleta?.nome ?? '—'}</td>
+                        <td style={{ padding: '12px 16px', color: T.text }}>{c.atleta?.nome || c.atletaNome || '—'}</td>
                         <td style={{ padding: '12px 16px', color: T.accent, fontWeight: 800, fontFamily: SYNE }}>{brl(c.valor)}</td>
                         <td style={{ padding: '12px 16px', color: T.muted }}>{dataBR(c.vencimento)}</td>
                         <td style={{ padding: '12px 16px' }}>
