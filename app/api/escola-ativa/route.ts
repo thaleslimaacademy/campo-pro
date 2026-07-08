@@ -26,7 +26,7 @@ export async function GET() {
 
   // Busca dados completos da escola ativa
   const { data: escola } = await supabaseAdmin
-    .from('Escola').select('id, nome, logoUrl, slug').eq('id', escolaId!).single()
+    .from('Escola').select('id, nome, logoUrl, slug, cidade, estado').eq('id', escolaId!).single()
 
   // Super admin: busca lista de todas as escolas para o switcher
   let todasEscolas: { id: string; nome: string }[] = []

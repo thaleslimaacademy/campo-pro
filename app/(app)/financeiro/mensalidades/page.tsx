@@ -13,7 +13,7 @@ const dataBR = (c: string | null) => (c ? c.slice(0, 10).split('-').reverse().jo
 const labelStatus = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()
 const corStatus = (s: string) => ({ PAGO: T.green, PENDENTE: T.gold, VENCIDO: T.red, CANCELADO: '#555' } as Record<string, string>)[s] ?? '#555'
 
-type Cobranca = { id: string; valor: number; status: string; competencia: string | null; vencimento: string | null; descricao: string | null; excluidaEm: string | null; atletaNome?: string | null; atleta?: { nome: string } | null; pixCopiaCola?: string | null; pixQrCode?: string | null }
+type Cobranca = { id: string; valor: number; status: string; competencia: string | null; vencimento: string | null; descricao: string | null; excluidaEm: string | null; atletaNome?: string | null; pagoEm?: string | null; atleta?: { nome: string } | null; pixCopiaCola?: string | null; pixQrCode?: string | null }
 const STATUS = [{ key: 'todas', label: 'Todas' }, { key: 'PENDENTE', label: 'Pendentes' }, { key: 'PAGO', label: 'Pagas' }, { key: 'VENCIDO', label: 'Vencidas' }, { key: 'CANCELADO', label: 'Canceladas' }]
 const INP: React.CSSProperties = { background: '#080C15', border: '1px solid rgba(240,244,255,0.1)', borderRadius: 8, padding: '10px 12px', color: T.text, fontSize: 13, width: '100%' }
 
@@ -39,6 +39,13 @@ export default function MensalidadesPage() {
   const [showForm, setShowForm] = useState(false)
   const [busca, setBusca] = useState('')
   const [modalPix, setModalPix] = useState<Cobranca | null>(null)
+  const [escola, setEscola] = useState<{ nome?: string; cidade?: string; estado?: string; logoUrl?: string } | null>(null)
+
+  useEffect(() => {
+    fetch('/api/escola-ativa').then(r => r.json()).then(d => {
+      if (d.escola) setEscola(d.escola)
+    })
+  }, [])
 
   const filtrados = lista.filter(c => {
     if (!busca.trim()) return true
