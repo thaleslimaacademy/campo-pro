@@ -13,7 +13,7 @@ const dataBR = (c: string | null) => (c ? c.slice(0, 10).split('-').reverse().jo
 const labelStatus = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()
 const corStatus = (s: string) => ({ PAGO: T.green, PENDENTE: T.gold, VENCIDO: T.red, CANCELADO: '#555' } as Record<string, string>)[s] ?? '#555'
 
-type Cobranca = { id: string; valor: number; status: string; competencia: string | null; vencimento: string | null; descricao: string | null; excluidaEm: string | null; atletaNome?: string | null; atleta?: { nome: string } | null }
+type Cobranca = { id: string; valor: number; status: string; competencia: string | null; vencimento: string | null; descricao: string | null; excluidaEm: string | null; atletaNome?: string | null; atleta?: { nome: string } | null; pixCopiaCola?: string | null; pixQrCode?: string | null }
 const STATUS = [{ key: 'todas', label: 'Todas' }, { key: 'PENDENTE', label: 'Pendentes' }, { key: 'PAGO', label: 'Pagas' }, { key: 'VENCIDO', label: 'Vencidas' }, { key: 'CANCELADO', label: 'Canceladas' }]
 const INP: React.CSSProperties = { background: '#080C15', border: '1px solid rgba(240,244,255,0.1)', borderRadius: 8, padding: '10px 12px', color: T.text, fontSize: 13, width: '100%' }
 
@@ -38,6 +38,7 @@ export default function MensalidadesPage() {
   const [diaVencimento, setDiaVencimento] = useState(10)
   const [showForm, setShowForm] = useState(false)
   const [busca, setBusca] = useState('')
+  const [modalPix, setModalPix] = useState<Cobranca | null>(null)
 
   const filtrados = lista.filter(c => {
     if (!busca.trim()) return true
@@ -69,6 +70,11 @@ export default function MensalidadesPage() {
   const apagar = async (id: string) => { if (!confirm('Apagar da lista?')) return; await softDeleteCobranca(id); await carregar() }
   const restaurar = async (id: string) => { await restaurarCobranca(id); await carregar() }
   const definitivo = async (id: string) => { if (!confirm('Excluir DEFINITIVAMENTE?')) return; await excluirDefinitivo(id); await carregar() }
+  const copiarPix = async (pix: string) => {
+    await navigator.clipboard.writeText(pix)
+    alert('Código PIX copiado!')
+  }
+
   const gerarReciboCobranca = (c: Cobranca) => { gerarRecibo({ tipo: 'MENSALIDADE', nome: c.atleta?.nome || c.atletaNome || '—', valor: c.valor, descricao: c.descricao ?? 'Mensalidade', data: c.competencia ? c.competencia.slice(0, 10) : new Date().toISOString().slice(0, 10) }) }
 
   return (
@@ -155,6 +161,9 @@ export default function MensalidadesPage() {
                             {!excluida && c.status === 'PAGO' && (
                               <button onClick={() => gerarReciboCobranca(c)} style={ICON_BTN} title="Gerar recibo"><FileText size={14} /></button>
                             )}
+                            {!excluida && c.pixCopiaCola && (
+                              <button onClick={() => setModalPix(c)} style={{ ...ICON_BTN, color: '#00D67A' }} title="Ver código PIX">⚡</button>
+                            )}
                             {excluida ? (
                               <>
                                 <button onClick={() => restaurar(c.id)} style={ICON_BTN} title="Restaurar"><RotateCcw size={14} /></button>
@@ -183,6 +192,34 @@ export default function MensalidadesPage() {
         </div>
       </div>
       <style>{`.spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+
+      {/* MODAL PIX */}
+      {modalPix && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.85)', display:'flex', alignItems:'flex-end', justifyContent:'center', zIndex:200 }}>
+          <div style={{ background:'#0D1220', borderRadius:'20px 20px 0 0', padding:24, width:'100%', maxWidth:480 }}>
+            <p style={{ fontFamily:'Syne,sans-serif', fontWeight:900, fontSize:16, color:'#F0F4FF', margin:'0 0 4px', textTransform:'uppercase' }}>⚡ Código PIX</p>
+            <p style={{ fontSize:12, color:'rgba(240,244,255,0.45)', margin:'0 0 16px' }}>{modalPix.atleta?.nome || modalPix.atletaNome || '—'} · {brl(modalPix.valor)}</p>
+            <div style={{ background:'#080C15', border:'1px solid rgba(240,244,255,0.1)', borderRadius:10, padding:14, marginBottom:14, wordBreak:'break-all', fontSize:12, color:'#00D67A', fontFamily:'monospace' }}>
+              {modalPix.pixCopiaCola}
+            </div>
+            {modalPix.pixQrCode && (
+              <div style={{ textAlign:'center', marginBottom:14 }}>
+                <img src={`data:image/png;base64,${modalPix.pixQrCode}`} alt="QR Code PIX" style={{ width:160, height:160, borderRadius:8, background:'white', padding:8 }} />
+              </div>
+            )}
+            <div style={{ display:'flex', gap:10 }}>
+              <button onClick={() => setModalPix(null)} style={{ flex:1, background:'transparent', border:'1px solid rgba(240,244,255,0.1)', color:'rgba(240,244,255,0.45)', padding:13, borderRadius:10, cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:700, fontSize:13 }}>
+                Fechar
+              </button>
+              <button onClick={() => copiarPix(modalPix.pixCopiaCola!)} style={{ flex:2, background:'#00D67A', color:'#000', padding:13, borderRadius:10, border:'none', cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:900, fontSize:13, textTransform:'uppercase' }}>
+                📋 Copiar código PIX
+              </button>
+            </div>
+            <p style={{ fontSize:11, color:'rgba(240,244,255,0.3)', textAlign:'center', margin:'12px 0 0' }}>Cole no app do banco para pagar</p>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }

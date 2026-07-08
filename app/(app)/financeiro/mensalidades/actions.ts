@@ -48,7 +48,7 @@ export async function cancelarCobranca(cobrancaId: string) {
 // ── Aliases e funções legadas usadas pela página existente ──
 export async function listarMensalidades(opts?: { status?: string; incluirExcluidas?: boolean }) {
   const escolaId = await getEscolaIdServer()
-  let q = supabaseAdmin.from('Cobranca').select('id, atletaId, atletaNome, valor, valorPago, vencimento, status, descricao, periodo, baixaManual, tipo, pagoEm, excluidaEm, grupoCobrancaId, qtdParcelas, parcelaAtual').eq('escolaId', escolaId).order('vencimento', { ascending: false }).limit(300)
+  let q = supabaseAdmin.from('Cobranca').select('id, atletaId, atletaNome, valor, valorPago, vencimento, status, descricao, periodo, baixaManual, tipo, pagoEm, excluidaEm, grupoCobrancaId, qtdParcelas, parcelaAtual, pixCopiaCola, pixQrCode').eq('escolaId', escolaId).order('vencimento', { ascending: false }).limit(300)
   if (opts?.status && opts.status !== 'TODOS') q = q.eq('status', opts.status)
   if (!opts?.incluirExcluidas) q = q.is('excluidaEm', null)
   const { data } = await q
@@ -57,6 +57,8 @@ export async function listarMensalidades(opts?: { status?: string; incluirExclui
     ...c,
     competencia: c.vencimento,
     atleta: c.atletaNome ? { nome: c.atletaNome } : null,
+    pixCopiaCola: c.pixCopiaCola ?? null,
+    pixQrCode: c.pixQrCode ?? null,
   }))
 }
 
@@ -75,11 +77,16 @@ export async function gerarMensalidades(params: { atletaId?: string; atletaIds?:
   const agora = new Date()
   const grupoId = qtd > 1 ? crypto.randomUUID() : null
   const insertions = []
+  // Busca nomes dos atletas de uma vez
+  const { data: atletasInfo } = await supabaseAdmin
+    .from('Atleta').select('id, nome').in('id', ids)
+  const nomeMap = Object.fromEntries((atletasInfo || []).map(a => [a.id, a.nome]))
   for (const atletaId of ids) {
     for (let i = 0; i < qtd; i++) {
       const dataVenc = new Date(agora.getFullYear(), agora.getMonth() + i, diaVencimento)
       insertions.push({
         id: crypto.randomUUID(), escolaId, atletaId,
+        atletaNome: nomeMap[atletaId] || null,
         valor, vencimento: dataVenc.toISOString().split('T')[0],
         status: 'PENDENTE', descricao: `Mensalidade${qtd > 1 ? ` (${i+1}/${qtd})` : ''}`,
         periodo, qtdParcelas: qtd, parcelaAtual: i + 1,
