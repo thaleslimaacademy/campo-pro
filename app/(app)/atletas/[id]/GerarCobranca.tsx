@@ -49,7 +49,7 @@ export default function GerarCobranca({ atletaId, atletaNome, escolaId }: { atle
 
   async function gerarAsaas() {
     setGerando(true)
-    const res  = await fetch('/api/cobranca', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ atletaId, valor: parseFloat(valor), vencimento, descricao, desconto: { value: 15, dueDateLimitDays: 0, type: 'FIXED' } }) })
+    const res  = await fetch('/api/cobranca', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ atletaId, valor: parseFloat(valor), vencimento, descricao }) })
     const data = await res.json()
     if (data.sucesso) setPix({ copiaCola: data.pixCopiaCola, qrCode: data.pixQrCode })
     else alert('Erro: ' + (data.error || JSON.stringify(data)))

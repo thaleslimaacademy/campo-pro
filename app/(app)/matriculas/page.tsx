@@ -61,7 +61,7 @@ function MatriculasInner() {
   async function gerarCobrancaAtleta(atletaId: string, nome: string) {
     setGerandoCobranca(true)
     const vencimento = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 10).toISOString().split('T')[0]
-    const res = await fetch('/api/cobranca', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ atletaId, valor: valorMensalidade, vencimento, descricao: 'Mensalidade', desconto: { value: 15, dueDateLimitDays: 0, type: 'FIXED' } }) })
+    const res = await fetch('/api/cobranca', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ atletaId, valor: valorMensalidade, vencimento, descricao: 'Mensalidade' }) })
     const data = await res.json()
     alert(data.sucesso ? `Cobrança gerada para ${nome}!` : 'Erro: ' + JSON.stringify(data))
     setGerandoCobranca(false)

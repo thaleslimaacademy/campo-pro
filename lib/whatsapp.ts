@@ -15,7 +15,7 @@ async function getInstancia(escolaId: string): Promise<string | null> {
 }
 
 // Envia mensagem usando a instância da escola
-export async function enviarWhatsApp(telefone: string, mensagem: string, escolaId?: string) {
+async function _enviarWhatsApp_original(telefone: string, mensagem: string, escolaId?: string) {
   // Instância: da escola se tiver, senão a global como fallback
   const instancia = escolaId
     ? (await getInstancia(escolaId)) || process.env.EVOLUTION_INSTANCE || 'tlfa'
@@ -87,4 +87,23 @@ export async function desconectarInstancia(nomeInstancia: string) {
       headers: { 'apikey': EVO_KEY },
     })
   } catch {}
+}
+
+
+// --- rate limit centralizado (anti-banimento WhatsApp) ---
+// Enfileira todas as chamadas de enviarWhatsApp, não importa se vieram
+// de um for, Promise.all ou map. Delay randomico de 3-8s entre cada envio real.
+let _queue_enviarWhatsApp: Promise<any> = Promise.resolve();
+
+export async function enviarWhatsApp(
+  ...args: Parameters<typeof _enviarWhatsApp_original>
+): ReturnType<typeof _enviarWhatsApp_original> {
+  const run = _queue_enviarWhatsApp.then(async () => {
+    const result = await _enviarWhatsApp_original(...args);
+    const delay = 3000 + Math.random() * 5000;
+    await new Promise((resolve) => setTimeout(resolve, delay));
+    return result;
+  });
+  _queue_enviarWhatsApp = run.catch(() => undefined);
+  return run as ReturnType<typeof _enviarWhatsApp_original>;
 }
