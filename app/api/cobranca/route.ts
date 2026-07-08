@@ -38,7 +38,8 @@ export async function POST(req: NextRequest) {
     if (cobranca.errors || !cobranca.id) return NextResponse.json({ error: 'Erro ao criar cobrança', detalhes: cobranca }, { status: 400 })
     const qrCode = await getPixQrCode(apiKey, cobranca.id)
     const novoId = crypto.randomUUID()
-    await supabaseAdmin.from('Cobranca').insert({ id: novoId, escolaId, atletaId, valor, vencimento, competencia: vencimento.slice(0, 7) + '-01', status: 'PENDENTE', asaasId: cobranca.id, pixCopiaCola: qrCode.payload || null, pixQrCode: qrCode.encodedImage || null, descricao })
+    const { data: atletaData } = await supabaseAdmin.from('Atleta').select('nome').eq('id', atletaId).single()
+    await supabaseAdmin.from('Cobranca').insert({ id: novoId, escolaId, atletaId, atletaNome: atletaData?.nome || null, valor, vencimento, competencia: vencimento.slice(0, 7) + '-01', status: 'PENDENTE', asaasId: cobranca.id, pixCopiaCola: qrCode.payload || null, pixQrCode: qrCode.encodedImage || null, descricao })
     if (responsavel?.whatsapp && qrCode.payload) {
       const dataVencimento = new Date(vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
       const nomeResp = responsavel.nome.split(' ')[0]

@@ -115,16 +115,14 @@ export async function GET(req: NextRequest) {
             if (!nova.errors) {
               const qr = await getPixQrCode(apiKey, nova.id)
               await supabaseAdmin.from('Cobranca').insert({
-                id: novoId, escolaId: cob.escolaId, atletaId: cob.atletaId,
-                atletaNome: atleta.nome, valor: novoValor, vencimento: amanha,
+                id: novoId, escolaId: cob.escolaId, atletaId: cob.atletaId, atletaNome: atleta?.nome || null, valor: novoValor, vencimento: amanha,
                 status: 'PENDENTE', asaasId: nova.id,
                 pixCopiaCola: qr.payload || null, pixQrCode: qr.encodedImage || null, descricao,
               })
             }
           } else {
             await supabaseAdmin.from('Cobranca').insert({
-              id: novoId, escolaId: cob.escolaId, atletaId: cob.atletaId,
-              atletaNome: atleta?.nome || null, valor: novoValor, vencimento: amanha,
+              id: novoId, escolaId: cob.escolaId, atletaId: cob.atletaId, atletaNome: atleta?.nome || null, valor: novoValor, vencimento: amanha,
               status: 'PENDENTE', tipo: 'MANUAL', descricao,
             })
           }
