@@ -1,5 +1,7 @@
 'use server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { cancelarCobrancaAsaas } from '@/lib/asaas'
+import { getAsaasKey } from '@/lib/getAsaasKey'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 import { revalidatePath } from 'next/cache'
 
@@ -68,8 +70,8 @@ export async function listarAtletas() {
   return data ?? []
 }
 
-export async function gerarMensalidades(params: { atletaId?: string; atletaIds?: string[]; quantidade?: number; mesInicial?: number; valor?: number; diaVencimento?: number; periodo?: string }) {
-  const { atletaId, atletaIds, quantidade = 1, mesInicial, valor = 85, diaVencimento = 10, periodo = 'mensal' } = params
+export async function gerarMensalidades(params: { atletaId?: string; atletaIds?: string[]; quantidade?: number; mesInicial?: number; valor?: number; diaVencimento?: number; periodo?: string; silencioso?: boolean }) {
+  const { atletaId, atletaIds, quantidade = 1, mesInicial, valor = 85, diaVencimento = 10, periodo = 'mensal', silencioso = false } = params
   const ids = atletaIds || (atletaId ? [atletaId] : [])
   if (!ids.length) return { criadas: 0, geradas: 0 }
   const escolaId = await getEscolaIdServer()
@@ -115,12 +117,25 @@ export async function excluirDefinitivo(cobrancaId: string) {
 }
 
 export async function marcarPago(cobrancaId: string, valorPago?: number, formaPagamento?: string) {
+  // Busca asaasId e escolaId para cancelar no Asaas
+  const { data: cob } = await supabaseAdmin.from('Cobranca')
+    .select('asaasId, escolaId').eq('id', cobrancaId).single()
+
   await supabaseAdmin.from('Cobranca').update({
     status: 'PAGO', pagoEm: new Date().toISOString(),
     valorPago: valorPago || null, baixaManual: true,
     baixaManualEm: new Date().toISOString(),
     tipo: formaPagamento || 'MANUAL',
   }).eq('id', cobrancaId)
+
+  // Cancela no Asaas para evitar cobrança duplicada
+  if (cob?.asaasId && cob?.escolaId) {
+    try {
+      const apiKey = await getAsaasKey(cob.escolaId)
+      if (apiKey) await cancelarCobrancaAsaas(apiKey, cob.asaasId)
+    } catch (err) { console.error('Erro ao cancelar no Asaas:', err) }
+  }
+
   revalidatePath('/financeiro/mensalidades')
 }
 

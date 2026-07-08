@@ -1,4 +1,5 @@
 'use server'
+import { gerarMensalidades } from '@/app/(app)/financeiro/mensalidades/actions'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 import { revalidatePath } from 'next/cache'
@@ -26,11 +27,23 @@ export async function aprovarMatricula(matriculaId: string, escolaId: string, at
   telefone: string | null; cep: string | null; endereco: string | null; numero: string | null
   bairro: string | null; cidade: string | null; estado: string | null
   nomeResponsavel: string; whatsappResponsavel: string
+  turmaId?: string; turnoEstuda?: string; valorMensalidade?: number; diaVencimento?: number
 }) {
   const atletaId   = crypto.randomUUID()
   const tokenPais  = crypto.randomUUID()
   const { error } = await supabaseAdmin.from('Atleta').insert({ id: atletaId, escolaId, nome: atletaData.nome, dataNascimento: atletaData.dataNascimento, cpf: atletaData.cpf, rg: atletaData.rg, posicao: atletaData.posicao, telefone: atletaData.telefone, cep: atletaData.cep, endereco: atletaData.endereco, numero: atletaData.numero, bairro: atletaData.bairro, cidade: atletaData.cidade, estado: atletaData.estado, tokenPais, ativo: true })
   if (error) throw new Error(error.message)
+  // Pré-gera 12 meses de mensalidades (modo silencioso — sem WhatsApp/Asaas ainda)
+  try {
+    await gerarMensalidades({
+      atletaId,
+      quantidade: 12,
+      valor: atletaData.valorMensalidade ? Number(atletaData.valorMensalidade) : 85,
+      diaVencimento: atletaData.diaVencimento ? Number(atletaData.diaVencimento) : 10,
+      silencioso: true,
+    })
+  } catch (err) { console.error('Erro ao pré-gerar mensalidades:', err) }
+
   const { error: errResp } = await supabaseAdmin.from('Responsavel').upsert(
     { id: crypto.randomUUID(), atletaId, nome: atletaData.nomeResponsavel, telefone: atletaData.whatsappResponsavel, whatsapp: atletaData.whatsappResponsavel, principal: true },
     { onConflict: 'atletaId' }

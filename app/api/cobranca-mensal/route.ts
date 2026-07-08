@@ -38,11 +38,40 @@ export async function POST(req: NextRequest) {
         if (atleta.bolsista) { totalBolsistas++; continue }
 
         // Verifica se já tem cobrança neste mês/ano
-        const { count } = await supabaseAdmin.from('Cobranca')
-          .select('*', { count: 'exact', head: true })
-          .eq('atletaId', atleta.id)
-          .like('vencimento', `${anoMes}%`)
-        if (count && count > 0) { totalPuladas++; continue }
+        const { data: cobExistente } = await supabaseAdmin.from('Cobranca')
+          .select('id, asaasId, status, valor').eq('atletaId', atleta.id)
+          .like('vencimento', `${anoMes}%`).limit(1).single()
+
+        if (cobExistente) {
+          // Se já tem cobrança pré-gerada sem Asaas e está PENDENTE → gera PIX e envia WhatsApp
+          if (cobExistente.status === 'PENDENTE' && !cobExistente.asaasId && apiKey) {
+            try {
+              let asaasCustomerId = atleta.asaasCustomerId
+              if (!asaasCustomerId) {
+                const cliente = await criarClienteAsaas(apiKey, { name: atleta.nome, cpfCnpj: atleta.cpf?.replace(/\D/g,'') || '00000000191', phone: atleta.telefone || '', address:'', addressNumber:'', province:'', postalCode:'' })
+                if (!cliente.errors) { asaasCustomerId = cliente.id; await supabaseAdmin.from('Atleta').update({ asaasCustomerId }).eq('id', atleta.id) }
+              }
+              if (asaasCustomerId) {
+                const venc = `${anoMes}-${String(hoje).padStart(2,'0')}`
+                const cobAsaas = await criarCobrancaPix(apiKey, { customer: asaasCustomerId, billingType:'PIX', value: cobExistente.valor, dueDate: venc, description:'Mensalidade' })
+                if (!cobAsaas.errors) {
+                  const qr = await getPixQrCode(apiKey, cobAsaas.id)
+                  await supabaseAdmin.from('Cobranca').update({ asaasId: cobAsaas.id, pixCopiaCola: qr.payload||null, pixQrCode: qr.encodedImage||null }).eq('id', cobExistente.id)
+                  // Envia WhatsApp
+                  const { data: resps } = await supabaseAdmin.from('Responsavel').select('nome, whatsapp').eq('atletaId', atleta.id).eq('principal', true).limit(1)
+                  const resp = resps?.[0]
+                  if (resp?.whatsapp) {
+                    const nomeResp = resp.nome.split(' ')[0]
+                    const dataFmt = new Date(venc + 'T12:00:00').toLocaleDateString('pt-BR')
+                    const link = `https://gestaofc.com.br/pagar/${cobExistente.id}`
+                    await enviarWhatsApp(resp.whatsapp, `Ola ${nomeResp}! 👋\n\nA mensalidade de *${atleta.nome}* foi gerada.\n\n💰 Valor: *R$ ${Number(cobExistente.valor).toFixed(2)}*\n📅 Vencimento: *${dataFmt}*\n\nPague agora:\n${link}\n\n_${escola.nome.split('—').pop()?.trim() || escola.nome}_`, escola.id)
+                  }
+                }
+              }
+            } catch(err) { console.error('Erro PIX pre-gerada:', err) }
+          }
+          totalPuladas++; continue
+        }
 
         const vencimento = `${anoMes}-${String(hoje).padStart(2, '0')}`
         // P2: valor CHEIO do plano (sem proporcional)
