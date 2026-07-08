@@ -25,6 +25,7 @@ function MatriculasInner() {
   const [painelCobranca, setPainelCobranca] = useState(false)
   const [valorCobranca, setValorCobranca] = useState(85)
   const [diaVencCobranca, setDiaVencCobranca] = useState(10)
+  const [taxaMatricula, setTaxaMatricula] = useState(0)
 
   function carregar() {
     startLoad(async () => {
@@ -127,15 +128,28 @@ function MatriculasInner() {
                     style={{ width: '100%', background: '#080C15', border: '1px solid rgba(240,244,255,0.15)', borderRadius: 8, padding: '12px 14px', color: T.text, fontSize: 15, fontWeight: 700, boxSizing: 'border-box' as const }} />
                 </div>
                 <div>
+                  <label style={{ fontSize: 10, color: T.muted, textTransform: 'uppercase', letterSpacing: 0.8, display: 'block', marginBottom: 4, fontFamily: SYNE, fontWeight: 700 }}>Taxa de matrícula (R$) — opcional</label>
+                  <input type="number" value={taxaMatricula} onChange={e => setTaxaMatricula(Number(e.target.value))} min={0}
+                    placeholder="0 = sem taxa"
+                    style={{ width: '100%', background: '#080C15', border: '1px solid rgba(240,244,255,0.15)', borderRadius: 8, padding: '12px 14px', color: T.text, fontSize: 15, fontWeight: 700, boxSizing: 'border-box' as const }} />
+                  <p style={{ fontSize: 10, color: 'rgba(240,244,255,0.3)', margin: '4px 0 0' }}>Será somada na 1ª mensalidade e não volta a ser cobrada</p>
+                </div>
+                <div>
                   <label style={{ fontSize: 10, color: T.muted, textTransform: 'uppercase', letterSpacing: 0.8, display: 'block', marginBottom: 4, fontFamily: SYNE, fontWeight: 700 }}>Dia de vencimento todo mês</label>
                   <select value={diaVencCobranca} onChange={e => setDiaVencCobranca(Number(e.target.value))}
                     style={{ width: '100%', background: '#080C15', border: '1px solid rgba(240,244,255,0.15)', borderRadius: 8, padding: '12px 14px', color: T.text, fontSize: 14 }}>
                     {[1,5,10,15,20,25,28].map(d => <option key={d} value={d}>Dia {d} de cada mês</option>)}
                   </select>
                 </div>
-                <p style={{ fontSize: 11, color: T.muted, margin: 0, textAlign: 'center' }}>
-                  O sistema vai salvar esse valor e dia para os próximos meses automaticamente.
-                </p>
+                <div style={{ background: 'rgba(65,105,225,0.08)', border: '1px solid rgba(65,105,225,0.2)', borderRadius: 8, padding: '10px 14px' }}>
+                  <p style={{ fontSize: 11, color: '#7DD3FC', margin: '0 0 4px', fontWeight: 700 }}>Resumo da 1ª cobrança:</p>
+                  <p style={{ fontSize: 12, color: T.text, margin: 0 }}>
+                    Mensalidade: R$ {valorCobranca.toFixed(2)}
+                    {taxaMatricula > 0 && ` + Taxa matrícula: R$ ${taxaMatricula.toFixed(2)}`}
+                    {` = `}<strong style={{ color: '#00D67A' }}>R$ {(valorCobranca + (taxaMatricula || 0)).toFixed(2)}</strong>
+                  </p>
+                  <p style={{ fontSize: 10, color: T.muted, margin: '4px 0 0' }}>A partir do 2º mês: R$ {valorCobranca.toFixed(2)} · Todo dia {diaVencCobranca}</p>
+                </div>
                 <div style={{ display: 'flex', gap: 10 }}>
                   <button onClick={() => setPainelCobranca(false)}
                     style={{ flex: 1, background: 'transparent', border: '1px solid rgba(240,244,255,0.1)', color: T.muted, padding: 12, borderRadius: 8, cursor: 'pointer', fontFamily: SYNE, fontWeight: 700, fontSize: 13 }}>
@@ -144,7 +158,7 @@ function MatriculasInner() {
                   <button onClick={() => gerarCobrancaAtleta(selecionada.atletaId || '', selecionada.nomeAtleta)}
                     disabled={gerandoCobranca || !selecionada.atletaId || valorCobranca <= 0}
                     style={{ flex: 2, background: T.primary, color: T.text, padding: 12, borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: SYNE, fontWeight: 800, fontSize: 13, textTransform: 'uppercase', opacity: gerandoCobranca ? 0.6 : 1 }}>
-                    {gerandoCobranca ? 'Gerando...' : '⚡ Gerar PIX e salvar'}
+                    {gerandoCobranca ? 'Gerando...' : `⚡ Gerar PIX — R$ ${(valorCobranca + (taxaMatricula || 0)).toFixed(2)}`}
                   </button>
                 </div>
               </div>
