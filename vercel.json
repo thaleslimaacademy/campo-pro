@@ -14,7 +14,7 @@
     },
     {
       "path": "/api/cobranca-mensal",
-      "schedule": "0 10 9-31 * *"
+      "schedule": "0 10 * * *"
     },
     {
       "path": "/api/cobranca-reemissao",
@@ -22,7 +22,7 @@
     },
     {
       "path": "/api/nps/enviar",
-      "schedule": "0 10 9-31 * *"
+      "schedule": "0 10 * * *"
     }
   ]
 }
