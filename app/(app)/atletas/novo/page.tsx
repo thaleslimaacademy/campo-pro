@@ -73,6 +73,7 @@ export default function NovoAtleta() {
     if (!form.dataNascimento) { setErro('Data de nascimento é obrigatória.'); return }
     if (!form.nomeResponsavel) { setErro('Nome do responsável é obrigatório.'); return }
     if (!form.cpfResponsavel) { setErro('CPF do responsável é obrigatório.'); return }
+    if (!form.whatsappResponsavel) { setErro('WhatsApp do responsável é obrigatório.'); return }
     setLoading(true); setErro('')
     try {
       const tokenPais = crypto.randomUUID()
@@ -248,7 +249,7 @@ export default function NovoAtleta() {
             <div><label style={LBL}>Nome completo *</label><input name="nomeResponsavel" value={form.nomeResponsavel} onChange={handleChange} placeholder="Nome do responsável" style={INP} /></div>
             <div><label style={LBL}>CPF *</label><input name="cpfResponsavel" value={form.cpfResponsavel} onChange={handleChange} placeholder="000.000.000-00" style={INP} /></div>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-              <div><label style={LBL}>WhatsApp</label><input name="whatsappResponsavel" value={form.whatsappResponsavel} onChange={handleChange} placeholder="(34) 99999-9999" style={INP} /></div>
+              <div><label style={LBL}>WhatsApp *</label><input name="whatsappResponsavel" value={form.whatsappResponsavel} onChange={handleChange} placeholder="(34) 99999-9999" style={INP} /></div>
               <div><label style={LBL}>Parentesco</label>
                 <select name="parentescoResponsavel" value={form.parentescoResponsavel} onChange={handleChange} style={SEL}>
                   <option value="">Selecionar</option>
