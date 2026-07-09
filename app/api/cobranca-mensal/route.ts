@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
                     const nomeResp = resp.nome.split(' ')[0]
                     const dataFmt = new Date(venc + 'T12:00:00').toLocaleDateString('pt-BR')
                     const link = `https://gestaofc.com.br/pagar/${cobExistente.id}`
-                    await enviarWhatsApp(resp.whatsapp, `Ola ${nomeResp}! 👋\n\nA mensalidade de *${atleta.nome}* foi gerada.\n\n💰 Valor: *R$ ${Number(cobExistente.valor).toFixed(2)}*\n📅 Vencimento: *${dataFmt}*\n\nPague agora:\n${link}\n\n_${escola.nome.split('—').pop()?.trim() || escola.nome}_`, escola.id)
+                    await enviarWhatsApp(resp.whatsapp, `Ola ${nomeResp}! 👋\n\nA mensalidade de *${atleta.nome}* vence *hoje* (${dataFmt}).\n\n💰 Valor: *R$ ${Number(cobExistente.valor).toFixed(2)}*\n\n🔗 Pague agora:\n${link}\n\n_${escola.nome.split('—').pop()?.trim() || escola.nome}_`, escola.id)
                   }
                 }
               }
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
             const nomeResp = resp.nome.split(' ')[0]
             const dataFmt = new Date(vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
             const linkPagamento = `https://gestaofc.com.br/pagar/${novoId}`
-            const mensagem = `Ola ${nomeResp}! 👋\n\nA mensalidade de *${atleta.nome}* foi gerada.\n\n💰 Valor: *R$ ${valor.toFixed(2)}*\n📅 Vencimento: *${dataFmt}*\n\nPague agora:\n${linkPagamento}\n\n_${escola.nome.split('—').pop()?.trim() || escola.nome}_`
+            const mensagem = `Ola ${nomeResp}! 👋\n\nA mensalidade de *${atleta.nome}* vence *hoje* (${dataFmt}).\n\n💰 Valor: *R$ ${valor.toFixed(2)}*\n\n🔗 Pague agora:\n${linkPagamento}\n\n_${escola.nome.split('—').pop()?.trim() || escola.nome}_`
             await enviarWhatsApp(resp.whatsapp, mensagem, escola.id)
           }
 

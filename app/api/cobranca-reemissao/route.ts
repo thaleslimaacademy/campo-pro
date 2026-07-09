@@ -31,28 +31,70 @@ export async function GET(req: NextRequest) {
     .eq('ativo', true)
     .eq('diaVencimento', diaAlvo3)
 
+  const anoMesAtual = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`
+
   for (const atleta of atletasD3 || []) {
     if (atleta.bolsista) continue
     try {
       const { data: escolaD3 } = await supabaseAdmin.from('Escola')
-        .select('nome').eq('id', atleta.escolaId).single()
+        .select('nome, ativo').eq('id', atleta.escolaId).single()
+      if (!escolaD3?.ativo) continue // escola pausada
       const escolaNomeD3 = escolaD3?.nome?.split('—').pop()?.trim() || 'GestãoFC'
+
+      // Busca cobrança do mês atual (pré-gerada ou já com PIX)
+      const { data: cobD3 } = await supabaseAdmin.from('Cobranca')
+        .select('id, valor, pixCopiaCola, pixQrCode, asaasId, vencimento')
+        .eq('atletaId', atleta.id)
+        .in('status', ['PENDENTE'])
+        .like('vencimento', `${anoMesAtual}%`)
+        .limit(1).single()
+
       const { data: planosD3 } = await supabaseAdmin.from('PlanoMensalidade')
         .select('slug, valor').eq('escolaId', atleta.escolaId)
       const PLANOSD3: Record<string, number> = {}
       for (const p of planosD3 || []) PLANOSD3[p.slug] = Number(p.valor)
-      const valorD3 = PLANOSD3[atleta.planoMensalidade || ''] || atleta.valorMensalidade || 85
+      const valorD3 = cobD3?.valor || PLANOSD3[atleta.planoMensalidade || ''] || atleta.valorMensalidade || 85
+
       const { data: respsD3 } = await supabaseAdmin.from('Responsavel')
         .select('nome, whatsapp').eq('atletaId', atleta.id).eq('principal', true).limit(1)
       const respD3 = respsD3?.[0]
       if (!respD3?.whatsapp) continue
+
       const nomeRespD3 = respD3.nome.split(' ')[0]
       const dataVencD3 = new Date()
       dataVencD3.setDate(diaAlvo3)
       const dataFmtD3 = dataVencD3.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })
-      await enviarWhatsApp(respD3.whatsapp,
-        `Ola ${nomeRespD3}! 📅\n\nLembrete: a mensalidade de *${atleta.nome?.trim()}* vence em *3 dias* (${dataFmtD3}).\n\n💰 Valor: *R$ ${Number(valorD3).toFixed(2)}*\n\nPague em dia e evite multa e juros!\n\n_${escolaNomeD3}_`,
-        atleta.escolaId)
+
+      // Monta mensagem com link de pagamento se tiver PIX
+      const linkPagamento = cobD3?.id ? `https://gestaofc.com.br/pagar/${cobD3.id}` : null
+      const pixCopia = cobD3?.pixCopiaCola || null
+
+      let mensagemD3 = `Ola ${nomeRespD3}! 📅
+
+`
+      mensagemD3 += `A mensalidade de *${atleta.nome?.trim()}* vence em *3 dias* (${dataFmtD3}).
+
+`
+      mensagemD3 += `💰 Valor: *R$ ${Number(valorD3).toFixed(2)}*
+`
+      if (linkPagamento) {
+        mensagemD3 += `
+🔗 Pague agora:
+${linkPagamento}
+`
+      }
+      if (pixCopia) {
+        mensagemD3 += `
+📋 Ou copie o código PIX:
+\`${pixCopia.slice(0, 50)}...\`
+`
+      }
+      mensagemD3 += `
+Pague em dia e evite multa e juros!
+
+_${escolaNomeD3}_`
+
+      await enviarWhatsApp(respD3.whatsapp, mensagemD3, atleta.escolaId)
       await new Promise(r => setTimeout(r, 400))
     } catch (err) { console.error('Erro D-3', atleta.id, err) }
   }
