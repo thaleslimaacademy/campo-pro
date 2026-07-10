@@ -13,22 +13,17 @@ const STATUS_MAP: Record<string, string> = {
 const brl = (n: number) => n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 const dataBR = (s: string | null) => { if (!s) return '-'; return s.slice(0, 10).split('-').reverse().join('/') }
 
-export async function POST(req: NextRequest) {
+// Processa o webhook em background — sem bloquear a resposta
+async function processar(body: Record<string, unknown>) {
   try {
-    const body = await req.json()
-    console.log('Webhook Asaas recebido:', JSON.stringify(body))
-
-    const evento = body.event
-    const pagamento = body.payment
-
-    if (!evento || !pagamento?.id) {
-      return NextResponse.json({ error: 'Payload invalido' }, { status: 400 })
-    }
+    const evento = body.event as string
+    const pagamento = body.payment as Record<string, unknown>
+    if (!evento || !pagamento?.id) return
 
     const novoStatus = STATUS_MAP[evento]
-    if (!novoStatus) return NextResponse.json({ ignorado: true })
+    if (!novoStatus) return
 
-    // ── COMPRA DE FOTO ────────────────────────────────────
+    // ── COMPRA DE FOTO ──
     const { data: fotoCompra } = await supabaseAdmin
       .from('FotoCompra')
       .select('id, fotos, compradorNome, compradorTelefone, linkEnviado')
@@ -39,35 +34,25 @@ export async function POST(req: NextRequest) {
       await supabaseAdmin.from('FotoCompra')
         .update({ status: novoStatus, ...(novoStatus === 'PAGO' ? { pagoEm: new Date().toISOString() } : {}) })
         .eq('id', fotoCompra.id)
-      console.log('FotoCompra atualizada:', fotoCompra.id, '->', novoStatus)
-
       if (novoStatus === 'PAGO' && !fotoCompra.linkEnviado) {
         try {
           const { data: fotos } = await supabaseAdmin
             .from('Foto').select('id, urlOriginal').in('id', fotoCompra.fotos)
-          const links = await Promise.all((fotos || []).map(async (f, i) => {
+          const links = await Promise.all((fotos || []).map(async (f: {id:string;urlOriginal:string}, i: number) => {
             const { data } = await supabaseAdmin.storage.from('fotos-originais')
               .createSignedUrl(f.urlOriginal, 60 * 60 * 24 * 7)
             return `📷 Foto ${i + 1}: ${data?.signedUrl || ''}`
           }))
           const primeiroNome = fotoCompra.compradorNome.split(' ')[0]
-          const msg = [
-            `✅ *Pagamento confirmado!*`, ``,
-            `Olá, *${primeiroNome}*! 🎉`, ``,
-            `Suas fotos estão prontas. Links válidos por *7 dias*:`, ``,
-            ...links, ``,
-            `⬇️ Clique em cada link para baixar a foto original.`, ``,
-            `_Gestão FC · gestaofc.com.br_`,
-          ].join('\n')
+          const msg = [`✅ *Pagamento confirmado!*`, ``, `Olá, *${primeiroNome}*! 🎉`, ``, `Suas fotos estão prontas. Links válidos por *7 dias*:`, ``, ...links, ``, `⬇️ Clique em cada link para baixar.`, ``, `_GestãoFC · gestaofc.com.br_`].join('\n')
           await enviarWhatsApp(fotoCompra.compradorTelefone, msg)
           await supabaseAdmin.from('FotoCompra').update({ linkEnviado: true }).eq('id', fotoCompra.id)
-          console.log('Fotos enviadas via WhatsApp para:', fotoCompra.compradorTelefone)
-        } catch (e) { console.error('Erro ao enviar fotos WhatsApp:', (e as Error).message) }
+        } catch (e) { console.error('Erro WhatsApp foto:', (e as Error).message) }
       }
-      return NextResponse.json({ sucesso: true, tipo: 'foto', status: novoStatus })
+      return
     }
 
-    // ── PEDIDO DA LOJA ────────────────────────────────────
+    // ── PEDIDO DA LOJA ──
     const { data: pedido } = await supabaseAdmin
       .from('Pedido')
       .select('id, compradorNome, compradorTelefone, itens, valor, tipoEntrega')
@@ -78,119 +63,92 @@ export async function POST(req: NextRequest) {
       await supabaseAdmin.from('Pedido')
         .update({ status: novoStatus, ...(novoStatus === 'PAGO' ? { pagoEm: new Date().toISOString() } : {}) })
         .eq('id', pedido.id)
-      console.log('Pedido atualizado:', pedido.id, '->', novoStatus)
-
       if (novoStatus === 'PAGO') {
         try {
           const primeiroNome = pedido.compradorNome.split(' ')[0]
-          const itensTexto = (pedido.itens as any[]).map(i =>
+          const itensTexto = (pedido.itens as {nome:string;tamanho?:string;cor?:string;qtd:number;preco:number}[]).map(i =>
             `• ${i.nome}${i.tamanho ? ` (${i.tamanho})` : ''}${i.cor ? ` - ${i.cor}` : ''} × ${i.qtd} — R$ ${(i.preco * i.qtd).toFixed(2).replace('.', ',')}`
           ).join('\n')
-          const msg = [
-            `✅ *Pedido confirmado!*`, ``,
-            `Olá, *${primeiroNome}*! 🎉`, ``,
-            `*Seus itens:*`,
-            itensTexto, ``,
-            `💰 Total: *R$ ${pedido.valor.toFixed(2).replace('.', ',')}*`,
-            `📦 Entrega: *${pedido.tipoEntrega === 'RETIRADA' ? 'Retirada na escola' : 'Entrega no endereço'}*`, ``,
-            `Em breve entraremos em contato! 👊`,
-            `_Gestão FC · gestaofc.com.br_`,
-          ].join('\n')
+          const msg = [`✅ *Pedido confirmado!*`, ``, `Olá, *${primeiroNome}*! 🎉`, ``, `*Seus itens:*`, itensTexto, ``, `💰 Total: *R$ ${pedido.valor.toFixed(2).replace('.', ',')}*`, `📦 Entrega: *${pedido.tipoEntrega === 'RETIRADA' ? 'Retirada na escola' : 'Entrega no endereço'}*`, ``, `Em breve entraremos em contato! 👊`, `_GestãoFC · gestaofc.com.br_`].join('\n')
           await enviarWhatsApp(pedido.compradorTelefone, msg)
-          console.log('Confirmação pedido enviada para:', pedido.compradorTelefone)
         } catch (e) { console.error('Erro WhatsApp pedido:', (e as Error).message) }
       }
-      return NextResponse.json({ sucesso: true, tipo: 'pedido', status: novoStatus })
+      return
     }
 
-
-    // ── ASSINATURA GESTAOFC (ativação de escola) ──────────
-    if (pagamento.subscription && novoStatus === 'PAGO') {
+    // ── ASSINATURA GESTAOFC ──
+    if ((pagamento.subscription as string) && novoStatus === 'PAGO') {
       const { data: escola } = await supabaseAdmin
-        .from('Escola')
-        .select('id, nome, ativo, statusPlano, whatsapp, planoGestaoFC')
-        .eq('asaasSubscriptionId', pagamento.subscription)
-        .maybeSingle()
-
+        .from('Escola').select('id, nome, ativo, statusPlano, whatsapp, planoGestaoFC')
+        .eq('asaasSubscriptionId', pagamento.subscription).maybeSingle()
       if (escola) {
         const maxMod = escola.planoGestaoFC === 'ELITE' ? 99 : escola.planoGestaoFC === 'PRO' ? 3 : 1
-        await supabaseAdmin.from('Escola').update({
-          ativo: true,
-          statusPlano: 'ATIVO',
-          maxModalidades: maxMod,
-        }).eq('id', escola.id)
-        console.log('✅ Escola ativada:', escola.id, escola.nome)
-
+        await supabaseAdmin.from('Escola').update({ ativo: true, statusPlano: 'ATIVO', maxModalidades: maxMod }).eq('id', escola.id)
         if (escola.whatsapp) {
           try {
-            const msg = [
-              `🏆 *GestãoFC — Plano Ativado!*`, ``,
-              `Olá! Seu pagamento foi confirmado e o *${escola.nome}* já está ativo no GestãoFC. 🎉`, ``,
-              `📋 Plano: *${escola.planoGestaoFC || 'PRO'}*`,
-              `✅ Status: *ATIVO*`, ``,
-              `Acesse agora: *gestaofc.com.br*`, ``,
-              `_Gestão FC · Bem-vindo(a)!_`,
-            ].join('\n')
-            await enviarWhatsApp(escola.whatsapp, msg)
+            await enviarWhatsApp(escola.whatsapp, `🏆 *GestãoFC — Plano Ativado!*\n\nOlá! Seu pagamento foi confirmado e o *${escola.nome}* já está ativo. 🎉\n\nAcesse: *gestaofc.com.br*\n\n_Bem-vindo(a)!_`)
           } catch (e) { console.error('Erro WhatsApp escola:', (e as Error).message) }
         }
-
-        return NextResponse.json({ sucesso: true, tipo: 'escola', status: 'ATIVO' })
+        return
       }
     }
 
-    // ── MENSALIDADE ───────────────────────────────────────
+    // ── MENSALIDADE ──
     const { error } = await supabaseAdmin
       .from('Cobranca')
       .update({ status: novoStatus, ...(novoStatus === 'PAGO' ? { pagoEm: new Date().toISOString() } : {}) })
       .eq('asaasId', pagamento.id)
 
-    if (error) {
-      console.error('Erro ao atualizar Cobranca:', error)
-      return NextResponse.json({ error: 'Erro ao atualizar' }, { status: 500 })
-    }
-    console.log('Cobranca atualizada:', pagamento.id, '->', novoStatus)
+    if (error) { console.error('Erro ao atualizar Cobranca:', error); return }
 
     if (novoStatus === 'PAGO') {
       try {
         const { data: cobranca } = await supabaseAdmin
-          .from('Cobranca').select('valor, descricao, vencimento, atletaId')
+          .from('Cobranca').select('valor, descricao, vencimento, atletaId, escolaId')
           .eq('asaasId', pagamento.id).single()
 
         if (cobranca?.atletaId) {
-          const { data: atleta } = await supabaseAdmin
-            .from('Atleta').select('nome').eq('id', cobranca.atletaId).single()
-          const { data: responsavel } = await supabaseAdmin
-            .from('Responsavel').select('nome, whatsapp')
-            .eq('atletaId', cobranca.atletaId).eq('principal', true).maybeSingle()
+          const [{ data: atleta }, { data: responsavel }, { data: escola }] = await Promise.all([
+            supabaseAdmin.from('Atleta').select('nome').eq('id', cobranca.atletaId).single(),
+            supabaseAdmin.from('Responsavel').select('nome, whatsapp').eq('atletaId', cobranca.atletaId).eq('principal', true).maybeSingle(),
+            supabaseAdmin.from('Escola').select('nome').eq('id', cobranca.escolaId).single(),
+          ])
+          const escolaNome = escola?.nome?.split('—').pop()?.trim() || 'GestãoFC'
 
           if (responsavel?.whatsapp) {
             const primeiroNome = responsavel.nome?.split(' ')[0] || 'Responsável'
             const msg = [
-              `🏆 *THALES LIMA FOOTBALL ACADEMY*`, ``,
-              `Olá, *${primeiroNome}*! ✅`, ``,
-              `━━━━━━━━━━━━━━━━━━━━`,
-              `      *RECIBO DE PAGAMENTO*`,
-              `━━━━━━━━━━━━━━━━━━━━`, ``,
+              `✅ *Pagamento confirmado!*`, ``,
+              `Olá, *${primeiroNome}*! 🎉`, ``,
               `👤 Atleta: *${atleta?.nome || '-'}*`,
               `📋 Referente: ${cobranca.descricao || 'Mensalidade'}`,
               `💰 Valor: *R$ ${brl(Number(cobranca.valor))}*`,
               `📅 Vencimento: ${dataBR(cobranca.vencimento)}`,
               `✅ Status: *PAGO*`, ``,
-              `━━━━━━━━━━━━━━━━━━━━`, ``,
               `Obrigado pelo pagamento! 🙏`,
-              `_Thales Lima Football Academy_`,
-              `_gestaofc.com.br_`,
+              `_${escolaNome} · gestaofc.com.br_`,
             ].join('\n')
-            await enviarWhatsApp(responsavel.whatsapp, msg)
+            await enviarWhatsApp(responsavel.whatsapp, msg, cobranca.escolaId)
           }
         }
-      } catch (wzErr: unknown) { console.error('Erro WhatsApp:', (wzErr as Error).message) }
+      } catch (e) { console.error('Erro WhatsApp confirmação:', (e as Error).message) }
     }
+  } catch (err) {
+    console.error('Erro processar webhook:', (err as Error).message)
+  }
+}
 
-    return NextResponse.json({ sucesso: true, tipo: 'mensalidade', status: novoStatus })
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json()
+    console.log('Webhook Asaas recebido:', body.event, body.payment?.id)
+
+    // ✅ Responde 200 IMEDIATAMENTE — evita timeout do Asaas
+    processar(body).catch(err => console.error('Erro background:', err))
+    return NextResponse.json({ recebido: true })
+
   } catch (err: unknown) {
-    console.error('Erro webhook:', (err as Error).message)
+    console.error('Erro webhook parse:', (err as Error).message)
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
