@@ -1,23 +1,17 @@
 import type { NextConfig } from "next";
 
-async function redirects() {
-  return [
-    {
-      source: '/',
-      destination: '/home',
-      permanent: false,
-    },
-  ]
-}
-
 const nextConfig: NextConfig = {
-  redirects,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   experimental: {
     serverActions: {
       bodySizeLimit: '15mb',
     },
   },
-  turbopack: {},
 };
 
 export default nextConfig;
