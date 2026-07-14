@@ -114,7 +114,7 @@ _${escolaNomeD3}_`
     const dataAlvo = diasAtras(n)
 
     const { data: cobVencidas } = await supabaseAdmin.from('Cobranca')
-      .select('id, valor, asaasId, atletaId, escolaId, descricao, competencia')
+      .select('id, valor, asaasId, atletaId, escolaId, descricao')
       .in('status', ['PENDENTE', 'VENCIDO'])
       .eq('vencimento', dataAlvo)
 
@@ -140,25 +140,16 @@ _${escolaNomeD3}_`
 
         // ── D+1: reemite cobrança com multa + juros ──
         if (acao === 'reemitir') {
-          // FIX 4: nunca reemitir uma reemissao. Sem este guard, a cobranca nova
-          // (vencimento = amanha) era pega de novo pelo D+1 no dia seguinte,
-          // gerando juros compostos em loop infinito.
-          const jaEhReemissao = (cob.descricao || '').startsWith('Mensalidade em atraso')
-          if (jaEhReemissao) {
-            await supabaseAdmin.from('Cobranca').update({ status: 'VENCIDO' }).eq('id', cob.id)
-            continue
-          }
+          await supabaseAdmin.from('Cobranca').update({ status: 'VENCIDO' }).eq('id', cob.id)
 
-          // FIX 3: valorBase agora e sempre a mensalidade original, nunca um
-          // valor ja penalizado (o guard acima garante isso).
           const valorBase  = Number(cob.valor)
           const valorJuros = valorBase * (jurosPct / 100)
-          const novoValor  = Math.round((valorBase + multaFixa + valorJuros) * 100) / 100
+          const novoValor  = valorBase + multaFixa + valorJuros
           const novoId     = crypto.randomUUID()
           const descricao  = `Mensalidade em atraso + multa R$${multaFixa.toFixed(0)} + juros ${jurosPct}%`
-          let novaCriada   = false
 
           if (atleta?.asaasCustomerId && apiKey) {
+            if (cob.asaasId) await cancelarCobrancaAsaas(apiKey, cob.asaasId)
             const nova = await criarCobrancaPix(apiKey, {
               customer: atleta.asaasCustomerId, billingType: 'PIX',
               value: novoValor, dueDate: amanha, description: descricao,
@@ -167,32 +158,15 @@ _${escolaNomeD3}_`
               const qr = await getPixQrCode(apiKey, nova.id)
               await supabaseAdmin.from('Cobranca').insert({
                 id: novoId, escolaId: cob.escolaId, atletaId: cob.atletaId, atletaNome: atleta?.nome || null, valor: novoValor, vencimento: amanha,
-                status: 'PENDENTE', asaasId: nova.id, competencia: cob.competencia,
+                status: 'PENDENTE', asaasId: nova.id,
                 pixCopiaCola: qr.payload || null, pixQrCode: qr.encodedImage || null, descricao,
               })
-              novaCriada = true
-              // so cancela no Asaas depois que a nova existe
-              if (cob.asaasId) await cancelarCobrancaAsaas(apiKey, cob.asaasId)
             }
           } else {
             await supabaseAdmin.from('Cobranca').insert({
               id: novoId, escolaId: cob.escolaId, atletaId: cob.atletaId, atletaNome: atleta?.nome || null, valor: novoValor, vencimento: amanha,
-              status: 'PENDENTE', tipo: 'MANUAL', competencia: cob.competencia, descricao,
+              status: 'PENDENTE', tipo: 'MANUAL', descricao,
             })
-            novaCriada = true
-          }
-
-          // FIX 1: cancela a anterior DE VERDADE (status + excluidaEm), para ela
-          // sumir da lista de inadimplentes. So cancela se a nova foi criada.
-          if (novaCriada) {
-            await supabaseAdmin.from('Cobranca').update({
-              status: 'CANCELADO',
-              excluidaEm: new Date().toISOString(),
-            }).eq('id', cob.id)
-          } else {
-            await supabaseAdmin.from('Cobranca').update({ status: 'VENCIDO' }).eq('id', cob.id)
-            erros++
-            continue
           }
 
           if (resp?.whatsapp && atleta) {
