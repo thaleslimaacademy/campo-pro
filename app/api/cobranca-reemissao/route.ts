@@ -4,13 +4,15 @@ import { cancelarCobrancaAsaas, criarCobrancaPix, getPixQrCode } from '@/lib/asa
 import { getAsaasKey } from '@/lib/getAsaasKey'
 import { enviarWhatsApp } from '@/lib/whatsapp'
 
-function diasAtras(n: number): string {
-  const d = new Date(); d.setDate(d.getDate() - n)
+// offset em dias a partir de hoje (negativo = passado)
+function dataComOffset(n: number): string {
+  const d = new Date()
+  d.setDate(d.getDate() + n)
   return d.toISOString().slice(0, 10)
 }
-function diasAFrente(n: number): string {
-  const d = new Date(); d.setDate(d.getDate() + n)
-  return d.toISOString().slice(0, 10)
+
+function fmtBR(iso: string): string {
+  return new Date(iso + 'T12:00:00').toLocaleDateString('pt-BR')
 }
 
 export async function GET(req: NextRequest) {
@@ -19,138 +21,96 @@ export async function GET(req: NextRequest) {
   if (!isVercelCron && authHeader !== 'Bearer ' + process.env.CRON_SECRET)
     return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 })
 
-  const hoje = new Date().toISOString().slice(0, 10)
-  const amanha = diasAFrente(1)
+  const hoje = dataComOffset(0)
+  const amanha = dataComOffset(1)
 
-  // ── D-3: lembrete PRÉ-vencimento ──
-  const diaHoje = new Date().getDate()
-  const diaAlvo3 = diaHoje + 3 <= 28 ? diaHoje + 3 : diaHoje + 3 - 28
-
-  const { data: atletasD3 } = await supabaseAdmin.from('Atleta')
-    .select('id, nome, escolaId, diaVencimento, planoMensalidade, valorMensalidade, bolsista')
-    .eq('ativo', true)
-    .eq('diaVencimento', diaAlvo3)
-
-  const anoMesAtual = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`
-
-  for (const atleta of atletasD3 || []) {
-    if (atleta.bolsista) continue
-    try {
-      const { data: escolaD3 } = await supabaseAdmin.from('Escola')
-        .select('nome, ativo').eq('id', atleta.escolaId).single()
-      if (!escolaD3?.ativo) continue // escola pausada
-      const escolaNomeD3 = escolaD3?.nome?.split('—').pop()?.trim() || 'GestãoFC'
-
-      // Busca cobrança do mês atual (pré-gerada ou já com PIX)
-      const { data: cobD3 } = await supabaseAdmin.from('Cobranca')
-        .select('id, valor, pixCopiaCola, pixQrCode, asaasId, vencimento')
-        .eq('atletaId', atleta.id)
-        .in('status', ['PENDENTE'])
-        .like('vencimento', `${anoMesAtual}%`)
-        .limit(1).single()
-
-      const { data: planosD3 } = await supabaseAdmin.from('PlanoMensalidade')
-        .select('slug, valor').eq('escolaId', atleta.escolaId)
-      const PLANOSD3: Record<string, number> = {}
-      for (const p of planosD3 || []) PLANOSD3[p.slug] = Number(p.valor)
-      const valorD3 = cobD3?.valor || PLANOSD3[atleta.planoMensalidade || ''] || atleta.valorMensalidade || 85
-
-      const { data: respsD3 } = await supabaseAdmin.from('Responsavel')
-        .select('nome, whatsapp').eq('atletaId', atleta.id).eq('principal', true).limit(1)
-      const respD3 = respsD3?.[0]
-      if (!respD3?.whatsapp) continue
-
-      const nomeRespD3 = respD3.nome.split(' ')[0]
-      const dataVencD3 = new Date()
-      dataVencD3.setDate(diaAlvo3)
-      const dataFmtD3 = dataVencD3.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })
-
-      // Monta mensagem com link de pagamento se tiver PIX
-      const linkPagamento = cobD3?.id ? `https://gestaofc.com.br/pagar/${cobD3.id}` : null
-      const pixCopia = cobD3?.pixCopiaCola || null
-
-      let mensagemD3 = `Ola ${nomeRespD3}! 📅
-
-`
-      mensagemD3 += `A mensalidade de *${atleta.nome?.trim()}* vence em *3 dias* (${dataFmtD3}).
-
-`
-      mensagemD3 += `💰 Valor: *R$ ${Number(valorD3).toFixed(2)}*
-`
-      if (linkPagamento) {
-        mensagemD3 += `
-🔗 Pague agora:
-${linkPagamento}
-`
-      }
-      if (pixCopia) {
-        mensagemD3 += `
-📋 Ou copie o código PIX:
-\`${pixCopia.slice(0, 50)}...\`
-`
-      }
-      mensagemD3 += `
-Pague em dia e evite multa e juros!
-
-_${escolaNomeD3}_`
-
-      await enviarWhatsApp(respD3.whatsapp, mensagemD3, atleta.escolaId)
-      await new Promise(r => setTimeout(r, 400))
-    } catch (err) { console.error('Erro D-3', atleta.id, err) }
-  }
-
-  // D+1: venceu ontem → reemite com multa+juros e novo PIX
-  // D+4: venceu há 4 dias → lembrete WhatsApp (sem reemitir)
-  // D+10: venceu há 10 dias → aviso final WhatsApp (sem reemitir)
-  const checkDias = [
-    { diasAtras: 1, acao: 'reemitir' },
-    { diasAtras: 4, acao: 'lembrete' },
-    { diasAtras: 10, acao: 'aviso_final' },
+  // ── REGUA DE COBRANCA ──────────────────────────────────────
+  //   D-3   lembrete previo      (cobranca vence em 3 dias)
+  //   D0    vence hoje
+  //   D+1   reemite com multa+juros (uma unica vez)
+  //   D+15  aviso final
+  // offset = quantos dias somar em hoje para achar o vencimento alvo
+  const regua = [
+    { offset:   3, acao: 'lembrete_previo' },
+    { offset:   0, acao: 'vencimento_hoje' },
+    { offset:  -1, acao: 'reemitir' },
+    { offset: -15, acao: 'aviso_final' },
   ]
 
-  let reemitidas = 0, lembretes = 0, erros = 0
+  let lembretesPrevios = 0, avisosVencimento = 0, reemitidas = 0, avisosFinais = 0, erros = 0
+  const escolaAtivaCache: Record<string, boolean> = {}
 
-  for (const { diasAtras: n, acao } of checkDias) {
-    const dataAlvo = diasAtras(n)
+  for (const { offset, acao } of regua) {
+    const dataAlvo = dataComOffset(offset)
 
-    const { data: cobVencidas } = await supabaseAdmin.from('Cobranca')
-      .select('id, valor, asaasId, atletaId, escolaId, descricao, competencia')
+    const { data: cobrancas } = await supabaseAdmin.from('Cobranca')
+      .select('id, valor, asaasId, atletaId, escolaId, descricao, competencia, pixCopiaCola')
       .in('status', ['PENDENTE', 'VENCIDO'])
+      .is('excluidaEm', null)
       .eq('vencimento', dataAlvo)
 
-    if (!cobVencidas?.length) continue
+    if (!cobrancas?.length) continue
 
-    for (const cob of cobVencidas) {
+    for (const cob of cobrancas) {
       try {
-        const apiKey = await getAsaasKey(cob.escolaId)
         const { data: escolaConfig } = await supabaseAdmin.from('Escola')
-          .select('multaAtraso, jurosAoMes, nome, evolutionInstance')
+          .select('multaAtraso, jurosAoMes, nome, ativo')
           .eq('id', cob.escolaId).single()
+
+        // escola pausada nao dispara nada
+        if (escolaAtivaCache[cob.escolaId] === undefined)
+          escolaAtivaCache[cob.escolaId] = !!escolaConfig?.ativo
+        if (!escolaAtivaCache[cob.escolaId]) continue
 
         const multaFixa  = Number(escolaConfig?.multaAtraso || 15)
         const jurosPct   = Number(escolaConfig?.jurosAoMes || 1)
         const escolaNome = escolaConfig?.nome?.split('—').pop()?.trim() || 'GestãoFC'
 
         const { data: atleta } = await supabaseAdmin.from('Atleta')
-          .select('nome, asaasCustomerId').eq('id', cob.atletaId).single()
+          .select('nome, asaasCustomerId, bolsista').eq('id', cob.atletaId).single()
+        if (atleta?.bolsista) continue
 
         const { data: resps } = await supabaseAdmin.from('Responsavel')
           .select('nome, whatsapp').eq('atletaId', cob.atletaId).eq('principal', true).limit(1)
         const resp = resps?.[0]
+        const nomeResp = resp?.nome?.split(' ')[0] || ''
+        const link = `https://gestaofc.com.br/pagar/${cob.id}`
+        const valorFmt = Number(cob.valor).toFixed(2)
 
-        // ── D+1: reemite cobrança com multa + juros ──
-        if (acao === 'reemitir') {
-          // FIX 4: nunca reemitir uma reemissao. Sem este guard, a cobranca nova
-          // (vencimento = amanha) era pega de novo pelo D+1 no dia seguinte,
-          // gerando juros compostos em loop infinito.
+        // ── D-3: lembrete previo ──
+        if (acao === 'lembrete_previo') {
+          if (resp?.whatsapp && atleta) {
+            let msg = `Ola ${nomeResp}! 📅\n\nA mensalidade de *${atleta.nome?.trim()}* vence em *3 dias* (${fmtBR(dataAlvo)}).\n\n💰 Valor: *R$ ${valorFmt}*\n\n🔗 Pague agora:\n${link}\n`
+            if (cob.pixCopiaCola) {
+              msg += `\n📋 Ou copie o código PIX:\n\`${cob.pixCopiaCola.slice(0, 50)}...\`\n`
+            }
+            msg += `\nPague em dia e evite multa e juros!\n\n_${escolaNome}_`
+            await enviarWhatsApp(resp.whatsapp, msg, cob.escolaId)
+            lembretesPrevios++
+          }
+        }
+
+        // ── D0: vence hoje (avisa que amanha entra multa+juros) ──
+        else if (acao === 'vencimento_hoje') {
+          if (resp?.whatsapp && atleta) {
+            const valorComAcrescimo = (Number(cob.valor) + multaFixa + Number(cob.valor) * (jurosPct / 100)).toFixed(2)
+            await enviarWhatsApp(resp.whatsapp,
+              `Ola ${nomeResp}! 👋\n\nA mensalidade de *${atleta.nome?.trim()}* vence *hoje* (${fmtBR(dataAlvo)}).\n\n💰 Valor: *R$ ${valorFmt}*\n\n🔗 Pague agora:\n${link}\n\n⚠️ *Atenção:* se o pagamento não for feito hoje, amanhã será gerada uma nova cobrança com multa de R$${multaFixa.toFixed(0)} + juros de ${jurosPct}% ao mês, passando para *R$ ${valorComAcrescimo}*.\n\n_${escolaNome}_`,
+              cob.escolaId)
+            avisosVencimento++
+          }
+        }
+
+        // ── D+1: reemite com multa + juros ──
+        else if (acao === 'reemitir') {
+          // nunca reemitir uma reemissao (evita juros compostos em loop)
           const jaEhReemissao = (cob.descricao || '').startsWith('Mensalidade em atraso')
           if (jaEhReemissao) {
             await supabaseAdmin.from('Cobranca').update({ status: 'VENCIDO' }).eq('id', cob.id)
             continue
           }
 
-          // FIX 3: valorBase agora e sempre a mensalidade original, nunca um
-          // valor ja penalizado (o guard acima garante isso).
+          const apiKey = await getAsaasKey(cob.escolaId)
           const valorBase  = Number(cob.valor)
           const valorJuros = valorBase * (jurosPct / 100)
           const novoValor  = Math.round((valorBase + multaFixa + valorJuros) * 100) / 100
@@ -166,28 +126,27 @@ _${escolaNomeD3}_`
             if (!nova.errors) {
               const qr = await getPixQrCode(apiKey, nova.id)
               await supabaseAdmin.from('Cobranca').insert({
-                id: novoId, escolaId: cob.escolaId, atletaId: cob.atletaId, atletaNome: atleta?.nome || null, valor: novoValor, vencimento: amanha,
+                id: novoId, escolaId: cob.escolaId, atletaId: cob.atletaId,
+                atletaNome: atleta?.nome || null, valor: novoValor, vencimento: amanha,
                 status: 'PENDENTE', asaasId: nova.id, competencia: cob.competencia,
                 pixCopiaCola: qr.payload || null, pixQrCode: qr.encodedImage || null, descricao,
               })
               novaCriada = true
-              // so cancela no Asaas depois que a nova existe
               if (cob.asaasId) await cancelarCobrancaAsaas(apiKey, cob.asaasId)
             }
           } else {
             await supabaseAdmin.from('Cobranca').insert({
-              id: novoId, escolaId: cob.escolaId, atletaId: cob.atletaId, atletaNome: atleta?.nome || null, valor: novoValor, vencimento: amanha,
+              id: novoId, escolaId: cob.escolaId, atletaId: cob.atletaId,
+              atletaNome: atleta?.nome || null, valor: novoValor, vencimento: amanha,
               status: 'PENDENTE', tipo: 'MANUAL', competencia: cob.competencia, descricao,
             })
             novaCriada = true
           }
 
-          // FIX 1: cancela a anterior DE VERDADE (status + excluidaEm), para ela
-          // sumir da lista de inadimplentes. So cancela se a nova foi criada.
+          // cancela a anterior de verdade, so se a nova existe
           if (novaCriada) {
             await supabaseAdmin.from('Cobranca').update({
-              status: 'CANCELADO',
-              excluidaEm: new Date().toISOString(),
+              status: 'CANCELADO', excluidaEm: new Date().toISOString(),
             }).eq('id', cob.id)
           } else {
             await supabaseAdmin.from('Cobranca').update({ status: 'VENCIDO' }).eq('id', cob.id)
@@ -196,46 +155,36 @@ _${escolaNomeD3}_`
           }
 
           if (resp?.whatsapp && atleta) {
-            const nomeResp = resp.nome.split(' ')[0]
-            const dataFmt = new Date(amanha + 'T12:00:00').toLocaleDateString('pt-BR')
             await enviarWhatsApp(resp.whatsapp,
-              `Ola ${nomeResp}! ⚠️\n\nA mensalidade de *${atleta.nome}* venceu ontem e não foi paga.\n\nFoi gerada nova cobrança com acréscimo:\n💰 *R$ ${novoValor.toFixed(2)}* (multa R$${multaFixa.toFixed(0)} + juros ${jurosPct}%/mês)\n📅 Novo vencimento: *${dataFmt}*\n\nPague agora:\nhttps://gestaofc.com.br/pagar/${novoId}\n\n_${escolaNome}_`,
+              `Ola ${nomeResp}! ⚠️\n\nA mensalidade de *${atleta.nome}* venceu ontem e não foi paga.\n\nFoi gerada nova cobrança com acréscimo:\n💰 *R$ ${novoValor.toFixed(2)}* (multa R$${multaFixa.toFixed(0)} + juros ${jurosPct}%/mês)\n📅 Novo vencimento: *${fmtBR(amanha)}*\n\nPague agora:\nhttps://gestaofc.com.br/pagar/${novoId}\n\n_${escolaNome}_`,
               cob.escolaId)
           }
           reemitidas++
         }
 
-        // ── D+4: lembrete ──
-        else if (acao === 'lembrete') {
-          if (resp?.whatsapp && atleta) {
-            const nomeResp = resp.nome.split(' ')[0]
-            const valor = Number(cob.valor).toFixed(2)
-            await enviarWhatsApp(resp.whatsapp,
-              `Ola ${nomeResp}! 🔔\n\n*Lembrete:* a mensalidade de *${atleta.nome}* está em atraso há 4 dias.\n\n💰 Valor pendente: *R$ ${valor}*\n\nRegularize o quanto antes para evitar acréscimos maiores.\n\nhttps://gestaofc.com.br/pagar/${cob.id}\n\n_${escolaNome}_`,
-              cob.escolaId)
-            lembretes++
-          }
-        }
-
-        // ── D+10: aviso final ──
+        // ── D+15: aviso final ──
         else if (acao === 'aviso_final') {
+          await supabaseAdmin.from('Cobranca').update({ status: 'VENCIDO' }).eq('id', cob.id)
           if (resp?.whatsapp && atleta) {
-            const nomeResp = resp.nome.split(' ')[0]
-            const valor = Number(cob.valor).toFixed(2)
             await enviarWhatsApp(resp.whatsapp,
-              `Ola ${nomeResp}! 🚨\n\n*Aviso importante:* a mensalidade de *${atleta.nome}* está em atraso há 10 dias.\n\n💰 Valor pendente: *R$ ${valor}*\n\nEntre em contato com a secretaria para regularizar sua situação e evitar a suspensão das atividades.\n\n_${escolaNome}_`,
+              `Ola ${nomeResp}! 🚨\n\n*Aviso importante:* a mensalidade de *${atleta.nome}* está em atraso há 15 dias.\n\n💰 Valor pendente: *R$ ${valorFmt}*\n\n🔗 Regularize agora:\n${link}\n\nEntre em contato com a secretaria para evitar a suspensão das atividades.\n\n_${escolaNome}_`,
               cob.escolaId)
-            lembretes++
+            avisosFinais++
           }
         }
 
         await new Promise(r => setTimeout(r, 300))
       } catch (err) {
-        console.error('Erro reemissao', cob.id, err)
+        console.error('Erro regua', acao, cob.id, err)
         erros++
       }
     }
   }
 
-  return NextResponse.json({ ok: true, reemitidas, lembretes, erros, data: hoje })
+  return NextResponse.json({
+    ok: true,
+    regua: 'D-3 | D0 | D+1 | D+15',
+    lembretesPrevios, avisosVencimento, reemitidas, avisosFinais, erros,
+    data: hoje,
+  })
 }
