@@ -1,10 +1,37 @@
 'use client'
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
 import { salvarFotoAtleta } from './foto-actions'
 
 const T = { primary:'#4169E1', cobalt:'#1A3FA8', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', green:'#00D67A' }
 const SYNE = 'Syne, sans-serif'
+
+const MAX_PX  = 600   // foto de perfil nao precisa mais que isso
+const QUALIDADE = 0.85
+
+// Comprime no navegador: 3MB -> ~60KB. Evita estourar o limite de tempo
+// do server action na Vercel (plano Hobby = 10s).
+async function comprimirImagem(file: File): Promise<string> {
+  const bitmap = await createImageBitmap(file)
+  let { width, height } = bitmap
+
+  if (width > height && width > MAX_PX) {
+    height = Math.round((height * MAX_PX) / width)
+    width = MAX_PX
+  } else if (height > MAX_PX) {
+    width = Math.round((width * MAX_PX) / height)
+    height = MAX_PX
+  }
+
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('Navegador nao suporta canvas')
+  ctx.drawImage(bitmap, 0, 0, width, height)
+  bitmap.close()
+
+  return canvas.toDataURL('image/jpeg', QUALIDADE)
+}
 
 export default function FotoAtleta({ atletaId, fotoUrl, nome }: { atletaId: string; fotoUrl: string | null; nome: string }) {
   const [foto, setFoto]         = useState<string | null>(fotoUrl)
@@ -14,18 +41,13 @@ export default function FotoAtleta({ atletaId, fotoUrl, nome }: { atletaId: stri
     const file = e.target.files?.[0]
     if (!file) return
     setUploading(true)
-    const ext = file.name.split('.').pop() || 'jpg'
     try {
-      const base64: string = await new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = () => resolve(reader.result as string)
-        reader.onerror = reject
-        reader.readAsDataURL(file)
-      })
-      const { url } = await salvarFotoAtleta(atletaId, base64, ext)
+      // comprime antes de enviar — sempre sai JPEG
+      const base64 = await comprimirImagem(file)
+      const { url } = await salvarFotoAtleta(atletaId, base64, 'jpg')
       setFoto(url)
     } catch (err: any) {
-      alert('Erro ao enviar foto: ' + err.message)
+      alert('Erro ao enviar foto: ' + (err?.message || err))
     }
     setUploading(false)
   }
