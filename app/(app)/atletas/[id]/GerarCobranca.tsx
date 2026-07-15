@@ -43,8 +43,11 @@ export default function GerarCobranca({ atletaId, atletaNome, escolaId }: { atle
     const data = await res.json()
     setGerando(false)
     setAberto(false)
-    if (data.ok) alert(`✅ ${qtd} cobrança(s) gerada(s) para ${atletaNome}!`)
-    else alert('Erro: ' + (data.error || 'Tente novamente'))
+    if (data.ok) {
+      const n = data.geradas ?? qtd
+      const pul = data.puladas?.length ? ` (${data.puladas.length} mês(es) já tinha(m) mensalidade e foram pulados)` : ''
+      alert(`✅ ${n} cobrança(s) gerada(s) para ${atletaNome}!${pul}`)
+    } else alert(data.error || 'Erro: tente novamente')
   }
 
   async function gerarAsaas() {
