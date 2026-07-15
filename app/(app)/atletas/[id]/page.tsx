@@ -117,7 +117,12 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
             <FotoAtleta atletaId={atleta.id} fotoUrl={atleta.fotoUrl || null} nome={atleta.nome} />
             <div style={{ flex: 1 }}>
               <p style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 18, color: T.text, margin: '0 0 4px', letterSpacing: -0.3 }}>{atleta.nome}</p>
-              <p style={{ color: T.primary, fontSize: 13, fontWeight: 700, margin: '0 0 6px' }}>{atleta.posicao || 'Sem posição'}</p>
+              <p style={{ color: T.primary, fontSize: 13, fontWeight: 700, margin: '0 0 6px' }}>
+                {atleta.posicao || 'Sem posição'}
+                {!atleta.bolsista && atleta.diaVencimento ? (
+                  <span style={{ color: T.gold, fontWeight: 700 }}> · Vence dia {atleta.diaVencimento}</span>
+                ) : null}
+              </p>
               {turma && (
                 <span style={{ display: 'inline-block', background: `${T.gold}18`, border: `1px solid ${T.gold}40`, color: T.gold, borderRadius: 6, padding: '2px 10px', fontSize: 11, fontWeight: 700 }}>{turma.nome}</span>
               )}

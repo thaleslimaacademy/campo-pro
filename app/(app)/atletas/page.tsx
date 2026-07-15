@@ -8,7 +8,7 @@ type Atleta = {
   id: string; nome: string; posicao: string | null; fotoUrl: string | null
   bolsista: boolean | null; dataNascimento: string | null; turmaId: string | null
   ativo: boolean; diaVencimento: number | null; valorMensalidade: number | null
-  planoMensalidade: string | null
+  planoMensalidade: string | null; responsavelNome: string | null
 }
 type Turma = { id: string; nome: string }
 type Modo = 'lista' | 'grade'
@@ -81,7 +81,17 @@ export default function Atletas() {
         <div style={{ padding: '10px 12px 12px', textAlign: 'center' }}>
           <p style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 13, color: '#F0F4FF', margin: '0 0 4px', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.nome.split(' ').slice(0,2).join(' ')}</p>
           <p style={{ fontSize: 11, color: 'rgba(240,244,255,0.45)', margin: '0 0 6px' }}>{[a.posicao, ano].filter(Boolean).join(' · ')}</p>
-          {turma && <div style={{ background: 'rgba(65,105,225,0.15)', border: '1px solid rgba(65,105,225,0.3)', borderRadius: 6, padding: '2px 8px', display: 'inline-block', fontSize: 10, color: '#7DD3FC', fontWeight: 700, fontFamily: SYNE }}>{turma}</div>}
+          <div style={{ display: 'flex', gap: 4, justifyContent: 'center', flexWrap: 'wrap' }}>
+            {turma && <div style={{ background: 'rgba(65,105,225,0.15)', border: '1px solid rgba(65,105,225,0.3)', borderRadius: 6, padding: '2px 8px', fontSize: 10, color: '#7DD3FC', fontWeight: 700, fontFamily: SYNE }}>{turma}</div>}
+            {!a.bolsista && a.diaVencimento && (
+              <div style={{ background: 'rgba(255,215,0,0.12)', border: '1px solid rgba(255,215,0,0.3)', borderRadius: 6, padding: '2px 8px', fontSize: 10, color: '#FFD700', fontWeight: 700, fontFamily: SYNE }}>Dia {a.diaVencimento}</div>
+            )}
+          </div>
+          {a.responsavelNome && (
+            <p style={{ fontSize: 10, color: 'rgba(240,244,255,0.35)', margin: '6px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              👤 {a.responsavelNome.split(' ').slice(0, 2).join(' ')}
+            </p>
+          )}
         </div>
 
         {/* Ações rápidas */}
@@ -198,7 +208,19 @@ export default function Atletas() {
                   )}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 14, color: '#F0F4FF', margin: '0 0 2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.nome}</p>
-                    <p style={{ fontSize: 11, color: T.muted, margin: 0 }}>{[a.posicao, ano, turma].filter(Boolean).join(' · ')}</p>
+                    <p style={{ fontSize: 11, color: T.muted, margin: 0 }}>
+                      {[a.posicao, ano, turma].filter(Boolean).join(' · ')}
+                      {!a.bolsista && a.diaVencimento ? (
+                        <span style={{ color: '#FFD700', fontWeight: 700 }}>
+                          {[a.posicao, ano, turma].filter(Boolean).length > 0 ? ' · ' : ''}Dia {a.diaVencimento}
+                        </span>
+                      ) : null}
+                    </p>
+                    {a.responsavelNome && (
+                      <p style={{ fontSize: 10, color: 'rgba(240,244,255,0.3)', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        👤 {a.responsavelNome}
+                      </p>
+                    )}
                   </div>
                   {a.bolsista && <span style={{ background: '#00D67A20', color: '#00D67A', fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 4, fontFamily: SYNE, textTransform: 'uppercase', flexShrink: 0 }}>Bolsista</span>}
                   <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>

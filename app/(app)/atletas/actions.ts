@@ -16,8 +16,23 @@ export async function getAtletasComTurmas() {
       .select('id, nome')
       .eq('escolaId', escolaId),
   ])
+
+  // Responsavel principal de cada atleta (exibido na lista e na grade)
+  const atletas = atletasRes.data ?? []
+  const respMap = new Map<string, string>()
+  if (atletas.length) {
+    const { data: resps } = await supabaseAdmin
+      .from('Responsavel')
+      .select('atletaId, nome, principal')
+      .in('atletaId', atletas.map(a => a.id))
+    for (const r of resps ?? []) {
+      // o principal sempre ganha; se nao houver principal, fica o primeiro
+      if (r.principal || !respMap.has(r.atletaId)) respMap.set(r.atletaId, r.nome)
+    }
+  }
+
   return {
-    atletas: atletasRes.data ?? [],
+    atletas: atletas.map(a => ({ ...a, responsavelNome: respMap.get(a.id) ?? null })),
     turmas: turmasRes.data ?? [],
   }
 }
