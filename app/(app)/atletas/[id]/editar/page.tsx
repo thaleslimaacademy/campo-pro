@@ -13,7 +13,7 @@ const SEC_TITLE: React.CSSProperties = { fontFamily:SYNE, fontWeight:700, fontSi
 const POSICOES = ['Goleiro','Zagueiro','Lateral Direito','Lateral Esquerdo','Volante','Meia','Meia-atacante','Atacante','Centroavante']
 const DIAS_VCTO = Array.from({length:28},(_,i)=>String(i+1))
 
-type Plano = { id: string; nome: string; valor: number }
+type Plano = { id: string; nome: string; slug: string; valor: number }
 type Turma = { id: string; nome: string }
 
 export default function EditarAtleta() {
@@ -28,7 +28,7 @@ export default function EditarAtleta() {
   const [bolsista, setBolsista] = useState(false)
   const [planos, setPlanos] = useState<Plano[]>([])
   const [turmas, setTurmas] = useState<Turma[]>([])
-  const [form, setForm] = useState({ nome:'', dataNascimento:'', cpf:'', rg:'', posicao:'', telefone:'', planoMensalidadeId:'', diaPagamento:'10', motivoBolsa:'', turmaId:'', cep:'', endereco:'', numero:'', bairro:'', cidade:'', estado:'' })
+  const [form, setForm] = useState({ nome:'', dataNascimento:'', cpf:'', rg:'', posicao:'', telefone:'', planoMensalidade:'', diaVencimento:'10', motivoBolsa:'', turmaId:'', cep:'', endereco:'', numero:'', bairro:'', cidade:'', estado:'' })
 
   useEffect(() => {
     startLoad(async () => {
@@ -42,8 +42,8 @@ export default function EditarAtleta() {
       setForm({
         nome: String(a.nome || ''), dataNascimento: a.dataNascimento ? String(a.dataNascimento).split('T')[0] : '',
         cpf: String(a.cpf || ''), rg: String(a.rg || ''), posicao: String(a.posicao || ''),
-        telefone: String(a.telefone || ''), planoMensalidadeId: String(a.planoMensalidadeId || ''),
-        diaPagamento: String(a.diaPagamento || '10'), motivoBolsa: String(a.motivoBolsa || ''),
+        telefone: String(a.telefone || ''), planoMensalidade: String(a.planoMensalidade || ''),
+        diaVencimento: String(a.diaVencimento || '10'), motivoBolsa: String(a.motivoBolsa || ''),
         turmaId: String(a.turmaId || ''), cep: String(a.cep || ''), endereco: String(a.endereco || ''),
         numero: String(a.numero || ''), bairro: String(a.bairro || ''), cidade: String(a.cidade || ''), estado: String(a.estado || ''),
       })
@@ -68,8 +68,8 @@ export default function EditarAtleta() {
     startSave(async () => {
       await salvarAtleta(id, {
         nome: form.nome, dataNascimento: form.dataNascimento || null, cpf: form.cpf || null, rg: form.rg || null,
-        posicao: form.posicao || null, telefone: form.telefone || null, planoMensalidadeId: form.planoMensalidadeId || null,
-        diaPagamento: Number(form.diaPagamento), bolsista, motivoBolsa: bolsista ? form.motivoBolsa : null,
+        posicao: form.posicao || null, telefone: form.telefone || null, planoMensalidade: form.planoMensalidade || null,
+        diaVencimento: Number(form.diaVencimento), bolsista, motivoBolsa: bolsista ? form.motivoBolsa : null,
         turmaId: form.turmaId || null, cep: form.cep || null, endereco: form.endereco || null,
         numero: form.numero || null, bairro: form.bairro || null, cidade: form.cidade || null, estado: form.estado || null,
       })
@@ -171,13 +171,13 @@ export default function EditarAtleta() {
             {!bolsista && (
               <>
                 <div><label style={LBL}>Plano de mensalidade</label>
-                  <select name="planoMensalidadeId" value={form.planoMensalidadeId} onChange={handleChange} style={sel}>
+                  <select name="planoMensalidade" value={form.planoMensalidade} onChange={handleChange} style={sel}>
                     <option value="">Selecionar plano</option>
-                    {planos.map(p => <option key={p.id} value={p.id}>{p.nome} — R$ {Number(p.valor).toFixed(2)}</option>)}
+                    {planos.map(p => <option key={p.id} value={p.slug}>{p.nome} — R$ {Number(p.valor).toFixed(2)}</option>)}
                   </select>
                 </div>
                 <div><label style={LBL}>Dia de vencimento</label>
-                  <select name="diaPagamento" value={form.diaPagamento} onChange={handleChange} style={sel}>
+                  <select name="diaVencimento" value={form.diaVencimento} onChange={handleChange} style={sel}>
                     {DIAS_VCTO.map(d => <option key={d} value={d}>Dia {d}</option>)}
                   </select>
                 </div>

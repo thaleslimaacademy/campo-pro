@@ -31,7 +31,16 @@ export async function aprovarMatricula(matriculaId: string, escolaId: string, at
 }) {
   const atletaId   = crypto.randomUUID()
   const tokenPais  = crypto.randomUUID()
-  const { error } = await supabaseAdmin.from('Atleta').insert({ id: atletaId, escolaId, nome: atletaData.nome, dataNascimento: atletaData.dataNascimento, cpf: atletaData.cpf, rg: atletaData.rg, posicao: atletaData.posicao, telefone: atletaData.telefone, cep: atletaData.cep, endereco: atletaData.endereco, numero: atletaData.numero, bairro: atletaData.bairro, cidade: atletaData.cidade, estado: atletaData.estado, tokenPais, ativo: true })
+  const aprovadoEm = new Date()
+
+  // Dia de vencimento: usa o que veio do formulario; se nao veio, puxa
+  // automaticamente do dia da APROVACAO. Clamp em 28 porque 29/30/31 nao
+  // existem em todo mes — fevereiro quebraria a cobranca em silencio.
+  const diaVencimento = atletaData.diaVencimento
+    ? Math.min(Number(atletaData.diaVencimento), 28)
+    : Math.min(aprovadoEm.getDate(), 28)
+
+  const { error } = await supabaseAdmin.from('Atleta').insert({ id: atletaId, escolaId, nome: atletaData.nome, dataNascimento: atletaData.dataNascimento, cpf: atletaData.cpf, rg: atletaData.rg, posicao: atletaData.posicao, telefone: atletaData.telefone, cep: atletaData.cep, endereco: atletaData.endereco, numero: atletaData.numero, bairro: atletaData.bairro, cidade: atletaData.cidade, estado: atletaData.estado, tokenPais, ativo: true, turmaId: atletaData.turmaId || null, valorMensalidade: atletaData.valorMensalidade ? Number(atletaData.valorMensalidade) : null, diaVencimento })
   if (error) throw new Error(error.message)
   // Pré-gera 12 meses de mensalidades (modo silencioso — sem WhatsApp/Asaas ainda)
   try {
@@ -39,7 +48,7 @@ export async function aprovarMatricula(matriculaId: string, escolaId: string, at
       atletaId,
       quantidade: 12,
       valor: atletaData.valorMensalidade ? Number(atletaData.valorMensalidade) : 85,
-      diaVencimento: atletaData.diaVencimento ? Number(atletaData.diaVencimento) : 10,
+      diaVencimento,
       silencioso: true,
     })
   } catch (err) { console.error('Erro ao pré-gerar mensalidades:', err) }
@@ -49,7 +58,7 @@ export async function aprovarMatricula(matriculaId: string, escolaId: string, at
     { onConflict: 'atletaId' }
   )
   if (errResp) console.error('Responsavel insert error:', errResp.message)
-  await supabaseAdmin.from('Matricula').update({ status: 'APROVADO', atletaId }).eq('id', matriculaId)
+  await supabaseAdmin.from('Matricula').update({ status: 'APROVADO', atletaId, dataAprovacao: aprovadoEm.toISOString() }).eq('id', matriculaId)
   revalidatePath('/matriculas')
   return { atletaId, tokenPais }
 }
