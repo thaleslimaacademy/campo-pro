@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { usePerfil } from '@/lib/usePerfil'
+import { criarAtleta } from './actions'
 import BottomNav from '@/components/ui/BottomNav'
 
 const POSICOES: Record<string, string[]> = {
@@ -76,42 +77,9 @@ export default function NovoAtleta() {
     if (!form.whatsappResponsavel) { setErro('WhatsApp do responsável é obrigatório.'); return }
     setLoading(true); setErro('')
     try {
-      const tokenPais = crypto.randomUUID()
-      const { data: atleta, error: eAtl } = await supabase.from('Atleta').insert({
-        escolaId, nome: form.nome,
-        dataNascimento: form.dataNascimento,
-        cpf: form.cpf || null, rg: form.rg || null,
-        telefone: form.telefone || null,
-        posicao: form.posicao, turmaId: form.turmaId || null,
-        diaVencimento: Number(form.diaVencimento),
-        planoMensalidade: form.planoMensalidade || null,
-        valorMensalidade: form.valorMensalidade ? Number(form.valorMensalidade) : null,
-        turnoEstuda: form.turnoEstuda || null,
-        unidadeEscolar: form.unidadeEscolar || null,
-        serieEstuda: form.serieEstuda || null,
-        cep: form.cep || null, endereco: form.endereco || null,
-        numero: form.numero || null, bairro: form.bairro || null,
-        cidade: form.cidade || null, estado: form.estado || null,
-        ativo: true, tokenPais,
-      }).select('id').single()
-      if (eAtl) throw eAtl
-      // Responsável 1
-      await supabase.from('Responsavel').insert({
-        atletaId: atleta!.id, nome: form.nomeResponsavel,
-        cpf: form.cpfResponsavel || null, whatsapp: form.whatsappResponsavel || null,
-        email: form.emailResponsavel || null, telefone: form.whatsappResponsavel || null,
-        parentesco: form.parentescoResponsavel || null, principal: true,
-      })
-      // Responsável 2 (se preenchido)
-      if (form.nomeResponsavel2) {
-        await supabase.from('Responsavel').insert({
-          atletaId: atleta!.id, nome: form.nomeResponsavel2,
-          cpf: form.cpfResponsavel2 || null, whatsapp: form.whatsappResponsavel2 || null,
-          parentesco: form.parentesco2 || null, principal: false,
-        })
-      }
+      const { atletaId } = await criarAtleta(form)
       setSucesso(true)
-      setTimeout(() => { window.location.href = `/atletas/${atleta!.id}` }, 1000)
+      setTimeout(() => { window.location.href = `/atletas/${atletaId}` }, 1000)
     } catch (err: unknown) {
       setErro('Erro ao salvar: ' + (err as Error).message)
     }

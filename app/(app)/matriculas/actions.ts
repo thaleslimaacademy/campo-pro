@@ -53,11 +53,16 @@ export async function aprovarMatricula(matriculaId: string, escolaId: string, at
     })
   } catch (err) { console.error('Erro ao pré-gerar mensalidades:', err) }
 
-  const { error: errResp } = await supabaseAdmin.from('Responsavel').upsert(
-    { id: crypto.randomUUID(), atletaId, nome: atletaData.nomeResponsavel, telefone: atletaData.whatsappResponsavel, whatsapp: atletaData.whatsappResponsavel, principal: true },
-    { onConflict: 'atletaId' }
-  )
-  if (errResp) console.error('Responsavel insert error:', errResp.message)
+  // Antes era .upsert({...}, { onConflict: 'atletaId' }), mas nao existe
+  // constraint unica em Responsavel.atletaId — o Postgres recusa com 42P10 e o
+  // responsavel nunca era salvo. O atleta acabou de ser criado acima, entao um
+  // insert simples e seguro.
+  const { error: errResp } = await supabaseAdmin.from('Responsavel').insert({
+    id: crypto.randomUUID(), atletaId, nome: atletaData.nomeResponsavel,
+    telefone: atletaData.whatsappResponsavel, whatsapp: atletaData.whatsappResponsavel,
+    principal: true,
+  })
+  if (errResp) throw new Error('Atleta criado, mas falhou ao salvar o responsavel: ' + errResp.message)
   await supabaseAdmin.from('Matricula').update({ status: 'APROVADO', atletaId, dataAprovacao: aprovadoEm.toISOString() }).eq('id', matriculaId)
   revalidatePath('/matriculas')
   return { atletaId, tokenPais }

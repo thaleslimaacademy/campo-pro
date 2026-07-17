@@ -2,7 +2,7 @@
 import AdminGuard from '@/components/AdminGuard'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { listarRematriculas, aprovarRematricula, rejeitarRematricula } from './actions'
 
 interface Rematricula {
   id: string
@@ -27,12 +27,12 @@ function RematriculasInner() {
   const [processando, setProcessando] = useState<string | null>(null)
 
   async function carregar() {
-    const { data } = await supabase
-      .from('Matricula')
-      .select('*')
-      .eq('tipo', 'rematricula')
-      .order('criadoEm', { ascending: false })
-    setRematriculas(data || [])
+    try {
+      const data = await listarRematriculas()
+      setRematriculas(data as Rematricula[])
+    } catch (err) {
+      alert('Erro ao carregar: ' + (err as Error).message)
+    }
     setLoading(false)
   }
 
@@ -41,19 +41,24 @@ function RematriculasInner() {
   async function aprovar(id: string, atletaId: string) {
     if (!confirm('Confirmar rematricula deste atleta?')) return
     setProcessando(id)
-    await supabase.from('Matricula').update({ status: 'APROVADO' }).eq('id', id)
-    if (atletaId) {
-      await supabase.from('Atleta').update({ ativo: true }).eq('id', atletaId)
+    try {
+      await aprovarRematricula(id, atletaId || null)
+      await carregar()
+    } catch (err) {
+      alert('Erro ao aprovar: ' + (err as Error).message)
     }
-    carregar()
     setProcessando(null)
   }
 
   async function rejeitar(id: string) {
     if (!confirm('Rejeitar esta rematricula?')) return
     setProcessando(id)
-    await supabase.from('Matricula').update({ status: 'REJEITADO' }).eq('id', id)
-    carregar()
+    try {
+      await rejeitarRematricula(id)
+      await carregar()
+    } catch (err) {
+      alert('Erro ao rejeitar: ' + (err as Error).message)
+    }
     setProcessando(null)
   }
 
