@@ -33,6 +33,14 @@ export async function aprovarMatricula(matriculaId: string, escolaId: string, at
   const tokenPais  = crypto.randomUUID()
   const aprovadoEm = new Date()
 
+  // Puxa da Matricula os campos que a tela de aprovacao nao repassa
+  // (tamanho de uniforme e autorizacao de imagem) para copiar ao Atleta.
+  const { data: matExtra } = await supabaseAdmin
+    .from('Matricula')
+    .select('tamanhoUniforme, autorizacaoImagem')
+    .eq('id', matriculaId)
+    .single()
+
   // Dia de vencimento: usa o que veio do formulario; se nao veio, puxa
   // automaticamente do dia da APROVACAO. Clamp em 28 porque 29/30/31 nao
   // existem em todo mes — fevereiro quebraria a cobranca em silencio.
@@ -40,7 +48,7 @@ export async function aprovarMatricula(matriculaId: string, escolaId: string, at
     ? Math.min(Number(atletaData.diaVencimento), 28)
     : Math.min(aprovadoEm.getDate(), 28)
 
-  const { error } = await supabaseAdmin.from('Atleta').insert({ id: atletaId, escolaId, nome: atletaData.nome, dataNascimento: atletaData.dataNascimento, cpf: atletaData.cpf, rg: atletaData.rg, posicao: atletaData.posicao, telefone: atletaData.telefone, cep: atletaData.cep, endereco: atletaData.endereco, numero: atletaData.numero, bairro: atletaData.bairro, cidade: atletaData.cidade, estado: atletaData.estado, tokenPais, ativo: true, turmaId: atletaData.turmaId || null, valorMensalidade: atletaData.valorMensalidade ? Number(atletaData.valorMensalidade) : null, diaVencimento })
+  const { error } = await supabaseAdmin.from('Atleta').insert({ id: atletaId, escolaId, nome: atletaData.nome, dataNascimento: atletaData.dataNascimento, cpf: atletaData.cpf, rg: atletaData.rg, posicao: atletaData.posicao, telefone: atletaData.telefone, cep: atletaData.cep, endereco: atletaData.endereco, numero: atletaData.numero, bairro: atletaData.bairro, cidade: atletaData.cidade, estado: atletaData.estado, tokenPais, ativo: true, turmaId: atletaData.turmaId || null, valorMensalidade: atletaData.valorMensalidade ? Number(atletaData.valorMensalidade) : null, diaVencimento, tamanhoUniforme: matExtra?.tamanhoUniforme || null, autorizacaoImagem: matExtra?.autorizacaoImagem || false })
   if (error) throw new Error(error.message)
   // Pré-gera 12 meses de mensalidades (modo silencioso — sem WhatsApp/Asaas ainda)
   try {
