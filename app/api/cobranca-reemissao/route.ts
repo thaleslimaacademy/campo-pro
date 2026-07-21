@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { cancelarCobrancaAsaas, criarCobrancaPix, getPixQrCode } from '@/lib/asaas'
 import { getAsaasKey } from '@/lib/getAsaasKey'
-import { enviarWhatsApp } from '@/lib/whatsapp'
+import { msgLembreteD3, msgVencimentoHoje, msgAtraso } from '@/lib/whatsapp-templates'
 
 // offset em dias a partir de hoje (negativo = passado)
 function dataComOffset(n: number): string {
@@ -80,23 +80,23 @@ export async function GET(req: NextRequest) {
         // ── D-3: lembrete previo ──
         if (acao === 'lembrete_previo') {
           if (resp?.whatsapp && atleta) {
-            let msg = `Ola ${nomeResp}! 📅\n\nA mensalidade de *${atleta.nome?.trim()}* vence em *3 dias* (${fmtBR(dataAlvo)}).\n\n💰 Valor: *R$ ${valorFmt}*\n\n🔗 Pague agora:\n${link}\n`
-            if (cob.pixCopiaCola) {
-              msg += `\n📋 Ou copie o código PIX:\n\`${cob.pixCopiaCola.slice(0, 50)}...\`\n`
-            }
-            msg += `\nPague em dia e evite multa e juros!\n\n_${escolaNome}_`
-            await enviarWhatsApp(resp.whatsapp, msg, cob.escolaId)
+            await msgLembreteD3({
+              telefone: resp.whatsapp, nomeResp, nomeAtleta: atleta.nome?.trim() || '',
+              valor: Number(cob.valor), dataVenc: fmtBR(dataAlvo),
+              linkPagamento: link, escolaId: cob.escolaId,
+            })
             lembretesPrevios++
           }
         }
 
-        // ── D0: vence hoje (avisa que amanha entra multa+juros) ──
+        // ── D0: vence hoje ──
         else if (acao === 'vencimento_hoje') {
           if (resp?.whatsapp && atleta) {
-            const valorComAcrescimo = (Number(cob.valor) + multaFixa + Number(cob.valor) * (jurosPct / 100)).toFixed(2)
-            await enviarWhatsApp(resp.whatsapp,
-              `Ola ${nomeResp}! 👋\n\nA mensalidade de *${atleta.nome?.trim()}* vence *hoje* (${fmtBR(dataAlvo)}).\n\n💰 Valor: *R$ ${valorFmt}*\n\n🔗 Pague agora:\n${link}\n\n⚠️ *Atenção:* se o pagamento não for feito hoje, amanhã será gerada uma nova cobrança com multa de R$${multaFixa.toFixed(0)} + juros de ${jurosPct}% ao mês, passando para *R$ ${valorComAcrescimo}*.\n\n_${escolaNome}_`,
-              cob.escolaId)
+            await msgVencimentoHoje({
+              telefone: resp.whatsapp, nomeResp, nomeAtleta: atleta.nome?.trim() || '',
+              valor: Number(cob.valor), dataVenc: fmtBR(dataAlvo),
+              linkPagamento: link, escolaId: cob.escolaId,
+            })
             avisosVencimento++
           }
         }
@@ -155,9 +155,12 @@ export async function GET(req: NextRequest) {
           }
 
           if (resp?.whatsapp && atleta) {
-            await enviarWhatsApp(resp.whatsapp,
-              `Ola ${nomeResp}! ⚠️\n\nA mensalidade de *${atleta.nome}* venceu ontem e não foi paga.\n\nFoi gerada nova cobrança com acréscimo:\n💰 *R$ ${novoValor.toFixed(2)}* (multa R$${multaFixa.toFixed(0)} + juros ${jurosPct}%/mês)\n📅 Novo vencimento: *${fmtBR(amanha)}*\n\nPague agora:\nhttps://gestaofc.com.br/pagar/${novoId}\n\n_${escolaNome}_`,
-              cob.escolaId)
+            await msgAtraso({
+              telefone: resp.whatsapp, nomeResp, nomeAtleta: atleta.nome?.trim() || '',
+              valor: novoValor, diasAtraso: 1,
+              linkPagamento: `https://gestaofc.com.br/pagar/${novoId}`,
+              escolaId: cob.escolaId,
+            })
           }
           reemitidas++
         }
@@ -166,9 +169,11 @@ export async function GET(req: NextRequest) {
         else if (acao === 'aviso_final') {
           await supabaseAdmin.from('Cobranca').update({ status: 'VENCIDO' }).eq('id', cob.id)
           if (resp?.whatsapp && atleta) {
-            await enviarWhatsApp(resp.whatsapp,
-              `Ola ${nomeResp}! 🚨\n\n*Aviso importante:* a mensalidade de *${atleta.nome}* está em atraso há 15 dias.\n\n💰 Valor pendente: *R$ ${valorFmt}*\n\n🔗 Regularize agora:\n${link}\n\nEntre em contato com a secretaria para evitar a suspensão das atividades.\n\n_${escolaNome}_`,
-              cob.escolaId)
+            await msgAtraso({
+              telefone: resp.whatsapp, nomeResp, nomeAtleta: atleta.nome?.trim() || '',
+              valor: Number(cob.valor), diasAtraso: 15,
+              linkPagamento: link, escolaId: cob.escolaId,
+            })
             avisosFinais++
           }
         }

@@ -24,6 +24,13 @@ async function _enviarWhatsApp_original(telefone: string, mensagem: string, esco
   const numero = telefone.replace(/\D/g, '')
   const numeroFormatado = numero.startsWith('55') ? numero : '55' + numero
 
+  // Instancia nula = escola desconectada. Antes isso caia no fallback 'tlfa'
+  // silenciosamente; agora falha de forma visivel para quem chama.
+  if (escolaId && !instancia) {
+    console.error('❌ WhatsApp: escola', escolaId, 'sem instancia conectada')
+    return { ok: false, erro: 'instancia_desconectada', escolaId }
+  }
+
   try {
     const res = await fetch(`${EVO_URL}/message/sendText/${instancia}`, {
       method: 'POST',
@@ -32,10 +39,15 @@ async function _enviarWhatsApp_original(telefone: string, mensagem: string, esco
       signal: AbortSignal.timeout(10000),
     })
     const data = await res.json()
-    console.log('📲 WhatsApp enviado via', instancia, ':', data)
-    return data
+    // A Evolution responde 200 mesmo quando o numero nao existe no WhatsApp;
+    // um envio ok traz a key da mensagem. Sem ela, tratamos como falha.
+    const ok = res.ok && !!(data?.key || data?.status === 'PENDING' || data?.messageId)
+    if (!ok) console.error('❌ WhatsApp NAO enviado via', instancia, ':', JSON.stringify(data).slice(0, 200))
+    else console.log('📲 WhatsApp enviado via', instancia)
+    return { ok, data }
   } catch (err: unknown) {
     console.error('❌ Erro WhatsApp:', (err as Error).message)
+    return { ok: false, erro: (err as Error).message }
   }
 }
 
@@ -100,7 +112,9 @@ export async function enviarWhatsApp(
 ): ReturnType<typeof _enviarWhatsApp_original> {
   const run = _queue_enviarWhatsApp.then(async () => {
     const result = await _enviarWhatsApp_original(...args);
-    const delay = 15000 + Math.random() * 15000; // 15-30s entre mensagens
+    // 4-8s entre mensagens. Antes era 15-30s: com 27 pais o cron passava de 10min
+    // e estourava o limite de tempo da funcao na Vercel, entregando so aos primeiros.
+    const delay = 4000 + Math.random() * 4000;
     await new Promise((resolve) => setTimeout(resolve, delay));
     return result;
   });

@@ -3,7 +3,7 @@
  * Documentação: https://developers.facebook.com/docs/whatsapp/cloud-api
  *
  * Variáveis de ambiente necessárias (adicionar no Vercel):
- *   META_WABA_TOKEN        = Token de acesso permanente do App Meta
+ *   META_ACCESS_TOKEN        = Token de acesso permanente do App Meta
  *   META_PHONE_NUMBER_ID   = ID do número de telefone no Meta
  *   META_WABA_ID           = ID da conta WhatsApp Business
  *   META_WEBHOOK_VERIFY    = Token de verificação do webhook (você define)
@@ -12,8 +12,8 @@
  * PROVIDER=evo   →  usa Evolution API (atual)
  */
 
-const META_API = 'https://graph.facebook.com/v19.0'
-const TOKEN    = () => process.env.META_WABA_TOKEN || ''
+const META_API = 'https://graph.facebook.com/v21.0'
+const TOKEN    = () => process.env.META_ACCESS_TOKEN || ''
 const PHONE_ID = () => process.env.META_PHONE_NUMBER_ID || ''
 
 // ─── TEMPLATES APROVADOS ────────────────────────────────────────────────────
@@ -52,7 +52,7 @@ function formatarNumero(tel: string): string {
 export async function enviarTemplateMeta({ to, template, params, phoneNumberId }: TemplateParams) {
   const phoneId = phoneNumberId || PHONE_ID()
   if (!phoneId || !TOKEN()) {
-    throw new Error('META_WABA_TOKEN ou META_PHONE_NUMBER_ID não configurados')
+    throw new Error('META_ACCESS_TOKEN ou META_PHONE_NUMBER_ID não configurados')
   }
 
   const components = params.length > 0 ? [{
@@ -114,5 +114,5 @@ export async function enviarTextoMeta(to: string, texto: string, phoneNumberId?:
 
 // Verifica se a API Meta está configurada
 export function metaConfigurado(): boolean {
-  return !!(process.env.META_WABA_TOKEN && process.env.META_PHONE_NUMBER_ID)
+  return !!(process.env.META_ACCESS_TOKEN && process.env.META_PHONE_NUMBER_ID)
 }
