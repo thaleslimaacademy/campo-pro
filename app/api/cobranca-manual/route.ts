@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { enviarWhatsApp } from '@/lib/whatsapp'
+import { msgLembreteD3, msgVencimentoHoje } from '@/lib/whatsapp-templates'
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth()
@@ -68,17 +68,36 @@ export async function POST(req: NextRequest) {
   const { error } = await supabaseAdmin.from('Cobranca').insert(insertions)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Dispara WhatsApp pro responsável (se tiver número)
-  if (respWhats) {
-    const primeiraData  = new Date(agora.getFullYear(), agora.getMonth(), diaVencimento || 10)
-    const dataFormatada = primeiraData.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })
-    const saudacao      = resp?.nome ? `, ${resp.nome.split(' ')[0]}` : ''
+  // WhatsApp: usa os templates (a Meta so aceita template em mensagem proativa).
+  // Avisa sobre a PRIMEIRA parcela gerada — as demais entram na regua normal.
+  if (respWhats && insertions.length) {
+    const primeira      = insertions[0]
+    const dataFormatada = new Date(primeira.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
+    const nomeResp      = resp?.nome?.split(' ')[0] || ''
     const nomeAtleta    = atleta?.nome?.trim() || 'seu atleta'
-    const mensagem = insertions.length > 1
-      ? `Olá${saudacao}!💰\n\nFoi gerada a cobrança da mensalidade de *${nomeAtleta}* na *${escolaNome}*.\n\n📋 ${insertions.length} parcelas de R$ ${Number(valor).toFixed(2)}\n📅 Primeiro vencimento: ${dataFormatada}\n\nEm caso de dúvidas, fale com a secretaria. ⚽`
-      : `Olá${saudacao}!💰\n\nFoi gerada a cobrança da mensalidade de *${nomeAtleta}* na *${escolaNome}*.\n\n💵 Valor: R$ ${Number(valor).toFixed(2)}\n📅 Vencimento: ${dataFormatada}\n\nEm caso de dúvidas, fale com a secretaria. ⚽`
+    const linkPagamento = `https://gestaofc.com.br/pagar/${primeira.id}`
 
-    await enviarWhatsApp(respWhats, mensagem, escolaId)
+    const hojeBR = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }))
+    hojeBR.setHours(0, 0, 0, 0)
+    const alvo = new Date(primeira.vencimento + 'T12:00:00')
+    alvo.setHours(0, 0, 0, 0)
+    const dias = Math.round((alvo.getTime() - hojeBR.getTime()) / 86400000)
+
+    try {
+      if (dias <= 0) {
+        await msgVencimentoHoje({
+          telefone: respWhats, nomeResp, nomeAtleta,
+          valor: Number(valor), dataVenc: dataFormatada, linkPagamento, escolaId,
+        })
+      } else {
+        await msgLembreteD3({
+          telefone: respWhats, nomeResp, nomeAtleta,
+          valor: Number(valor), dataVenc: dataFormatada, linkPagamento, dias, escolaId,
+        })
+      }
+    } catch (e) {
+      console.error('❌ Cobranca criada mas WhatsApp falhou:', (e as Error).message)
+    }
   }
 
   return NextResponse.json({ ok: true, geradas: insertions.length, puladas: pulados, whatsappEnviado: !!respWhats })

@@ -3,7 +3,7 @@ import { criarClienteAsaas, criarCobrancaPix, getPixQrCode } from '@/lib/asaas'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getAsaasKey } from '@/lib/getAsaasKey'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
-import { enviarWhatsApp } from '@/lib/whatsapp'
+import { msgLembreteD3, msgVencimentoHoje } from '@/lib/whatsapp-templates'
 
 export async function POST(req: NextRequest) {
   try {
@@ -63,12 +63,34 @@ export async function POST(req: NextRequest) {
     const { data: atletaData } = await supabaseAdmin.from('Atleta').select('nome').eq('id', atletaId).single()
     const { error: errInsert } = await supabaseAdmin.from('Cobranca').insert({ id: novoId, escolaId, atletaId, atletaNome: atletaData?.nome?.trim() || null, valor, vencimento, competencia, status: 'PENDENTE', asaasId: cobranca.id, pixCopiaCola: qrCode.payload || null, pixQrCode: qrCode.encodedImage || null, descricao })
     if (errInsert) return NextResponse.json({ error: 'Cobranca criada no Asaas mas falhou ao salvar no banco: ' + errInsert.message }, { status: 500 })
-    if (responsavel?.whatsapp && qrCode.payload) {
+    // WhatsApp: usa os templates (a Meta so aceita template em mensagem proativa).
+    // Se falhar, a cobranca ja esta salva — o erro nao derruba a resposta.
+    if (responsavel?.whatsapp) {
       const dataVencimento = new Date(vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
       const nomeResp = responsavel.nome.split(' ')[0]
       const linkPagamento = `https://gestaofc.com.br/pagar/${novoId}`
-      const mensagem = `Olá ${nomeResp}! 👋\n\nA cobrança de *${atleta.nome}* foi gerada.\n\n💰 *Valor:* R$ ${Number(valor).toFixed(2)}\n📅 *Vencimento:* ${dataVencimento}\n📝 ${descricao || 'Mensalidade'}\n\nAcesse o link abaixo para pagar com Pix:\n👉 ${linkPagamento}\n\n_Thales Lima Football Academy_ ⚽`
-      await enviarWhatsApp(responsavel.whatsapp, mensagem, escolaId)
+      // quantos dias faltam ate o vencimento (no fuso de Brasilia)
+      const hojeBR = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }))
+      hojeBR.setHours(0, 0, 0, 0)
+      const alvo = new Date(vencimento + 'T12:00:00')
+      alvo.setHours(0, 0, 0, 0)
+      const dias = Math.round((alvo.getTime() - hojeBR.getTime()) / 86400000)
+
+      try {
+        if (dias <= 0) {
+          await msgVencimentoHoje({
+            telefone: responsavel.whatsapp, nomeResp, nomeAtleta: atleta.nome?.trim() || '',
+            valor: Number(valor), dataVenc: dataVencimento, linkPagamento, escolaId,
+          })
+        } else {
+          await msgLembreteD3({
+            telefone: responsavel.whatsapp, nomeResp, nomeAtleta: atleta.nome?.trim() || '',
+            valor: Number(valor), dataVenc: dataVencimento, linkPagamento, dias, escolaId,
+          })
+        }
+      } catch (e) {
+        console.error('❌ Cobranca criada mas WhatsApp falhou:', (e as Error).message)
+      }
     }
     return NextResponse.json({ sucesso: true, pixCopiaCola: qrCode.payload, pixQrCode: qrCode.encodedImage })
   } catch (err: any) { console.error('❌ Erro geral:', err.message); return NextResponse.json({ error: err.message || 'Erro interno' }, { status: 500 }) }

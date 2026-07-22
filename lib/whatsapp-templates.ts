@@ -18,7 +18,7 @@ function usaMeta(): boolean {
 
 // ─── TEMPLATES ──────────────────────────────────────────────────────────────
 
-// D-3: lembrete 3 dias antes do vencimento
+// Lembrete previo — 'dias' e quantos dias faltam para o vencimento (padrao 3)
 export async function msgLembreteD3(params: {
   telefone: string
   nomeResp: string
@@ -26,17 +26,19 @@ export async function msgLembreteD3(params: {
   valor: number
   dataVenc: string
   linkPagamento: string
+  dias?: number
   escolaId?: string
 }) {
+  const dias = String(params.dias ?? 3)
   if (usaMeta()) {
     return enviarTemplateMeta({
       to: params.telefone,
       template: 'cobranca_lembrete',
-      params: [params.nomeResp, params.nomeAtleta, '3', brl(params.valor), params.linkPagamento],
+      params: [params.nomeResp, params.nomeAtleta, dias, brl(params.valor), params.linkPagamento],
     })
   }
   // Fallback Evolution
-  const msg = `Ola ${params.nomeResp}! 📅\n\nA mensalidade de *${params.nomeAtleta}* vence em *3 dias* (${params.dataVenc}).\n\n💰 Valor: *${brl(params.valor)}*\n\n🔗 Pague agora:\n${params.linkPagamento}\n\nPague em dia e evite multa e juros!`
+  const msg = `Ola ${params.nomeResp}! 📅\n\nA mensalidade de *${params.nomeAtleta}* vence em *${dias} dias* (${params.dataVenc}).\n\n💰 Valor: *${brl(params.valor)}*\n\n🔗 Pague agora:\n${params.linkPagamento}\n\nPague em dia e evite multa e juros!`
   return enviarEvo(params.telefone, msg, params.escolaId)
 }
 
