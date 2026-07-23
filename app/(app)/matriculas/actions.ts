@@ -8,12 +8,13 @@ export async function getMatriculas() {
   const escolaId = await getEscolaIdServer()
   const [matriculasRes, escolaRes] = await Promise.all([
     supabaseAdmin.from('Matricula').select('*').eq('escolaId', escolaId).order('criadoEm', { ascending: false }),
-    supabaseAdmin.from('Escola').select('valorMensalidade').eq('id', escolaId).single(),
+    supabaseAdmin.from('Escola').select('valorMensalidade, valorMatricula').eq('id', escolaId).single(),
   ])
   return {
     escolaId,
     matriculas: matriculasRes.data ?? [],
     valorMensalidade: Number(escolaRes.data?.valorMensalidade ?? 100),
+    valorMatricula: Number(escolaRes.data?.valorMatricula ?? 0),
   }
 }
 
@@ -33,14 +34,6 @@ export async function aprovarMatricula(matriculaId: string, escolaId: string, at
   const tokenPais  = crypto.randomUUID()
   const aprovadoEm = new Date()
 
-  // Puxa da Matricula os campos que a tela de aprovacao nao repassa
-  // (tamanho de uniforme e autorizacao de imagem) para copiar ao Atleta.
-  const { data: matExtra } = await supabaseAdmin
-    .from('Matricula')
-    .select('tamanhoUniforme, autorizacaoImagem')
-    .eq('id', matriculaId)
-    .single()
-
   // Dia de vencimento: usa o que veio do formulario; se nao veio, puxa
   // automaticamente do dia da APROVACAO. Clamp em 28 porque 29/30/31 nao
   // existem em todo mes — fevereiro quebraria a cobranca em silencio.
@@ -48,18 +41,13 @@ export async function aprovarMatricula(matriculaId: string, escolaId: string, at
     ? Math.min(Number(atletaData.diaVencimento), 28)
     : Math.min(aprovadoEm.getDate(), 28)
 
-  const { error } = await supabaseAdmin.from('Atleta').insert({ id: atletaId, escolaId, nome: atletaData.nome, dataNascimento: atletaData.dataNascimento, cpf: atletaData.cpf, rg: atletaData.rg, posicao: atletaData.posicao, telefone: atletaData.telefone, cep: atletaData.cep, endereco: atletaData.endereco, numero: atletaData.numero, bairro: atletaData.bairro, cidade: atletaData.cidade, estado: atletaData.estado, tokenPais, ativo: true, turmaId: atletaData.turmaId || null, valorMensalidade: atletaData.valorMensalidade ? Number(atletaData.valorMensalidade) : null, diaVencimento, tamanhoUniforme: matExtra?.tamanhoUniforme || null, autorizacaoImagem: matExtra?.autorizacaoImagem || false })
+  const { error } = await supabaseAdmin.from('Atleta').insert({ id: atletaId, escolaId, nome: atletaData.nome, dataNascimento: atletaData.dataNascimento, cpf: atletaData.cpf, rg: atletaData.rg, posicao: atletaData.posicao, telefone: atletaData.telefone, cep: atletaData.cep, endereco: atletaData.endereco, numero: atletaData.numero, bairro: atletaData.bairro, cidade: atletaData.cidade, estado: atletaData.estado, tokenPais, ativo: true, turmaId: atletaData.turmaId || null, valorMensalidade: atletaData.valorMensalidade ? Number(atletaData.valorMensalidade) : null, diaVencimento })
   if (error) throw new Error(error.message)
-  // Pré-gera 12 meses de mensalidades (modo silencioso — sem WhatsApp/Asaas ainda)
-  try {
-    await gerarMensalidades({
-      atletaId,
-      quantidade: 12,
-      valor: atletaData.valorMensalidade ? Number(atletaData.valorMensalidade) : 85,
-      diaVencimento,
-      silencioso: true,
-    })
-  } catch (err) { console.error('Erro ao pré-gerar mensalidades:', err) }
+  // A pre-geracao das 12 mensalidades NAO acontece mais aqui. Ela rodava antes
+  // de o admin configurar o valor no modal "Configure a mensalidade", entao as
+  // 12 nasciam com o valor padrao da escola e a configuracao correta depois
+  // batia na trava de duplicata. Agora quem pre-gera e `preGerarRestante()`,
+  // chamada pelo modal com o valor ja definido.
 
   // Antes era .upsert({...}, { onConflict: 'atletaId' }), mas nao existe
   // constraint unica em Responsavel.atletaId — o Postgres recusa com 42P10 e o
@@ -74,6 +62,27 @@ export async function aprovarMatricula(matriculaId: string, escolaId: string, at
   await supabaseAdmin.from('Matricula').update({ status: 'APROVADO', atletaId, dataAprovacao: aprovadoEm.toISOString() }).eq('id', matriculaId)
   revalidatePath('/matriculas')
   return { atletaId, tokenPais }
+}
+
+/**
+ * Pre-gera as mensalidades dos meses seguintes, depois que o admin definiu o
+ * valor no modal. A trava de duplicata do `gerarMensalidades` pula o mes que
+ * ja tem a 1a cobranca (a que leva a taxa de matricula), entao das 12 sobram 11.
+ */
+export async function preGerarRestante(atletaId: string, valor: number, diaVencimento: number) {
+  try {
+    const r = await gerarMensalidades({
+      atletaId,
+      quantidade: 12,
+      valor: Number(valor),
+      diaVencimento: Math.min(Number(diaVencimento) || 10, 28),
+      silencioso: true,
+    })
+    return { ok: true, geradas: r.geradas ?? 0 }
+  } catch (err) {
+    console.error('Erro ao pre-gerar mensalidades:', err)
+    return { ok: false, geradas: 0, erro: (err as Error).message }
+  }
 }
 
 export async function recusarMatricula(matriculaId: string) {

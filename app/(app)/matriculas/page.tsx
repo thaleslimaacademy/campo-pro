@@ -2,7 +2,7 @@
 import { useEffect, useState, useTransition } from 'react'
 import AdminGuard from '@/components/AdminGuard'
 import BottomNav from '@/components/ui/BottomNav'
-import { getMatriculas, aprovarMatricula, recusarMatricula } from './actions'
+import { getMatriculas, aprovarMatricula, recusarMatricula, preGerarRestante } from './actions'
 
 const T = { bg: '#0A0E1A', surface: '#0D1220', primary: '#4169E1', accent: '#00BFFF', text: '#F0F4FF', muted: 'rgba(240,244,255,0.4)', border: 'rgba(240,244,255,0.08)', green: '#00D67A', red: '#FF4444', gold: '#FFD700' }
 const SYNE = 'Syne, sans-serif'
@@ -38,6 +38,8 @@ function MatriculasInner() {
       setEscolaId(d.escolaId)
       setMatriculas(d.matriculas as Matricula[])
       setValorMensalidade(d.valorMensalidade)
+      // taxa vem da configuracao da escola; o admin pode sobrescrever no modal
+      if (typeof d.valorMatricula === 'number') setTaxaMatricula(d.valorMatricula)
     })
   }
   useEffect(() => { carregar() }, [])
@@ -85,11 +87,20 @@ function MatriculasInner() {
         body: JSON.stringify({ atletaId, valor: valorTotal, vencimento: dataVencCobranca, descricao })
       })
       const data = await res.json()
-      if (data.sucesso && data.pixCopiaCola) {
-        setPixResultado({ pixCopiaCola: data.pixCopiaCola, pixQrCode: data.pixQrCode, valor: valorTotal, vencimento: dataVencCobranca })
-        setPainelCobranca(false)
-      } else if (data.sucesso) {
-        alert(`✅ Cobrança gerada para ${nome}!`)
+      if (data.sucesso) {
+        // 1a cobranca criada (com a taxa de matricula). Agora pre-gera os meses
+        // seguintes ja com o valor configurado — sem a taxa, que so entra uma vez.
+        let extras = 0
+        try {
+          const pre = await preGerarRestante(atletaId, valorCobranca, diaExtraido)
+          extras = pre.geradas || 0
+        } catch { /* a 1a cobranca ja esta criada; nao bloqueia o fluxo */ }
+
+        if (data.pixCopiaCola) {
+          setPixResultado({ pixCopiaCola: data.pixCopiaCola, pixQrCode: data.pixQrCode, valor: valorTotal, vencimento: dataVencCobranca })
+        } else {
+          alert(`✅ Cobrança gerada para ${nome}!` + (extras ? `\n\n+ ${extras} mensalidades dos próximos meses.` : ''))
+        }
         setPainelCobranca(false)
       } else {
         alert('Erro: ' + (data.error || JSON.stringify(data)))
