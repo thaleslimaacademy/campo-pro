@@ -17,13 +17,24 @@ export async function GET() {
     supabaseAdmin.from('Escola').select('nome, slug').eq('id', escolaId).single(),
     supabaseAdmin.from('Atleta').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('ativo', true),
     supabaseAdmin.from('Matricula').select('*', { count: 'exact', head: true }).eq('escolaId', escolaId).eq('status', 'PENDENTE'),
-    supabaseAdmin.from('Cobranca').select('valor, status').eq('escolaId', escolaId).gte('vencimento', di).lte('vencimento', df),
+    supabaseAdmin.from('Cobranca').select('valor, status, vencimento, atletaId').eq('escolaId', escolaId).is('excluidaEm', null).gte('vencimento', di).lte('vencimento', df),
     supabaseAdmin.from('Treino').select('id').eq('escolaId', escolaId).gte('data', hojeStr).limit(1).single(),
   ])
 
-  const cobs = cobrancas.data || []
-  const pagasV = cobs.filter((c: {status: string; valor: number}) => c.status === 'PAGO').reduce((s: number, c: {valor: number}) => s + Number(c.valor), 0)
-  const inadimplentes = cobs.filter((c: {status: string}) => c.status === 'VENCIDO').length
+  type Cob = { status: string; valor: number; vencimento: string; atletaId: string }
+  const cobs = (cobrancas.data || []) as Cob[]
+  const pagasV = cobs.filter(c => c.status === 'PAGO').reduce((s: number, c) => s + Number(c.valor), 0)
+
+  // Inadimplente = ATLETA (nao cobranca) com mensalidade nao paga cujo
+  // vencimento ja passou. Antes contava so status === 'VENCIDO', mas a regua
+  // so marca VENCIDO no D+15 — e nao filtrava as cobrancas da lixeira, o que
+  // fazia o dashboard acusar inadimplente que a tela de mensalidades nao mostra.
+  const atletasInadimplentes = new Set(
+    cobs
+      .filter(c => (c.status === 'PENDENTE' || c.status === 'VENCIDO') && c.vencimento < hojeStr)
+      .map(c => c.atletaId)
+  )
+  const inadimplentes = atletasInadimplentes.size
 
   let presenca = { p: 0, t: 0 }
   if (treino.data) {

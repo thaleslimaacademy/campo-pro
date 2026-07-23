@@ -168,7 +168,7 @@ export default function Dashboard() {
       {/* ALERTAS */}
       <div style={{ padding: '12px 16px 0' }}>
         {isAdmin && inadimplentes > 0 && (
-          <a href="/financeiro/mensalidades?status=VENCIDO" style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(255,107,107,0.08)', border: '1px solid rgba(255,107,107,0.25)', borderRadius: 10, padding: '10px 14px', marginBottom: 8, textDecoration: 'none' }}>
+          <a href="/financeiro/mensalidades" style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(255,107,107,0.08)', border: '1px solid rgba(255,107,107,0.25)', borderRadius: 10, padding: '10px 14px', marginBottom: 8, textDecoration: 'none' }}>
             <i className="ti ti-alert-triangle" style={{ fontSize: 16, color: '#FF6B6B' }} />
             <span style={{ fontSize: 12, color: '#FF6B6B', fontWeight: 700 }}>{inadimplentes} aluno{inadimplentes > 1 ? 's' : ''} inadimplente{inadimplentes > 1 ? 's' : ''}</span>
             <i className="ti ti-chevron-right" style={{ fontSize: 14, color: '#FF6B6B', marginLeft: 'auto' }} />
