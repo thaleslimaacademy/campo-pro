@@ -67,8 +67,11 @@ export async function GET(req: NextRequest) {
         const escolaNome = escolaConfig?.nome?.split('—').pop()?.trim() || 'GestãoFC'
 
         const { data: atleta } = await supabaseAdmin.from('Atleta')
-          .select('nome, asaasCustomerId, bolsista').eq('id', cob.atletaId).single()
+          .select('nome, asaasCustomerId, bolsista, ativo').eq('id', cob.atletaId).single()
         if (atleta?.bolsista) continue
+        // Atleta desativado (desistiu) nao pode continuar recebendo as
+        // mensalidades futuras que ja foram pre-geradas.
+        if (atleta && atleta.ativo === false) continue
 
         const { data: resps } = await supabaseAdmin.from('Responsavel')
           .select('nome, whatsapp').eq('atletaId', cob.atletaId).eq('principal', true).limit(1)
