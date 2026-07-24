@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
-import { Trash2, RotateCcw, Plus, Loader2, FileText } from 'lucide-react'
+import { Trash2, RotateCcw, Plus, Loader2, FileText, Search, X } from 'lucide-react'
 import { listarMensalidades, listarAtletas, gerarMensalidades, softDeleteCobranca, restaurarCobranca, excluirDefinitivo, marcarPago, cancelarCobranca } from './actions'
 import { gerarRecibo } from '@/lib/gerarRecibo'
 
@@ -126,6 +126,22 @@ export default function MensalidadesPage() {
           </div>
         )}
 
+        {/* BUSCA */}
+        <div style={{ position: 'relative', marginBottom: 14 }}>
+          <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: T.muted, pointerEvents: 'none' }} />
+          <input
+            value={busca}
+            onChange={e => setBusca(e.target.value)}
+            placeholder="Buscar por nome do aluno ou competência (ex: set/2026)..."
+            style={{ ...INP, paddingLeft: 36, paddingRight: busca ? 36 : 12 }}
+          />
+          {busca && (
+            <button onClick={() => setBusca('')} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: T.muted, cursor: 'pointer', display: 'flex' }} title="Limpar busca">
+              <X size={15} />
+            </button>
+          )}
+        </div>
+
         {/* FILTROS */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16, alignItems: 'center' }}>
           {STATUS.map(s => (
@@ -140,8 +156,8 @@ export default function MensalidadesPage() {
         <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden' }}>
           {carregando
             ? <div style={{ padding: 24, color: T.muted, fontSize: 13 }}>Carregando…</div>
-            : lista.length === 0
-            ? <div style={{ padding: 24, color: T.muted, fontSize: 13 }}>Nenhuma cobrança encontrada.</div>
+            : filtrados.length === 0
+            ? <div style={{ padding: 24, color: T.muted, fontSize: 13 }}>{busca ? `Nenhum resultado para "${busca}".` : 'Nenhuma cobrança encontrada.'}</div>
             : (
               <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Inter, sans-serif', fontSize: 13 }}>
                 <thead>
@@ -152,7 +168,7 @@ export default function MensalidadesPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {lista.map(c => {
+                  {filtrados.map(c => {
                     const excluida = !!c.excluidaEm
                     return (
                       <tr key={c.id} style={{ borderTop: `1px solid ${T.border}`, opacity: excluida ? 0.5 : 1 }}>
