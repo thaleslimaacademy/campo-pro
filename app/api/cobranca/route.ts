@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { criarClienteAsaas, criarCobrancaPix, getPixQrCode } from '@/lib/asaas'
+import { criarClienteAsaas, criarCobrancaPix, getPixQrCode, cancelarCobrancaAsaas } from '@/lib/asaas'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getAsaasKey } from '@/lib/getAsaasKey'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
@@ -22,21 +22,38 @@ export async function POST(req: NextRequest) {
     // Impede duas mensalidades do mesmo mes para o mesmo atleta. Cobre o
     // duplo clique no botao e a colisao com cobranca ja pre-gerada.
     // Cobrancas avulsas (Uniforme, Taxa...) passam normalmente.
+    // Com forcar=true: em vez de bloquear, cancela a pendente antiga
+    // (no banco e no Asaas, se ja tinha PIX) e segue criando a nova —
+    // e o fluxo de "substituir mensalidade" usado no card Nova Cobranca.
     const competencia = String(vencimento).slice(0, 7) + '-01'
     const ehMensalidade = String(descricao || 'Mensalidade').trim().toLowerCase().startsWith('mensalidade')
-    if (ehMensalidade && !forcar) {
+    if (ehMensalidade) {
       const { data: existentes } = await supabaseAdmin.from('Cobranca')
-        .select('id, valor, status, descricao')
+        .select('id, valor, status, descricao, asaasId')
         .eq('atletaId', atletaId)
         .eq('competencia', competencia)
         .is('excluidaEm', null)
         .in('status', ['PENDENTE', 'VENCIDO', 'PAGO'])
       const jaExiste = (existentes || []).find(c => String(c.descricao || '').trim().toLowerCase().startsWith('mensalidade'))
-      if (jaExiste) {
+      if (jaExiste && !forcar) {
         return NextResponse.json({
           error: `Ja existe uma mensalidade de ${competencia.slice(0, 7)} para este atleta: R$ ${Number(jaExiste.valor).toFixed(2)} (${jaExiste.status}). Cancele a anterior antes de gerar outra.`,
           jaExiste: true, cobrancaId: jaExiste.id,
         }, { status: 409 })
+      }
+      if (jaExiste && forcar) {
+        if (jaExiste.status === 'PAGO') {
+          return NextResponse.json({
+            error: `A mensalidade de ${competencia.slice(0, 7)} ja esta PAGA (R$ ${Number(jaExiste.valor).toFixed(2)}). Nao e possivel substituir uma cobranca ja paga.`,
+          }, { status: 409 })
+        }
+        if (jaExiste.asaasId) {
+          try { await cancelarCobrancaAsaas(apiKey, jaExiste.asaasId) } catch { /* ja cancelada no Asaas, segue */ }
+        }
+        const { error: eCanc } = await supabaseAdmin.from('Cobranca').update({
+          status: 'CANCELADO', excluidaEm: new Date().toISOString(),
+        }).eq('id', jaExiste.id)
+        if (eCanc) return NextResponse.json({ error: 'Falhou ao cancelar a mensalidade anterior: ' + eCanc.message }, { status: 500 })
       }
     }
     const { data: responsaveis } = await supabaseAdmin.from('Responsavel').select('nome, whatsapp').eq('atletaId', atletaId).eq('principal', true).limit(1)
@@ -63,13 +80,10 @@ export async function POST(req: NextRequest) {
     const { data: atletaData } = await supabaseAdmin.from('Atleta').select('nome').eq('id', atletaId).single()
     const { error: errInsert } = await supabaseAdmin.from('Cobranca').insert({ id: novoId, escolaId, atletaId, atletaNome: atletaData?.nome?.trim() || null, valor, vencimento, competencia, status: 'PENDENTE', asaasId: cobranca.id, pixCopiaCola: qrCode.payload || null, pixQrCode: qrCode.encodedImage || null, descricao })
     if (errInsert) return NextResponse.json({ error: 'Cobranca criada no Asaas mas falhou ao salvar no banco: ' + errInsert.message }, { status: 500 })
-    // WhatsApp: usa os templates (a Meta so aceita template em mensagem proativa).
-    // Se falhar, a cobranca ja esta salva — o erro nao derruba a resposta.
     if (responsavel?.whatsapp) {
       const dataVencimento = new Date(vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
       const nomeResp = responsavel.nome.split(' ')[0]
       const linkPagamento = `https://gestaofc.com.br/pagar/${novoId}`
-      // quantos dias faltam ate o vencimento (no fuso de Brasilia)
       const hojeBR = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }))
       hojeBR.setHours(0, 0, 0, 0)
       const alvo = new Date(vencimento + 'T12:00:00')

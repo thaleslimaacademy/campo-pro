@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 
 
-const T = { surface:'#0D1220', primary:'#4169E1', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', border:'rgba(240,244,255,0.08)', green:'#00D67A', red:'#FF4444' }
+const T = { surface:'#0D1220', primary:'#4169E1', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', border:'rgba(240,244,255,0.08)', green:'#00D67A', red:'#FF4444', amber:'#FFB84D' }
 const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
 const INP: React.CSSProperties = { width:'100%', background:'#080C15', border:`1px solid rgba(240,244,255,0.1)`, borderRadius:8, padding:'11px 14px', color:T.text, fontFamily:INTER, fontSize:13, boxSizing:'border-box' }
@@ -23,6 +23,7 @@ export default function GerarCobranca({ atletaId, atletaNome, escolaId }: { atle
   const [gerando, setGerando]     = useState(false)
   const [pix, setPix]             = useState<{ copiaCola: string; qrCode: string } | null>(null)
   const [copiado, setCopiado]     = useState(false)
+  const [conflito, setConflito]   = useState<string | null>(null)
 
   useEffect(() => {
     fetch('/api/escola-config')
@@ -34,7 +35,6 @@ export default function GerarCobranca({ atletaId, atletaNome, escolaId }: { atle
   async function gerarManual() {
     setGerando(true)
     const qtd = periodo === 'semestral' ? 6 : periodo === 'anual' ? 12 : 1
-    const agora = new Date()
     const res = await fetch('/api/cobranca-manual', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -50,13 +50,15 @@ export default function GerarCobranca({ atletaId, atletaNome, escolaId }: { atle
     } else alert(data.error || 'Erro: tente novamente')
   }
 
-  async function gerarAsaas() {
+  async function gerarAsaas(forcar = false) {
     setGerando(true)
-    const res  = await fetch('/api/cobranca', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ atletaId, valor: parseFloat(valor), vencimento, descricao }) })
+    setConflito(null)
+    const res  = await fetch('/api/cobranca', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ atletaId, valor: parseFloat(valor), vencimento, descricao, forcar }) })
     const data = await res.json()
-    if (data.sucesso) setPix({ copiaCola: data.pixCopiaCola, qrCode: data.pixQrCode })
-    else alert('Erro: ' + (data.error || JSON.stringify(data)))
     setGerando(false)
+    if (data.sucesso) { setPix({ copiaCola: data.pixCopiaCola, qrCode: data.pixQrCode }); return }
+    if (res.status === 409 && data.jaExiste) { setConflito(data.error); return }
+    alert('Erro: ' + (data.error || JSON.stringify(data)))
   }
 
   function copiar() {
@@ -90,18 +92,28 @@ export default function GerarCobranca({ atletaId, atletaNome, escolaId }: { atle
     <div style={{ background:T.surface, border:`1px solid ${T.border}`, borderLeft:`3px solid ${T.primary}`, borderRadius:12, padding:16, marginBottom:12 }}>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
         <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:13, color:T.primary, textTransform:'uppercase', letterSpacing:0.5 }}>💰 Nova Cobrança</p>
-        <button onClick={() => setAberto(false)} style={{ background:'transparent', border:'none', color:T.muted, fontSize:18, cursor:'pointer' }}>✕</button>
+        <button onClick={() => { setAberto(false); setConflito(null) }} style={{ background:'transparent', border:'none', color:T.muted, fontSize:18, cursor:'pointer' }}>✕</button>
       </div>
       <p style={{ fontSize:11, color:T.muted, marginBottom:14 }}>{atletaNome} · {temAsaas ? 'PIX via Asaas' : 'Cobrança manual'}</p>
+
+      {conflito && (
+        <div style={{ background:`${T.amber}12`, border:`1px solid ${T.amber}44`, borderRadius:10, padding:12, marginBottom:14 }}>
+          <p style={{ fontSize:12, color:T.amber, marginBottom:10, lineHeight:1.4 }}>{conflito}</p>
+          <button
+            onClick={() => gerarAsaas(true)}
+            disabled={gerando}
+            style={{ width:'100%', background:T.amber, color:'#1a1200', padding:'11px', borderRadius:8, fontFamily:SYNE, fontWeight:800, fontSize:12, border:'none', cursor:gerando?'not-allowed':'pointer', textTransform:'uppercase', opacity:gerando?0.5:1 }}>
+            {gerando ? 'Substituindo...' : 'Cancelar a anterior e substituir'}
+          </button>
+        </div>
+      )}
 
       <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
         <div><label style={LBL}>Valor (R$)</label><input value={valor} onChange={e => setValor(e.target.value)} type="number" style={INP} /></div>
 
         {temAsaas ? (
-          // Asaas: data específica
           <div><label style={LBL}>Vencimento</label><input value={vencimento} onChange={e => setVencimento(e.target.value)} type="date" style={INP} /></div>
         ) : (
-          // Manual: dia do mês + período + forma
           <>
             <div><label style={LBL}>Dia de vencimento</label>
               <select value={diaVenc} onChange={e => setDiaVenc(e.target.value)} style={INP}>
@@ -130,7 +142,7 @@ export default function GerarCobranca({ atletaId, atletaNome, escolaId }: { atle
         <div><label style={LBL}>Descrição</label><input value={descricao} onChange={e => setDescricao(e.target.value)} type="text" style={INP} /></div>
 
         <button
-          onClick={temAsaas ? gerarAsaas : gerarManual}
+          onClick={() => { setConflito(null); temAsaas ? gerarAsaas(false) : gerarManual() }}
           disabled={gerando || (temAsaas ? !vencimento : false)}
           style={{ background:T.primary, color:T.text, padding:'13px', borderRadius:8, fontFamily:SYNE, fontWeight:800, fontSize:13, border:'none', cursor:gerando?'not-allowed':'pointer', textTransform:'uppercase', letterSpacing:0.5, opacity:gerando?0.5:1 }}>
           {gerando ? 'Gerando...' : temAsaas ? 'Gerar PIX' : `Gerar cobrança${periodo!=='mensal'?` (${periodo==='semestral'?6:12}x)`:''}`}
