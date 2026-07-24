@@ -13,7 +13,6 @@ const SEC_TITLE: React.CSSProperties = { fontFamily:SYNE, fontWeight:700, fontSi
 const POSICOES = ['Goleiro','Zagueiro','Lateral Direito','Lateral Esquerdo','Volante','Meia','Meia-atacante','Atacante','Centroavante']
 const DIAS_VCTO = Array.from({length:28},(_,i)=>String(i+1))
 
-type Plano = { id: string; nome: string; slug: string; valor: number }
 type Turma = { id: string; nome: string }
 
 export default function EditarAtleta() {
@@ -26,9 +25,8 @@ export default function EditarAtleta() {
   const [sucesso, setSucesso] = useState(false)
   const [ativo, setAtivo] = useState(true)
   const [bolsista, setBolsista] = useState(false)
-  const [planos, setPlanos] = useState<Plano[]>([])
   const [turmas, setTurmas] = useState<Turma[]>([])
-  const [form, setForm] = useState({ nome:'', dataNascimento:'', cpf:'', rg:'', posicao:'', telefone:'', planoMensalidade:'', diaVencimento:'10', motivoBolsa:'', turmaId:'', cep:'', endereco:'', numero:'', bairro:'', cidade:'', estado:'' })
+  const [form, setForm] = useState({ nome:'', dataNascimento:'', cpf:'', rg:'', posicao:'', telefone:'', valorMensalidade:'', diaVencimento:'10', motivoBolsa:'', turmaId:'', cep:'', endereco:'', numero:'', bairro:'', cidade:'', estado:'' })
 
   useEffect(() => {
     startLoad(async () => {
@@ -37,12 +35,11 @@ export default function EditarAtleta() {
       if (!a) { router.push('/atletas'); return }
       setAtivo(Boolean(a.ativo))
       setBolsista(Boolean(a.bolsista))
-      setPlanos(d.planos as Plano[])
       setTurmas(d.turmas as Turma[])
       setForm({
         nome: String(a.nome || ''), dataNascimento: a.dataNascimento ? String(a.dataNascimento).split('T')[0] : '',
         cpf: String(a.cpf || ''), rg: String(a.rg || ''), posicao: String(a.posicao || ''),
-        telefone: String(a.telefone || ''), planoMensalidade: String(a.planoMensalidade || ''),
+        telefone: String(a.telefone || ''), valorMensalidade: a.valorMensalidade != null ? String(a.valorMensalidade) : '',
         diaVencimento: String(a.diaVencimento || '10'), motivoBolsa: String(a.motivoBolsa || ''),
         turmaId: String(a.turmaId || ''), cep: String(a.cep || ''), endereco: String(a.endereco || ''),
         numero: String(a.numero || ''), bairro: String(a.bairro || ''), cidade: String(a.cidade || ''), estado: String(a.estado || ''),
@@ -66,13 +63,17 @@ export default function EditarAtleta() {
 
   function salvar() {
     startSave(async () => {
-      await salvarAtleta(id, {
+      const resultado = await salvarAtleta(id, {
         nome: form.nome, dataNascimento: form.dataNascimento || null, cpf: form.cpf || null, rg: form.rg || null,
-        posicao: form.posicao || null, telefone: form.telefone || null, planoMensalidade: form.planoMensalidade || null,
+        posicao: form.posicao || null, telefone: form.telefone || null,
+        valorMensalidade: bolsista ? 0 : (form.valorMensalidade ? Number(form.valorMensalidade) : null),
         diaVencimento: Number(form.diaVencimento), bolsista, motivoBolsa: bolsista ? form.motivoBolsa : null,
         turmaId: form.turmaId || null, cep: form.cep || null, endereco: form.endereco || null,
         numero: form.numero || null, bairro: form.bairro || null, cidade: form.cidade || null, estado: form.estado || null,
       })
+      if (resultado && 'avisosMensalidade' in resultado && resultado.avisosMensalidade) {
+        alert('Atleta salvo, mas houve avisos ao atualizar cobranças futuras:\n' + resultado.avisosMensalidade.join('\n'))
+      }
       setSucesso(true)
       setTimeout(() => { router.push(`/atletas/${id}`) }, 1200)
     })
@@ -170,11 +171,10 @@ export default function EditarAtleta() {
             {bolsista && <div><label style={LBL}>Motivo da bolsa</label><input name="motivoBolsa" value={form.motivoBolsa} onChange={handleChange} style={INP} placeholder="Ex: Projeto social, Destaque esportivo..." /></div>}
             {!bolsista && (
               <>
-                <div><label style={LBL}>Plano de mensalidade</label>
-                  <select name="planoMensalidade" value={form.planoMensalidade} onChange={handleChange} style={sel}>
-                    <option value="">Selecionar plano</option>
-                    {planos.map(p => <option key={p.id} value={p.slug}>{p.nome} — R$ {Number(p.valor).toFixed(2)}</option>)}
-                  </select>
+                <div>
+                  <label style={LBL}>Valor da mensalidade (R$)</label>
+                  <input name="valorMensalidade" value={form.valorMensalidade} onChange={handleChange} type="number" step="0.01" min="0" style={INP} placeholder="Ex: 175.00 (soma de várias modalidades)" />
+                  <p style={{ fontSize:10, color:T.muted, marginTop:4 }}>Ao mudar, as mensalidades futuras já geradas são atualizadas automaticamente.</p>
                 </div>
                 <div><label style={LBL}>Dia de vencimento</label>
                   <select name="diaVencimento" value={form.diaVencimento} onChange={handleChange} style={sel}>
