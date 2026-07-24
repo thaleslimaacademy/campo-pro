@@ -19,8 +19,12 @@ export async function getAtletaParaEditar(id: string) {
 /**
  * Propaga uma mudanca de valorMensalidade para as cobrancas futuras que ja
  * estao pre-geradas (garantirMensalidadesFuturas roda 3 meses a frente).
- * Sem PIX gerado ainda: so atualiza o valor no banco. Com PIX ja gerado:
- * cancela o PIX antigo na Asaas e gera outro na hora com o valor novo.
+ *
+ * Ordem importa: primeiro atualiza em LOTE UNICO as que ainda nao tem PIX
+ * (update simples, sem chamada externa) — assim, mesmo que o restante da
+ * funcao seja interrompido pelo timeout de 10s da Vercel (plano Hobby, ja
+ * vimos isso acontecer com o upload de foto), essas ja ficam salvas. Só
+ * depois trata as que ja tem PIX na Asaas (mais lento: cancela e recria).
  */
 async function propagarValorMensalidade(atletaId: string, escolaId: string, novoValor: number) {
   const hoje = new Date().toISOString().slice(0, 10)
@@ -36,47 +40,50 @@ async function propagarValorMensalidade(atletaId: string, escolaId: string, novo
 
   const mensalidades = (futuras ?? []).filter(c =>
     String(c.descricao || '').trim().toLowerCase().startsWith('mensalidade')
+    && Number(c.valor) !== novoValor
   )
 
-  let atualizadas = 0
   const avisos: string[] = []
-  let apiKey: string | null = null
+  let atualizadas = 0
 
-  for (const cob of mensalidades) {
-    if (Number(cob.valor) === novoValor) continue
+  // ── Passo 1: sem PIX ainda — update em lote, rapido e seguro ──
+  const semPix = mensalidades.filter(c => !c.asaasId)
+  if (semPix.length) {
+    const { error, count } = await supabaseAdmin.from('Cobranca')
+      .update({ valor: novoValor })
+      .in('id', semPix.map(c => c.id))
+      .select('id', { count: 'exact', head: true })
+    if (error) avisos.push(`Falha ao atualizar ${semPix.length} mensalidade(s) sem PIX: ${error.message}`)
+    else atualizadas += count ?? semPix.length
+  }
 
-    if (!cob.asaasId) {
-      const { error } = await supabaseAdmin.from('Cobranca')
-        .update({ valor: novoValor }).eq('id', cob.id)
-      if (error) avisos.push(`Cobrança ${cob.id}: ${error.message}`)
-      else atualizadas++
-      continue
+  // ── Passo 2: com PIX na Asaas — cancela e recria, uma por vez ──
+  const comPix = mensalidades.filter(c => c.asaasId)
+  if (comPix.length) {
+    let apiKey: string | null = null
+    try { apiKey = await getAsaasKey(escolaId) } catch { apiKey = '' }
+
+    for (const cob of comPix) {
+      if (!apiKey) {
+        avisos.push(`Cobrança ${cob.id}: sem chave Asaas configurada, PIX não regenerado`)
+        continue
+      }
+      try {
+        await cancelarCobrancaAsaas(apiKey, cob.asaasId as string)
+      } catch (e) {
+        avisos.push(`Cobrança ${cob.id}: falha ao cancelar PIX antigo — ${(e as Error).message}`)
+        continue
+      }
+      await supabaseAdmin.from('Cobranca').update({
+        valor: novoValor, asaasId: null, pixCopiaCola: null, pixQrCode: null,
+      }).eq('id', cob.id)
+
+      const gerado = await gerarPixSeFaltar(
+        cob.id, escolaId, atletaId, novoValor, String(cob.vencimento).slice(0, 10)
+      )
+      if (!gerado) avisos.push(`Cobrança ${cob.id}: valor atualizado mas o novo PIX falhou — será recriado no D-3`)
+      atualizadas++
     }
-
-    if (apiKey === null) {
-      try { apiKey = await getAsaasKey(escolaId) } catch { apiKey = '' }
-    }
-    if (!apiKey) {
-      avisos.push(`Cobrança ${cob.id}: sem chave Asaas configurada, PIX não regenerado`)
-      continue
-    }
-
-    try {
-      await cancelarCobrancaAsaas(apiKey, cob.asaasId)
-    } catch (e) {
-      avisos.push(`Cobrança ${cob.id}: falha ao cancelar PIX antigo — ${(e as Error).message}`)
-      continue
-    }
-
-    await supabaseAdmin.from('Cobranca').update({
-      valor: novoValor, asaasId: null, pixCopiaCola: null, pixQrCode: null,
-    }).eq('id', cob.id)
-
-    const gerado = await gerarPixSeFaltar(
-      cob.id, escolaId, atletaId, novoValor, String(cob.vencimento).slice(0, 10)
-    )
-    if (!gerado) avisos.push(`Cobrança ${cob.id}: valor atualizado mas o novo PIX falhou — será recriado no D-3`)
-    atualizadas++
   }
 
   return { atualizadas, avisos }
