@@ -88,6 +88,7 @@ async function gerarPixSeFaltar(
 async function garantirMensalidadesFuturas(meses: number) {
   let criadas = 0, atletasAfetados = 0
   const hojeD = new Date()
+  const hojeISO = hojeD.toISOString().slice(0, 10)
 
   const { data: escolas } = await supabaseAdmin.from('Escola')
     .select('id, valorMensalidade').eq('ativo', true)
@@ -127,7 +128,7 @@ async function garantirMensalidadesFuturas(meses: number) {
         const competencia = venc.slice(0, 7) + '-01'
         if (jaTem.has(competencia)) continue
         // nao cria retroativo: se o vencimento do mes corrente ja passou, pula
-        if (venc < hoje) continue
+        if (venc < hojeISO) continue
         novas.push({
           id: crypto.randomUUID(), escolaId: escola.id, atletaId: a.id,
           atletaNome: (a.nome || '').trim() || null,
