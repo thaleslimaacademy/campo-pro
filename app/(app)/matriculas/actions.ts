@@ -65,15 +65,18 @@ export async function aprovarMatricula(matriculaId: string, escolaId: string, at
 }
 
 /**
- * Pre-gera as mensalidades dos meses seguintes, depois que o admin definiu o
+ * Pre-gera as mensalidades dos proximos meses, depois que o admin definiu o
  * valor no modal. A trava de duplicata do `gerarMensalidades` pula o mes que
- * ja tem a 1a cobranca (a que leva a taxa de matricula), entao das 12 sobram 11.
+ * ja tem a 1a cobranca (a que leva a taxa de matricula).
+ * A regua diaria mantem essa janela de 3 meses sempre renovada.
  */
 export async function preGerarRestante(atletaId: string, valor: number, diaVencimento: number) {
   try {
     const r = await gerarMensalidades({
       atletaId,
-      quantidade: 12,
+      // 3 meses. A regua diaria mantem sempre 3 meses a frente e renova
+      // sozinha — nao faz sentido travar 12 competencias de uma vez.
+      quantidade: 3,
       valor: Number(valor),
       diaVencimento: Math.min(Number(diaVencimento) || 10, 28),
       silencioso: true,
