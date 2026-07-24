@@ -4,6 +4,7 @@ import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 import { revalidatePath } from 'next/cache'
 import { cancelarCobrancaAsaas } from '@/lib/asaas'
 import { getAsaasKey } from '@/lib/getAsaasKey'
+import { gerarPixSeFaltar } from '@/lib/gerarPixSeFaltar'
 
 export async function getAtletaParaEditar(id: string) {
   const escolaId = await getEscolaIdServer()
@@ -15,24 +16,98 @@ export async function getAtletaParaEditar(id: string) {
   return { escolaId, atleta: atletaRes.data, planos: planosRes.data ?? [], turmas: turmasRes.data ?? [] }
 }
 
+/**
+ * Propaga uma mudanca de valorMensalidade para as cobrancas futuras que ja
+ * estao pre-geradas (garantirMensalidadesFuturas roda 3 meses a frente).
+ * Sem PIX gerado ainda: so atualiza o valor no banco. Com PIX ja gerado:
+ * cancela o PIX antigo na Asaas e gera outro na hora com o valor novo.
+ */
+async function propagarValorMensalidade(atletaId: string, escolaId: string, novoValor: number) {
+  const hoje = new Date().toISOString().slice(0, 10)
+  const { data: futuras, error: erroBusca } = await supabaseAdmin.from('Cobranca')
+    .select('id, valor, asaasId, vencimento, descricao')
+    .eq('atletaId', atletaId)
+    .eq('escolaId', escolaId)
+    .eq('status', 'PENDENTE')
+    .is('excluidaEm', null)
+    .gte('vencimento', hoje)
+
+  if (erroBusca) return { atualizadas: 0, avisos: [`Falha ao buscar cobranças futuras: ${erroBusca.message}`] }
+
+  const mensalidades = (futuras ?? []).filter(c =>
+    String(c.descricao || '').trim().toLowerCase().startsWith('mensalidade')
+  )
+
+  let atualizadas = 0
+  const avisos: string[] = []
+  let apiKey: string | null = null
+
+  for (const cob of mensalidades) {
+    if (Number(cob.valor) === novoValor) continue
+
+    if (!cob.asaasId) {
+      const { error } = await supabaseAdmin.from('Cobranca')
+        .update({ valor: novoValor }).eq('id', cob.id)
+      if (error) avisos.push(`Cobrança ${cob.id}: ${error.message}`)
+      else atualizadas++
+      continue
+    }
+
+    if (apiKey === null) {
+      try { apiKey = await getAsaasKey(escolaId) } catch { apiKey = '' }
+    }
+    if (!apiKey) {
+      avisos.push(`Cobrança ${cob.id}: sem chave Asaas configurada, PIX não regenerado`)
+      continue
+    }
+
+    try {
+      await cancelarCobrancaAsaas(apiKey, cob.asaasId)
+    } catch (e) {
+      avisos.push(`Cobrança ${cob.id}: falha ao cancelar PIX antigo — ${(e as Error).message}`)
+      continue
+    }
+
+    await supabaseAdmin.from('Cobranca').update({
+      valor: novoValor, asaasId: null, pixCopiaCola: null, pixQrCode: null,
+    }).eq('id', cob.id)
+
+    const gerado = await gerarPixSeFaltar(
+      cob.id, escolaId, atletaId, novoValor, String(cob.vencimento).slice(0, 10)
+    )
+    if (!gerado) avisos.push(`Cobrança ${cob.id}: valor atualizado mas o novo PIX falhou — será recriado no D-3`)
+    atualizadas++
+  }
+
+  return { atualizadas, avisos }
+}
+
 export async function salvarAtleta(id: string, payload: Record<string, unknown>) {
   const escolaId = await getEscolaIdServer()
+
+  let avisosMensalidade: string[] | null = null
+  if ('valorMensalidade' in payload) {
+    const novoValor = Number(payload.valorMensalidade)
+    if (!Number.isNaN(novoValor)) {
+      const { data: atual } = await supabaseAdmin.from('Atleta')
+        .select('valorMensalidade').eq('id', id).eq('escolaId', escolaId).single()
+      if (atual && Number(atual.valorMensalidade) !== novoValor) {
+        const resultado = await propagarValorMensalidade(id, escolaId, novoValor)
+        if (resultado.avisos.length) avisosMensalidade = resultado.avisos
+      }
+    }
+  }
+
   const { error } = await supabaseAdmin.from('Atleta').update(payload).eq('id', id).eq('escolaId', escolaId)
-  // antes o erro era ignorado: a tela dizia "Salvo!" sem ter salvado nada
   if (error) throw new Error(error.message)
   revalidatePath(`/atletas/${id}`)
   revalidatePath('/atletas')
+  revalidatePath('/financeiro/mensalidades')
+
+  if (avisosMensalidade) return { ok: true, avisosMensalidade }
+  return { ok: true }
 }
 
-/**
- * Ativa/desativa o atleta.
- *
- * Ao DESATIVAR (aluno desistiu), cancela as mensalidades futuras que ainda
- * estao em aberto — inclusive no Asaas. Sem isso, as 12 mensalidades
- * pre-geradas continuariam cobrando o responsavel por meses depois da saida.
- * As cobrancas ja pagas e as vencidas em aberto sao preservadas: pagas viram
- * historico financeiro, vencidas ainda podem ser negociadas.
- */
 export async function toggleAtivoAtleta(id: string, ativo: boolean) {
   const escolaId = await getEscolaIdServer()
 
@@ -74,13 +149,6 @@ export async function toggleAtivoAtleta(id: string, ativo: boolean) {
   return { ok: true, canceladas }
 }
 
-/**
- * Exclui o atleta em definitivo. So deve ser usado para cadastro errado.
- *
- * Se existir qualquer cobranca PAGA, a exclusao e bloqueada: apagar destruiria
- * o historico financeiro (dinheiro que entrou sumiria do caixa). Nesse caso o
- * correto e DESATIVAR, que cancela o que esta por vir e preserva o passado.
- */
 export async function excluirAtleta(id: string) {
   const escolaId = await getEscolaIdServer()
 
