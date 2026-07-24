@@ -55,7 +55,7 @@ export default function MatriculaClient({ escolaId, escolaNome, escolaLogoUrl, v
   const LBL: React.CSSProperties = { fontSize:11, color:mutedCol, textTransform:'uppercase', letterSpacing:'0.8px', display:'block', marginBottom:6 }
   const SEC: React.CSSProperties = { background:surfaceCol, border:`1px solid ${borderCol}`, borderRadius:16, padding:20, marginBottom:16 }
 
-  const [step, setStep] = useState<'form' | 'contrato' | 'pagamento' | 'sucesso'>('form')
+  const [step, setStep] = useState<'form' | 'contrato' | 'sucesso'>('form')
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState('')
   const [contratoLido, setContratoLido] = useState(false)
@@ -90,6 +90,12 @@ export default function MatriculaClient({ escolaId, escolaNome, escolaLogoUrl, v
     if (!form.nomeAtleta)        return 'Nome do atleta é obrigatório.'
     if (!form.dataNascimento)    return 'Data de nascimento é obrigatória.'
     if (!form.cpf && !form.rg)   return 'Pelo menos CPF ou RG é obrigatório.'
+    if (!form.cep)               return 'CEP é obrigatório.'
+    if (!form.endereco)          return 'Endereço é obrigatório.'
+    if (!form.numero)            return 'Número é obrigatório.'
+    if (!form.bairro)            return 'Bairro é obrigatório.'
+    if (!form.cidade)            return 'Cidade é obrigatória.'
+    if (!form.estado)            return 'Estado é obrigatório.'
     if (!form.nomeResponsavel)   return 'Nome do responsável é obrigatório.'
     if (!form.cpfResponsavel)    return 'CPF do responsável 1 é obrigatório.'
     if (!form.whatsappResponsavel) return 'WhatsApp do responsável é obrigatório.'
@@ -115,7 +121,9 @@ export default function MatriculaClient({ escolaId, escolaNome, escolaLogoUrl, v
       const data = await res.json()
       if (data.ok) {
         setMatriculaId(data.matriculaId || '')
-        setStep(valorMatricula > 0 ? 'pagamento' : 'sucesso')
+        // A cobranca so nasce quando o admin aprova a matricula no app —
+        // o pai nao paga nada nesta etapa.
+        setStep('sucesso')
       } else {
         setErro(data.error || 'Erro ao enviar matrícula. Tente novamente.')
       }
@@ -123,7 +131,7 @@ export default function MatriculaClient({ escolaId, escolaNome, escolaLogoUrl, v
     setEnviando(false)
   }
 
-  const STEPS = ['Dados', 'Contrato', valorMatricula > 0 ? 'Pagamento' : 'Confirmação']
+  const STEPS = ['Dados', 'Contrato', 'Confirmação']
   const stepIdx = step === 'form' ? 0 : step === 'contrato' ? 1 : 2
 
   return (
@@ -196,16 +204,16 @@ export default function MatriculaClient({ escolaId, escolaNome, escolaLogoUrl, v
             <div style={SEC}>
               <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:13, color:accent, margin:'0 0 16px', textTransform:'uppercase', letterSpacing:0.5 }}>📍 Endereço</p>
               <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
-                <div><label style={LBL}>CEP</label><input name="cep" value={form.cep} onChange={handleChange} onBlur={e => buscarCep(e.target.value)} placeholder="00000-000" style={INP} /></div>
+                <div><label style={LBL}>CEP *</label><input name="cep" value={form.cep} onChange={handleChange} onBlur={e => buscarCep(e.target.value)} placeholder="00000-000" style={INP} /></div>
                 <div style={{ display:'grid', gridTemplateColumns:'1fr 80px', gap:10 }}>
-                  <div><label style={LBL}>Endereço</label><input name="endereco" value={form.endereco} onChange={handleChange} placeholder="Rua, Avenida..." style={INP} /></div>
-                  <div><label style={LBL}>Nº</label><input name="numero" value={form.numero} onChange={handleChange} style={INP} /></div>
+                  <div><label style={LBL}>Endereço *</label><input name="endereco" value={form.endereco} onChange={handleChange} placeholder="Rua, Avenida..." style={INP} /></div>
+                  <div><label style={LBL}>Nº *</label><input name="numero" value={form.numero} onChange={handleChange} style={INP} /></div>
                 </div>
                 <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-                  <div><label style={LBL}>Bairro</label><input name="bairro" value={form.bairro} onChange={handleChange} style={INP} /></div>
-                  <div><label style={LBL}>Cidade</label><input name="cidade" value={form.cidade} onChange={handleChange} style={INP} /></div>
+                  <div><label style={LBL}>Bairro *</label><input name="bairro" value={form.bairro} onChange={handleChange} style={INP} /></div>
+                  <div><label style={LBL}>Cidade *</label><input name="cidade" value={form.cidade} onChange={handleChange} style={INP} /></div>
                 </div>
-                <div style={{ width:80 }}><label style={LBL}>Estado</label><input name="estado" value={form.estado} onChange={handleChange} placeholder="MG" style={INP} /></div>
+                <div style={{ width:80 }}><label style={LBL}>Estado *</label><input name="estado" value={form.estado} onChange={handleChange} placeholder="MG" style={INP} /></div>
               </div>
             </div>
 
@@ -304,14 +312,29 @@ export default function MatriculaClient({ escolaId, escolaNome, escolaLogoUrl, v
           </>
         )}
 
-        {/* STEP 3 — SUCESSO */}
+        {/* STEP 3 — CONFIRMAÇÃO */}
         {step === 'sucesso' && (
           <div style={{ textAlign:'center', padding:'40px 0' }}>
             <div style={{ fontSize:64, marginBottom:20 }}>🎉</div>
             <h2 style={{ fontFamily:SYNE, fontWeight:900, fontSize:24, color:accent, marginBottom:12 }}>Pré-matrícula enviada!</h2>
             <p style={{ fontSize:14, color:mutedCol, lineHeight:1.7, maxWidth:360, margin:'0 auto 24px' }}>
-              Recebemos sua ficha com sucesso. Em breve nossa equipe entrará em contato pelo WhatsApp para confirmar a matrícula.
+              Recebemos a ficha de <b style={{ color:textCol }}>{form.nomeAtleta}</b> com sucesso.
             </p>
+
+            <div style={{ ...SEC, textAlign:'left', maxWidth:360, margin:'0 auto 20px' }}>
+              <p style={{ fontFamily:SYNE, fontWeight:700, fontSize:12, color:accent, marginBottom:14, textTransform:'uppercase', letterSpacing:1 }}>Próximos passos</p>
+              {[
+                'Nossa equipe analisa a ficha e o contrato assinado',
+                'Você recebe a confirmação e as boas-vindas pelo WhatsApp',
+                'Junto vem o link para pagar a primeira mensalidade',
+              ].map((passo, i) => (
+                <div key={i} style={{ display:'flex', alignItems:'flex-start', gap:10, marginBottom: i < 2 ? 10 : 0 }}>
+                  <span style={{ fontFamily:SYNE, fontWeight:800, fontSize:12, color:accent, minWidth:18 }}>{i+1}.</span>
+                  <p style={{ fontSize:13, color:mutedCol, margin:0, lineHeight:1.5 }}>{passo}</p>
+                </div>
+              ))}
+            </div>
+
             <div style={{ background:`${accent}10`, border:`1px solid ${accent}25`, borderRadius:14, padding:'16px 20px', display:'inline-block' }}>
               <p style={{ fontSize:13, color:textCol, margin:0 }}>
                 📲 Fique de olho no seu WhatsApp<br />
