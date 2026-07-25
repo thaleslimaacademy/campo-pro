@@ -261,6 +261,15 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
           <CopiarLink link={'https://gestaofc.com.br/pais/' + atleta.tokenPais} />
         </div>
 
+        {financeiroOk && !atleta.bolsista && (
+          <div style={CARD}>
+            <p style={LABEL}>Link de Pagamentos</p>
+            <p style={{ fontSize: 11, color: T.muted, marginBottom: 8 }}>Mostra todas as mensalidades pendentes juntas, cada uma com seu QR Code — envie em vez de um link por mês.</p>
+            <p style={{ fontSize: 11, color: T.muted, wordBreak: 'break-all', marginBottom: 10 }}>{'https://gestaofc.com.br/pagar-atleta/' + atleta.id}</p>
+            <CopiarLink link={'https://gestaofc.com.br/pagar-atleta/' + atleta.id} />
+          </div>
+        )}
+
         <div style={{ background: `${T.gold}08`, border: `1px solid ${T.gold}25`, borderRadius: 14, padding: 16, marginBottom: 10 }}>
           <p style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 11, color: T.gold, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>Link de Rematrícula</p>
           <p style={{ fontSize: 11, color: T.muted, marginBottom: 8 }}>Envie para o responsável renovar a matrícula.</p>
