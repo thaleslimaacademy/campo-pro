@@ -240,8 +240,8 @@ export default function TurmaDetalhes() {
 
       {/* Modal Editar */}
       {editando && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(10,14,26,0.92)', display: 'flex', alignItems: 'flex-end', zIndex: 50 }}>
-          <div style={{ width: '100%', background: '#0F1629', borderRadius: '20px 20px 0 0', padding: '24px 20px 40px', border: '1px solid rgba(65,105,225,0.3)' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(10,14,26,0.92)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 200 }}>
+          <div style={{ width: '100%', maxHeight: '88vh', overflowY: 'auto', background: '#0F1629', borderRadius: '20px 20px 0 0', padding: '24px 20px 40px', border: '1px solid rgba(65,105,225,0.3)', boxSizing: 'border-box' }}>
             <div style={{ fontFamily: syne, fontWeight: 700, fontSize: 16, color: offWhite, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 20 }}>Editar Turma</div>
             {[
               { label: 'Nome', key: 'nome', placeholder: 'Ex: Sub-11' },
