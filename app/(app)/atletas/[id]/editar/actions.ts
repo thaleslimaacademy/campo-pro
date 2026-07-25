@@ -225,10 +225,19 @@ export async function toggleAtivoAtleta(id: string, ativo: boolean) {
 export async function excluirAtleta(id: string) {
   const escolaId = await getEscolaIdServer()
 
-  const { count: pagas } = await supabaseAdmin.from('Cobranca')
+  // Falha fechada: se a consulta der erro, PARA em vez de seguir como se
+  // nao houvesse pagamento nenhum. Antes, `pagas` vinha `null` num erro de
+  // rede e `null && null > 0` avaliava como falso — deixava excluir e
+  // perder o historico financeiro justamente quando o sistema nao
+  // conseguiu nem confirmar se havia pagamento.
+  const { count: pagas, error: erroContagem } = await supabaseAdmin.from('Cobranca')
     .select('id', { count: 'exact', head: true })
     .eq('atletaId', id)
     .eq('status', 'PAGO')
+
+  if (erroContagem) {
+    throw new Error('Nao foi possivel confirmar se ha pagamentos registrados, exclusao cancelada por seguranca: ' + erroContagem.message)
+  }
 
   if (pagas && pagas > 0) {
     throw new Error(
