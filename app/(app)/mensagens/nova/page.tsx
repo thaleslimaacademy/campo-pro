@@ -2,8 +2,8 @@
 import { usePerfil } from '@/lib/usePerfil'
 import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
 import { Suspense } from 'react'
+import { registrarMensagem } from './actions'
 
 type Atleta = {
   id: string
@@ -88,10 +88,14 @@ function NovaMensagemForm() {
       } catch { erros++ }
     }
 
-    await supabase.from('Mensagem').insert({
-      escolaId: escolaId!, titulo: titulo || null, conteudo, tipo,
-      turmaId: turmaId || null, atletaIds: atletasParaEnviar, totalEnviados: enviados,
-    })
+    try {
+      await registrarMensagem({
+        titulo: titulo || null, conteudo, tipo,
+        turmaId: turmaId || null, atletaIds: atletasParaEnviar, totalEnviados: enviados,
+      })
+    } catch (e) {
+      console.error('Falha ao registrar mensagem no histórico:', (e as Error).message)
+    }
 
     setResultado({ enviados, erros })
     setEnviando(false)

@@ -3,8 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useTransition } from 'react'
-import { getJogoDetalhe, atualizarStatusJogo } from './actions'
-import { supabase } from '@/lib/supabase'
+import { getJogoDetalhe, atualizarStatusJogo, adicionarEventoSumula, removerEventoSumula, salvarRelatorioJogo } from './actions'
 
 interface Jogo {
   id: string
@@ -40,7 +39,6 @@ export default function Sumula() {
   const [showAddEvento, setShowAddEvento] = useState(false)
   const [formEvento, setFormEvento] = useState({ tipo: 'gol', timeId: '', atletaNome: '', minuto: '' })
 
-  // ── Tokens visuais ──
   const syne = 'Syne, sans-serif'
   const neon = '#FF6B00'
   const gold = '#FFD700'
@@ -84,36 +82,32 @@ export default function Sumula() {
   async function adicionarEvento() {
     if (!formEvento.atletaNome || !formEvento.timeId) return alert('Selecione o time e informe o atleta.')
     setSalvando(true)
-    const novoGolsA = jogo!.golsA + (formEvento.tipo === 'gol' && formEvento.timeId === jogo!.timeAId ? 1 : 0)
-    const novoGolsB = jogo!.golsB + (formEvento.tipo === 'gol' && formEvento.timeId === jogo!.timeBId ? 1 : 0)
-    await supabase.from('SumulaEvento').insert({
-      jogoId: id, tipo: formEvento.tipo, atletaNome: formEvento.atletaNome,
-      timeId: formEvento.timeId, minuto: formEvento.minuto ? parseInt(formEvento.minuto) : null,
-    })
-    if (formEvento.tipo === 'gol') {
-      await supabase.from('CampeonatoJogo').update({ golsA: novoGolsA, golsB: novoGolsB }).eq('id', id)
-    }
-    setFormEvento({ tipo: 'gol', timeId: '', atletaNome: '', minuto: '' })
-    setShowAddEvento(false)
-    carregar(); setSalvando(false)
+    try {
+      await adicionarEventoSumula(id, {
+        tipo: formEvento.tipo, timeId: formEvento.timeId, atletaNome: formEvento.atletaNome,
+        minuto: formEvento.minuto ? parseInt(formEvento.minuto) : null,
+      })
+      setFormEvento({ tipo: 'gol', timeId: '', atletaNome: '', minuto: '' })
+      setShowAddEvento(false)
+      carregar()
+    } catch (e) { alert('Erro: ' + (e as Error).message) }
+    setSalvando(false)
   }
 
-  async function removerEvento(eventoId: string, tipo: string, timeId: string) {
+  async function removerEvento(eventoId: string) {
     if (!confirm('Remover este evento?')) return
-    if (tipo === 'gol' && jogo) {
-      const novoGolsA = jogo.golsA - (timeId === jogo.timeAId ? 1 : 0)
-      const novoGolsB = jogo.golsB - (timeId === jogo.timeBId ? 1 : 0)
-      await supabase.from('CampeonatoJogo').update({ golsA: Math.max(0, novoGolsA), golsB: Math.max(0, novoGolsB) }).eq('id', id)
-    }
-    await supabase.from('SumulaEvento').delete().eq('id', eventoId)
-    carregar()
+    try { await removerEventoSumula(eventoId, id); carregar() }
+    catch (e) { alert('Erro: ' + (e as Error).message) }
   }
 
   async function salvarRelatorio() {
     setSalvando(true)
-    await supabase.from('CampeonatoJogo').update({ relatorioArbitro: relatorio } as any).eq('id', id)
-    setShowRelatorio(false); setSalvando(false)
-    alert('Relatório salvo!')
+    try {
+      await salvarRelatorioJogo(id, relatorio)
+      setShowRelatorio(false)
+      alert('Relatório salvo!')
+    } catch (e) { alert('Erro: ' + (e as Error).message) }
+    setSalvando(false)
   }
 
   const atletasDoTime = formEvento.timeId === jogo?.timeAId ? atletasA : atletasB
@@ -137,7 +131,6 @@ export default function Sumula() {
   return (
     <div style={{ minHeight: '100vh', background: bg, color: '#F0F0F0', fontFamily: 'Inter,sans-serif', paddingBottom: '96px' }}>
 
-      {/* ── HEADER ── */}
       <div style={{ padding: '20px 20px 0', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
         <a href={'/campeonato/' + jogo.campeonatoId} style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', textDecoration: 'none' }}>← Voltar</a>
         <h1 style={{ fontFamily: syne, fontWeight: 800, fontSize: '20px', color: '#F0F0F0', margin: 0 }}>📋 Súmula</h1>
@@ -145,10 +138,8 @@ export default function Sumula() {
 
       <div style={{ padding: '0 20px' }}>
 
-        {/* ── PLACAR ── */}
         <div style={{ background: cardBg, border: isAndamento ? '1px solid rgba(57,255,20,0.2)' : isEncerrado ? '1px solid rgba(212,175,55,0.2)' : cardBorder, borderRadius: '20px', padding: '20px', marginBottom: '12px' }}>
 
-          {/* Fase + Status */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>
               {jogo.fase}{jogo.grupo ? ' · Grupo ' + jogo.grupo : ''}
@@ -163,7 +154,6 @@ export default function Sumula() {
             </span>
           </div>
 
-          {/* Times + Placar */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '20px' }}>
             <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '15px', color: '#F0F0F0', flex: 1, textAlign: 'right', margin: 0 }}>{timeA.nome}</p>
             <div style={{ background: 'rgba(0,0,0,0.3)', borderRadius: '16px', padding: '12px 20px', textAlign: 'center', border: '1px solid rgba(255,255,255,0.08)' }}>
@@ -174,7 +164,6 @@ export default function Sumula() {
             <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '15px', color: '#F0F0F0', flex: 1, textAlign: 'left', margin: 0 }}>{timeB.nome}</p>
           </div>
 
-          {/* Botões de ação */}
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
             {jogo.status === 'agendado' && (
               <button onClick={iniciarJogo} style={{ background: 'linear-gradient(135deg,#FF6B00,#2bcc0f)', color: '#0F0F1A', padding: '10px 24px', borderRadius: '12px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', boxShadow: '0 0 16px rgba(57,255,20,0.3)' }}>
@@ -199,7 +188,6 @@ export default function Sumula() {
           </div>
         </div>
 
-        {/* ── FORM EVENTO ── */}
         {showAddEvento && (
           <div style={{ background: 'rgba(57,255,20,0.03)', border: '1px solid rgba(57,255,20,0.15)', borderRadius: '16px', padding: '16px', marginBottom: '12px' }}>
             <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: neon, marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '1px' }}>Registrar Evento</p>
@@ -250,7 +238,6 @@ export default function Sumula() {
           </div>
         )}
 
-        {/* ── FORM RELATÓRIO ── */}
         {showRelatorio && (
           <div style={{ background: 'rgba(212,175,55,0.04)', border: '1px solid rgba(212,175,55,0.2)', borderRadius: '16px', padding: '16px', marginBottom: '12px' }}>
             <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: gold, marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>📝 Relatório do Árbitro</p>
@@ -267,7 +254,6 @@ export default function Sumula() {
           </div>
         )}
 
-        {/* ── LISTA DE EVENTOS ── */}
         <div style={{ background: cardBg, border: cardBorder, borderRadius: '16px', marginBottom: '12px', overflow: 'hidden' }}>
           <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: neon, padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', textTransform: 'uppercase', letterSpacing: '1px', margin: 0 }}>
             Eventos ({eventos.length})
@@ -289,7 +275,7 @@ export default function Sumula() {
                     </div>
                   </div>
                   {!isEncerrado && (
-                    <button onClick={() => removerEvento(e.id, e.tipo, e.timeId)} style={{ fontSize: '11px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#F87171', padding: '4px 10px', borderRadius: '8px', cursor: 'pointer' }}>
+                    <button onClick={() => removerEvento(e.id)} style={{ fontSize: '11px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#F87171', padding: '4px 10px', borderRadius: '8px', cursor: 'pointer' }}>
                       Remover
                     </button>
                   )}
@@ -299,7 +285,6 @@ export default function Sumula() {
           )}
         </div>
 
-        {/* ── RESUMO DE GOLS ── */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
           {[
             { time: timeA, id: timeA.id },
@@ -325,7 +310,6 @@ export default function Sumula() {
 
       </div>
 
-      {/* ── NAV ── */}
       <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-around', padding: '12px 0 20px', borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(5,5,5,0.95)', backdropFilter: 'blur(10px)' }}>
         {[
           { href: '/dashboard', label: 'Inicio', icon: '🏠' },

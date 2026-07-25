@@ -3,7 +3,6 @@ import { useTransition } from 'react'
 import { getTurmaDetalhe, adicionarAtletaTurma, removerAtletaTurma, editarTurma, arquivarTurma } from './actions'
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
 
 type Atleta = {
   id: string
@@ -83,12 +82,12 @@ export default function TurmaDetalhes() {
   }
 
   async function salvarEdicao() {
-    await supabase.from('Turma').update({
+    await editarTurma(id, {
       nome: formEdit.nome,
       diasSemana: formEdit.diasSemana,
       horario: formEdit.horario,
       descricao: formEdit.descricao,
-    }).eq('id', id)
+    })
     setTurma(prev => prev ? { ...prev, ...formEdit } : prev)
     setEditando(false)
   }

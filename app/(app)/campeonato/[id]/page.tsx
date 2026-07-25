@@ -3,8 +3,11 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useTransition } from 'react'
-import { getCampeonatoDetalhe, atualizarStatusCampeonato } from './actions'
-import { supabase } from '@/lib/supabase'
+import {
+  getCampeonatoDetalhe, atualizarStatusCampeonato, adicionarTimeCampeonato,
+  excluirTimeCampeonato, toggleAcessoTime, sortearGruposCampeonato,
+  gerarJogosFaseGruposCampeonato, gerarJogosFaseCampeonato,
+} from './actions'
 
 interface Campeonato {
   id: string
@@ -60,7 +63,6 @@ export default function CampeonatoDetalhes() {
     responsavelWhatsapp: '',
   })
 
-  // ── Tokens visuais ──
   const syne = 'Syne, sans-serif'
   const neon = '#4169E1'
   const gold = '#FFD700'
@@ -69,7 +71,6 @@ export default function CampeonatoDetalhes() {
   const cardBorder = '1px solid rgba(255,255,255,0.07)'
   const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 12px', color: '#F0F4FF', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '6px', outline: 'none', boxSizing: 'border-box' as const }
 
-  // Helper: estilo do badge de status do campeonato
   function statusBadgeStyle(status: string) {
     const map: { [k: string]: { background: string; color: string; border: string } } = {
       rascunho:  { background: 'rgba(107,114,128,0.15)', color: '#9CA3AF', border: '1px solid rgba(107,114,128,0.2)' },
@@ -80,7 +81,6 @@ export default function CampeonatoDetalhes() {
     return map[status] || {}
   }
 
-  // Helper: estilo do badge de status do jogo
   function jogoBadgeStyle(status: string) {
     if (status === 'encerrado') return { background: 'rgba(57,255,20,0.1)',  color: neon }
     if (status === 'andamento') return { background: 'rgba(212,175,55,0.1)', color: gold }
@@ -105,48 +105,24 @@ export default function CampeonatoDetalhes() {
     if (!formTime.nome) return alert('Nome obrigatório.')
     if (times.length >= 16) return alert('Máximo 16 times.')
     setSalvandoTime(true)
-    const { error } = await supabase.from('CampeonatoTime').insert({
-      campeonatoId: id,
-      nome: formTime.nome,
-      tipo: formTime.tipo,
-      responsavelNome: formTime.responsavelNome || null,
-      responsavelWhatsapp: formTime.responsavelWhatsapp || null,
-      acessoAtivo: true,
-    })
-    if (error) alert('Erro: ' + error.message)
-    else { setFormTime({ nome: '', tipo: 'externo', responsavelNome: '', responsavelWhatsapp: '' }); setShowFormTime(false); carregar() }
+    try {
+      await adicionarTimeCampeonato(id, formTime)
+      setFormTime({ nome: '', tipo: 'externo', responsavelNome: '', responsavelWhatsapp: '' })
+      setShowFormTime(false)
+      carregar()
+    } catch (e) { alert('Erro: ' + (e as Error).message) }
     setSalvandoTime(false)
   }
 
   async function excluirTime(timeId: string) {
     if (!confirm('Excluir este time? Os jogos relacionados tambem serao removidos.')) return
-
-    // 1. Remove eventos de sumula dos jogos que envolvem este time
-    const jogosDoTime = jogos.filter(j => j.timeAId === timeId || j.timeBId === timeId)
-    for (const j of jogosDoTime) {
-      await supabase.from('SumulaEvento').delete().eq('jogoId', j.id)
-    }
-
-    // 2. Remove os jogos que envolvem este time (FK: CampeonatoJogo_timebid_fkey)
-    const { error: errJogosA } = await supabase.from('CampeonatoJogo').delete().eq('timeAId', timeId)
-    if (errJogosA) { alert('Erro ao excluir jogos (A): ' + errJogosA.message); return }
-    const { error: errJogosB } = await supabase.from('CampeonatoJogo').delete().eq('timeBId', timeId)
-    if (errJogosB) { alert('Erro ao excluir jogos (B): ' + errJogosB.message); return }
-
-    // 3. Remove atletas do time
-    const { error: errAtletas } = await supabase.from('CampeonatoAtleta').delete().eq('timeId', timeId)
-    if (errAtletas) { alert('Erro ao excluir atletas: ' + errAtletas.message); return }
-
-    // 4. Remove o time
-    const { error: errTime } = await supabase.from('CampeonatoTime').delete().eq('id', timeId)
-    if (errTime) { alert('Erro ao excluir time: ' + errTime.message); return }
-
-    carregar()
+    try { await excluirTimeCampeonato(timeId, id); carregar() }
+    catch (e) { alert('Erro: ' + (e as Error).message) }
   }
 
   async function toggleAcesso(timeId: string, ativo: boolean) {
-    await supabase.from('CampeonatoTime').update({ acessoAtivo: !ativo }).eq('id', timeId)
-    carregar()
+    try { await toggleAcessoTime(timeId, ativo, id); carregar() }
+    catch (e) { alert('Erro: ' + (e as Error).message) }
   }
 
   async function atualizarStatus(novoStatus: string) {
@@ -157,37 +133,19 @@ export default function CampeonatoDetalhes() {
   async function sortearGrupos() {
     if (times.length < 2) return alert('Adicione pelo menos 2 times.')
     if (!confirm('Sortear grupos automaticamente?')) return
-    const letras = ['A', 'B', 'C', 'D']
-    const embaralhados = [...times].sort(() => Math.random() - 0.5)
-    const porGrupo = Math.ceil(embaralhados.length / 4)
-    for (let i = 0; i < embaralhados.length; i++) {
-      const grupo = letras[Math.floor(i / porGrupo)] || 'A'
-      await supabase.from('CampeonatoTime').update({ grupo }).eq('id', embaralhados[i].id)
-    }
-    carregar()
+    try { await sortearGruposCampeonato(id); carregar() }
+    catch (e) { alert('Erro: ' + (e as Error).message) }
   }
 
   async function gerarJogosFaseGrupos() {
-    const jogosGrupos = jogos.filter(j => j.fase === 'Fase de Grupos')
-    if (jogosGrupos.length > 0) {
-      if (!confirm('Já existem jogos de grupos. Regerar?')) return
-      await supabase.from('CampeonatoJogo').delete().in('id', jogosGrupos.map(j => j.id))
-    }
-    const grupos = [...new Set(times.map(t => t.grupo).filter(Boolean))]
-    if (grupos.length === 0) return alert('Sorteie os grupos primeiro.')
-    const novos: any[] = []
-    for (const grupo of grupos) {
-      const tg = times.filter(t => t.grupo === grupo)
-      for (let i = 0; i < tg.length; i++) {
-        for (let j = i + 1; j < tg.length; j++) {
-          novos.push({ campeonatoId: id, timeAId: tg[i].id, timeBId: tg[j].id, fase: 'Fase de Grupos', grupo, status: 'agendado', golsA: 0, golsB: 0 })
-        }
-      }
-    }
-    if (novos.length === 0) return alert('Nenhum jogo gerado.')
-    await supabase.from('CampeonatoJogo').insert(novos)
-    alert(novos.length + ' jogos gerados!')
-    carregar()
+    const jaTemGrupos = jogos.some(j => j.fase === 'Fase de Grupos')
+    const regerar = jaTemGrupos ? confirm('Já existem jogos de grupos. Regerar?') : false
+    if (jaTemGrupos && !regerar) return
+    try {
+      const r = await gerarJogosFaseGruposCampeonato(id, regerar)
+      if (r.criados === 0 && !r.jaExiste) alert('Nenhum jogo gerado.')
+      carregar()
+    } catch (e) { alert('Erro: ' + (e as Error).message) }
   }
 
   async function gerarMataMata() {
@@ -212,16 +170,16 @@ export default function CampeonatoDetalhes() {
     }
     if (classificados.length < 2) return alert('Poucos times classificados. Verifique se os jogos foram encerrados.')
     const embaralhados = [...classificados].sort(() => Math.random() - 0.5)
-    const novos: any[] = []
+    const pares: { timeAId: string; timeBId: string }[] = []
     for (let i = 0; i < embaralhados.length - 1; i += 2) {
-      if (embaralhados[i + 1]) {
-        novos.push({ campeonatoId: id, timeAId: embaralhados[i].id, timeBId: embaralhados[i + 1].id, fase: faseEscolhida, status: 'agendado', golsA: 0, golsB: 0 })
-      }
+      if (embaralhados[i + 1]) pares.push({ timeAId: embaralhados[i].id, timeBId: embaralhados[i + 1].id })
     }
-    await supabase.from('CampeonatoJogo').insert(novos)
-    setShowMataMata(false)
-    alert(novos.length + ' jogos de ' + faseEscolhida + ' gerados!')
-    carregar()
+    try {
+      const r = await gerarJogosFaseCampeonato(id, faseEscolhida, pares, false)
+      setShowMataMata(false)
+      alert(r.criados + ' jogos de ' + faseEscolhida + ' gerados!')
+      carregar()
+    } catch (e) { alert('Erro: ' + (e as Error).message) }
   }
 
   async function gerarProximaFase(faseAtual: string) {
@@ -247,20 +205,18 @@ export default function CampeonatoDetalhes() {
   async function gerarJogosMataMataPuro() {
     if (times.length < 2) return alert('Adicione pelo menos 2 times.')
     const jogosExistentes = jogos.filter(j => j.fase === faseEscolhida)
-    if (jogosExistentes.length > 0) {
-      if (!confirm('Já existem jogos desta fase. Regerar?')) return
-      await supabase.from('CampeonatoJogo').delete().in('id', jogosExistentes.map(j => j.id))
-    }
+    const regerar = jogosExistentes.length > 0 ? confirm('Já existem jogos desta fase. Regerar?') : false
+    if (jogosExistentes.length > 0 && !regerar) return
     const embaralhados = [...times].sort(() => Math.random() - 0.5)
-    const novos: any[] = []
+    const pares: { timeAId: string; timeBId: string }[] = []
     for (let i = 0; i < embaralhados.length - 1; i += 2) {
-      if (embaralhados[i + 1]) {
-        novos.push({ campeonatoId: id, timeAId: embaralhados[i].id, timeBId: embaralhados[i + 1].id, fase: faseEscolhida, status: 'agendado', golsA: 0, golsB: 0 })
-      }
+      if (embaralhados[i + 1]) pares.push({ timeAId: embaralhados[i].id, timeBId: embaralhados[i + 1].id })
     }
-    await supabase.from('CampeonatoJogo').insert(novos)
-    alert(novos.length + ' jogos de ' + faseEscolhida + ' gerados!')
-    carregar()
+    try {
+      const r = await gerarJogosFaseCampeonato(id, faseEscolhida, pares, regerar)
+      alert(r.criados + ' jogos de ' + faseEscolhida + ' gerados!')
+      carregar()
+    } catch (e) { alert('Erro: ' + (e as Error).message) }
   }
 
   function nomeTime(timeId: string) {
@@ -307,7 +263,6 @@ export default function CampeonatoDetalhes() {
   return (
     <div style={{ minHeight: '100vh', background: bg, color: '#F0F4FF', fontFamily: 'Inter,sans-serif', paddingBottom: '96px' }}>
 
-      {/* ── HEADER ── */}
       <div style={{ padding: '20px 20px 0', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
         <a href="/campeonato" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', textDecoration: 'none' }}>← Voltar</a>
         <h1 style={{ fontFamily: syne, fontWeight: 800, fontSize: '20px', color: '#F0F4FF', margin: 0 }}>🏆 {campeonato.nome}</h1>
@@ -315,7 +270,6 @@ export default function CampeonatoDetalhes() {
 
       <div style={{ padding: '0 20px' }}>
 
-        {/* ── INFO + AÇÕES ── */}
         <div style={{ background: cardBg, border: '1px solid rgba(57,255,20,0.15)', borderRadius: '16px', padding: '16px', marginBottom: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
             <span style={{ fontSize: '11px', padding: '4px 12px', borderRadius: '20px', fontWeight: 700, fontFamily: syne, ...statusBadgeStyle(campeonato.status) }}>
@@ -375,7 +329,6 @@ export default function CampeonatoDetalhes() {
           )}
         </div>
 
-        {/* ── TABS ── */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
           {(['times', 'jogos', 'classificacao'] as const).map(a => (
             <button key={a} onClick={() => setAba(a)} style={{ flex: 1, padding: '10px', borderRadius: '12px', fontSize: '12px', fontWeight: 700, fontFamily: syne, border: 'none', cursor: 'pointer', background: aba === a ? 'linear-gradient(135deg,#4169E1,#2bcc0f)' : 'rgba(255,255,255,0.05)', color: aba === a ? '#0A0E1A' : 'rgba(255,255,255,0.5)', transition: 'all 0.2s' }}>
@@ -384,7 +337,6 @@ export default function CampeonatoDetalhes() {
           ))}
         </div>
 
-        {/* ── ABA TIMES ── */}
         {aba === 'times' && (
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
@@ -468,7 +420,6 @@ export default function CampeonatoDetalhes() {
           </div>
         )}
 
-        {/* ── ABA JOGOS ── */}
         {aba === 'jogos' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {jogos.length === 0 ? (
@@ -540,7 +491,6 @@ export default function CampeonatoDetalhes() {
           </div>
         )}
 
-        {/* ── ABA CLASSIFICAÇÃO ── */}
         {aba === 'classificacao' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {classificacao.length === 0 ? (
@@ -584,7 +534,6 @@ export default function CampeonatoDetalhes() {
 
       </div>
 
-      {/* ── NAV ── */}
       <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-around', padding: '12px 0 20px', borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(5,5,5,0.95)', backdropFilter: 'blur(10px)' }}>
         {[
           { href: '/dashboard', label: 'Inicio', icon: '🏠' },
