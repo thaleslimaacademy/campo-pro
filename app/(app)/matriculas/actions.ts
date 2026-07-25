@@ -3,6 +3,7 @@ import { gerarMensalidades } from '@/app/(app)/financeiro/mensalidades/actions'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 import { revalidatePath } from 'next/cache'
+import { clampDiaPreferido } from '@/lib/dataVencimento'
 
 export async function getMatriculas() {
   const escolaId = await getEscolaIdServer()
@@ -35,11 +36,12 @@ export async function aprovarMatricula(matriculaId: string, escolaId: string, at
   const aprovadoEm = new Date()
 
   // Dia de vencimento: usa o que veio do formulario; se nao veio, puxa
-  // automaticamente do dia da APROVACAO. Clamp em 28 porque 29/30/31 nao
-  // existem em todo mes — fevereiro quebraria a cobranca em silencio.
+  // automaticamente do dia da APROVACAO. So guarda a PREFERENCIA (1-31) —
+  // o ajuste pro tamanho real de cada mes acontece na hora de gerar cada
+  // cobranca (dataVencimentoNoMes), nao aqui.
   const diaVencimento = atletaData.diaVencimento
-    ? Math.min(Number(atletaData.diaVencimento), 28)
-    : Math.min(aprovadoEm.getDate(), 28)
+    ? clampDiaPreferido(Number(atletaData.diaVencimento))
+    : clampDiaPreferido(aprovadoEm.getDate())
 
   const { error } = await supabaseAdmin.from('Atleta').insert({ id: atletaId, escolaId, nome: atletaData.nome, dataNascimento: atletaData.dataNascimento, cpf: atletaData.cpf, rg: atletaData.rg, posicao: atletaData.posicao, telefone: atletaData.telefone, cep: atletaData.cep, endereco: atletaData.endereco, numero: atletaData.numero, bairro: atletaData.bairro, cidade: atletaData.cidade, estado: atletaData.estado, tokenPais, ativo: true, turmaId: atletaData.turmaId || null, valorMensalidade: atletaData.valorMensalidade ? Number(atletaData.valorMensalidade) : null, diaVencimento })
   if (error) throw new Error(error.message)
@@ -78,7 +80,7 @@ export async function preGerarRestante(atletaId: string, valor: number, diaVenci
       // sozinha — nao faz sentido travar 12 competencias de uma vez.
       quantidade: 3,
       valor: Number(valor),
-      diaVencimento: Math.min(Number(diaVencimento) || 10, 28),
+      diaVencimento: clampDiaPreferido(diaVencimento),
       silencioso: true,
     })
     return { ok: true, geradas: r.geradas ?? 0 }

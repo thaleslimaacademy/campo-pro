@@ -11,7 +11,7 @@ const SEC: React.CSSProperties = { background:T.surface, border:`1px solid ${T.b
 const SEC_TITLE: React.CSSProperties = { fontFamily:SYNE, fontWeight:700, fontSize:11, color:T.primary, textTransform:'uppercase', letterSpacing:1, marginBottom:14 }
 
 const POSICOES = ['Goleiro','Zagueiro','Lateral Direito','Lateral Esquerdo','Volante','Meia','Meia-atacante','Atacante','Centroavante']
-const DIAS_VCTO = Array.from({length:28},(_,i)=>String(i+1))
+const DIAS_VCTO = Array.from({length:31},(_,i)=>String(i+1))
 
 type Turma = { id: string; nome: string }
 

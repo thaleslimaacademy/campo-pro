@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { msgLembreteD3, msgVencimentoHoje, msgAtraso } from '@/lib/whatsapp-templates'
 import { gerarPixSeFaltar } from '@/lib/gerarPixSeFaltar'
+import { dataVencimentoNoMes } from '@/lib/dataVencimento'
 
 // offset em dias a partir de hoje (negativo = passado)
 function dataComOffset(n: number): string {
@@ -49,7 +50,10 @@ async function garantirMensalidadesFuturas(meses: number) {
           .map(c => String(c.competencia).slice(0, 10))
       )
 
-      const dia = Math.min(Number(a.diaVencimento) || 10, 28)
+      // Dia PREFERIDO do atleta (1-31, sem clamp em 28). O clamp real pro
+      // mes especifico acontece dentro de dataVencimentoNoMes(), que sabe
+      // quantos dias cada mes realmente tem.
+      const diaPreferido = Number(a.diaVencimento) || 10
       const valor = Number(a.valorMensalidade)
         || PLANOS[a.planoMensalidade || '']
         || Number(escola.valorMensalidade)
@@ -57,10 +61,10 @@ async function garantirMensalidadesFuturas(meses: number) {
 
       const novas = []
       for (let i = 0; i <= meses; i++) {
-        const alvo = new Date(Date.UTC(hojeD.getUTCFullYear(), hojeD.getUTCMonth() + i, dia))
-        const venc = alvo.toISOString().slice(0, 10)
+        const venc = dataVencimentoNoMes(hojeD.getUTCFullYear(), hojeD.getUTCMonth() + i, diaPreferido)
         const competencia = venc.slice(0, 7) + '-01'
         if (jaTem.has(competencia)) continue
+        // nao cria retroativo: se o vencimento do mes corrente ja passou, pula
         if (venc < hojeISO) continue
         novas.push({
           id: crypto.randomUUID(), escolaId: escola.id, atletaId: a.id,

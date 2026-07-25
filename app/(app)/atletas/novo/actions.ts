@@ -2,6 +2,7 @@
 import { supabaseAdmin } from '@/lib/supabase'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 import { revalidatePath } from 'next/cache'
+import { clampDiaPreferido } from '@/lib/dataVencimento'
 
 // Antes o cadastro era feito do lado do cliente com a chave anon. O RLS de
 // Atleta e Responsavel so permite SELECT, entao os inserts eram barrados.
@@ -38,7 +39,7 @@ export async function criarAtleta(form: FormNovoAtleta) {
     telefone: form.telefone || null,
     posicao: form.posicao || null,
     turmaId: form.turmaId || null,
-    diaVencimento: Math.min(dia, 28),
+    diaVencimento: clampDiaPreferido(dia),
     planoMensalidade: form.planoMensalidade || null,
     valorMensalidade: form.valorMensalidade ? Number(form.valorMensalidade) : null,
     turnoEstuda: form.turnoEstuda || null,

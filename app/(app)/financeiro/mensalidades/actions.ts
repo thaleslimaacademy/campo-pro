@@ -4,6 +4,7 @@ import { cancelarCobrancaAsaas } from '@/lib/asaas'
 import { getAsaasKey } from '@/lib/getAsaasKey'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 import { revalidatePath } from 'next/cache'
+import { dataVencimentoNoMes } from '@/lib/dataVencimento'
 
 export async function getMensalidades() {
   const escolaId = await getEscolaIdServer()
@@ -101,8 +102,7 @@ export async function gerarMensalidades(params: { atletaId?: string; atletaIds?:
   let puladas = 0
   for (const aid of ids) {
     for (let i = 0; i < qtd; i++) {
-      const dataVenc = new Date(agora.getFullYear(), agora.getMonth() + i, diaVencimento)
-      const venc = dataVenc.toISOString().split('T')[0]
+      const venc = dataVencimentoNoMes(agora.getFullYear(), agora.getMonth() + i, diaVencimento)
       const competencia = venc.slice(0, 7) + '-01'
       if (!forcar && jaTem.has(`${aid}|${competencia}`)) { puladas++; continue }
       insertions.push({

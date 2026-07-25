@@ -113,7 +113,7 @@ export default function MensalidadesPage() {
               <Campo label="Qtd. meses"><input type="number" min={1} max={24} value={quantidade} onChange={e => setQuantidade(Number(e.target.value))} style={INP} /></Campo>
               <Campo label="Mês inicial"><input type="month" value={mesInicial} onChange={e => setMesInicial(e.target.value)} style={INP} /></Campo>
               <Campo label="Valor (R$)"><input type="number" min={0} step="0.01" value={valor} onChange={e => setValor(Number(e.target.value))} style={INP} /></Campo>
-              <Campo label="Dia vencimento"><input type="number" min={1} max={28} value={diaVencimento} onChange={e => setDiaVencimento(Number(e.target.value))} style={INP} /></Campo>
+              <Campo label="Dia vencimento"><input type="number" min={1} max={31} value={diaVencimento} onChange={e => setDiaVencimento(Number(e.target.value))} style={INP} /></Campo>
             </div>
             <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
               {[3, 6, 10, 12].map(q => (
