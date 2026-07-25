@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { cancelarCobrancaAsaas } from '@/lib/asaas'
 import { getAsaasKey } from '@/lib/getAsaasKey'
 import { gerarPixSeFaltar } from '@/lib/gerarPixSeFaltar'
+import { dataVencimentoNoMes, clampDiaPreferido } from '@/lib/dataVencimento'
 
 export async function getAtletaParaEditar(id: string) {
   const escolaId = await getEscolaIdServer()
@@ -26,7 +27,7 @@ export async function getAtletaParaEditar(id: string) {
  * vimos isso acontecer com o upload de foto), essas ja ficam salvas. Só
  * depois trata as que ja tem PIX na Asaas (mais lento: cancela e recria).
  */
-async function propagarValorMensalidade(atletaId: string, escolaId: string, novoValor: number) {
+async function propagarValorMensalidade(atletaId: string, escolaId: string, novoValor: number, avisos: string[]) {
   const hoje = new Date().toISOString().slice(0, 10)
   const { data: futuras, error: erroBusca } = await supabaseAdmin.from('Cobranca')
     .select('id, valor, asaasId, vencimento, descricao')
@@ -36,25 +37,20 @@ async function propagarValorMensalidade(atletaId: string, escolaId: string, novo
     .is('excluidaEm', null)
     .gte('vencimento', hoje)
 
-  if (erroBusca) return { atualizadas: 0, avisos: [`Falha ao buscar cobranças futuras: ${erroBusca.message}`] }
+  if (erroBusca) { avisos.push(`Falha ao buscar cobranças futuras (valor): ${erroBusca.message}`); return }
 
   const mensalidades = (futuras ?? []).filter(c =>
     String(c.descricao || '').trim().toLowerCase().startsWith('mensalidade')
     && Number(c.valor) !== novoValor
   )
 
-  const avisos: string[] = []
-  let atualizadas = 0
-
   // ── Passo 1: sem PIX ainda — update em lote, rapido e seguro ──
   const semPix = mensalidades.filter(c => !c.asaasId)
   if (semPix.length) {
-    const { error, count } = await supabaseAdmin.from('Cobranca')
+    const { error } = await supabaseAdmin.from('Cobranca')
       .update({ valor: novoValor })
       .in('id', semPix.map(c => c.id))
-      .select('id', { count: 'exact', head: true })
-    if (error) avisos.push(`Falha ao atualizar ${semPix.length} mensalidade(s) sem PIX: ${error.message}`)
-    else atualizadas += count ?? semPix.length
+    if (error) avisos.push(`Falha ao atualizar ${semPix.length} mensalidade(s) sem PIX (valor): ${error.message}`)
   }
 
   // ── Passo 2: com PIX na Asaas — cancela e recria, uma por vez ──
@@ -65,13 +61,13 @@ async function propagarValorMensalidade(atletaId: string, escolaId: string, novo
 
     for (const cob of comPix) {
       if (!apiKey) {
-        avisos.push(`Cobrança ${cob.id}: sem chave Asaas configurada, PIX não regenerado`)
+        avisos.push(`Cobrança ${cob.id}: sem chave Asaas configurada, PIX não regenerado (valor)`)
         continue
       }
       try {
         await cancelarCobrancaAsaas(apiKey, cob.asaasId as string)
       } catch (e) {
-        avisos.push(`Cobrança ${cob.id}: falha ao cancelar PIX antigo — ${(e as Error).message}`)
+        avisos.push(`Cobrança ${cob.id}: falha ao cancelar PIX antigo (valor) — ${(e as Error).message}`)
         continue
       }
       await supabaseAdmin.from('Cobranca').update({
@@ -82,26 +78,96 @@ async function propagarValorMensalidade(atletaId: string, escolaId: string, novo
         cob.id, escolaId, atletaId, novoValor, String(cob.vencimento).slice(0, 10)
       )
       if (!gerado) avisos.push(`Cobrança ${cob.id}: valor atualizado mas o novo PIX falhou — será recriado no D-3`)
-      atualizadas++
     }
   }
+}
 
-  return { atualizadas, avisos }
+/**
+ * Propaga uma mudanca de diaVencimento para as cobrancas futuras ja
+ * pre-geradas. A competencia (mes) nao muda — so o dia dentro daquele mes,
+ * recalculado com dataVencimentoNoMes() pra nunca estourar (dia 31 cai em
+ * 30/28/29 conforme o mes tiver menos dias). Mesma ordem sem-PIX primeiro /
+ * com-PIX depois que propagarValorMensalidade, pelo mesmo motivo de timeout.
+ */
+async function propagarDiaVencimento(atletaId: string, escolaId: string, novoDia: number, avisos: string[]) {
+  const hoje = new Date().toISOString().slice(0, 10)
+  const { data: futuras, error: erroBusca } = await supabaseAdmin.from('Cobranca')
+    .select('id, vencimento, competencia, asaasId, valor, descricao')
+    .eq('atletaId', atletaId)
+    .eq('escolaId', escolaId)
+    .eq('status', 'PENDENTE')
+    .is('excluidaEm', null)
+    .gte('vencimento', hoje)
+
+  if (erroBusca) { avisos.push(`Falha ao buscar cobranças futuras (vencimento): ${erroBusca.message}`); return }
+
+  const mensalidades = (futuras ?? []).filter(c =>
+    String(c.descricao || '').trim().toLowerCase().startsWith('mensalidade') && c.competencia
+  )
+
+  const comNovaData = mensalidades.map(c => {
+    const [ano, mes] = String(c.competencia).slice(0, 7).split('-').map(Number)
+    const novoVencimento = dataVencimentoNoMes(ano, mes - 1, novoDia)
+    return { ...c, novoVencimento }
+  }).filter(c => c.novoVencimento !== String(c.vencimento).slice(0, 10))
+
+  // ── Passo 1: sem PIX — cada uma tem uma data nova diferente, update
+  // individual (mas sem chamada externa, entao rapido mesmo assim) ──
+  const semPix = comNovaData.filter(c => !c.asaasId)
+  for (const cob of semPix) {
+    const { error } = await supabaseAdmin.from('Cobranca')
+      .update({ vencimento: cob.novoVencimento }).eq('id', cob.id)
+    if (error) avisos.push(`Cobrança ${cob.id}: falha ao atualizar vencimento — ${error.message}`)
+  }
+
+  // ── Passo 2: com PIX na Asaas — cancela e recria com a data nova ──
+  const comPix = comNovaData.filter(c => c.asaasId)
+  if (comPix.length) {
+    let apiKey: string | null = null
+    try { apiKey = await getAsaasKey(escolaId) } catch { apiKey = '' }
+
+    for (const cob of comPix) {
+      if (!apiKey) {
+        avisos.push(`Cobrança ${cob.id}: sem chave Asaas configurada, PIX não regenerado (vencimento)`)
+        continue
+      }
+      try {
+        await cancelarCobrancaAsaas(apiKey, cob.asaasId as string)
+      } catch (e) {
+        avisos.push(`Cobrança ${cob.id}: falha ao cancelar PIX antigo (vencimento) — ${(e as Error).message}`)
+        continue
+      }
+      await supabaseAdmin.from('Cobranca').update({
+        vencimento: cob.novoVencimento, asaasId: null, pixCopiaCola: null, pixQrCode: null,
+      }).eq('id', cob.id)
+
+      const gerado = await gerarPixSeFaltar(
+        cob.id, escolaId, atletaId, Number(cob.valor), cob.novoVencimento
+      )
+      if (!gerado) avisos.push(`Cobrança ${cob.id}: vencimento atualizado mas o novo PIX falhou — será recriado no D-3`)
+    }
+  }
 }
 
 export async function salvarAtleta(id: string, payload: Record<string, unknown>) {
   const escolaId = await getEscolaIdServer()
+  const avisos: string[] = []
 
-  let avisosMensalidade: string[] | null = null
+  const { data: atual } = await supabaseAdmin.from('Atleta')
+    .select('valorMensalidade, diaVencimento').eq('id', id).eq('escolaId', escolaId).single()
+
   if ('valorMensalidade' in payload) {
     const novoValor = Number(payload.valorMensalidade)
-    if (!Number.isNaN(novoValor)) {
-      const { data: atual } = await supabaseAdmin.from('Atleta')
-        .select('valorMensalidade').eq('id', id).eq('escolaId', escolaId).single()
-      if (atual && Number(atual.valorMensalidade) !== novoValor) {
-        const resultado = await propagarValorMensalidade(id, escolaId, novoValor)
-        if (resultado.avisos.length) avisosMensalidade = resultado.avisos
-      }
+    if (!Number.isNaN(novoValor) && atual && Number(atual.valorMensalidade) !== novoValor) {
+      await propagarValorMensalidade(id, escolaId, novoValor, avisos)
+    }
+  }
+
+  if ('diaVencimento' in payload) {
+    const novoDia = clampDiaPreferido(Number(payload.diaVencimento))
+    payload.diaVencimento = novoDia
+    if (atual && Number(atual.diaVencimento) !== novoDia) {
+      await propagarDiaVencimento(id, escolaId, novoDia, avisos)
     }
   }
 
@@ -111,7 +177,7 @@ export async function salvarAtleta(id: string, payload: Record<string, unknown>)
   revalidatePath('/atletas')
   revalidatePath('/financeiro/mensalidades')
 
-  if (avisosMensalidade) return { ok: true, avisosMensalidade }
+  if (avisos.length) return { ok: true, avisosMensalidade: avisos }
   return { ok: true }
 }
 
