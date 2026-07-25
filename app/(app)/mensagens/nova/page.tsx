@@ -3,7 +3,7 @@ import { usePerfil } from '@/lib/usePerfil'
 import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Suspense } from 'react'
-import { registrarMensagem } from './actions'
+import { carregarDadosMensagem, buscarResponsaveisParaEnvio, registrarMensagem } from './actions'
 
 type Atleta = {
   id: string
@@ -41,15 +41,13 @@ function NovaMensagemForm() {
   const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 12px', color: '#F0F4FF', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '6px', outline: 'none', boxSizing: 'border-box' as const }
 
   useEffect(() => {
-    if (!escolaId) return
     async function carregar() {
-      const { data: t } = await supabase.from('Turma').select('*').eq('escolaId', escolaId!).eq('ativa', true).order('nome')
-      setTurmas(t || [])
-      const { data: a } = await supabase.from('Atleta').select('id, nome, fotoUrl, turmaId').eq('escolaId', escolaId!).eq('ativo', true).order('nome')
-      setAtletas(a || [])
+      const d = await carregarDadosMensagem()
+      setTurmas(d.turmas)
+      setAtletas(d.atletas as Atleta[])
     }
     carregar()
-  }, [escolaId])
+  }, [])
 
   function toggleAtleta(id: string) {
     setAtletasSelecionados(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id])
@@ -70,9 +68,7 @@ function NovaMensagemForm() {
 
     if (atletasParaEnviar.length === 0) { alert('Nenhum atleta selecionado'); setEnviando(false); return }
 
-    const { data: responsaveis } = await supabase
-      .from('Responsavel').select('atletaId, whatsapp, telefone')
-      .in('atletaId', atletasParaEnviar).eq('principal', true)
+    const responsaveis = await buscarResponsaveisParaEnvio(atletasParaEnviar)
 
     let enviados = 0, erros = 0
     for (const resp of responsaveis || []) {
