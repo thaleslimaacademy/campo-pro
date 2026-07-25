@@ -150,6 +150,7 @@ export default function Atletas() {
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
+            <a href="/atletas/carteirinhas" style={{ background: 'rgba(255,255,255,0.15)', color: T.text, borderRadius: 8, padding: '9px 12px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, textDecoration: 'none', textTransform: 'uppercase' }}>🪪 Carteirinhas</a>
             <a href="/atletas/importar" style={{ background: 'rgba(255,255,255,0.15)', color: T.text, borderRadius: 8, padding: '9px 12px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, textDecoration: 'none', textTransform: 'uppercase' }}>⬆ CSV</a>
             <a href="/atletas/novo" style={{ background: T.text, color: T.primary, borderRadius: 8, padding: '9px 14px', fontFamily: SYNE, fontWeight: 800, fontSize: 12, textDecoration: 'none', textTransform: 'uppercase' }}>+ Novo</a>
           </div>
