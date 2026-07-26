@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import PushNotificationButton from '@/components/PushNotificationButton'
+import AtivarDebitoAutomatico from './AtivarDebitoAutomatico'
 
 export default async function AreaPais({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params
@@ -7,7 +8,7 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
   // ── Busca atleta pelo token do responsável ──
   const { data: atleta } = await supabase
     .from('Atleta')
-    .select('id, nome, posicao, tokenPais, fotoUrl, escolaId')
+    .select('id, nome, posicao, tokenPais, fotoUrl, escolaId, valorMensalidade, asaasSubscriptionId')
     .eq('tokenPais', token)
     .single()
 
@@ -503,6 +504,13 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
             </div>
           </div>
         )}
+
+        {/* ── DÉBITO AUTOMÁTICO ── */}
+        <AtivarDebitoAutomatico
+          token={token}
+          valorMensalidade={atleta.valorMensalidade ? Number(atleta.valorMensalidade) : null}
+          jaAtivo={!!atleta.asaasSubscriptionId}
+        />
 
         {/* ── PUSH NOTIFICATIONS ── */}
         <PushNotificationButton atletaId={atleta.id} escolaId={atleta.escolaId || ''} />

@@ -73,6 +73,31 @@ export async function criarCobrancaBoleto(apiKey: string, dados: {
   return JSON.parse(text)
 }
 
+/**
+ * Cria uma assinatura recorrente com cartao de credito. Os dados do cartao
+ * (numero, validade, cvv) sao enviados UMA VEZ so, direto pra Asaas — nunca
+ * ficam salvos no nosso banco nem em log. A partir da 1a cobranca validada,
+ * a Asaas cobra sozinha todo mes no cartao, sem nenhuma acao nossa ou do pai.
+ */
+export async function criarAssinaturaCartao(apiKey: string, dados: {
+  customer: string
+  value: number
+  nextDueDate: string
+  cycle: 'MONTHLY'
+  description: string
+  creditCard: { holderName: string; number: string; expiryMonth: string; expiryYear: string; ccv: string }
+  creditCardHolderInfo: { name: string; cpfCnpj: string; postalCode: string; addressNumber: string; email?: string; phone?: string }
+  remoteIp: string
+}) {
+  const res = await fetch(`${BASE_URL}/subscriptions`, {
+    method: 'POST', headers: headers(apiKey), body: JSON.stringify(dados),
+    signal: AbortSignal.timeout(15000),
+  })
+  const text = await res.text()
+  console.log('📦 Asaas assinatura raw:', text.slice(0, 300)) // nunca loga o corpo inteiro (pode conter erro c/ dado sensivel ecoado)
+  return JSON.parse(text)
+}
+
 export async function criarCobrancaGenerica(apiKey: string, dados: {
   customer: string; billingType: string; value?: number; dueDate: string; description: string
   installmentCount?: number; installmentValue?: number
