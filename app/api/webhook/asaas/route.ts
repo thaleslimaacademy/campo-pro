@@ -13,12 +13,47 @@ const STATUS_MAP: Record<string, string> = {
 const brl = (n: number) => n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 const dataBR = (s: string | null) => { if (!s) return '-'; return s.slice(0, 10).split('-').reverse().join('/') }
 
+/**
+ * Quando uma assinatura recorrente (debito automatico no cartao) gera a
+ * cobranca do mes sozinha, a Asaas manda PAYMENT_CREATED antes de cobrar.
+ * Criamos a linha em Cobranca aqui — sem isso, o PAYMENT_CONFIRMED que vem
+ * logo em seguida nao teria nenhuma linha pra atualizar (o update por
+ * asaasId simplesmente nao acharia nada e sairia em silencio).
+ */
+async function processarPagamentoCriado(pagamento: Record<string, unknown>) {
+  const subscriptionId = pagamento.subscription as string | undefined
+  if (!subscriptionId) return
+
+  const { data: atleta } = await supabaseAdmin.from('Atleta')
+    .select('id, nome, escolaId').eq('asaasSubscriptionId', subscriptionId).maybeSingle()
+  if (!atleta) return // nao e uma assinatura de mensalidade nossa (pode ser de outro fluxo)
+
+  const { data: jaExiste } = await supabaseAdmin.from('Cobranca')
+    .select('id').eq('asaasId', pagamento.id as string).maybeSingle()
+  if (jaExiste) return // idempotencia — webhook pode reenviar o mesmo evento
+
+  const vencimento = String(pagamento.dueDate || '').slice(0, 10)
+  const { error } = await supabaseAdmin.from('Cobranca').insert({
+    id: crypto.randomUUID(), escolaId: atleta.escolaId, atletaId: atleta.id,
+    atletaNome: atleta.nome, valor: pagamento.value as number, vencimento,
+    competencia: vencimento.slice(0, 7) + '-01',
+    status: 'PENDENTE', tipo: 'CARTAO_RECORRENTE', descricao: 'Mensalidade — débito automático',
+    asaasId: pagamento.id as string,
+  })
+  if (error) console.error('Erro ao criar Cobranca da assinatura:', error.message)
+}
+
 // Processa o webhook em background — sem bloquear a resposta
 async function processar(body: Record<string, unknown>) {
   try {
     const evento = body.event as string
     const pagamento = body.payment as Record<string, unknown>
     if (!evento || !pagamento?.id) return
+
+    if (evento === 'PAYMENT_CREATED') {
+      await processarPagamentoCriado(pagamento)
+      return
+    }
 
     const novoStatus = STATUS_MAP[evento]
     if (!novoStatus) return
@@ -44,7 +79,7 @@ async function processar(body: Record<string, unknown>) {
             return `📷 Foto ${i + 1}: ${data?.signedUrl || ''}`
           }))
           const primeiroNome = fotoCompra.compradorNome.split(' ')[0]
-          const msg = [`✅ *Pagamento confirmado!*`, ``, `Olá, *${primeiroNome}*! 🎉`, ``, `Suas fotos estão prontas. Links válidos por *7 dias*:`, ``, ...links, ``, `⬇️ Clique em cada link para baixar.`, ``, `_GestãoFC · gestaofc.com.br_`].join('\n')
+          const msg = [`✅ *Pagamento confirmado!*`, ``, `Olá, *${primeiroNome}*! 🎉`, ``, `Suas fotos estão prontas. Links válidos por *7 dias*:`,``, ...links, ``, `⬇️ Clique em cada link para baixar.`, ``, `_GestãoFC · gestaofc.com.br_`].join('\n')
           await enviarWhatsApp(fotoCompra.compradorTelefone, msg)
           await supabaseAdmin.from('FotoCompra').update({ linkEnviado: true }).eq('id', fotoCompra.id)
         } catch (e) { console.error('Erro WhatsApp foto:', (e as Error).message) }
@@ -86,7 +121,7 @@ async function processar(body: Record<string, unknown>) {
         await supabaseAdmin.from('Escola').update({ ativo: true, statusPlano: 'ATIVO', maxModalidades: maxMod }).eq('id', escola.id)
         if (escola.whatsapp) {
           try {
-            await enviarWhatsApp(escola.whatsapp, `🏆 *GestãoFC — Plano Ativado!*\n\nOlá! Seu pagamento foi confirmado e o *${escola.nome}* já está ativo. 🎉\n\nAcesse: *gestaofc.com.br*\n\n_Bem-vindo(a)!_`)
+            await enviarWhatsApp(escola.whatsapp, `🏆 *GestãoFC — Plano Ativado!*\n\nOlá! Seu pagamento foi confirmado e o *${escola.nome}* já estáativo. 🎉\n\nAcesse: *gestaofc.com.br*\n\n_Bem-vindo(a)!_`)
           } catch (e) { console.error('Erro WhatsApp escola:', (e as Error).message) }
         }
         return
@@ -96,7 +131,7 @@ async function processar(body: Record<string, unknown>) {
     // ── MENSALIDADE ──
     const { error } = await supabaseAdmin
       .from('Cobranca')
-      .update({ status: novoStatus, ...(novoStatus === 'PAGO' ? { pagoEm: new Date().toISOString() } : {}) })
+      .update({ status: novoStatus, ...(novoStatus === 'PAGO' ? { pagoEm:new Date().toISOString() } : {}) })
       .eq('asaasId', pagamento.id)
 
     if (error) { console.error('Erro ao atualizar Cobranca:', error); return }
@@ -149,6 +184,6 @@ export async function POST(req: NextRequest) {
 
   } catch (err: unknown) {
     console.error('Erro webhook parse:', (err as Error).message)
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return NextResponse.json({ error: (err as Error).message }, { status:500 })
   }
 }

@@ -37,6 +37,7 @@ async function garantirMensalidadesFuturas(meses: number) {
     const { data: atletas } = await supabaseAdmin.from('Atleta')
       .select('id, nome, diaVencimento, valorMensalidade, planoMensalidade')
       .eq('escolaId', escola.id).eq('ativo', true).eq('bolsista', false)
+      .neq('formaPagamento', 'CARTAO_RECORRENTE') // quem esta em debito automatico e cobrado pela propria assinatura Asaas, nao pela regua
 
     for (const a of atletas || []) {
       const { data: existentes } = await supabaseAdmin.from('Cobranca')
@@ -132,6 +133,10 @@ export async function GET(req: NextRequest) {
           .select('nome, asaasCustomerId, bolsista, ativo').eq('id', cob.atletaId).single()
         if (atleta?.bolsista) continue
         if (atleta && atleta.ativo === false) continue
+        // Cobranca de debito automatico: nao manda lembrete (nao ha nada
+        // que o pai precise fazer) e nao gera PIX (o webhook PAYMENT_CREATED
+        // ja criou essa linha com o asaasId da propria cobranca da assinatura).
+        if (cob.descricao && String(cob.descricao).includes('débito automático')) continue
 
         const { data: resps } = await supabaseAdmin.from('Responsavel')
           .select('nome, whatsapp').eq('atletaId', cob.atletaId).eq('principal', true).limit(1)
