@@ -60,6 +60,9 @@ export async function buscarClienteAsaas(apiKey: string, cpfCnpj: string) {
 
 export async function criarCobrancaBoleto(apiKey: string, dados: {
   customer: string; billingType: 'BOLETO'; value: number; dueDate: string; description: string
+  discount?: { value: number; dueDateLimitDays: number; type: 'FIXED' | 'PERCENTAGE' }
+  fine?: { value: number }
+  interest?: { value: number }
 }) {
   const res = await fetch(`${BASE_URL}/payments`, {
     method: 'POST', headers: headers(apiKey), body: JSON.stringify(dados),

@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import { FileText, ExternalLink, Copy, CheckCircle, Loader2 } from 'lucide-react'
-import { listarAtletasBoleto, gerarBoleto, getCpfResponsavel, salvarCpfResponsavel, getTelefoneResponsavel, listarBoletos, cancelarBoleto } from './actions'
+import { listarAtletasBoleto, gerarBoleto, getCpfResponsavel, salvarCpfResponsavel, getTelefoneResponsavel, listarBoletos, cancelarBoleto, getValorMensalidadeAtleta } from './actions'
 import { gerarRecibo } from '@/lib/gerarRecibo'
 
 type Estado = 'form' | 'loading' | 'resultado'
+type BoletoGerado = { mes: string; vencimento: string; bankSlipUrl: string; invoiceUrl: string; id: string }
 
 export default function BoletoPage() {
   const [atletas, setAtletas] = useState<{ id: string; nome: string }[]>([])
@@ -15,14 +16,16 @@ export default function BoletoPage() {
   const [boletos, setBoletos] = useState<any[]>([])
   const [aba, setAba] = useState<'novo' | 'historico'>('novo')
   const [cpf, setCpf] = useState('')
-  const [valor, setValor] = useState('')
+  const [valorMensalidade, setValorMensalidade] = useState('')
+  const [valorBoleto, setValorBoleto] = useState('')
+  const [meses, setMeses] = useState(1)
   const [vencimento, setVencimento] = useState(() => {
     const d = new Date(); d.setDate(d.getDate() + 5)
     return d.toISOString().slice(0, 10)
   })
   const [descricao, setDescricao] = useState('Mensalidade TLFA')
-  const [resultado, setResultado] = useState<{ bankSlipUrl: string; invoiceUrl: string } | null>(null)
-  const [copiado, setCopiado] = useState(false)
+  const [resultados, setResultados] = useState<BoletoGerado[] | null>(null)
+  const [copiadoId, setCopiadoId] = useState<string | null>(null)
   const [cancelando, setCancelando] = useState<string | null>(null)
   const [erro, setErro] = useState('')
 
@@ -34,16 +37,25 @@ export default function BoletoPage() {
     setCpf('')
     getCpfResponsavel(atletaId).then(c => { if (c) setCpf(c) }).catch(() => {})
     getTelefoneResponsavel(atletaId).then(t => { if (t) setTelefoneResp(t.replace(/\D/g, '')) }).catch(() => {})
+    getValorMensalidadeAtleta(atletaId).then(v => {
+      if (v) { setValorMensalidade(String(v)); if (!valorBoleto) setValorBoleto(String(v)) }
+    }).catch(() => {})
   }, [atletaId])
 
   const atletaNome = atletas.find(a => a.id === atletaId)?.nome ?? ''
+  const desconto = (Number(valorBoleto || 0) - Number(valorMensalidade || 0))
 
   const gerar = async () => {
-    if (!atletaId || !cpf || !valor || !vencimento) { setErro('Preencha todos os campos obrigatórios'); return }
+    if (!atletaId || !cpf || !valorMensalidade || !valorBoleto || !vencimento) { setErro('Preencha todos os campos obrigatórios'); return }
+    if (Number(valorBoleto) < Number(valorMensalidade)) { setErro('O valor do boleto não pode ser menor que o valor da mensalidade.'); return }
     setErro(''); setEstado('loading')
     try {
-      const r = await gerarBoleto({ atletaId, cpf, valor: Number(valor), vencimento, descricao })
-      setResultado(r)
+      const r = await gerarBoleto({
+        atletaId, cpf,
+        valorMensalidade: Number(valorMensalidade), valorBoleto: Number(valorBoleto),
+        vencimento, descricao, meses,
+      })
+      setResultados(r)
       setEstado('resultado')
       listarBoletos().then(setBoletos)
       const salvar = confirm('Salvar CPF para próximas cobranças deste atleta?')
@@ -51,10 +63,17 @@ export default function BoletoPage() {
     } catch (e) { setErro((e as Error).message); setEstado('form') }
   }
 
-  const copiar = async () => {
-    if (!resultado) return
-    await navigator.clipboard.writeText(resultado.bankSlipUrl)
-    setCopiado(true); setTimeout(() => setCopiado(false), 2000)
+  const copiar = async (id: string, url: string) => {
+    await navigator.clipboard.writeText(url)
+    setCopiadoId(id); setTimeout(() => setCopiadoId(null), 2000)
+  }
+
+  const enviarTodosWhatsApp = () => {
+    if (!resultados) return
+    const linhas = resultados.map(r => `${r.mes.split('-').reverse().join('/')} (venc. ${r.vencimento.split('-').reverse().join('/')}): ${r.bankSlipUrl}`)
+    const msg = `Boletos TLFA - ${atletaNome}\n\n${linhas.join('\n')}`
+    const num = telefoneResp ? '55' + telefoneResp.replace(/\D/g, '') : ''
+    window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_blank')
   }
 
   const calcularJuros = (v: number, venc: string, pagoEm: string | null) => {
@@ -79,15 +98,12 @@ export default function BoletoPage() {
   const handleCancelar = async (id: string, asaasId: string) => {
     if (!confirm('Cancelar este boleto?')) return
     setCancelando(id)
-    // Atualização otimista — reflete na UI imediatamente
     setBoletos(prev => prev.map(b => b.id === id ? { ...b, status: 'CANCELADO' } : b))
     try {
       await cancelarBoleto(id, asaasId)
-      // Confirma com o banco após sucesso
       const atualizados = await listarBoletos()
       setBoletos(atualizados)
     } catch (e) {
-      // Reverte se a server action falhou
       setBoletos(prev => prev.map(b => b.id === id ? { ...b, status: 'PENDENTE' } : b))
       alert('Erro ao cancelar boleto. Tente novamente.')
     } finally {
@@ -174,35 +190,46 @@ export default function BoletoPage() {
 
         {aba === 'novo' && (
           <>
-            {estado === 'resultado' && resultado ? (
+            {estado === 'resultado' && resultados ? (
               <div style={card}>
                 <div style={{ textAlign: 'center', marginBottom: 24 }}>
                   <CheckCircle size={48} color="#4169E1" />
-                  <h2 style={{ fontFamily: 'Syne, sans-serif', color: '#4169E1', margin: '12px 0 4px' }}>Boleto gerado!</h2>
-                  <p style={{ color: '#9aa', fontSize: 13 }}>Vencimento: {vencimento.split('-').reverse().join('/')}</p>
+                  <h2 style={{ fontFamily: 'Syne, sans-serif', color: '#4169E1', margin: '12px 0 4px' }}>
+                    {resultados.length} boleto{resultados.length > 1 ? 's' : ''} gerado{resultados.length > 1 ? 's' : ''}!
+                  </h2>
+                  <p style={{ color: '#9aa', fontSize: 13 }}>{atletaNome}</p>
                 </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+                  {resultados.map(r => (
+                    <div key={r.id} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, padding: 12 }}>
+                      <p style={{ fontSize: 12, color: '#9aa', margin: '0 0 8px', textTransform: 'capitalize' as const }}>
+                        Venc. {r.vencimento.split('-').reverse().join('/')}
+                      </p>
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <a href={r.bankSlipUrl} target="_blank" rel="noreferrer"
+                          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: '#4169E1', color: '#fff', borderRadius: 8, padding: '10px', fontWeight: 700, fontFamily: 'Syne, sans-serif', textDecoration: 'none', fontSize: 12 }}>
+                          <ExternalLink size={14} /> Abrir
+                        </a>
+                        <button onClick={() => copiar(r.id, r.bankSlipUrl)}
+                          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: 'transparent', border: '1px solid #FFD700', color: '#FFD700', borderRadius: 8, padding: '10px', fontWeight: 600, cursor: 'pointer', fontSize: 12 }}>
+                          {copiadoId === r.id ? <><CheckCircle size={14} /> Copiado!</> : <><Copy size={14} /> Copiar</>}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  <a href={resultado.bankSlipUrl} target="_blank" rel="noreferrer"
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#4169E1', color: '#04130a', borderRadius: 12, padding: '14px 20px', fontWeight: 700, fontFamily: 'Syne, sans-serif', textDecoration: 'none', fontSize: 15 }}>
-                    <ExternalLink size={18} /> Abrir Boleto
-                  </a>
-                  <button onClick={copiar}
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'transparent', border: '1px solid #FFD700', color: '#FFD700', borderRadius: 12, padding: '12px 20px', fontWeight: 600, cursor: 'pointer' }}>
-                    {copiado ? <><CheckCircle size={16} /> Copiado!</> : <><Copy size={16} /> Copiar link</>}
-                  </button>
-                  <button onClick={() => {
-                    const msg = 'Boleto TLFA - ' + atletaNome + ' - Venc: ' + vencimento.split('-').reverse().join('/') + ' - ' + resultado.bankSlipUrl
-                    const num = telefoneResp ? '55' + telefoneResp.replace(/\D/g, '') : ''
-                    window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_blank')
-                  }}
+                  <button onClick={enviarTodosWhatsApp}
                     style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#25D366', color: '#fff', borderRadius: 12, padding: '12px 20px', fontWeight: 600, cursor: 'pointer', border: 'none', width: '100%' }}>
-                    {'💬 Enviar via WhatsApp'}
+                    {'💬 Enviar tudo via WhatsApp'}
                   </button>
-                  <button onClick={() => gerarRecibo({ tipo: 'MENSALIDADE', nome: atletaNome, valor: Number(valor), descricao, data: new Date().toISOString().slice(0, 10) })}
+                  <button onClick={() => gerarRecibo({ tipo: 'MENSALIDADE', nome: atletaNome, valor: Number(valorBoleto), descricao, data: new Date().toISOString().slice(0, 10) })}
                     style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'transparent', border: '1px solid #2A2A4A', color: '#cdd', borderRadius: 12, padding: '12px 20px', cursor: 'pointer' }}>
                     <FileText size={16} /> Gerar recibo PDF
                   </button>
-                  <button onClick={() => { setEstado('form'); setResultado(null); setValor(''); setCpf('') }}
+                  <button onClick={() => { setEstado('form'); setResultados(null); setValorBoleto(''); setValorMensalidade(''); setCpf(''); setMeses(1) }}
                     style={{ color: '#9aa', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 13, marginTop: 4 }}>
                     Gerar novo boleto
                   </button>
@@ -219,21 +246,45 @@ export default function BoletoPage() {
                 <Campo label="CPF ou CNPJ do responsável *">
                   <input value={cpf} onChange={e => setCpf(e.target.value)} placeholder="000.000.000-00" style={inp} />
                 </Campo>
+
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                  <Campo label="Valor (R$) *">
-                    <input type="number" value={valor} onChange={e => setValor(e.target.value)} placeholder="85,00" style={inp} />
+                  <Campo label="Valor da mensalidade (R$) *">
+                    <input type="number" value={valorMensalidade} onChange={e => setValorMensalidade(e.target.value)} placeholder="85,00" style={inp} />
                   </Campo>
-                  <Campo label="Vencimento *">
-                    <input type="date" value={vencimento} onChange={e => setVencimento(e.target.value)} style={inp} />
+                  <Campo label="Valor do boleto (R$) *">
+                    <input type="number" value={valorBoleto} onChange={e => setValorBoleto(e.target.value)} placeholder="100,00" style={inp} />
                   </Campo>
                 </div>
+
+                {desconto > 0 && (
+                  <p style={{ fontSize: 12, color: '#00D67A', margin: '-6px 0 12px', background: 'rgba(0,214,122,0.08)', borderRadius: 8, padding: '8px 10px' }}>
+                    💚 Desconto de R$ {desconto.toFixed(2)} se pago até o vencimento — o responsável paga R$ {Number(valorMensalidade).toFixed(2)}
+                  </p>
+                )}
+                {desconto < 0 && (
+                  <p style={{ fontSize: 12, color: '#FF4444', margin: '-6px 0 12px' }}>
+                    O valor do boleto está menor que o da mensalidade — confira os valores.
+                  </p>
+                )}
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <Campo label="1º Vencimento *">
+                    <input type="date" value={vencimento} onChange={e => setVencimento(e.target.value)} style={inp} />
+                  </Campo>
+                  <Campo label="Quantos meses">
+                    <select value={meses} onChange={e => setMeses(Number(e.target.value))} style={inp}>
+                      {[1, 2, 3, 6, 12].map(n => <option key={n} value={n}>{n} {n === 1 ? 'mês' : 'meses'}</option>)}
+                    </select>
+                  </Campo>
+                </div>
+
                 <Campo label="Descrição">
                   <input value={descricao} onChange={e => setDescricao(e.target.value)} style={inp} />
                 </Campo>
                 {erro && <p style={{ color: '#FF4757', fontSize: 13, margin: '8px 0 0' }}>{erro}</p>}
                 <button onClick={gerar} disabled={estado === 'loading'}
                   style={{ marginTop: 20, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#4169E1', color: '#04130a', border: 'none', borderRadius: 12, padding: '14px 20px', fontWeight: 700, fontFamily: 'Syne, sans-serif', fontSize: 15, cursor: 'pointer', opacity: estado === 'loading' ? 0.7 : 1 }}>
-                  {estado === 'loading' ? <><Loader2 size={18} className="spin" /> Gerando…</> : 'Gerar Boleto'}
+                  {estado === 'loading' ? <><Loader2 size={18} className="spin" /> Gerando…</> : `Gerar ${meses > 1 ? meses + ' Boletos' : 'Boleto'}`}
                 </button>
                 <p style={{ color: '#9aa', fontSize: 11, marginTop: 12, textAlign: 'center' }}>
                   {cpf ? '✅ CPF encontrado — pré-preenchido do cadastro.' : 'O CPF será salvo opcionalmente após gerar o boleto.'}
