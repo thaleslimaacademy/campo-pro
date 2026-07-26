@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { cancelarCobrancaAsaas } from '@/lib/asaas'
 import { getAsaasKey } from '@/lib/getAsaasKey'
 import { gerarPixSeFaltar } from '@/lib/gerarPixSeFaltar'
+import { cancelarAssinaturaAsaas } from '@/lib/asaas'
 import { dataVencimentoNoMes, clampDiaPreferido } from '@/lib/dataVencimento'
 
 export async function getAtletaParaEditar(id: string) {
@@ -190,6 +191,22 @@ export async function toggleAtivoAtleta(id: string, ativo: boolean) {
 
   let canceladas = 0
   if (!ativo) {
+    // Se o atleta esta em debito automatico, a assinatura na Asaas continua
+    // cobrando sozinha mesmo depois de desativado aqui — precisa cancelar
+    // a assinatura junto, nao so as cobrancas avulsas.
+    const { data: atletaAtual } = await supabaseAdmin.from('Atleta')
+      .select('asaasSubscriptionId').eq('id', id).single()
+    if (atletaAtual?.asaasSubscriptionId) {
+      try {
+        const apiKeyAssinatura = await getAsaasKey(escolaId)
+        await cancelarAssinaturaAsaas(apiKeyAssinatura, atletaAtual.asaasSubscriptionId)
+      } catch (e) {
+        console.error('Falha ao cancelar assinatura na Asaas:', (e as Error).message)
+      }
+      await supabaseAdmin.from('Atleta')
+        .update({ asaasSubscriptionId: null, formaPagamento: 'MANUAL' }).eq('id', id)
+    }
+
     const hoje = new Date().toISOString().slice(0, 10)
     const { data: futuras } = await supabaseAdmin.from('Cobranca')
       .select('id, asaasId')

@@ -98,6 +98,21 @@ export async function criarAssinaturaCartao(apiKey: string, dados: {
   return JSON.parse(text)
 }
 
+/**
+ * Cancela uma assinatura recorrente na Asaas (endpoint diferente do de
+ * cancelar uma cobranca avulsa — assinatura e /subscriptions, nao /payments).
+ * Cancela a assinatura inteira; cobrancas ja geradas e pendentes daquela
+ * assinatura tambem sao canceladas automaticamente pela Asaas.
+ */
+export async function cancelarAssinaturaAsaas(apiKey: string, subscriptionId: string) {
+  const res = await fetch(`${BASE_URL}/subscriptions/${subscriptionId}`, {
+    method: 'DELETE', headers: headers(apiKey),
+    signal: AbortSignal.timeout(10000),
+  })
+  const text = await res.text()
+  return JSON.parse(text)
+}
+
 export async function criarCobrancaGenerica(apiKey: string, dados: {
   customer: string; billingType: string; value?: number; dueDate: string; description: string
   installmentCount?: number; installmentValue?: number
