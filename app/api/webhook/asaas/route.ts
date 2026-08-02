@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { enviarWhatsApp } from '@/lib/whatsapp'
+import { baixarCobrancaFamilia } from '@/lib/cobrancaFamilia'
 
 const STATUS_MAP: Record<string, string> = {
   PAYMENT_RECEIVED: 'PAGO',
@@ -139,8 +140,14 @@ async function processar(body: Record<string, unknown>) {
     if (novoStatus === 'PAGO') {
       try {
         const { data: cobranca } = await supabaseAdmin
-          .from('Cobranca').select('valor, descricao, vencimento, atletaId, escolaId')
+          .from('Cobranca').select('id, valor, descricao, vencimento, atletaId, escolaId, tipo')
           .eq('asaasId', pagamento.id).single()
+
+        // Cobrança agregada de família: propaga a baixa pra cada ficha
+        // individual dos filhos (elas nunca tiveram PIX próprio).
+        if (cobranca?.tipo === 'FAMILIA') {
+          await baixarCobrancaFamilia(cobranca.id)
+        }
 
         if (cobranca?.atletaId) {
           const [{ data: atleta }, { data: responsavel }, { data: escola }] = await Promise.all([

@@ -4,7 +4,7 @@ import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 import { revalidatePath } from 'next/cache'
 import { cancelarCobrancaAsaas } from '@/lib/asaas'
 import { getAsaasKey } from '@/lib/getAsaasKey'
-import { gerarPixSeFaltar } from '@/lib/gerarPixSeFaltar'
+import { gerarPixOuAgregarFamilia } from '@/lib/cobrancaFamilia'
 import { cancelarAssinaturaAsaas } from '@/lib/asaas'
 import { dataVencimentoNoMes, clampDiaPreferido } from '@/lib/dataVencimento'
 
@@ -31,7 +31,7 @@ export async function getAtletaParaEditar(id: string) {
 async function propagarValorMensalidade(atletaId: string, escolaId: string, novoValor: number, avisos: string[]) {
   const hoje = new Date().toISOString().slice(0, 10)
   const { data: futuras, error: erroBusca } = await supabaseAdmin.from('Cobranca')
-    .select('id, valor, asaasId, vencimento, descricao')
+    .select('id, valor, asaasId, vencimento, competencia, descricao')
     .eq('atletaId', atletaId)
     .eq('escolaId', escolaId)
     .eq('status', 'PENDENTE')
@@ -75,8 +75,8 @@ async function propagarValorMensalidade(atletaId: string, escolaId: string, novo
         valor: novoValor, asaasId: null, pixCopiaCola: null, pixQrCode: null,
       }).eq('id', cob.id)
 
-      const gerado = await gerarPixSeFaltar(
-        cob.id, escolaId, atletaId, novoValor, String(cob.vencimento).slice(0, 10)
+      const gerado = await gerarPixOuAgregarFamilia(
+        cob.id, escolaId, atletaId, novoValor, String(cob.vencimento).slice(0, 10), String(cob.competencia).slice(0, 10)
       )
       if (!gerado) avisos.push(`Cobrança ${cob.id}: valor atualizado mas o novo PIX falhou — será recriado no D-3`)
     }
@@ -142,8 +142,8 @@ async function propagarDiaVencimento(atletaId: string, escolaId: string, novoDia
         vencimento: cob.novoVencimento, asaasId: null, pixCopiaCola: null, pixQrCode: null,
       }).eq('id', cob.id)
 
-      const gerado = await gerarPixSeFaltar(
-        cob.id, escolaId, atletaId, Number(cob.valor), cob.novoVencimento
+      const gerado = await gerarPixOuAgregarFamilia(
+        cob.id, escolaId, atletaId, Number(cob.valor), cob.novoVencimento, String(cob.competencia).slice(0, 10)
       )
       if (!gerado) avisos.push(`Cobrança ${cob.id}: vencimento atualizado mas o novo PIX falhou — será recriado no D-3`)
     }

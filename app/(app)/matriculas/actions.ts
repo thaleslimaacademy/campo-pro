@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 import { revalidatePath } from 'next/cache'
 import { clampDiaPreferido } from '@/lib/dataVencimento'
+import { detectarFamiliaParaAtleta } from '@/lib/detectarFamilias'
 
 export async function getMatriculas() {
   const escolaId = await getEscolaIdServer()
@@ -62,6 +63,13 @@ export async function aprovarMatricula(matriculaId: string, escolaId: string, at
   })
   if (errResp) throw new Error('Atleta criado, mas falhou ao salvar o responsavel: ' + errResp.message)
   await supabaseAdmin.from('Matricula').update({ status: 'APROVADO', atletaId, dataAprovacao: aprovadoEm.toISOString() }).eq('id', matriculaId)
+
+  // Detecta se esse atleta tem irmao ja cadastrado (mesmo CPF/telefone de
+  // responsavel na matricula). So cria/atualiza a Familia como PENDENTE —
+  // nao cobra junto ate o admin confirmar em /familias. Nao bloqueia a
+  // aprovacao se falhar, e um recurso a mais, nao um pre-requisito dela.
+  try { await detectarFamiliaParaAtleta(atletaId) } catch (e) { console.error('Erro ao detectar familia:', (e as Error).message) }
+
   revalidatePath('/matriculas')
   return { atletaId, tokenPais }
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { msgLembreteD3, msgVencimentoHoje, msgAtraso } from '@/lib/whatsapp-templates'
-import { gerarPixSeFaltar } from '@/lib/gerarPixSeFaltar'
+import { gerarPixOuAgregarFamilia } from '@/lib/cobrancaFamilia'
 import { dataVencimentoNoMes } from '@/lib/dataVencimento'
 
 // offset em dias a partir de hoje (negativo = passado)
@@ -147,7 +147,7 @@ export async function GET(req: NextRequest) {
 
         if (acao === 'lembrete_previo') {
           if (!cob.asaasId) {
-            await gerarPixSeFaltar(cob.id, cob.escolaId, cob.atletaId, Number(cob.valor), dataAlvo)
+            await gerarPixOuAgregarFamilia(cob.id, cob.escolaId, cob.atletaId, Number(cob.valor), dataAlvo, String(cob.competencia).slice(0, 10))
           }
           if (resp?.whatsapp && atleta) {
             await msgLembreteD3({
@@ -161,7 +161,7 @@ export async function GET(req: NextRequest) {
 
         else if (acao === 'vencimento_hoje') {
           if (!cob.asaasId) {
-            await gerarPixSeFaltar(cob.id, cob.escolaId, cob.atletaId, Number(cob.valor), dataAlvo)
+            await gerarPixOuAgregarFamilia(cob.id, cob.escolaId, cob.atletaId, Number(cob.valor), dataAlvo, String(cob.competencia).slice(0, 10))
           }
           if (resp?.whatsapp && atleta) {
             await msgVencimentoHoje({
@@ -179,7 +179,7 @@ export async function GET(req: NextRequest) {
           if (eVenc) { erros++; continue }
 
           if (!cob.asaasId) {
-            await gerarPixSeFaltar(cob.id, cob.escolaId, cob.atletaId, Number(cob.valor), dataAlvo)
+            await gerarPixOuAgregarFamilia(cob.id, cob.escolaId, cob.atletaId, Number(cob.valor), dataAlvo, String(cob.competencia).slice(0, 10))
           }
 
           if (resp?.whatsapp && atleta) {
