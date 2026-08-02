@@ -15,15 +15,15 @@ export default async function Home() {
       {/* NAV */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(10,14,26,0.95)', borderBottom: '1px solid rgba(65,105,225,0.12)', backdropFilter: 'blur(16px)', padding: '0 24px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <img src="/icon-192.png" alt="GestãoFC" style={{ width: 34, height: 34, borderRadius: 8 }} />
-            <span style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 17, color: '#F0F4FF', letterSpacing: -0.5 }}>GestãoFC</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flexShrink: 0 }}>
+            <img src="/icon-192.png" alt="GestãoFC" style={{ width: 34, height: 34, borderRadius: 8, flexShrink: 0 }} />
+            <span style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 17, color: '#F0F4FF', letterSpacing: -0.5, whiteSpace: 'nowrap' }}>GestãoFC</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <Link href="#funcionalidades" style={{ color: 'rgba(240,244,255,0.55)', textDecoration: 'none', fontSize: 14 }}>Funcionalidades</Link>
-            <Link href="#planos" style={{ color: 'rgba(240,244,255,0.55)', textDecoration: 'none', fontSize: 14 }}>Planos</Link>
-            <Link href="/login" style={{ color: 'rgba(240,244,255,0.55)', textDecoration: 'none', fontSize: 14 }}>Entrar</Link>
-            <Link href="/sign-up?plano=pro" style={{ background: '#4169E1', color: '#F0F4FF', borderRadius: 8, padding: '8px 20px', textDecoration: 'none', fontFamily: SYNE, fontWeight: 800, fontSize: 13, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
+            <Link href="#funcionalidades" className="hidden sm:inline" style={{ color: 'rgba(240,244,255,0.55)', textDecoration: 'none', fontSize: 14, whiteSpace: 'nowrap' }}>Funcionalidades</Link>
+            <Link href="#planos" className="hidden sm:inline" style={{ color: 'rgba(240,244,255,0.55)', textDecoration: 'none', fontSize: 14, whiteSpace: 'nowrap' }}>Planos</Link>
+            <Link href="/login" style={{ color: 'rgba(240,244,255,0.55)', textDecoration: 'none', fontSize: 14, whiteSpace: 'nowrap' }}>Entrar</Link>
+            <Link href="/sign-up?plano=pro" className="hidden sm:inline-block" style={{ background: '#4169E1', color: '#F0F4FF', borderRadius: 8, padding: '8px 20px', textDecoration: 'none', fontFamily: SYNE, fontWeight: 800, fontSize: 13, textTransform: 'uppercase', letterSpacing: 0.5, whiteSpace: 'nowrap' }}>
               Teste grátis
             </Link>
           </div>

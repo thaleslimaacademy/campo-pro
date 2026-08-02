@@ -142,14 +142,14 @@ export default function Atletas() {
 
       {/* HEADER */}
       <div style={{ background: T.primary, padding: '20px 20px 16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 10, marginBottom: 12 }}>
           <div>
             <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Elenco</div>
             <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: T.text, letterSpacing: -0.8, textTransform: 'uppercase' }}>
               Atletas <span style={{ color: '#00BFFF', fontStyle: 'italic' }}>{atletas.length}</span>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <a href="/atletas/carteirinhas" style={{ background: 'rgba(255,255,255,0.15)', color: T.text, borderRadius: 8, padding: '9px 12px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, textDecoration: 'none', textTransform: 'uppercase' }}>🪪 Carteirinhas</a>
             <a href="/atletas/importar" style={{ background: 'rgba(255,255,255,0.15)', color: T.text, borderRadius: 8, padding: '9px 12px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, textDecoration: 'none', textTransform: 'uppercase' }}>⬆ CSV</a>
             <a href="/atletas/novo" style={{ background: T.text, color: T.primary, borderRadius: 8, padding: '9px 14px', fontFamily: SYNE, fontWeight: 800, fontSize: 12, textDecoration: 'none', textTransform: 'uppercase' }}>+ Novo</a>

@@ -28,11 +28,18 @@ export async function GET() {
   const { data: escola } = await supabaseAdmin
     .from('Escola').select('id, nome, logoUrl, slug, cidade, estado').eq('id', escolaId!).single()
 
-  // Super admin: busca lista de todas as escolas para o switcher
+  // Switcher normal: só escolas vinculadas ao usuário via PerfilUsuario.
+  // Acesso irrestrito a todas as escolas fica só no menu Super Admin (/super-admin).
   let todasEscolas: { id: string; nome: string }[] = []
   if (isSuperAdmin) {
-    const { data } = await supabaseAdmin.from('Escola').select('id, nome').order('nome')
-    todasEscolas = data || []
+    const { data: perfis } = await supabaseAdmin
+      .from('PerfilUsuario').select('escolaId').eq('clerkUserId', userId)
+    const escolaIds = Array.from(new Set((perfis || []).map(p => p.escolaId).filter(Boolean)))
+    if (escolaIds.length > 0) {
+      const { data } = await supabaseAdmin
+        .from('Escola').select('id, nome').in('id', escolaIds).order('nome')
+      todasEscolas = data || []
+    }
   }
 
   return NextResponse.json({
