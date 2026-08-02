@@ -37,7 +37,7 @@ export default async function Home() {
           <span style={{ fontSize: 12, color: '#00D67A', fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase' }}>15 dias grátis · sem cartão</span>
         </div>
 
-        <h1 style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 'clamp(38px, 6vw, 68px)', lineHeight: 1.05, letterSpacing: -2, margin: '0 0 24px', maxWidth: 800, marginLeft: 'auto', marginRight: 'auto' }}>
+        <h1 style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 'clamp(30px, 7vw, 68px)', lineHeight: 1.05, letterSpacing: -2, margin: '0 0 24px', maxWidth: 800, marginLeft: 'auto', marginRight: 'auto', overflowWrap: 'break-word' }}>
           Sua escolinha no controle.<br />
           <span style={{ color: '#4169E1' }}>Cobrança automática.</span><br />
           Zero inadimplência.
