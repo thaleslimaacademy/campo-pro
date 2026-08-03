@@ -68,14 +68,23 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
   const [responsaveisRes, presencasRes, cobrancasRes, turmaRes] = await Promise.all([
     supabaseAdmin.from('Responsavel').select('*').eq('atletaId', id),
     supabaseAdmin.from('Presenca').select('status, criadoEm').eq('atletaId', id).gte('criadoEm', seisAtras.toISOString()).order('criadoEm', { ascending: true }),
-    financeiroOk ? supabaseAdmin.from('Cobranca').select('id, valor, vencimento, status, descricao').eq('atletaId', id).order('vencimento', { ascending: false }).limit(12) : Promise.resolve({ data: null }),
+    financeiroOk ? supabaseAdmin.from('Cobranca').select('id, valor, vencimento, status, descricao, familiaCobrancaId').eq('atletaId', id).order('vencimento', { ascending: false }).limit(12) : Promise.resolve({ data: null }),
     atleta.turmaId ? supabaseAdmin.from('Turma').select('id, nome').eq('id', atleta.turmaId).single() : Promise.resolve({ data: null }),
   ])
 
   const responsaveis = responsaveisRes.data || []
   const presencas    = presencasRes.data || []
-  const cobrancas    = cobrancasRes.data || []
+  const cobrancas    = (cobrancasRes.data || []) as { id: string; descricao: string | null; vencimento: string; valor: number; status: string; familiaCobrancaId: string | null }[]
   const turma        = turmaRes.data
+
+  // Cobranças de filho de família (familiaCobrancaId preenchido) mostram o
+  // valor real da agregada (soma dos irmãos), não o valor da ficha individual.
+  const idsAgregadas = Array.from(new Set(cobrancas.map((c) => c.familiaCobrancaId).filter((v): v is string => !!v)))
+  const agregadasPorId = new Map<string, { valor: number; vencimento: string }>()
+  if (idsAgregadas.length > 0) {
+    const { data: agregadas } = await supabaseAdmin.from('Cobranca').select('id, valor, vencimento').in('id', idsAgregadas)
+    for (const a of (agregadas ?? []) as { id: string; valor: number; vencimento: string }[]) agregadasPorId.set(a.id, a)
+  }
 
   // Presença por mês
   const meses: Record<string, { presentes: number; total: number }> = {}
@@ -196,21 +205,39 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
               <p style={{ color: T.muted, fontSize: 13, textAlign: 'center', padding: '16px 0' }}>Nenhuma cobrança registrada</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {(cobrancas as { id: string; descricao: string | null; vencimento: string; valor: number; status: string }[]).map(c => (
-                  <div key={c.id} style={{ background: T.surface2, borderRadius: 10, padding: '10px 12px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <p style={{ fontSize: 12, fontWeight: 600, color: T.text, margin: '0 0 2px' }}>{c.descricao || 'Mensalidade'}</p>
-                        <p style={{ fontSize: 11, color: T.muted, margin: 0 }}>{new Date(c.vencimento.includes('T') ? c.vencimento : c.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
+                {cobrancas.map(c => {
+                  const agregada = c.familiaCobrancaId ? agregadasPorId.get(c.familiaCobrancaId) : null
+
+                  // Filho de família: essa linha é só a ficha interna, a
+                  // cobrança de verdade (com PIX e ações) é a agregada.
+                  if (c.familiaCobrancaId) {
+                    const venc = agregada?.vencimento || c.vencimento
+                    return (
+                      <div key={c.id} style={{ background: T.surface2, borderRadius: 10, padding: '10px 12px', border: `1px dashed ${T.border}` }}>
+                        <p style={{ fontSize: 12, color: T.muted, margin: 0 }}>
+                          👨‍👩‍👧 Incluída na cobrança da família (R$ {Number(agregada?.valor ?? c.valor).toFixed(2)}) — vencimento{' '}
+                          {new Date(venc.includes('T') ? venc : venc + 'T12:00:00').toLocaleDateString('pt-BR')}
+                        </p>
                       </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <p style={{ fontSize: 13, fontWeight: 700, color: T.text, margin: '0 0 2px' }}>R$ {Number(c.valor).toFixed(2)}</p>
-                        <p style={{ fontSize: 10, fontWeight: 800, color: STATUS_COR[c.status] || T.muted, margin: 0 }}>{c.status}</p>
+                    )
+                  }
+
+                  return (
+                    <div key={c.id} style={{ background: T.surface2, borderRadius: 10, padding: '10px 12px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <p style={{ fontSize: 12, fontWeight: 600, color: T.text, margin: '0 0 2px' }}>{c.descricao || 'Mensalidade'}</p>
+                          <p style={{ fontSize: 11, color: T.muted, margin: 0 }}>{new Date(c.vencimento.includes('T') ? c.vencimento : c.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <p style={{ fontSize: 13, fontWeight: 700, color: T.text, margin: '0 0 2px' }}>R$ {Number(c.valor).toFixed(2)}</p>
+                          <p style={{ fontSize: 10, fontWeight: 800, color: STATUS_COR[c.status] || T.muted, margin: 0 }}>{c.status}</p>
+                        </div>
                       </div>
+                      <CobrancaAcoes cobrancaId={c.id} status={c.status} atletaId={atleta.id} escolaId={escolaId} />
                     </div>
-                    <CobrancaAcoes cobrancaId={c.id} status={c.status} atletaId={atleta.id} escolaId={escolaId} />
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
