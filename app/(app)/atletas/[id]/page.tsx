@@ -214,10 +214,14 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
                     const venc = agregada?.vencimento || c.vencimento
                     return (
                       <div key={c.id} style={{ background: T.surface2, borderRadius: 10, padding: '10px 12px', border: `1px dashed ${T.border}` }}>
-                        <p style={{ fontSize: 12, color: T.muted, margin: 0 }}>
+                        <p style={{ fontSize: 12, color: T.muted, margin: '0 0 8px' }}>
                           👨‍👩‍👧 Incluída na cobrança da família (R$ {Number(agregada?.valor ?? c.valor).toFixed(2)}) — vencimento{' '}
                           {new Date(venc.includes('T') ? venc : venc + 'T12:00:00').toLocaleDateString('pt-BR')}
                         </p>
+                        <a href={`/pagar/${c.familiaCobrancaId}`} target="_blank" rel="noreferrer"
+                          style={{ display: 'inline-block', fontSize: 11, fontWeight: 800, padding: '7px 14px', borderRadius: 8, border: `1px solid ${T.primary}44`, background: `${T.primary}12`, color: T.sky, textDecoration: 'none', fontFamily: SYNE, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                          💳 Ver/Pagar cobrança da família
+                        </a>
                       </div>
                     )
                   }
