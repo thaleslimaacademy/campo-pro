@@ -45,6 +45,22 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
     </div>
   )
 
+  // Irmãos: só mostra se a família já foi CONFIRMADA (vínculo pendente de
+  // revisão em /familias não aparece aqui — ainda pode não ser a mesma família).
+  let irmaos: { id: string; nome: string }[] = []
+  if (atleta.familiaId) {
+    const { data: familia } = await supabaseAdmin.from('Familia').select('status').eq('id', atleta.familiaId).single()
+    if (familia?.status === 'CONFIRMADA') {
+      const { data } = await supabaseAdmin.from('Atleta')
+        .select('id, nome')
+        .eq('familiaId', atleta.familiaId)
+        .eq('ativo', true)
+        .neq('id', atleta.id)
+        .order('nome')
+      irmaos = data ?? []
+    }
+  }
+
   // Busca paralela de todos os dados
   const agora = new Date()
   const seisAtras = new Date(agora.getFullYear(), agora.getMonth() - 5, 1)
@@ -139,6 +155,7 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
             atleta.cpf && ['CPF', atleta.cpf],
             atleta.rg && ['RG', atleta.rg],
             atleta.telefone && ['Telefone', atleta.telefone],
+            irmaos.length > 0 && ['Irmão(s) de', irmaos.map((i) => i.nome).join(', ')],
           ].filter(Boolean).map((row) => (
             <div key={row![0] as string} style={{ ...ROW }}>
               <span style={{ fontSize: 12, color: T.muted }}>{row![0]}</span>
