@@ -80,11 +80,28 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
   // Cobranças de filho de família (familiaCobrancaId preenchido) mostram o
   // valor real da agregada (soma dos irmãos), não o valor da ficha individual.
   const idsAgregadas = Array.from(new Set(cobrancas.map((c) => c.familiaCobrancaId).filter((v): v is string => !!v)))
-  const agregadasPorId = new Map<string, { valor: number; vencimento: string }>()
+  const agregadasPorId = new Map<string, { valor: number; vencimento: string; status: string }>()
   if (idsAgregadas.length > 0) {
-    const { data: agregadas } = await supabaseAdmin.from('Cobranca').select('id, valor, vencimento').in('id', idsAgregadas)
-    for (const a of (agregadas ?? []) as { id: string; valor: number; vencimento: string }[]) agregadasPorId.set(a.id, a)
+    const { data: agregadas } = await supabaseAdmin.from('Cobranca').select('id, valor, vencimento, status').in('id', idsAgregadas)
+    for (const a of (agregadas ?? []) as { id: string; valor: number; vencimento: string; status: string }[]) agregadasPorId.set(a.id, a)
   }
+
+  // Totais do card: uma cobrança de filho de família (familiaCobrancaId
+  // preenchido) já está representada pelo valor da agregada — não soma a
+  // ficha individual dela de novo. A chave dedupe pela id da agregada, então
+  // mesmo se o atleta atual for o "dono técnico" (a própria linha FAMILIA
+  // aparece na lista dele, junto com a ficha individual dele mesmo), ela só
+  // entra uma vez.
+  const totaisPorChave = new Map<string, { valor: number; status: string }>()
+  for (const c of cobrancas) {
+    if (c.familiaCobrancaId) {
+      const agregada = agregadasPorId.get(c.familiaCobrancaId)
+      if (agregada) totaisPorChave.set(c.familiaCobrancaId, { valor: agregada.valor, status: agregada.status })
+      continue
+    }
+    totaisPorChave.set(c.id, { valor: c.valor, status: c.status })
+  }
+  const valoresParaTotais = Array.from(totaisPorChave.values())
 
   // Presença por mês
   const meses: Record<string, { presentes: number; total: number }> = {}
@@ -101,9 +118,9 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
   const pct = presencas.length > 0 ? Math.round((totalPresentes / presencas.length) * 100) : 0
 
   // Financeiro
-  const totalPago     = cobrancas.filter((c: { status: string }) => c.status === 'PAGO').reduce((s: number, c: { valor: number }) => s + Number(c.valor), 0)
-  const totalPendente = cobrancas.filter((c: { status: string }) => c.status === 'PENDENTE').reduce((s: number, c: { valor: number }) => s + Number(c.valor), 0)
-  const totalVencido  = cobrancas.filter((c: { status: string }) => c.status === 'VENCIDO').reduce((s: number, c: { valor: number }) => s + Number(c.valor), 0)
+  const totalPago     = valoresParaTotais.filter((v) => v.status === 'PAGO').reduce((s, v) => s + Number(v.valor), 0)
+  const totalPendente = valoresParaTotais.filter((v) => v.status === 'PENDENTE').reduce((s, v) => s + Number(v.valor), 0)
+  const totalVencido  = valoresParaTotais.filter((v) => v.status === 'VENCIDO').reduce((s, v) => s + Number(v.valor), 0)
 
   const nascimento = atleta.dataNascimento
     ? new Date(atleta.dataNascimento.includes('T') ? atleta.dataNascimento : atleta.dataNascimento + 'T12:00:00').toLocaleDateString('pt-BR')
