@@ -39,7 +39,7 @@ export default function MensalidadesPage() {
   const [showForm, setShowForm] = useState(false)
   const [busca, setBusca] = useState('')
   const [modalPix, setModalPix] = useState<Cobranca | null>(null)
-  const [escola, setEscola] = useState<{ nome?: string; cidade?: string; estado?: string; logoUrl?: string } | null>(null)
+  const [escola, setEscola] = useState<{ nome?: string; cidade?: string; estado?: string; logoUrl?: string; corPrimaria?: string; corSecundaria?: string } | null>(null)
 
   useEffect(() => {
     fetch('/api/escola-ativa').then(r => r.json()).then(d => {
@@ -82,7 +82,12 @@ export default function MensalidadesPage() {
     alert('Código PIX copiado!')
   }
 
-  const gerarReciboCobranca = (c: Cobranca) => { gerarRecibo({ tipo: 'MENSALIDADE', nome: c.atleta?.nome || c.atletaNome || '—', valor: c.valor, descricao: c.descricao ?? 'Mensalidade', data: c.competencia ? c.competencia.slice(0, 10) : new Date().toISOString().slice(0, 10) }) }
+  const gerarReciboCobranca = (c: Cobranca) => { gerarRecibo({
+    tipo: 'MENSALIDADE', nome: c.atleta?.nome || c.atletaNome || '—', valor: c.valor,
+    descricao: c.descricao ?? 'Mensalidade', data: c.competencia ? c.competencia.slice(0, 10) : new Date().toISOString().slice(0, 10),
+    escolaNome: escola?.nome, escolaCidade: escola?.cidade, escolaEstado: escola?.estado, escolaLogoUrl: escola?.logoUrl,
+    corPrimaria: escola?.corPrimaria, corSecundaria: escola?.corSecundaria,
+  }) }
 
   return (
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, paddingBottom: 40 }}>

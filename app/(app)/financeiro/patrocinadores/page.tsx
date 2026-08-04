@@ -33,6 +33,7 @@ export default function PatrocinadoresPage() {
   const [vencimento, setVencimento] = useState('')
   const [descricao, setDescricao] = useState('')
   const [msgCobranca, setMsgCobranca] = useState(DEFAULT_TEMPLATE)
+  const [escola, setEscola] = useState<{ nome?: string; cidade?: string; estado?: string; logoUrl?: string; corPrimaria?: string; corSecundaria?: string } | null>(null)
 
   const carregar = useCallback(async () => {
     setCarregando(true)
@@ -40,6 +41,7 @@ export default function PatrocinadoresPage() {
   }, [])
 
   useEffect(() => { carregar() }, [carregar])
+  useEffect(() => { fetch('/api/escola-ativa').then(r => r.json()).then(d => { if (d.escola) setEscola(d.escola) }) }, [])
 
   const salvar = async () => {
     if (!nome || !valor || !vencimento) { alert('Preencha nome, valor e vencimento'); return }
@@ -58,7 +60,11 @@ export default function PatrocinadoresPage() {
   }
 
   const gerarPDF = (p: Patrocinador) =>
-    gerarRecibo({ tipo: 'PATROCINIO', nome: p.nome, valor: p.valor, descricao: p.descricao ?? p.empresa ?? '', data: new Date().toISOString().slice(0, 10) })
+    gerarRecibo({
+      tipo: 'PATROCINIO', nome: p.nome, valor: p.valor, descricao: p.descricao ?? p.empresa ?? '', data: new Date().toISOString().slice(0, 10),
+      escolaNome: escola?.nome, escolaCidade: escola?.cidade, escolaEstado: escola?.estado, escolaLogoUrl: escola?.logoUrl,
+      corPrimaria: escola?.corPrimaria, corSecundaria: escola?.corSecundaria,
+    })
 
   const salvarMsg = async () => {
     if (!msgEdit) return

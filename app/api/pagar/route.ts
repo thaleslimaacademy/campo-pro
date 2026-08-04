@@ -24,12 +24,15 @@ export async function GET(req: NextRequest) {
     .from('Atleta').select('nome, escolaId').eq('id', cobrancaRaw.atletaId).single()
 
   const { data: escola } = atleta
-    ? await supabaseAdmin.from('Escola').select('nome').eq('id', atleta.escolaId).single()
+    ? await supabaseAdmin.from('Escola').select('nome, logoUrl, corPrimaria, corSecundaria').eq('id', atleta.escolaId).single()
     : { data: null }
 
   return NextResponse.json({
     ...cobranca,
     nomeAtleta: atleta?.nome || '',
     nomeEscola: escola?.nome || '',
+    logoEscola: escola?.logoUrl || null,
+    corPrimaria: escola?.corPrimaria || null,
+    corSecundaria: escola?.corSecundaria || null,
   })
 }

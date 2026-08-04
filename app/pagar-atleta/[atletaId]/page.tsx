@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
+import { hexToRgb } from '@/lib/hexToRgb'
 
 type Cobranca = {
   id: string
@@ -23,7 +24,7 @@ const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
 const LABEL: React.CSSProperties = { fontSize: 11, color: T.muted, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }
 
-function CardCobranca({ cobranca }: { cobranca: Cobranca }) {
+function CardCobranca({ cobranca, primary, cobalt, primaryRgbStr }: { cobranca: Cobranca; primary: string; cobalt: string; primaryRgbStr: string }) {
   const [copiado, setCopiado] = useState(false)
   const [falhouCopiar, setFalhou] = useState(false)
   const [mostrarCodigo, setMostrarCodigo] = useState(false)
@@ -105,7 +106,7 @@ function CardCobranca({ cobranca }: { cobranca: Cobranca }) {
       {cobranca.pixQrCode && (
         <div style={{ textAlign: 'center', marginBottom: 20, paddingTop: 20, borderTop: `1px solid ${T.border}` }}>
           <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>Escaneie o QR Code com seu banco</p>
-          <div style={{ display: 'inline-block', background: '#FFFFFF', padding: 10, borderRadius: 14, border: `2px solid ${T.primary}40` }}>
+          <div style={{ display: 'inline-block', background: '#FFFFFF', padding: 10, borderRadius: 14, border: `2px solid ${primary}40` }}>
             <img src={'data:image/png;base64,' + cobranca.pixQrCode} alt="QR Code Pix" style={{ width: 200, height: 200, display: 'block' }} />
           </div>
         </div>
@@ -136,12 +137,12 @@ function CardCobranca({ cobranca }: { cobranca: Cobranca }) {
             onClick={copiarPix}
             style={{
               width: '100%',
-              background: copiado ? `${T.green}18` : `linear-gradient(135deg, ${T.primary}, ${T.cobalt})`,
+              background: copiado ? `${T.green}18` : `linear-gradient(135deg, ${primary}, ${cobalt})`,
               color: copiado ? T.green : T.text,
               border: copiado ? `1px solid ${T.green}40` : 'none',
               borderRadius: 14, padding: 17, fontFamily: SYNE, fontWeight: 800, fontSize: 15,
               cursor: 'pointer', letterSpacing: 0.3,
-              boxShadow: copiado ? 'none' : `0 6px 20px rgba(65,105,225,0.3)`, transition: 'all 0.2s',
+              boxShadow: copiado ? 'none' : `0 6px 20px rgba(${primaryRgbStr},0.3)`, transition: 'all 0.2s',
             }}
           >
             {copiado ? '✓ Código copiado!' : falhouCopiar ? 'Tentar copiar novamente' : '📋 Copiar código Pix'}
@@ -162,6 +163,9 @@ export default function PagarAtletaPage() {
   const atletaId = params.atletaId as string
   const [nomeAtleta, setNomeAtleta] = useState('')
   const [nomeEscola, setNomeEscola] = useState('')
+  const [logoEscola, setLogoEscola] = useState<string | null>(null)
+  const [corPrimaria, setCorPrimaria] = useState<string | null>(null)
+  const [corSecundaria, setCorSecundaria] = useState<string | null>(null)
   const [cobrancas, setCobrancas] = useState<Cobranca[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -173,6 +177,9 @@ export default function PagarAtletaPage() {
           const data = await res.json()
           setNomeAtleta(data.nomeAtleta)
           setNomeEscola(data.nomeEscola)
+          setLogoEscola(data.logoEscola || null)
+          setCorPrimaria(data.corPrimaria || null)
+          setCorSecundaria(data.corSecundaria || null)
           setCobrancas(data.cobrancas)
         }
       } catch { /* mostra "nao encontrado" abaixo */ }
@@ -180,6 +187,11 @@ export default function PagarAtletaPage() {
     }
     carregar()
   }, [atletaId])
+
+  const primary = corPrimaria || T.primary
+  const cobalt  = corSecundaria || T.cobalt
+  const primaryRgb = hexToRgb(primary)
+  const primaryRgbStr = `${primaryRgb.r},${primaryRgb.g},${primaryRgb.b}`
 
   if (loading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: T.bg }}>
@@ -198,8 +210,16 @@ export default function PagarAtletaPage() {
   return (
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, fontFamily: INTER, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 20px 40px' }}>
       <div style={{ textAlign: 'center', marginBottom: 20 }}>
-        <div style={{ width: 52, height: 52, borderRadius: 16, background: `linear-gradient(135deg, ${T.primary}, ${T.cobalt})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 900, color: T.text, fontFamily: SYNE, boxShadow: `0 8px 24px rgba(65,105,225,0.35)`, margin: '0 auto 14px' }}>G</div>
-        <p style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 19, color: T.text, margin: '0 0 4px', letterSpacing: -0.3 }}>{nomeEscola || 'GestãoFC'}</p>
+        {logoEscola ? (
+          <img
+            src={logoEscola}
+            alt={nomeEscola}
+            style={{ width: 52, height: 52, objectFit: 'contain', borderRadius: 16, background: '#FFFFFF', padding: 6, boxSizing: 'border-box', display: 'block', margin: '0 auto 14px' }}
+          />
+        ) : (
+          <div style={{ width: 52, height: 52, borderRadius: 16, background: `linear-gradient(135deg, ${primary}, ${cobalt})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 900, color: T.text, fontFamily: SYNE, boxShadow: `0 8px 24px rgba(${primaryRgbStr},0.35)`, margin: '0 auto 14px' }}>{(nomeEscola || '?').charAt(0).toUpperCase()}</div>
+        )}
+        <p style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 19, color: T.text, margin: '0 0 4px', letterSpacing: -0.3 }}>{nomeEscola}</p>
         <p style={{ fontSize: 12, color: T.muted, margin: 0 }}>Pendências de {nomeAtleta}</p>
       </div>
 
@@ -211,12 +231,15 @@ export default function PagarAtletaPage() {
       ) : (
         <>
           <p style={{ fontSize: 12, color: T.muted, marginBottom: 16 }}>{cobrancas.length} cobrança{cobrancas.length !== 1 ? 's' : ''} em aberto — escolha qual pagar</p>
-          {cobrancas.map(c => <CardCobranca key={c.id} cobranca={c} />)}
+          {cobrancas.map(c => <CardCobranca key={c.id} cobranca={c} primary={primary} cobalt={cobalt} primaryRgbStr={primaryRgbStr} />)}
         </>
       )}
 
       <p style={{ fontSize: 11, color: T.faint, textAlign: 'center', maxWidth: 340, lineHeight: 1.6, marginTop: 8 }}>
         Em caso de dúvidas, entre em contato com a escola.
+      </p>
+      <p style={{ fontSize: 10, color: T.faint, textAlign: 'center', marginTop: 18, opacity: 0.6 }}>
+        Emitido via gestaofc.com.br
       </p>
     </div>
   )

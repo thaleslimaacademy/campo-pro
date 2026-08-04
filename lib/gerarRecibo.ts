@@ -1,3 +1,5 @@
+import { hexToRgb } from './hexToRgb'
+
 const brl = (n: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n)
 
@@ -17,6 +19,8 @@ export async function gerarRecibo(params: {
   escolaCidade?: string
   escolaEstado?: string
   escolaLogoUrl?: string
+  corPrimaria?: string
+  corSecundaria?: string
   responsavelNome?: string
 }) {
   const { default: jsPDF } = await import('jspdf')
@@ -24,12 +28,13 @@ export async function gerarRecibo(params: {
   const W = 210, mx = 20
   let y = 15
 
-  // Dados dinâmicos da escola
+  // Dados dinâmicos da escola — identidade visual é da escolinha, não da plataforma
   const nomeEscola = params.escolaNome?.includes('—')
     ? params.escolaNome.split('—').pop()?.trim() || params.escolaNome
-    : params.escolaNome || 'GestãoFC'
+    : params.escolaNome || ''
   const cidade = params.escolaCidade || 'Iturama'
   const estado = params.escolaEstado || 'MG'
+  const primaria = hexToRgb(params.corPrimaria || '#4169E1')
 
   // Datas
   const hoje = new Date().toISOString().slice(0, 10)
@@ -57,7 +62,7 @@ export async function gerarRecibo(params: {
   // Header escola
   doc.setFillColor(10, 14, 26)
   doc.rect(0, y, W, 14, 'F')
-  doc.setTextColor(65, 105, 225)
+  doc.setTextColor(primaria.r, primaria.g, primaria.b)
   doc.setFontSize(13)
   doc.setFont('helvetica', 'bold')
   doc.text(nomeEscola.toUpperCase(), W / 2, y + 9.5, { align: 'center' })
@@ -69,7 +74,7 @@ export async function gerarRecibo(params: {
   doc.text('RECIBO DE PAGAMENTO', W / 2, y, { align: 'center' })
   y += 6
 
-  doc.setDrawColor(65, 105, 225)
+  doc.setDrawColor(primaria.r, primaria.g, primaria.b)
   doc.setLineWidth(0.6)
   doc.line(mx, y, W - mx, y)
   y += 8
@@ -88,10 +93,14 @@ export async function gerarRecibo(params: {
     : params.tipo === 'TAXA' ? 'Taxa de Matrícula'
     : params.tipo
 
-  doc.setFillColor(225, 235, 255)
+  doc.setFillColor(
+    Math.round(primaria.r + (255 - primaria.r) * 0.85),
+    Math.round(primaria.g + (255 - primaria.g) * 0.85),
+    Math.round(primaria.b + (255 - primaria.b) * 0.85),
+  )
   doc.roundedRect(mx, y, 52, 7, 1, 1, 'F')
   doc.setFontSize(8)
-  doc.setTextColor(65, 105, 225)
+  doc.setTextColor(primaria.r, primaria.g, primaria.b)
   doc.setFont('helvetica', 'bold')
   doc.text(tipoLabel.toUpperCase(), mx + 26, y + 4.8, { align: 'center' })
   y += 14
@@ -121,7 +130,7 @@ export async function gerarRecibo(params: {
   y += 24
 
   // Linha assinatura
-  doc.setDrawColor(65, 105, 225)
+  doc.setDrawColor(primaria.r, primaria.g, primaria.b)
   doc.setLineWidth(0.4)
   doc.line(mx, y, W - mx, y)
   y += 14
@@ -132,20 +141,20 @@ export async function gerarRecibo(params: {
   doc.text(`${cidade} – ${estado}, ${ptBRDate(dataPago)}`, W / 2, y, { align: 'center' })
   y += 18
 
-  doc.setDrawColor(65, 105, 225)
+  doc.setDrawColor(primaria.r, primaria.g, primaria.b)
   doc.line(W / 2 - 45, y, W / 2 + 45, y)
   y += 5
   doc.setFontSize(9)
   doc.setTextColor(80, 80, 80)
   doc.text(nomeEscola, W / 2, y, { align: 'center' })
 
-  // Rodapé
+  // Rodapé — identidade discreta da plataforma, sem competir com a escola
   doc.setFillColor(10, 14, 26)
   doc.rect(0, 281, W, 16, 'F')
-  doc.setTextColor(100, 130, 200)
-  doc.setFontSize(8)
+  doc.setTextColor(130, 140, 160)
+  doc.setFontSize(7)
   doc.setFont('helvetica', 'normal')
-  doc.text('gestaofc.com.br', W / 2, 291, { align: 'center' })
+  doc.text('Emitido via gestaofc.com.br', W / 2, 291, { align: 'center' })
 
   const safe = (s: string) => s.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
   doc.save(`recibo-${safe(tipoLabel)}-${safe(params.nome || 'atleta')}-${dataPago}.pdf`)

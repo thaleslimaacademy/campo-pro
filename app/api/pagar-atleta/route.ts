@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
   if (!atleta) return NextResponse.json({ error: 'atleta nao encontrado' }, { status: 404 })
 
   const { data: escola } = await supabaseAdmin
-    .from('Escola').select('nome').eq('id', atleta.escolaId).single()
+    .from('Escola').select('nome, logoUrl, corPrimaria, corSecundaria').eq('id', atleta.escolaId).single()
 
   const { data: cobrancasData } = await supabaseAdmin
     .from('Cobranca')
@@ -63,6 +63,9 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     nomeAtleta: atleta.nome,
     nomeEscola: escola?.nome || '',
+    logoEscola: escola?.logoUrl || null,
+    corPrimaria: escola?.corPrimaria || null,
+    corSecundaria: escola?.corSecundaria || null,
     cobrancas: cobrancasResolvidas,
   })
 }

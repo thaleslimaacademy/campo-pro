@@ -26,7 +26,7 @@ export async function GET() {
 
   // Busca dados completos da escola ativa
   const { data: escola } = await supabaseAdmin
-    .from('Escola').select('id, nome, logoUrl, slug, cidade, estado').eq('id', escolaId!).single()
+    .from('Escola').select('id, nome, logoUrl, slug, cidade, estado, corPrimaria, corSecundaria').eq('id', escolaId!).single()
 
   // Switcher normal: só escolas vinculadas ao usuário via PerfilUsuario.
   // Acesso irrestrito a todas as escolas fica só no menu Super Admin (/super-admin).

@@ -28,9 +28,11 @@ export default function BoletoPage() {
   const [copiadoId, setCopiadoId] = useState<string | null>(null)
   const [cancelando, setCancelando] = useState<string | null>(null)
   const [erro, setErro] = useState('')
+  const [escola, setEscola] = useState<{ nome?: string; cidade?: string; estado?: string; logoUrl?: string; corPrimaria?: string; corSecundaria?: string } | null>(null)
 
   useEffect(() => { listarAtletasBoleto().then(setAtletas).catch(() => {}) }, [])
   useEffect(() => { listarBoletos().then(setBoletos).catch(() => {}) }, [])
+  useEffect(() => { fetch('/api/escola-ativa').then(r => r.json()).then(d => { if (d.escola) setEscola(d.escola) }) }, [])
 
   useEffect(() => {
     if (!atletaId) return
@@ -225,7 +227,11 @@ export default function BoletoPage() {
                     style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#25D366', color: '#fff', borderRadius: 12, padding: '12px 20px', fontWeight: 600, cursor: 'pointer', border: 'none', width: '100%' }}>
                     {'💬 Enviar tudo via WhatsApp'}
                   </button>
-                  <button onClick={() => gerarRecibo({ tipo: 'MENSALIDADE', nome: atletaNome, valor: Number(valorBoleto), descricao, data: new Date().toISOString().slice(0, 10) })}
+                  <button onClick={() => gerarRecibo({
+                    tipo: 'MENSALIDADE', nome: atletaNome, valor: Number(valorBoleto), descricao, data: new Date().toISOString().slice(0, 10),
+                    escolaNome: escola?.nome, escolaCidade: escola?.cidade, escolaEstado: escola?.estado, escolaLogoUrl: escola?.logoUrl,
+                    corPrimaria: escola?.corPrimaria, corSecundaria: escola?.corSecundaria,
+                  })}
                     style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'transparent', border: '1px solid #2A2A4A', color: '#cdd', borderRadius: 12, padding: '12px 20px', cursor: 'pointer' }}>
                     <FileText size={16} /> Gerar recibo PDF
                   </button>
