@@ -17,6 +17,24 @@ export async function criarClienteAsaas(apiKey: string, dados: {
   return JSON.parse(text)
 }
 
+/**
+ * Atualiza um cliente que ja existe no Asaas (endpoint de update e POST no
+ * /customers/{id}, nao PUT). Usado pra consertar clientes que entraram sem
+ * cpfCnpj ou sem telefone — o Asaas recusa cobranca de cliente sem CPF.
+ */
+export async function atualizarClienteAsaas(apiKey: string, customerId: string, dados: {
+  name?: string; cpfCnpj?: string; email?: string; phone?: string; mobilePhone?: string
+  address?: string; addressNumber?: string; province?: string; postalCode?: string
+}) {
+  const res = await fetch(`${BASE_URL}/customers/${customerId}`, {
+    method: 'POST', headers: headers(apiKey), body: JSON.stringify(dados),
+    signal: AbortSignal.timeout(10000),
+  })
+  const text = await res.text()
+  console.log('📦 Asaas cliente update raw:', text)
+  try { return JSON.parse(text) } catch { return { raw: text } }
+}
+
 export async function criarCobrancaPix(apiKey: string, dados: {
   customer: string; billingType: 'PIX'; value: number; dueDate: string; description: string
   discount?: { value: number; dueDateLimitDays: number; type: 'FIXED' }

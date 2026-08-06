@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { criarClienteAsaas, criarCobrancaPix, getPixQrCode, cancelarCobrancaAsaas } from '@/lib/asaas'
+import { criarCobrancaPix, getPixQrCode, cancelarCobrancaAsaas } from '@/lib/asaas'
+import { garantirClienteAsaas } from '@/lib/asaasCliente'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getAsaasKey } from '@/lib/getAsaasKey'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
@@ -56,23 +57,20 @@ export async function POST(req: NextRequest) {
         if (eCanc) return NextResponse.json({ error: 'Falhou ao cancelar a mensalidade anterior: ' + eCanc.message }, { status: 500 })
       }
     }
-    const { data: responsaveis } = await supabaseAdmin.from('Responsavel').select('nome, whatsapp').eq('atletaId', atletaId).eq('principal', true).limit(1)
+    const { data: responsaveis } = await supabaseAdmin.from('Responsavel')
+      .select('nome, whatsapp').eq('atletaId', atletaId).eq('principal', true).limit(1)
     const responsavel = responsaveis?.[0] || null
-    let asaasCustomerId = atleta.asaasCustomerId
-    if (!asaasCustomerId) {
-      const dadosCliente: Record<string, string> = { name: atleta.nome }
-      const cpfLimpo = (atleta.cpf || '').replace(/\D/g, '')
-      if (cpfLimpo.length >= 11) dadosCliente.cpfCnpj = cpfLimpo
-      if (atleta.telefone) dadosCliente.phone = atleta.telefone.replace(/\D/g, '')
-      if (atleta.endereco) dadosCliente.address = atleta.endereco
-      if (atleta.numero) dadosCliente.addressNumber = atleta.numero
-      if (atleta.bairro) dadosCliente.province = atleta.bairro
-      if (atleta.cep) dadosCliente.postalCode = atleta.cep.replace(/\D/g, '')
-      const cliente = await criarClienteAsaas(apiKey, dadosCliente as any)
-      if (cliente.errors) return NextResponse.json({ error: 'Erro ao criar cliente Asaas', detalhes: cliente.errors }, { status: 400 })
-      asaasCustomerId = cliente.id
-      await supabaseAdmin.from('Atleta').update({ asaasCustomerId }).eq('id', atletaId)
-    }
+
+    // ── CLIENTE ASAAS ─────────────────────────────────────────────────
+    // O Asaas recusa cobranca de cliente sem cpfCnpj. Antes o cliente era
+    // montado com Atleta.cpf (campo opcional na ficha) e so era criado
+    // quando ainda nao existia — quem entrasse sem CPF ficava travado.
+    // garantirClienteAsaas usa o CPF do responsavel principal como pagador
+    // quando o atleta nao tem, e ATUALIZA o cliente que ja existe.
+    const cli = await garantirClienteAsaas(apiKey, atletaId)
+    if (!cli.ok) return NextResponse.json({ error: cli.erro }, { status: 400 })
+    const asaasCustomerId = cli.customerId
+
     const cobranca = await criarCobrancaPix(apiKey, { customer: asaasCustomerId, billingType: 'PIX', value: valor, dueDate: vencimento, description: descricao || 'Mensalidade', ...(multaAtraso > 0 ? { fine: { value: multaAtraso } } : {}), ...(jurosAoMes > 0 ? { interest: { value: jurosAoMes } } : {}), ...(desconto ? { discount: desconto } : {}) })
     if (cobranca.errors || !cobranca.id) return NextResponse.json({ error: 'Erro ao criar cobrança', detalhes: cobranca }, { status: 400 })
     const qrCode = await getPixQrCode(apiKey, cobranca.id)
