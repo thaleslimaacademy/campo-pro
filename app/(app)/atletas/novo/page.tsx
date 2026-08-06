@@ -25,6 +25,8 @@ const LBL: React.CSSProperties = { fontSize:10, color:T.muted, textTransform:'up
 const SEC: React.CSSProperties = { background:T.surface, border:`1px solid ${T.border}`, borderRadius:14, padding:18, marginBottom:14 }
 const SEC_TITLE = (cor: string) => ({ fontFamily:SYNE, fontWeight:800, fontSize:13, color:cor, textTransform:'uppercase' as const, letterSpacing:0.5, margin:'0 0 14px' })
 
+const soDigitos = (v?: string | null) => (v ?? '').replace(/\D/g, '')
+
 type Turma = { id: string; nome: string }
 type Plano = { id?: string; slug: string; nome: string; valor: string }
 
@@ -68,22 +70,44 @@ export default function NovoAtleta() {
     setForm(p => ({ ...p, [e.target.name]: e.target.value }))
   }
 
+  function falhar(msg: string) {
+    setErro(msg)
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!form.nome) { setErro('Nome é obrigatório.'); return }
-    if (!form.dataNascimento) { setErro('Data de nascimento é obrigatória.'); return }
-    if (!form.nomeResponsavel) { setErro('Nome do responsável é obrigatório.'); return }
-    if (!form.cpfResponsavel) { setErro('CPF do responsável é obrigatório.'); return }
-    if (!form.whatsappResponsavel) { setErro('WhatsApp do responsável é obrigatório.'); return }
+    if (loading) return
+
+    if (!form.nome.trim())            return falhar('Nome do atleta é obrigatório.')
+    if (!form.dataNascimento)         return falhar('Data de nascimento é obrigatória.')
+    if (!form.nomeResponsavel.trim()) return falhar('Nome do responsável 1 é obrigatório.')
+    if (!form.cpfResponsavel)         return falhar('CPF do responsável 1 é obrigatório.')
+    if (soDigitos(form.whatsappResponsavel).length < 10) {
+      return falhar('WhatsApp do responsável 1: informe o número com DDD.')
+    }
+    // Responsável 2 pela metade quebrava o cadastro inteiro (telefone é NOT NULL).
+    // Agora é barrado aqui, antes de sair da tela.
+    if (form.nomeResponsavel2.trim() && soDigitos(form.whatsappResponsavel2).length < 10) {
+      return falhar('Responsável 2: preencha o WhatsApp com DDD ou apague o nome para deixá-lo em branco.')
+    }
+
     setLoading(true); setErro('')
     try {
-      const { atletaId } = await criarAtleta(form)
+      const res = await criarAtleta(form)
+
+      // A action não lança mais exceção: devolve { ok:false, erro } quando falha.
+      if (!res.ok) { falhar(res.erro); return }
+
       setSucesso(true)
-      setTimeout(() => { window.location.href = `/atletas/${atletaId}` }, 1000)
+      setTimeout(() => { window.location.href = `/atletas/${res.atletaId}` }, 1000)
     } catch (err: unknown) {
-      setErro('Erro ao salvar: ' + (err as Error).message)
+      falhar('Erro inesperado ao salvar: ' + (err as Error).message)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   if (sucesso) return (
@@ -135,17 +159,11 @@ export default function NovoAtleta() {
                 </select>
               </div>
             </div>
-            <div><label style={LBL}>Turma</label>
-              <select name="turmaId" value={form.turmaId} onChange={handleChange} style={SEL}>
-                <option value="">Sem turma</option>
-                {turmas.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
-              </select>
-            </div>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-              <div><label style={LBL}>Turno da escolinha</label>
-                <select name="turnoEstuda" value={form.turnoEstuda} onChange={handleChange} style={SEL}>
-                  <option value="">Não definido</option>
-                  {TURNOS.map(t => <option key={t} value={t}>{t}</option>)}
+              <div><label style={LBL}>Turma</label>
+                <select name="turmaId" value={form.turmaId} onChange={handleChange} style={SEL}>
+                  <option value="">Sem turma</option>
+                  {turmas.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
                 </select>
               </div>
               <div><label style={LBL}>Dia de vencimento</label>
@@ -232,11 +250,18 @@ export default function NovoAtleta() {
         {/* RESPONSÁVEL 2 */}
         <div style={SEC}>
           <p style={SEC_TITLE(T.muted)}>👤 Responsável 2 (opcional)</p>
+          <p style={{ fontSize:11, color:T.muted, margin:'-8px 0 14px', fontFamily:INTER }}>
+            Deixe tudo em branco se não houver. Se preencher o nome, o WhatsApp passa a ser obrigatório.
+          </p>
           <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
             <div><label style={LBL}>Nome completo</label><input name="nomeResponsavel2" value={form.nomeResponsavel2} onChange={handleChange} placeholder="Nome do 2º responsável" style={INP} /></div>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
               <div><label style={LBL}>CPF</label><input name="cpfResponsavel2" value={form.cpfResponsavel2} onChange={handleChange} placeholder="000.000.000-00" style={INP} /></div>
-              <div><label style={LBL}>WhatsApp</label><input name="whatsappResponsavel2" value={form.whatsappResponsavel2} onChange={handleChange} placeholder="(34) 99999-9999" style={INP} /></div>
+              <div>
+                <label style={LBL}>WhatsApp {form.nomeResponsavel2.trim() ? '*' : ''}</label>
+                <input name="whatsappResponsavel2" value={form.whatsappResponsavel2} onChange={handleChange} placeholder="(34) 99999-9999"
+                  style={{ ...INP, border: form.nomeResponsavel2.trim() && soDigitos(form.whatsappResponsavel2).length < 10 ? `1px solid ${T.red}` : INP.border }} />
+              </div>
             </div>
             <div><label style={LBL}>Parentesco</label>
               <select name="parentesco2" value={form.parentesco2} onChange={handleChange} style={SEL}>
