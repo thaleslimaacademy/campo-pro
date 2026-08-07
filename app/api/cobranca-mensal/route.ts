@@ -1,8 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { criarClienteAsaas, criarCobrancaPix, getPixQrCode } from '@/lib/asaas'
+import { criarCobrancaPix, getPixQrCode } from '@/lib/asaas'
 import { getAsaasKey } from '@/lib/getAsaasKey'
+import { garantirClienteAsaas } from '@/lib/asaasCliente'
 import { enviarWhatsApp } from '@/lib/whatsapp'
+
+// 06/08/2026 — este arquivo criava o cliente Asaas com
+//   cpfCnpj: atleta.cpf || '00000000191'
+// ou seja, quem nao tinha CPF proprio na ficha entrava no Asaas com um CPF
+// de teste. A cobranca era gerada, mas amarrada a um CPF que nao existe —
+// problema de conciliacao e fiscal, nao so tecnico. Agora usa
+// garantirClienteAsaas, que puxa o CPF do responsavel principal (o unico
+// obrigatorio na ficha). Sem CPF em lugar nenhum, a mensalidade ainda e
+// criada, porem como cobranca MANUAL, e o atleta entra no contador
+// totalSemCpf da resposta pra voce saber quem precisa completar o cadastro.
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +28,8 @@ export async function POST(req: NextRequest) {
       .select('id, nome, evolutionInstance').eq('ativo', true)
 
     let totalGeradas = 0, totalErros = 0, totalPuladas = 0, totalBolsistas = 0
+    let totalSemCpf = 0
+    const semCpf: string[] = []
 
     for (const escola of escolas || []) {
       const apiKey = await getAsaasKey(escola.id)
@@ -29,7 +42,7 @@ export async function POST(req: NextRequest) {
 
       // Busca SOMENTE atletas cujo diaVencimento é HOJE
       const { data: atletas } = await supabaseAdmin.from('Atleta')
-        .select('id, nome, cpf, telefone, asaasCustomerId, planoMensalidade, diaVencimento, bolsista')
+        .select('id, nome, planoMensalidade, diaVencimento, bolsista')
         .eq('escolaId', escola.id)
         .eq('ativo', true)
         .eq('diaVencimento', hoje) // ← filtro chave
@@ -46,14 +59,13 @@ export async function POST(req: NextRequest) {
           // Se já tem cobrança pré-gerada sem Asaas e está PENDENTE → gera PIX e envia WhatsApp
           if (cobExistente.status === 'PENDENTE' && !cobExistente.asaasId && apiKey) {
             try {
-              let asaasCustomerId = atleta.asaasCustomerId
-              if (!asaasCustomerId) {
-                const cliente = await criarClienteAsaas(apiKey, { name: atleta.nome, cpfCnpj: atleta.cpf?.replace(/\D/g,'') || '00000000191', phone: atleta.telefone || '', address:'', addressNumber:'', province:'', postalCode:'' })
-                if (!cliente.errors) { asaasCustomerId = cliente.id; await supabaseAdmin.from('Atleta').update({ asaasCustomerId }).eq('id', atleta.id) }
-              }
-              if (asaasCustomerId) {
+              const cli = await garantirClienteAsaas(apiKey, atleta.id)
+              if (!cli.ok) {
+                console.error('[cobranca-mensal] sem cliente Asaas para', atleta.nome, '—', cli.erro)
+                totalSemCpf++; semCpf.push(atleta.nome)
+              } else {
                 const venc = `${anoMes}-${String(hoje).padStart(2,'0')}`
-                const cobAsaas = await criarCobrancaPix(apiKey, { customer: asaasCustomerId, billingType:'PIX', value: cobExistente.valor, dueDate: venc, description:'Mensalidade' })
+                const cobAsaas = await criarCobrancaPix(apiKey, { customer: cli.customerId, billingType:'PIX', value: cobExistente.valor, dueDate: venc, description:'Mensalidade' })
                 if (!cobAsaas.errors) {
                   const qr = await getPixQrCode(apiKey, cobAsaas.id)
                   await supabaseAdmin.from('Cobranca').update({ asaasId: cobAsaas.id, pixCopiaCola: qr.payload||null, pixQrCode: qr.encodedImage||null }).eq('id', cobExistente.id)
@@ -78,21 +90,20 @@ export async function POST(req: NextRequest) {
         const valor = PLANOS[atleta.planoMensalidade || ''] || 85
 
         try {
-          let asaasCustomerId = atleta.asaasCustomerId
-          if (!asaasCustomerId && apiKey) {
-            const cliente = await criarClienteAsaas(apiKey, {
-              name: atleta.nome,
-              cpfCnpj: atleta.cpf?.replace(/\D/g, '') || '00000000191',
-              phone: atleta.telefone || '',
-              address: '', addressNumber: '', province: '', postalCode: '',
-            })
-            if (!cliente.errors) {
-              asaasCustomerId = cliente.id
-              await supabaseAdmin.from('Atleta').update({ asaasCustomerId }).eq('id', atleta.id)
+          let asaasCustomerId: string | null = null
+          if (apiKey) {
+            const cli = await garantirClienteAsaas(apiKey, atleta.id)
+            if (cli.ok) {
+              asaasCustomerId = cli.customerId
+            } else {
+              // Sem CPF do atleta nem do responsavel: nao inventa CPF.
+              // A mensalidade e criada como MANUAL e o atleta e reportado.
+              console.error('[cobranca-mensal] sem cliente Asaas para', atleta.nome, '—', cli.erro)
+              totalSemCpf++; semCpf.push(atleta.nome)
             }
           }
 
-          let novoId = crypto.randomUUID()
+          const novoId = crypto.randomUUID()
 
           if (asaasCustomerId && apiKey) {
             // Com Asaas: gera PIX
@@ -140,7 +151,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ ok: true, totalGeradas, totalPuladas, totalErros, totalBolsistas, diaHoje: hoje })
+    return NextResponse.json({
+      ok: true, totalGeradas, totalPuladas, totalErros, totalBolsistas,
+      totalSemCpf, semCpf, diaHoje: hoje,
+    })
   } catch (err: unknown) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }

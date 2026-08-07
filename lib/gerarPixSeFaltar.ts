@@ -1,12 +1,20 @@
 import { supabaseAdmin } from '@/lib/supabase'
-import { criarClienteAsaas, criarCobrancaPix, getPixQrCode } from '@/lib/asaas'
+import { criarCobrancaPix, getPixQrCode } from '@/lib/asaas'
 import { getAsaasKey } from '@/lib/getAsaasKey'
+import { garantirClienteAsaas } from '@/lib/asaasCliente'
 
 /**
  * Cria o PIX no Asaas para uma cobranca que ainda nao tem.
  * As mensalidades pre-geradas nascem so no banco; o PIX e criado poucos dias
  * antes do vencimento (regua D-3) ou sob demanda, quando o valor da
  * mensalidade muda na ficha do atleta.
+ *
+ * 06/08/2026 — o cliente Asaas era montado aqui com Atleta.cpf (campo
+ * opcional) e so quando ainda nao existia. Atleta sem CPF proprio gerava
+ * cliente sem cpfCnpj, e o Asaas recusa cobranca nesse caso — a regua
+ * falhava em silencio (retorna false, ninguem ve). Agora passa pelo
+ * garantirClienteAsaas, que usa o CPF do responsavel principal como
+ * pagador e atualiza o cliente que ja existe.
  */
 export async function gerarPixSeFaltar(
   cobrancaId: string, escolaId: string, atletaId: string,
@@ -21,26 +29,12 @@ export async function gerarPixSeFaltar(
     const multa = Number(cfg?.multaAtraso || 0)
     const juros = Number(cfg?.jurosAoMes || 0)
 
-    const { data: atleta } = await supabaseAdmin.from('Atleta')
-      .select('nome, cpf, telefone, cep, endereco, numero, bairro, asaasCustomerId')
-      .eq('id', atletaId).single()
-    if (!atleta) return false
-
-    let customerId = atleta.asaasCustomerId
-    if (!customerId) {
-      const dados: Record<string, string> = { name: atleta.nome }
-      const cpf = (atleta.cpf || '').replace(/\D/g, '')
-      if (cpf.length >= 11) dados.cpfCnpj = cpf
-      if (atleta.telefone) dados.phone = atleta.telefone.replace(/\D/g, '')
-      if (atleta.endereco) dados.address = atleta.endereco
-      if (atleta.numero) dados.addressNumber = atleta.numero
-      if (atleta.bairro) dados.province = atleta.bairro
-      if (atleta.cep) dados.postalCode = atleta.cep.replace(/\D/g, '')
-      const cliente = await criarClienteAsaas(apiKey, dados as never)
-      if (cliente.errors || !cliente.id) return false
-      customerId = cliente.id
-      await supabaseAdmin.from('Atleta').update({ asaasCustomerId: customerId }).eq('id', atletaId)
+    const cli = await garantirClienteAsaas(apiKey, atletaId)
+    if (!cli.ok) {
+      console.error('[gerarPixSeFaltar] cliente Asaas indisponivel para', atletaId, '—', cli.erro)
+      return false
     }
+    const customerId = cli.customerId
 
     const nova = await criarCobrancaPix(apiKey, {
       customer: customerId, billingType: 'PIX',
@@ -48,7 +42,10 @@ export async function gerarPixSeFaltar(
       ...(multa > 0 ? { fine: { value: multa } } : {}),
       ...(juros > 0 ? { interest: { value: juros } } : {}),
     })
-    if (nova.errors || !nova.id) return false
+    if (nova.errors || !nova.id) {
+      console.error('[gerarPixSeFaltar] Asaas recusou a cobranca de', atletaId, JSON.stringify(nova.errors || nova))
+      return false
+    }
 
     const qr = await getPixQrCode(apiKey, nova.id)
     const { error } = await supabaseAdmin.from('Cobranca').update({
