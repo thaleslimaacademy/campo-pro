@@ -112,7 +112,7 @@ export async function GET(req: NextRequest) {
     const dataAlvo = dataComOffset(offset)
 
     const { data: cobrancas } = await supabaseAdmin.from('Cobranca')
-      .select('id, valor, asaasId, atletaId, escolaId, descricao, competencia, pixCopiaCola')
+      .select('id, valor, asaasId, atletaId, escolaId, descricao, competencia, pixCopiaCola, atletaNome, familiaCobrancaId')
       .in('status', ['PENDENTE', 'VENCIDO'])
       .is('excluidaEm', null)
       .eq('vencimento', dataAlvo)
@@ -138,20 +138,29 @@ export async function GET(req: NextRequest) {
         // ja criou essa linha com o asaasId da propria cobranca da assinatura).
         if (cob.descricao && String(cob.descricao).includes('débito automático')) continue
 
+        // Ficha individual de filho de familia: o PIX e a mensagem sao da
+        // cobranca AGREGADA, nunca da ficha do filho. Sem isso o responsavel
+        // recebia 3 avisos no mesmo dia (um por filho + a agregada), com o
+        // valor individual no texto e o valor cheio no link de pagamento.
+        // O status continua sendo atualizado normalmente, senao o financeiro
+        // ficaria com filhos PENDENTE e agregada VENCIDO.
+        const ehFilhoDeFamilia = !!cob.familiaCobrancaId
+
         const { data: resps } = await supabaseAdmin.from('Responsavel')
           .select('nome, whatsapp').eq('atletaId', cob.atletaId).eq('principal', true).limit(1)
         const resp = resps?.[0]
         const nomeResp = resp?.nome?.split(' ')[0] || ''
+        const nomeExibido = (cob.atletaNome || '').trim()
         const link = `https://gestaofc.com.br/pagar/${cob.id}`
         const valorFmt = Number(cob.valor).toFixed(2)
 
         if (acao === 'lembrete_previo') {
-          if (!cob.asaasId) {
+          if (!cob.asaasId && !ehFilhoDeFamilia) {
             await gerarPixOuAgregarFamilia(cob.id, cob.escolaId, cob.atletaId, Number(cob.valor), dataAlvo, String(cob.competencia).slice(0, 10))
           }
-          if (resp?.whatsapp && atleta) {
+          if (resp?.whatsapp && atleta && !ehFilhoDeFamilia) {
             await msgLembreteD3({
-              telefone: resp.whatsapp, nomeResp, nomeAtleta: atleta.nome?.trim() || '',
+              telefone: resp.whatsapp, nomeResp, nomeAtleta: nomeExibido || atleta.nome?.trim() || '',
               valor: Number(cob.valor), dataVenc: fmtBR(dataAlvo),
               linkPagamento: link, escolaId: cob.escolaId,
             })
@@ -160,12 +169,12 @@ export async function GET(req: NextRequest) {
         }
 
         else if (acao === 'vencimento_hoje') {
-          if (!cob.asaasId) {
+          if (!cob.asaasId && !ehFilhoDeFamilia) {
             await gerarPixOuAgregarFamilia(cob.id, cob.escolaId, cob.atletaId, Number(cob.valor), dataAlvo, String(cob.competencia).slice(0, 10))
           }
-          if (resp?.whatsapp && atleta) {
+          if (resp?.whatsapp && atleta && !ehFilhoDeFamilia) {
             await msgVencimentoHoje({
-              telefone: resp.whatsapp, nomeResp, nomeAtleta: atleta.nome?.trim() || '',
+              telefone: resp.whatsapp, nomeResp, nomeAtleta: nomeExibido || atleta.nome?.trim() || '',
               valor: Number(cob.valor), dataVenc: fmtBR(dataAlvo),
               linkPagamento: link, escolaId: cob.escolaId,
             })
@@ -178,13 +187,13 @@ export async function GET(req: NextRequest) {
             .update({ status: 'VENCIDO' }).eq('id', cob.id)
           if (eVenc) { erros++; continue }
 
-          if (!cob.asaasId) {
+          if (!cob.asaasId && !ehFilhoDeFamilia) {
             await gerarPixOuAgregarFamilia(cob.id, cob.escolaId, cob.atletaId, Number(cob.valor), dataAlvo, String(cob.competencia).slice(0, 10))
           }
 
-          if (resp?.whatsapp && atleta) {
+          if (resp?.whatsapp && atleta && !ehFilhoDeFamilia) {
             await msgAtraso({
-              telefone: resp.whatsapp, nomeResp, nomeAtleta: atleta.nome?.trim() || '',
+              telefone: resp.whatsapp, nomeResp, nomeAtleta: nomeExibido || atleta.nome?.trim() || '',
               valor: Number(cob.valor), diasAtraso: 1,
               linkPagamento: link, escolaId: cob.escolaId,
             })
@@ -194,9 +203,9 @@ export async function GET(req: NextRequest) {
 
         else if (acao === 'aviso_final') {
           await supabaseAdmin.from('Cobranca').update({ status: 'VENCIDO' }).eq('id', cob.id)
-          if (resp?.whatsapp && atleta) {
+          if (resp?.whatsapp && atleta && !ehFilhoDeFamilia) {
             await msgAtraso({
-              telefone: resp.whatsapp, nomeResp, nomeAtleta: atleta.nome?.trim() || '',
+              telefone: resp.whatsapp, nomeResp, nomeAtleta: nomeExibido || atleta.nome?.trim() || '',
               valor: Number(cob.valor), diasAtraso: 15,
               linkPagamento: link, escolaId: cob.escolaId,
             })
