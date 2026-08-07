@@ -47,3 +47,10 @@ next-env.d.ts
 .gradle/
 *.bkp.*
 .env.vercel.local
+
+# Android TWA / Bubblewrap
+app/build/
+*.keystore
+*.jks
+*.p12
+.env*
