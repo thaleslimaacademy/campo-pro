@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { waitUntil } from '@vercel/functions'
 import { supabaseAdmin } from '@/lib/supabase'
 import { enviarWhatsApp } from '@/lib/whatsapp'
+import { msgPagamentoConfirmado } from '@/lib/whatsapp-templates'
 import { baixarCobrancaFamilia } from '@/lib/cobrancaFamilia'
 
 const STATUS_MAP: Record<string, string> = {
@@ -11,9 +12,6 @@ const STATUS_MAP: Record<string, string> = {
   PAYMENT_DELETED: 'CANCELADO',
   PAYMENT_REFUNDED: 'CANCELADO',
 }
-
-const brl = (n: number) => n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-const dataBR = (s: string | null) => { if (!s) return '-'; return s.slice(0, 10).split('-').reverse().join('/') }
 
 /**
  * Quando uma assinatura recorrente (debito automatico no cartao) gera a
@@ -164,27 +162,25 @@ async function processar(body: Record<string, unknown>) {
         }
 
         if (cobranca?.atletaId) {
-          const [{ data: atleta }, { data: responsavel }, { data: escola }] = await Promise.all([
+          const [{ data: atleta }, { data: responsavel }] = await Promise.all([
             supabaseAdmin.from('Atleta').select('nome').eq('id', cobranca.atletaId).single(),
             supabaseAdmin.from('Responsavel').select('nome, whatsapp').eq('atletaId', cobranca.atletaId).eq('principal', true).maybeSingle(),
-            supabaseAdmin.from('Escola').select('nome').eq('id', cobranca.escolaId).single(),
           ])
-          const escolaNome = escola?.nome?.split('—').pop()?.trim() || 'GestãoFC'
 
           if (responsavel?.whatsapp) {
-            const primeiroNome = responsavel.nome?.split(' ')[0] || 'Responsável'
-            const msg = [
-              `✅ *Pagamento confirmado!*`, ``,
-              `Olá, *${primeiroNome}*! 🎉`, ``,
-              `👤 Atleta: *${atleta?.nome || '-'}*`,
-              `📋 Referente: ${cobranca.descricao || 'Mensalidade'}`,
-              `💰 Valor: *R$ ${brl(Number(cobranca.valor))}*`,
-              `📅 Vencimento: ${dataBR(cobranca.vencimento)}`,
-              `✅ Status: *PAGO*`, ``,
-              `Obrigado pelo pagamento! 🙏`,
-              `_${escolaNome} · gestaofc.com.br_`,
-            ].join('\n')
-            await enviarWhatsApp(responsavel.whatsapp, msg, cobranca.escolaId)
+            // Template aprovado da Meta (pagamento_confirmado) via
+            // whatsapp-templates, que ja decide Meta vs Evolution sozinho.
+            // Texto livre nao serve aqui: fora da janela de 24h a Meta recusa.
+            await msgPagamentoConfirmado({
+              telefone: responsavel.whatsapp,
+              nomeResp: responsavel.nome?.split(' ')[0] || 'Responsável',
+              nomeAtleta: atleta?.nome || '-',
+              // valor efetivamente pago (com multa/juros se houve atraso),
+              // com o valor de face como fallback
+              valor: Number(pagamento.value ?? cobranca.valor),
+              referencia: cobranca.descricao || 'Mensalidade',
+              escolaId: cobranca.escolaId,
+            })
           }
         }
       } catch (e) { console.error('Erro WhatsApp confirmação:', (e as Error).message) }
