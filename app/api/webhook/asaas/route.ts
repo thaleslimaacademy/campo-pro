@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { waitUntil } from '@vercel/functions'
 import { supabaseAdmin } from '@/lib/supabase'
 import { enviarWhatsApp } from '@/lib/whatsapp'
 import { baixarCobrancaFamilia } from '@/lib/cobrancaFamilia'
@@ -122,7 +123,7 @@ async function processar(body: Record<string, unknown>) {
         await supabaseAdmin.from('Escola').update({ ativo: true, statusPlano: 'ATIVO', maxModalidades: maxMod }).eq('id', escola.id)
         if (escola.whatsapp) {
           try {
-            await enviarWhatsApp(escola.whatsapp, `🏆 *GestãoFC — Plano Ativado!*\n\nOlá! Seu pagamento foi confirmado e o *${escola.nome}* já estáativo. 🎉\n\nAcesse: *gestaofc.com.br*\n\n_Bem-vindo(a)!_`)
+            await enviarWhatsApp(escola.whatsapp, `🏆 *GestãoFC — Plano Ativado!*\n\nOlá! Seu pagamento foi confirmado e o *${escola.nome}* já está ativo. 🎉\n\nAcesse: *gestaofc.com.br*\n\n_Bem-vindo(a)!_`)
           } catch (e) { console.error('Erro WhatsApp escola:', (e as Error).message) }
         }
         return
@@ -130,12 +131,25 @@ async function processar(body: Record<string, unknown>) {
     }
 
     // ── MENSALIDADE ──
-    const { error } = await supabaseAdmin
+    // .select('id') e obrigatorio: no Supabase, um update que nao casa nenhuma
+    // linha retorna SUCESSO com zero linhas, nao erro. Sem isso a falha some.
+    const { data: atualizadas, error } = await supabaseAdmin
       .from('Cobranca')
-      .update({ status: novoStatus, ...(novoStatus === 'PAGO' ? { pagoEm:new Date().toISOString() } : {}) })
+      .update({
+        status: novoStatus,
+        ...(novoStatus === 'PAGO' ? {
+          pagoEm: (pagamento.paymentDate as string) || new Date().toISOString(),
+          valorPago: pagamento.value as number,
+        } : {}),
+      })
       .eq('asaasId', pagamento.id)
+      .select('id')
 
     if (error) { console.error('Erro ao atualizar Cobranca:', error); return }
+    if (!atualizadas?.length) {
+      console.warn('Webhook sem cobranca correspondente:', pagamento.id, evento)
+      return
+    }
 
     if (novoStatus === 'PAGO') {
       try {
@@ -185,12 +199,14 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     console.log('Webhook Asaas recebido:', body.event, body.payment?.id)
 
-    // ✅ Responde 200 IMEDIATAMENTE — evita timeout do Asaas
-    processar(body).catch(err => console.error('Erro background:', err))
+    // Responde 200 rapido, mas o waitUntil garante que o processamento
+    // termine. Sem ele a instancia serverless congela ao enviar a resposta
+    // e o processar() morre no meio — era a causa da baixa nunca acontecer.
+    waitUntil(processar(body).catch(err => console.error('Erro background:', err)))
     return NextResponse.json({ recebido: true })
 
   } catch (err: unknown) {
     console.error('Erro webhook parse:', (err as Error).message)
-    return NextResponse.json({ error: (err as Error).message }, { status:500 })
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
