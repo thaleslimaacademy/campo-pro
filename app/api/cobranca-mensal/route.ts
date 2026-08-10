@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { criarCobrancaPix, getPixQrCode } from '@/lib/asaas'
 import { getAsaasKey } from '@/lib/getAsaasKey'
 import { garantirClienteAsaas } from '@/lib/asaasCliente'
-import { enviarWhatsApp } from '@/lib/whatsapp'
+import { msgVencimentoHoje } from '@/lib/whatsapp-templates'
 
 // 06/08/2026 — este arquivo criava o cliente Asaas com
 //   cpfCnpj: atleta.cpf || '00000000191'
@@ -14,6 +14,16 @@ import { enviarWhatsApp } from '@/lib/whatsapp'
 // obrigatorio na ficha). Sem CPF em lugar nenhum, a mensalidade ainda e
 // criada, porem como cobranca MANUAL, e o atleta entra no contador
 // totalSemCpf da resposta pra voce saber quem precisa completar o cadastro.
+//
+// 09/08/2026 — tres mudancas:
+//   1. WhatsApp passa por msgVencimentoHoje (template Meta 'cobranca_vencimento')
+//      em vez de enviarWhatsApp direto, que ia 100% Evolution.
+//   2. O valor padrao era a constante 85 no codigo. Virou uma cadeia:
+//      valor do atleta > plano > valor da escola > 85. A Alexandrita mudou
+//      pra 80 e todo atleta sem plano estava sendo cobrado a mais.
+//   3. .single() virou .maybeSingle() na busca de cobranca existente:
+//      .single() trata zero linhas como erro, e o atleta podia receber
+//      cobranca duplicada.
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,7 +35,7 @@ export async function POST(req: NextRequest) {
     const anoMes = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}`
 
     const { data: escolas } = await supabaseAdmin.from('Escola')
-      .select('id, nome, evolutionInstance').eq('ativo', true)
+      .select('id, nome, valorMensalidade').eq('ativo', true)
 
     let totalGeradas = 0, totalErros = 0, totalPuladas = 0, totalBolsistas = 0
     let totalSemCpf = 0
@@ -33,6 +43,7 @@ export async function POST(req: NextRequest) {
 
     for (const escola of escolas || []) {
       const apiKey = await getAsaasKey(escola.id)
+      const valorEscola = Number(escola.valorMensalidade) || 0
 
       // Busca planos da escola
       const { data: planosEscola } = await supabaseAdmin.from('PlanoMensalidade')
@@ -42,7 +53,7 @@ export async function POST(req: NextRequest) {
 
       // Busca SOMENTE atletas cujo diaVencimento é HOJE
       const { data: atletas } = await supabaseAdmin.from('Atleta')
-        .select('id, nome, planoMensalidade, diaVencimento, bolsista')
+        .select('id, nome, planoMensalidade, valorMensalidade, diaVencimento, bolsista')
         .eq('escolaId', escola.id)
         .eq('ativo', true)
         .eq('diaVencimento', hoje) // ← filtro chave
@@ -50,10 +61,11 @@ export async function POST(req: NextRequest) {
       for (const atleta of atletas || []) {
         if (atleta.bolsista) { totalBolsistas++; continue }
 
-        // Verifica se já tem cobrança neste mês/ano
+        // Verifica se já tem cobrança neste mês/ano.
+        // maybeSingle: zero linhas e um resultado valido aqui, nao erro.
         const { data: cobExistente } = await supabaseAdmin.from('Cobranca')
           .select('id, asaasId, status, valor').eq('atletaId', atleta.id)
-          .like('vencimento', `${anoMes}%`).limit(1).single()
+          .like('vencimento', `${anoMes}%`).limit(1).maybeSingle()
 
         if (cobExistente) {
           // Se já tem cobrança pré-gerada sem Asaas e está PENDENTE → gera PIX e envia WhatsApp
@@ -73,10 +85,15 @@ export async function POST(req: NextRequest) {
                   const { data: resps } = await supabaseAdmin.from('Responsavel').select('nome, whatsapp').eq('atletaId', atleta.id).eq('principal', true).limit(1)
                   const resp = resps?.[0]
                   if (resp?.whatsapp) {
-                    const nomeResp = resp.nome.split(' ')[0]
-                    const dataFmt = new Date(venc + 'T12:00:00').toLocaleDateString('pt-BR')
-                    const link = `https://gestaofc.com.br/pagar/${cobExistente.id}`
-                    await enviarWhatsApp(resp.whatsapp, `Ola ${nomeResp}! 👋\n\nA mensalidade de *${atleta.nome}* vence *hoje* (${dataFmt}).\n\n💰 Valor: *R$ ${Number(cobExistente.valor).toFixed(2)}*\n\n🔗 Pague agora:\n${link}\n\n_${escola.nome.split('—').pop()?.trim() || escola.nome}_`, escola.id)
+                    await msgVencimentoHoje({
+                      telefone: resp.whatsapp,
+                      nomeResp: resp.nome?.split(' ')[0] || 'Responsável',
+                      nomeAtleta: atleta.nome,
+                      valor: Number(cobExistente.valor),
+                      dataVenc: new Date(venc + 'T12:00:00').toLocaleDateString('pt-BR'),
+                      linkPagamento: `https://gestaofc.com.br/pagar/${cobExistente.id}`,
+                      escolaId: escola.id,
+                    })
                   }
                 }
               }
@@ -86,8 +103,12 @@ export async function POST(req: NextRequest) {
         }
 
         const vencimento = `${anoMes}-${String(hoje).padStart(2, '0')}`
-        // P2: valor CHEIO do plano (sem proporcional)
-        const valor = PLANOS[atleta.planoMensalidade || ''] || 85
+        // Valor: o do proprio atleta manda; depois o plano; depois o padrao
+        // da escola. O 85 fixo so sobra se nada estiver configurado.
+        const valor = Number(atleta.valorMensalidade)
+          || PLANOS[atleta.planoMensalidade || '']
+          || valorEscola
+          || 85
 
         try {
           let asaasCustomerId: string | null = null
@@ -135,11 +156,15 @@ export async function POST(req: NextRequest) {
             .select('nome, whatsapp').eq('atletaId', atleta.id).eq('principal', true).limit(1)
           const resp = resps?.[0]
           if (resp?.whatsapp) {
-            const nomeResp = resp.nome.split(' ')[0]
-            const dataFmt = new Date(vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
-            const linkPagamento = `https://gestaofc.com.br/pagar/${novoId}`
-            const mensagem = `Ola ${nomeResp}! 👋\n\nA mensalidade de *${atleta.nome}* vence *hoje* (${dataFmt}).\n\n💰 Valor: *R$ ${valor.toFixed(2)}*\n\n🔗 Pague agora:\n${linkPagamento}\n\n_${escola.nome.split('—').pop()?.trim() || escola.nome}_`
-            await enviarWhatsApp(resp.whatsapp, mensagem, escola.id)
+            await msgVencimentoHoje({
+              telefone: resp.whatsapp,
+              nomeResp: resp.nome?.split(' ')[0] || 'Responsável',
+              nomeAtleta: atleta.nome,
+              valor,
+              dataVenc: new Date(vencimento + 'T12:00:00').toLocaleDateString('pt-BR'),
+              linkPagamento: `https://gestaofc.com.br/pagar/${novoId}`,
+              escolaId: escola.id,
+            })
           }
 
           totalGeradas++
