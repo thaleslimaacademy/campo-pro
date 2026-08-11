@@ -131,7 +131,13 @@ async function processar(body: Record<string, unknown>) {
     // ── MENSALIDADE ──
     // .select('id') e obrigatorio: no Supabase, um update que nao casa nenhuma
     // linha retorna SUCESSO com zero linhas, nao erro. Sem isso a falha some.
-    const { data: atualizadas, error } = await supabaseAdmin
+    //
+    // 11/08/2026 — .neq('status','PAGO') quando o evento NAO e de pagamento.
+    // PAYMENT_OVERDUE e PAYMENT_DELETED estavam rebaixando cobranca ja PAGA
+    // de volta pra VENCIDO/CANCELADO. A regua entao enxergava como em aberto
+    // e cobrava de novo quem ja tinha pago. Uma cobranca paga nunca volta
+    // atras por evento de vencimento ou cancelamento.
+    const query = supabaseAdmin
       .from('Cobranca')
       .update({
         status: novoStatus,
@@ -141,7 +147,10 @@ async function processar(body: Record<string, unknown>) {
         } : {}),
       })
       .eq('asaasId', pagamento.id)
-      .select('id')
+
+    if (novoStatus !== 'PAGO') query.neq('status', 'PAGO')
+
+    const { data: atualizadas, error } = await query.select('id')
 
     if (error) { console.error('Erro ao atualizar Cobranca:', error); return }
     if (!atualizadas?.length) {
