@@ -146,6 +146,14 @@ export async function GET(req: NextRequest) {
         // ficaria com filhos PENDENTE e agregada VENCIDO.
         const ehFilhoDeFamilia = !!cob.familiaCobrancaId
 
+        // Reconfere o status IMEDIATAMENTE antes de agir. A lista foi lida no
+        // inicio da execucao e a fila de WhatsApp espera 4-8s por mensagem —
+        // com 20+ cobrancas isso leva minutos, e quem pagou nesse intervalo
+        // recebia cobranca mesmo ja tendo pago.
+        const { data: atual } = await supabaseAdmin.from('Cobranca')
+          .select('status').eq('id', cob.id).maybeSingle()
+        if (!atual || atual.status === 'PAGO' || atual.status === 'CANCELADO') continue
+
         const { data: resps } = await supabaseAdmin.from('Responsavel')
           .select('nome, whatsapp').eq('atletaId', cob.atletaId).eq('principal', true).limit(1)
         const resp = resps?.[0]

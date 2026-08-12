@@ -90,8 +90,12 @@ export default function EditarAtleta() {
   function deletar() {
     if (!confirm('EXCLUIR permanentemente este atleta e todos os seus dados?')) return
     startSave(async () => {
-      await excluirAtleta(id)
-      router.push('/atletas')
+      try {
+        await excluirAtleta(id)
+        router.push('/atletas')
+      } catch (e) {
+        alert((e as Error).message || 'Nao foi possivel excluir o atleta.')
+      }
     })
   }
 
