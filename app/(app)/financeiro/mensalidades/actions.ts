@@ -1,10 +1,9 @@
 'use server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { cancelarCobrancaAsaas } from '@/lib/asaas'
-import { getAsaasKey } from '@/lib/getAsaasKey'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 import { revalidatePath } from 'next/cache'
 import { dataVencimentoNoMes } from '@/lib/dataVencimento'
+import { cancelarPixDaCobranca, CAMPOS_PIX_LIMPOS } from '@/lib/cancelarPixDaCobranca'
 
 export async function getMensalidades() {
   const escolaId = await getEscolaIdServer()
@@ -31,21 +30,36 @@ export async function alterarDiaVencimentoMassa(atletaIds: string[], dia: number
   revalidatePath('/financeiro/mensalidades')
 }
 
+/**
+ * Baixa manual: o dinheiro entrou por fora (dinheiro, transferencia, cartao
+ * na maquininha). Cancela o PIX no Asaas pra ninguem pagar duas vezes.
+ * Se o Asaas falhar, a baixa acontece do mesmo jeito — o dinheiro ja entrou,
+ * segurar a baixa nao ajuda — mas devolve um aviso pra tela mostrar.
+ */
 export async function baixaManualCobranca(cobrancaId: string, valorPago: number, formaPagamento: string) {
-  await supabaseAdmin.from('Cobranca').update({
+  const pix = await cancelarPixDaCobranca(cobrancaId)
+
+  const { error } = await supabaseAdmin.from('Cobranca').update({
     status: 'PAGO',
     pagoEm: new Date().toISOString(),
     valorPago,
     baixaManual: true,
     baixaManualEm: new Date().toISOString(),
     tipo: formaPagamento,
+    ...(pix.ok ? CAMPOS_PIX_LIMPOS : {}),
   }).eq('id', cobrancaId)
+
+  if (error) throw new Error('Erro ao dar baixa: ' + error.message)
   revalidatePath('/financeiro/mensalidades')
+
+  return pix.ok
+    ? { ok: true as const }
+    : { ok: true as const, aviso: `Baixa registrada, mas o PIX continua ativo no Asaas (${pix.erro}). Cancele o codigo la pra evitar pagamento duplicado.` }
 }
 
+/** Alias historico — a pagina chama este nome em alguns lugares. */
 export async function cancelarCobranca(cobrancaId: string) {
-  await supabaseAdmin.from('Cobranca').update({ status: 'CANCELADO', excluidaEm: new Date().toISOString() }).eq('id', cobrancaId)
-  revalidatePath('/financeiro/mensalidades')
+  return softDeleteCobranca(cobrancaId)
 }
 
 // ── Aliases e funções legadas usadas pela página existente ──
@@ -109,7 +123,7 @@ export async function gerarMensalidades(params: { atletaId?: string; atletaIds?:
         id: crypto.randomUUID(), escolaId, atletaId: aid,
         atletaNome: nomeMap[aid] || null,
         valor, vencimento: venc, competencia,
-        status: 'PENDENTE', descricao: `Mensalidade${qtd > 1 ? ` (${i+1}/${qtd})` : ''}`,
+        status: 'PENDENTE', descricao: `Mensalidade${qtd > 1 ? ` (${i + 1}/${qtd})` : ''}`,
         periodo, qtdParcelas: qtd, parcelaAtual: i + 1,
         grupoCobrancaId: grupoId, tipo: 'MANUAL',
       })
@@ -123,42 +137,88 @@ export async function gerarMensalidades(params: { atletaId?: string; atletaIds?:
   return { geradas: insertions.length, criadas: insertions.length, puladas }
 }
 
+/**
+ * Exclusao (soft). Ordem obrigatoria: cancela no Asaas PRIMEIRO, so grava
+ * depois. Se o Asaas recusar, a exclusao nao acontece e o motivo sobe pra
+ * tela — melhor uma exclusao travada do que um codigo PIX orfao cobrando
+ * uma familia que ja saiu.
+ */
 export async function softDeleteCobranca(cobrancaId: string) {
-  await supabaseAdmin.from('Cobranca').update({ excluidaEm: new Date().toISOString(), status: 'CANCELADO' }).eq('id', cobrancaId)
+  const pix = await cancelarPixDaCobranca(cobrancaId)
+  if (!pix.ok) throw new Error(`Nao foi possivel excluir: ${pix.erro}.`)
+
+  const { data, error } = await supabaseAdmin.from('Cobranca').update({
+    status: 'CANCELADO',
+    excluidaEm: new Date().toISOString(),
+    ...CAMPOS_PIX_LIMPOS,
+  }).eq('id', cobrancaId).select('id')
+
+  if (error) throw new Error('Erro ao excluir: ' + error.message)
+  if (!data || data.length === 0) throw new Error('Nenhuma cobranca foi excluida — verifique o id.')
+
   revalidatePath('/financeiro/mensalidades')
+  return { ok: true as const, pixCancelado: pix.cancelado, observacao: pix.observacao }
 }
 
+/**
+ * Restaurar precisa zerar o asaasId: o pagamento foi DELETADO no Asaas na
+ * exclusao, entao aquele id nao volta. Sem zerar, a cobranca renasce
+ * apontando pra um pagamento que nao existe e a regua manda um QR morto.
+ */
 export async function restaurarCobranca(cobrancaId: string) {
-  await supabaseAdmin.from('Cobranca').update({ excluidaEm: null, status: 'PENDENTE' }).eq('id', cobrancaId)
+  const { error } = await supabaseAdmin.from('Cobranca').update({
+    excluidaEm: null,
+    status: 'PENDENTE',
+    asaasId: null,
+    ...CAMPOS_PIX_LIMPOS,
+  }).eq('id', cobrancaId)
+  if (error) throw new Error('Erro ao restaurar: ' + error.message)
   revalidatePath('/financeiro/mensalidades')
+  return { ok: true as const, aviso: 'Cobranca restaurada sem PIX — gere um novo codigo antes de cobrar.' }
 }
 
+/**
+ * Exclusao definitiva: apaga a linha. Precisa cancelar no Asaas ANTES,
+ * senao o asaasId some junto com a linha e o codigo fica orfao pra sempre,
+ * invisivel ate pra rotina de conciliacao.
+ */
 export async function excluirDefinitivo(cobrancaId: string) {
-  await supabaseAdmin.from('Cobranca').delete().eq('id', cobrancaId)
+  const pix = await cancelarPixDaCobranca(cobrancaId)
+  if (!pix.ok) throw new Error(`Nao foi possivel excluir definitivamente: ${pix.erro}.`)
+
+  const { error } = await supabaseAdmin.from('Cobranca').delete().eq('id', cobrancaId)
+  if (error) throw new Error('Erro ao excluir definitivamente: ' + error.message)
+
   revalidatePath('/financeiro/mensalidades')
+  return { ok: true as const, pixCancelado: pix.cancelado }
 }
 
 export async function marcarPago(cobrancaId: string, valorPago?: number, formaPagamento?: string) {
-  // Busca asaasId e escolaId para cancelar no Asaas
-  const { data: cob } = await supabaseAdmin.from('Cobranca')
-    .select('asaasId, escolaId').eq('id', cobrancaId).single()
+  const pix = await cancelarPixDaCobranca(cobrancaId)
 
-  await supabaseAdmin.from('Cobranca').update({
-    status: 'PAGO', pagoEm: new Date().toISOString(),
-    valorPago: valorPago || null, baixaManual: true,
-    baixaManualEm: new Date().toISOString(),
-    tipo: formaPagamento || 'MANUAL',
-  }).eq('id', cobrancaId)
-
-  // Cancela no Asaas para evitar cobrança duplicada
-  if (cob?.asaasId && cob?.escolaId) {
-    try {
-      const apiKey = await getAsaasKey(cob.escolaId)
-      if (apiKey) await cancelarCobrancaAsaas(apiKey, cob.asaasId)
-    } catch (err) { console.error('Erro ao cancelar no Asaas:', err) }
+  // Sem valor informado, cai no valor da propria cobranca — nunca NULL.
+  let valorFinal: number | null = valorPago ?? null
+  if (valorFinal == null) {
+    const { data: cob } = await supabaseAdmin.from('Cobranca').select('valor').eq('id', cobrancaId).maybeSingle()
+    valorFinal = cob?.valor ?? null
   }
 
+  const { error } = await supabaseAdmin.from('Cobranca').update({
+    status: 'PAGO',
+    pagoEm: new Date().toISOString(),
+    valorPago: valorFinal,
+    baixaManual: true,
+    baixaManualEm: new Date().toISOString(),
+    tipo: formaPagamento || 'MANUAL',
+    ...(pix.ok ? CAMPOS_PIX_LIMPOS : {}),
+  }).eq('id', cobrancaId)
+
+  if (error) throw new Error('Erro ao marcar como pago: ' + error.message)
   revalidatePath('/financeiro/mensalidades')
+
+  return pix.ok
+    ? { ok: true as const }
+    : { ok: true as const, aviso: `Marcado como pago, mas o PIX continua ativo no Asaas (${pix.erro}).` }
 }
 
 export async function alterarDiaVencimentoEmMassa(atletaIds: string[], dia: number) {
