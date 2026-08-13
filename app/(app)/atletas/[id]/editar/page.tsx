@@ -23,6 +23,9 @@ export default function EditarAtleta() {
   const [loading, startLoad] = useTransition()
   const [salvando, startSave] = useTransition()
   const [sucesso, setSucesso] = useState(false)
+  // Erro fica na tela (nao so num alert que some) — a mensagem do servidor
+  // costuma ser longa e acionavel ("use Desativar", "desmembre a familia").
+  const [erro, setErro] = useState('')
   const [ativo, setAtivo] = useState(true)
   const [bolsista, setBolsista] = useState(false)
   const [turmas, setTurmas] = useState<Turma[]>([])
@@ -51,6 +54,17 @@ export default function EditarAtleta() {
     setForm(p => ({ ...p, [e.target.name]: e.target.value }))
   }
 
+  /**
+   * Em producao o Next apaga a mensagem de qualquer erro lancado dentro de
+   * server action (mostra so um digest generico). Por isso as actions
+   * devolvem { ok, erro } em vez de lancar — este helper so trata o que
+   * sobrou: queda de rede antes da action responder.
+   */
+  function erroDeRede(e: unknown) {
+    console.error(e)
+    return 'Falha de conexao com o servidor. Verifique a internet e tente de novo.'
+  }
+
   async function buscarCep(cep: string) {
     const c = cep.replace(/\D/g, '')
     if (c.length !== 8) return
@@ -62,39 +76,58 @@ export default function EditarAtleta() {
   }
 
   function salvar() {
+    setErro('')
     startSave(async () => {
-      const resultado = await salvarAtleta(id, {
-        nome: form.nome, dataNascimento: form.dataNascimento || null, cpf: form.cpf || null, rg: form.rg || null,
-        posicao: form.posicao || null, telefone: form.telefone || null,
-        valorMensalidade: bolsista ? 0 : (form.valorMensalidade ? Number(form.valorMensalidade) : null),
-        diaVencimento: Number(form.diaVencimento), bolsista, motivoBolsa: bolsista ? form.motivoBolsa : null,
-        turmaId: form.turmaId || null, cep: form.cep || null, endereco: form.endereco || null,
-        numero: form.numero || null, bairro: form.bairro || null, cidade: form.cidade || null, estado: form.estado || null,
-      })
-      if (resultado && 'avisosMensalidade' in resultado && resultado.avisosMensalidade) {
-        alert('Atleta salvo, mas houve avisos ao atualizar cobranças futuras:\n' + resultado.avisosMensalidade.join('\n'))
+      try {
+        const resultado = await salvarAtleta(id, {
+          nome: form.nome, dataNascimento: form.dataNascimento || null, cpf: form.cpf || null, rg: form.rg || null,
+          posicao: form.posicao || null, telefone: form.telefone || null,
+          valorMensalidade: bolsista ? 0 : (form.valorMensalidade ? Number(form.valorMensalidade) : null),
+          diaVencimento: Number(form.diaVencimento), bolsista, motivoBolsa: bolsista ? form.motivoBolsa : null,
+          turmaId: form.turmaId || null, cep: form.cep || null, endereco: form.endereco || null,
+          numero: form.numero || null, bairro: form.bairro || null, cidade: form.cidade || null, estado: form.estado || null,
+        })
+
+        if (!resultado.ok) { setErro(resultado.erro); return }
+
+        if ('avisosMensalidade' in resultado && resultado.avisosMensalidade?.length) {
+          alert('Atleta salvo, mas houve avisos ao atualizar cobranças futuras:\n' + resultado.avisosMensalidade.join('\n'))
+        }
+        setSucesso(true)
+        setTimeout(() => { router.push(`/atletas/${id}`) }, 1200)
+      } catch (e) {
+        setErro(erroDeRede(e))
       }
-      setSucesso(true)
-      setTimeout(() => { router.push(`/atletas/${id}`) }, 1200)
     })
   }
 
   function toggleAtivo() {
+    setErro('')
     startSave(async () => {
       const novo = !ativo
-      await toggleAtivoAtleta(id, novo)
-      setAtivo(novo)
+      try {
+        const r = await toggleAtivoAtleta(id, novo)
+        if (!r.ok) { setErro(r.erro); return }
+        setAtivo(novo)
+        if (!novo && r.canceladas > 0) {
+          alert(`Atleta desativado. ${r.canceladas} mensalidade(s) futura(s) cancelada(s) — no app e na Asaas.`)
+        }
+      } catch (e) {
+        setErro(erroDeRede(e))
+      }
     })
   }
 
   function deletar() {
     if (!confirm('EXCLUIR permanentemente este atleta e todos os seus dados?')) return
+    setErro('')
     startSave(async () => {
       try {
-        await excluirAtleta(id)
+        const r = await excluirAtleta(id)
+        if (!r.ok) { setErro(r.erro); return }
         router.push('/atletas')
       } catch (e) {
-        alert((e as Error).message || 'Nao foi possivel excluir o atleta.')
+        setErro(erroDeRede(e))
       }
     })
   }
@@ -129,6 +162,16 @@ export default function EditarAtleta() {
       <div style={{ padding:'14px 16px' }}>
 
         {sucesso && <div style={{ background:`${T.green}15`, border:`1px solid ${T.green}30`, borderRadius:10, padding:12, marginBottom:12, textAlign:'center' }}><p style={{ color:T.green, fontWeight:700, fontFamily:SYNE }}>✅ Salvo! Redirecionando...</p></div>}
+
+        {erro && (
+          <div style={{ background:`${T.red}12`, border:`1px solid ${T.red}35`, borderRadius:10, padding:14, marginBottom:12 }}>
+            <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:12 }}>
+              <p style={{ color:T.red, fontFamily:'Inter,sans-serif', fontSize:13, lineHeight:1.5, margin:0 }}>{erro}</p>
+              <button onClick={() => setErro('')} style={{ background:'none', border:'none', color:T.red, fontSize:16, cursor:'pointer', lineHeight:1, padding:0 }}>×</button>
+            </div>
+          </div>
+        )}
+
         {!ativo && <div style={{ background:`${T.red}10`, border:`1px solid ${T.red}25`, borderRadius:10, padding:12, marginBottom:12, textAlign:'center' }}><p style={{ color:T.red, fontWeight:700, fontFamily:SYNE }}>⛔ Atleta inativo</p></div>}
 
         {/* DADOS DO ATLETA */}
@@ -211,10 +254,10 @@ export default function EditarAtleta() {
         <div style={{ ...SEC, borderColor:`${T.red}20` }}>
           <p style={{ ...SEC_TITLE, color:T.red }}>⚠️ Ações</p>
           <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-            <button onClick={toggleAtivo} style={{ background:ativo?'rgba(255,68,68,0.08)':'rgba(0,214,122,0.08)', border:`1px solid ${ativo?T.red+'25':T.green+'25'}`, color:ativo?T.red:T.green, padding:'12px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:12, cursor:'pointer', textTransform:'uppercase' }}>
+            <button onClick={toggleAtivo} disabled={salvando} style={{ background:ativo?'rgba(255,68,68,0.08)':'rgba(0,214,122,0.08)', border:`1px solid ${ativo?T.red+'25':T.green+'25'}`, color:ativo?T.red:T.green, padding:'12px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:12, cursor:salvando?'default':'pointer', textTransform:'uppercase', opacity:salvando?0.6:1 }}>
               {ativo ? 'Desativar atleta' : 'Reativar atleta'}
             </button>
-            <button onClick={deletar} style={{ background:'rgba(255,68,68,0.06)', border:`1px solid ${T.red}20`, color:T.red, padding:'12px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:12, cursor:'pointer', textTransform:'uppercase' }}>
+            <button onClick={deletar} disabled={salvando} style={{ background:'rgba(255,68,68,0.06)', border:`1px solid ${T.red}20`, color:T.red, padding:'12px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:12, cursor:salvando?'default':'pointer', textTransform:'uppercase', opacity:salvando?0.6:1 }}>
               Excluir permanentemente
             </button>
           </div>
