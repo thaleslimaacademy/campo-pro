@@ -2,6 +2,20 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { msgLembreteD3, msgVencimentoHoje } from '@/lib/whatsapp-templates'
+import { dataVencimentoNoMes } from '@/lib/dataVencimento'
+
+/**
+ * Antecedencia maxima para avisar o responsavel no ato da geracao.
+ * Fora dessa janela a cobranca e criada em silencio e quem avisa e a regua
+ * diaria (8h BRT), que dispara no D-3 — mesmo criterio, um dono so.
+ *
+ * 20/08/2026 — sem esse teto, gerar a mensalidade do mes seguinte logo apos
+ * o cadastro manual disparava o template de lembrete D-3 no mesmo dia,
+ * dizendo "faltam 32 dias". Cadastro manual quase sempre e aluno que ja
+ * pagou o primeiro mes em dinheiro, entao a familia recebia cobranca de
+ * uma mensalidade que nem comecou.
+ */
+const DIAS_ANTECEDENCIA_ENVIO = 3
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth()
@@ -21,7 +35,6 @@ export async function POST(req: NextRequest) {
   const atleta     = atletaRes.data
   const resp       = respRes.data?.[0] || null
   const respWhats  = resp?.whatsapp || resp?.telefone || null
-  const escolaNome = escolaRes.data?.nome?.split('—').pop()?.trim() || escolaRes.data?.nome || 'Escolinha'
 
   const qtd     = periodo === 'semestral' ? 6 : periodo === 'anual' ? 12 : 1
   const grupoId = qtd > 1 ? crypto.randomUUID() : null
@@ -42,8 +55,10 @@ export async function POST(req: NextRequest) {
   const insertions = []
   const pulados: string[] = []
   for (let i = 0; i < qtd; i++) {
-    const dataVenc = new Date(agora.getFullYear(), agora.getMonth() + i, diaVencimento || 10)
-    const venc = dataVenc.toISOString().split('T')[0]
+    // dataVencimentoNoMes faz o clamp do dia (31 em mes de 30 dias vira 30).
+    // Com `new Date(ano, mes, 31)` cru o mes rolava e o vencimento caia no
+    // dia 1 do mes seguinte, fora da competencia.
+    const venc = dataVencimentoNoMes(agora.getFullYear(), agora.getMonth() + i, Number(diaVencimento) || 10)
     const competencia = venc.slice(0, 7) + '-01'
     if (!forcar && jaTem.has(competencia)) { pulados.push(competencia.slice(0, 7)); continue }
     insertions.push({
@@ -70,7 +85,12 @@ export async function POST(req: NextRequest) {
 
   // WhatsApp: usa os templates (a Meta so aceita template em mensagem proativa).
   // Avisa sobre a PRIMEIRA parcela gerada — as demais entram na regua normal.
-  if (respWhats && insertions.length) {
+  let whatsappEnviado = false
+  let motivoNaoEnvio: string | null = null
+
+  if (!respWhats) {
+    motivoNaoEnvio = 'responsavel sem WhatsApp cadastrado'
+  } else {
     const primeira      = insertions[0]
     const dataFormatada = new Date(primeira.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
     const nomeResp      = resp?.nome?.split(' ')[0] || ''
@@ -83,24 +103,38 @@ export async function POST(req: NextRequest) {
     alvo.setHours(0, 0, 0, 0)
     const dias = Math.round((alvo.getTime() - hojeBR.getTime()) / 86400000)
 
-    try {
-      if (dias <= 0) {
-        await msgVencimentoHoje({
-          telefone: respWhats, nomeResp, nomeAtleta,
-          valor: Number(valor), dataVenc: dataFormatada, linkPagamento, escolaId,
-        })
-      } else {
-        await msgLembreteD3({
-          telefone: respWhats, nomeResp, nomeAtleta,
-          valor: Number(valor), dataVenc: dataFormatada, linkPagamento, dias, escolaId,
-        })
+    if (dias > DIAS_ANTECEDENCIA_ENVIO) {
+      // Longe demais: quem avisa e a regua, no D-3.
+      motivoNaoEnvio = `vence em ${dias} dias — a regua avisa no D-3`
+      console.log(`[cobranca-manual] ${nomeAtleta}: sem aviso agora, ${motivoNaoEnvio}`)
+    } else {
+      try {
+        if (dias <= 0) {
+          await msgVencimentoHoje({
+            telefone: respWhats, nomeResp, nomeAtleta,
+            valor: Number(valor), dataVenc: dataFormatada, linkPagamento, escolaId,
+          })
+        } else {
+          await msgLembreteD3({
+            telefone: respWhats, nomeResp, nomeAtleta,
+            valor: Number(valor), dataVenc: dataFormatada, linkPagamento, dias, escolaId,
+          })
+        }
+        whatsappEnviado = true
+      } catch (e) {
+        motivoNaoEnvio = 'falha no envio: ' + (e as Error).message
+        console.error('❌ Cobranca criada mas WhatsApp falhou:', (e as Error).message)
       }
-    } catch (e) {
-      console.error('❌ Cobranca criada mas WhatsApp falhou:', (e as Error).message)
     }
   }
 
-  return NextResponse.json({ ok: true, geradas: insertions.length, puladas: pulados, whatsappEnviado: !!respWhats })
+  return NextResponse.json({
+    ok: true,
+    geradas: insertions.length,
+    puladas: pulados,
+    whatsappEnviado,
+    ...(motivoNaoEnvio ? { motivoNaoEnvio } : {}),
+  })
 }
 
 export async function PATCH(req: NextRequest) {
