@@ -54,3 +54,5 @@ app/build/
 *.jks
 *.p12
 .env*
+
+*.bak
