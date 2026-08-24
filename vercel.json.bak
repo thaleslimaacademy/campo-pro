@@ -5,7 +5,6 @@
     { "path": "/api/lembretes",          "schedule": "0 11 * * *" },
     { "path": "/api/inadimplentes",      "schedule": "0 11 */3 * *" },
     { "path": "/api/aniversariantes",    "schedule": "0 11 * * *" },
-    { "path": "/api/nps/enviar",         "schedule": "0 10 * * *" },
-    { "path": "/api/conciliacao-asaas",  "schedule": "30 11 * * *" }
+    { "path": "/api/nps/enviar",         "schedule": "0 10 * * *" }
   ]
 }

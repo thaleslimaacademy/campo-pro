@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 const isPublicRoute = createRouteMatcher([
   '/login(.*)', '/acesso-negado(.*)', '/matricula(.*)', '/rematricula(.*)',
   '/convite(.*)', '/qrcode(.*)', '/planos(.*)', '/api/webhook(.*)',
-  '/api/lembretes(.*)', '/api/cobranca(.*)', '/api/perfil(.*)', '/api/conciliacao-asaas(.*)',
+  '/api/lembretes(.*)', '/api/cobranca(.*)', '/api/perfil(.*)',
   '/api/inadimplentes(.*)', '/api/atleta-turma(.*)', '/home(.*)', '/api/aniversariantes(.*)', '/logout(.*)',
   '/pagar(.*)', '/pagar-atleta(.*)', '/convocacao(.*)', '/api/notificar-convocacao(.*)',
   '/api/pagar(.*)', '/api/pagar-atleta(.*)', '/api/whatsapp-aprovacao(.*)', '/galeria(.*)',
