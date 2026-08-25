@@ -26,10 +26,16 @@ import { getAsaasKey } from '@/lib/getAsaasKey'
 
 const BASE_URL = 'https://api.asaas.com/v3'
 
-// Se a varredura achar mais que isso, algo esta errado na MINHA logica, nao
-// no seu Asaas. Para tudo e devolve a lista sem cancelar — cancelamento no
-// Asaas nao tem desfazer.
-const TETO_SEGURANCA = 30
+// Se a varredura achar mais que isso, para tudo e devolve a lista sem
+// cancelar — cancelamento no Asaas nao tem desfazer. Da pra subir o teto
+// conscientemente com ?teto=N depois de ler a lista.
+//
+// 24/08/2026 — a primeira execucao real bateu no teto com 59 achados, e a
+// trava estava certa: 3 deles eram cobranca de LOJA, GALERIA e TAXA, que
+// nao moram na tabela Cobranca. A varredura so olhava Cobranca e chamava
+// de orfao tudo que nao achasse ali. Agora consulta as 5 tabelas que
+// guardam asaasId.
+const TETO_PADRAO = 30
 
 // Status do Asaas que ainda podem ser pagos por alguem.
 const STATUS_ABERTOS = ['PENDING', 'OVERDUE']
@@ -42,10 +48,13 @@ type PagamentoAsaas = {
   description?: string
   customer?: string
   invoiceUrl?: string
+  /** Preenchido quando o pagamento foi gerado por uma assinatura recorrente. */
+  subscription?: string | null
 }
 
 type Achado = {
   asaasId: string
+  apiKey?: string
   valor: number
   vencimento: string
   statusAsaas: string
@@ -136,6 +145,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const tetoParam = Number(req.nextUrl.searchParams.get('teto'))
+  const teto = Number.isFinite(tetoParam) && tetoParam > 0 ? tetoParam : TETO_PADRAO
+
   const modoParam = req.nextUrl.searchParams.get('modo')
   const modo = modoParam || process.env.CONCILIACAO_MODO || 'relatorio'
   const vaiCancelar = modo === 'cancelar'
@@ -160,6 +172,10 @@ export async function GET(req: NextRequest) {
   }
 
   // ── 2. Tudo que o banco conhece ────────────────────────────────────
+  // asaasId NAO mora so na Cobranca: loja (Pedido), galeria (FotoCompra),
+  // assinatura do SaaS (PlanoEscola) e a propria Escola tambem guardam.
+  // Ignorar qualquer uma dessas faz cobranca legitima ser classificada
+  // como orfa — e, em modo cancelar, cancelada de verdade.
   const { data: linhas, error: eCob } = await supabaseAdmin
     .from('Cobranca')
     .select('id, asaasId, status, excluidaEm, atletaNome')
@@ -170,10 +186,28 @@ export async function GET(req: NextRequest) {
 
   const conhecidas = new Map((linhas ?? []).map(l => [l.asaasId as string, l]))
 
+  // Ids de outras tabelas: nao sao "cobranca de atleta", entao nunca viram
+  // orfao nem fantasma — so precisam ser reconhecidos como legitimos.
+  const outrosIds = new Set<string>()
+  const outrasTabelas = ['Pedido', 'FotoCompra', 'PlanoEscola', 'Escola'] as const
+
+  for (const tabela of outrasTabelas) {
+    const { data, error } = await supabaseAdmin.from(tabela).select('asaasId').not('asaasId', 'is', null).limit(5000)
+    if (error) {
+      // Falha fechada: sem conseguir ler a tabela, nao da pra saber o que e
+      // legitimo. Melhor abortar do que cancelar cobranca de loja por engano.
+      return NextResponse.json({
+        error: `falha ao ler ${tabela} (${error.message}). Varredura abortada — sem essa tabela eu classificaria cobranca legitima como orfa.`,
+      }, { status: 500 })
+    }
+    for (const r of data ?? []) if (r.asaasId) outrosIds.add(r.asaasId as string)
+  }
+
   // ── 3. Compara ─────────────────────────────────────────────────────
   const achados: Achado[] = []
   let totalAbertos = 0
   const errosLeitura: string[] = []
+  const ignorados = { assinatura: 0, outrasTabelas: 0 }
 
   for (const [apiKey, nomes] of chaves) {
     const r = await listarPagamentosAbertos(apiKey)
@@ -182,11 +216,18 @@ export async function GET(req: NextRequest) {
     totalAbertos += r.pagamentos.length
 
     for (const p of r.pagamentos) {
+      // Gerado por assinatura recorrente: quem manda nele e a Asaas, nao o
+      // app. Cancelar aqui derrubaria uma cobranca de cartao ativa.
+      if (p.subscription) { ignorados.assinatura++; continue }
+
+      // Loja, galeria, plano do SaaS: legitimo, so nao mora na Cobranca.
+      if (outrosIds.has(p.id)) { ignorados.outrasTabelas++; continue }
+
       const linha = conhecidas.get(p.id)
 
       if (!linha) {
         achados.push({
-          asaasId: p.id, valor: p.value, vencimento: p.dueDate, statusAsaas: p.status,
+          asaasId: p.id, apiKey, valor: p.value, vencimento: p.dueDate, statusAsaas: p.status,
           descricao: p.description || '(sem descricao)',
           motivo: 'orfao',
           detalhe: 'ativo no Asaas, nao existe no banco — a linha foi apagada sem cancelar',
@@ -197,7 +238,7 @@ export async function GET(req: NextRequest) {
       const foiCancelada = linha.status === 'CANCELADO' || linha.excluidaEm !== null
       if (foiCancelada) {
         achados.push({
-          asaasId: p.id, valor: p.value, vencimento: p.dueDate, statusAsaas: p.status,
+          asaasId: p.id, apiKey, valor: p.value, vencimento: p.dueDate, statusAsaas: p.status,
           descricao: p.description || '(sem descricao)',
           motivo: 'fantasma',
           detalhe: `cancelada no app${linha.atletaNome ? ` (${linha.atletaNome})` : ''}, mas segue cobravel no Asaas`,
@@ -210,6 +251,7 @@ export async function GET(req: NextRequest) {
     modo,
     executadoEm: new Date().toISOString(),
     escaneados: totalAbertos,
+    ignorados,
     orfaos: achados.filter(a => a.motivo === 'orfao').length,
     fantasmas: achados.filter(a => a.motivo === 'fantasma').length,
     valorTotal: Number(achados.reduce((s, a) => s + Number(a.valor || 0), 0).toFixed(2)),
@@ -222,15 +264,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ...resumoBase, ok: true, mensagem: 'Nenhum PIX orfao. Tudo conciliado.' })
   }
 
-  if (achados.length > TETO_SEGURANCA) {
+  if (achados.length > teto) {
     console.error('[conciliacao] TETO ESTOURADO:', achados.length, 'achados — nada foi cancelado')
     return NextResponse.json({
       ...resumoBase,
       ok: false,
       travado: true,
-      mensagem: `${achados.length} achados, acima do teto de ${TETO_SEGURANCA}. Nada foi cancelado. ` +
-        `Volume assim costuma indicar erro na varredura, nao bagunca real — confira a lista antes de liberar.`,
-      achados,
+      mensagem: `${achados.length} achados, acima do teto de ${teto}. Nada foi cancelado. ` +
+        `Confira a lista item a item. Se estiver tudo certo, suba o teto conscientemente com &teto=${achados.length}.`,
+      achados: achados.map(({ apiKey, ...resto }) => resto),
     })
   }
 
@@ -241,21 +283,15 @@ export async function GET(req: NextRequest) {
       ok: true,
       mensagem: `${achados.length} PIX orfao(s) encontrado(s). Nada foi cancelado (modo relatorio). ` +
         `Confira a lista e rode de novo com ?modo=cancelar pra executar.`,
-      achados,
+      achados: achados.map(({ apiKey, ...resto }) => resto),
     })
   }
 
-  // modo cancelar
-  const porChave = new Map<string, string>() // asaasId -> apiKey
-  for (const [apiKey] of chaves) {
-    for (const a of achados) if (!porChave.has(a.asaasId)) porChave.set(a.asaasId, apiKey)
-  }
-
+  // modo cancelar — cada achado carrega a chave da conta onde foi visto
   let cancelados = 0
   for (const a of achados) {
-    const apiKey = porChave.get(a.asaasId)
-    if (!apiKey) { a.cancelado = false; a.erroAoCancelar = 'chave nao encontrada'; continue }
-    const r = await cancelarNoAsaas(apiKey, a.asaasId)
+    if (!a.apiKey) { a.cancelado = false; a.erroAoCancelar = 'chave nao registrada no achado'; continue }
+    const r = await cancelarNoAsaas(a.apiKey, a.asaasId)
     a.cancelado = r.ok
     if (r.ok) cancelados++
     else a.erroAoCancelar = r.erro
@@ -273,6 +309,8 @@ export async function GET(req: NextRequest) {
       .update({ asaasId: null, pixCopiaCola: null, pixQrCode: null })
       .in('id', idsFantasmaLimpos)
   }
+
+  for (const a of achados) delete a.apiKey // nunca devolver chave de API na resposta
 
   console.log('[conciliacao] cancelados', cancelados, 'de', achados.length)
 
