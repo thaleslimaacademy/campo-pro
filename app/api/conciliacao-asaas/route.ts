@@ -55,6 +55,17 @@ type PagamentoAsaas = {
 type Achado = {
   asaasId: string
   apiKey?: string
+  /** Nome do atleta, descoberto pelo customer do Asaas. */
+  atleta?: string | null
+  atletaAtivo?: boolean | null
+  /** true = o app ja tem cobranca viva desse atleta no mesmo mes (orfao e duplicata). */
+  duplicata?: boolean
+  /**
+   * seguro  = pode cancelar sem pensar (sem dono, atleta inativo, ou duplicata)
+   * revisar = atleta ATIVO e o app NAO tem cobranca desse mes — cancelar aqui
+   *           apaga a unica via de cobranca de uma divida real
+   */
+  classificacao?: 'seguro' | 'revisar'
   valor: number
   vencimento: string
   statusAsaas: string
@@ -151,6 +162,10 @@ export async function GET(req: NextRequest) {
   const modoParam = req.nextUrl.searchParams.get('modo')
   const modo = modoParam || process.env.CONCILIACAO_MODO || 'relatorio'
   const vaiCancelar = modo === 'cancelar'
+  // Por padrao so cancela o que esta classificado como seguro. Os 'revisar'
+  // sao mensalidade de atleta ATIVO sem cobranca equivalente no app —
+  // cancelar apaga a unica via de uma divida real.
+  const incluirRevisar = req.nextUrl.searchParams.get('incluirRevisar') === '1'
 
   // ── 1. Chaves do Asaas (as escolas podem dividir a mesma conta) ────
   const { data: escolas, error: eEscolas } = await supabaseAdmin
@@ -203,6 +218,68 @@ export async function GET(req: NextRequest) {
     for (const r of data ?? []) if (r.asaasId) outrosIds.add(r.asaasId as string)
   }
 
+  // ── 2b. De quem e cada cobranca ────────────────────────────────────
+  // O orfao perdeu a linha no banco, mas o pagamento no Asaas ainda aponta
+  // pro customer. Atleta.asaasCustomerId faz a ponte de volta ao nome.
+  const { data: atletas, error: eAtl } = await supabaseAdmin
+    .from('Atleta').select('id, nome, ativo, asaasCustomerId')
+    .not('asaasCustomerId', 'is', null).limit(5000)
+  if (eAtl) return NextResponse.json({ error: 'falha ao ler atletas: ' + eAtl.message }, { status: 500 })
+
+  const porCustomer = new Map<string, { atletaId: string; nome: string; ativo: boolean }>()
+  for (const a of atletas ?? []) {
+    if (a.asaasCustomerId) porCustomer.set(a.asaasCustomerId as string, {
+      atletaId: a.id as string, nome: (a.nome as string) || '(sem nome)', ativo: !!a.ativo,
+    })
+  }
+
+  // Cobranca de familia tem customer proprio — trata como "dono ativo
+  // desconhecido", ou seja, sempre cai em revisar.
+  const { data: familias } = await supabaseAdmin
+    .from('Familia').select('id, asaasCustomerId').not('asaasCustomerId', 'is', null).limit(1000)
+  const customersFamilia = new Set((familias ?? []).map(f => f.asaasCustomerId as string))
+
+  // O que o app ainda cobra hoje, por atleta e mes. Se existe aqui, o orfao
+  // e sobra: a familia paga pela cobranca nova, nao pela velha.
+  const { data: vivas } = await supabaseAdmin
+    .from('Cobranca').select('atletaId, competencia')
+    .is('excluidaEm', null).in('status', ['PENDENTE', 'VENCIDO', 'PAGO']).limit(5000)
+  const cobrancasVivas = new Set(
+    (vivas ?? []).filter(v => v.atletaId && v.competencia)
+      .map(v => `${v.atletaId}|${String(v.competencia).slice(0, 7)}`)
+  )
+
+  /** Preenche dono, duplicata e classificacao de um achado. */
+  function classificar(a: Achado, customerId?: string | null) {
+    const mes = String(a.vencimento).slice(0, 7)
+
+    if (customerId && customersFamilia.has(customerId)) {
+      a.atleta = '(cobranca de familia)'
+      a.atletaAtivo = true
+      a.duplicata = false
+      a.classificacao = 'revisar'
+      return
+    }
+
+    const dono = customerId ? porCustomer.get(customerId) : undefined
+
+    if (!dono) {
+      // Sem dono no banco: atleta apagado ou cobranca de teste.
+      a.atleta = null
+      a.atletaAtivo = null
+      a.duplicata = false
+      a.classificacao = 'seguro'
+      return
+    }
+
+    a.atleta = dono.nome
+    a.atletaAtivo = dono.ativo
+    a.duplicata = cobrancasVivas.has(`${dono.atletaId}|${mes}`)
+
+    // Atleta inativo (saiu) ou ja tem cobranca do mes no app = sobra.
+    a.classificacao = (!dono.ativo || a.duplicata) ? 'seguro' : 'revisar'
+  }
+
   // ── 3. Compara ─────────────────────────────────────────────────────
   const achados: Achado[] = []
   let totalAbertos = 0
@@ -226,22 +303,28 @@ export async function GET(req: NextRequest) {
       const linha = conhecidas.get(p.id)
 
       if (!linha) {
-        achados.push({
+        const a: Achado = {
           asaasId: p.id, apiKey, valor: p.value, vencimento: p.dueDate, statusAsaas: p.status,
           descricao: p.description || '(sem descricao)',
           motivo: 'orfao',
           detalhe: 'ativo no Asaas, nao existe no banco — a linha foi apagada sem cancelar',
-        })
+        }
+        classificar(a, p.customer)
+        achados.push(a)
         continue
       }
 
       const foiCancelada = linha.status === 'CANCELADO' || linha.excluidaEm !== null
       if (foiCancelada) {
+        // Fantasma foi cancelado no app de proposito: a intencao ja esta
+        // registrada, entao cancelar no Asaas so cumpre o que ficou pela metade.
         achados.push({
           asaasId: p.id, apiKey, valor: p.value, vencimento: p.dueDate, statusAsaas: p.status,
           descricao: p.description || '(sem descricao)',
           motivo: 'fantasma',
           detalhe: `cancelada no app${linha.atletaNome ? ` (${linha.atletaNome})` : ''}, mas segue cobravel no Asaas`,
+          atleta: linha.atletaNome as string | null,
+          classificacao: 'seguro',
         })
       }
     }
@@ -254,6 +337,9 @@ export async function GET(req: NextRequest) {
     ignorados,
     orfaos: achados.filter(a => a.motivo === 'orfao').length,
     fantasmas: achados.filter(a => a.motivo === 'fantasma').length,
+    seguros: achados.filter(a => a.classificacao === 'seguro').length,
+    revisar: achados.filter(a => a.classificacao === 'revisar').length,
+    valorSeguros: Number(achados.filter(a => a.classificacao === 'seguro').reduce((s, a) => s + Number(a.valor || 0), 0).toFixed(2)),
     valorTotal: Number(achados.reduce((s, a) => s + Number(a.valor || 0), 0).toFixed(2)),
     ...(errosLeitura.length ? { errosLeitura } : {}),
   }
@@ -264,7 +350,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ...resumoBase, ok: true, mensagem: 'Nenhum PIX orfao. Tudo conciliado.' })
   }
 
-  if (achados.length > teto) {
+  const qtdSeguros = achados.filter(a => a.classificacao === 'seguro').length
+  if (vaiCancelar && (incluirRevisar ? achados.length : qtdSeguros) > teto) {
     console.error('[conciliacao] TETO ESTOURADO:', achados.length, 'achados — nada foi cancelado')
     return NextResponse.json({
       ...resumoBase,
@@ -288,8 +375,18 @@ export async function GET(req: NextRequest) {
   }
 
   // modo cancelar — cada achado carrega a chave da conta onde foi visto
+  const aCancelar = incluirRevisar ? achados : achados.filter(a => a.classificacao === 'seguro')
+
+  if (aCancelar.length === 0) {
+    return NextResponse.json({
+      ...resumoBase, ok: true, cancelados: 0,
+      mensagem: 'Nenhum achado seguro pra cancelar. Os pendentes sao todos "revisar" — use &incluirRevisar=1 se tiver certeza.',
+      achados: achados.map(({ apiKey, ...resto }) => resto),
+    })
+  }
+
   let cancelados = 0
-  for (const a of achados) {
+  for (const a of aCancelar) {
     if (!a.apiKey) { a.cancelado = false; a.erroAoCancelar = 'chave nao registrada no achado'; continue }
     const r = await cancelarNoAsaas(a.apiKey, a.asaasId)
     a.cancelado = r.ok
@@ -299,7 +396,7 @@ export async function GET(req: NextRequest) {
 
   // Fantasmas tem linha no banco: limpa o asaasId e o codigo PIX pra nao
   // reaparecerem na proxima varredura nem serem reenviados por engano.
-  const idsFantasmaLimpos = achados
+  const idsFantasmaLimpos = aCancelar
     .filter(a => a.motivo === 'fantasma' && a.cancelado)
     .map(a => conhecidas.get(a.asaasId)?.id)
     .filter((v): v is string => !!v)
@@ -312,14 +409,16 @@ export async function GET(req: NextRequest) {
 
   for (const a of achados) delete a.apiKey // nunca devolver chave de API na resposta
 
-  console.log('[conciliacao] cancelados', cancelados, 'de', achados.length)
+  console.log('[conciliacao] cancelados', cancelados, 'de', aCancelar.length, 'tentados')
 
   return NextResponse.json({
     ...resumoBase,
     ok: true,
+    tentados: aCancelar.length,
     cancelados,
-    falhas: achados.length - cancelados,
+    falhas: aCancelar.length - cancelados,
+    naoTocados: achados.length - aCancelar.length,
     linhasLimpas: idsFantasmaLimpos.length,
-    achados,
+    achados: achados.map(({ apiKey, ...resto }) => resto),
   })
 }
