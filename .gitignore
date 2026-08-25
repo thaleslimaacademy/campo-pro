@@ -56,3 +56,5 @@ app/build/
 .env*
 
 *.bak
+
+*.bak
