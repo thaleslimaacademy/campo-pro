@@ -2,7 +2,6 @@
 import { supabaseAdmin } from '@/lib/supabase'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 import { revalidatePath } from 'next/cache'
-import { cancelarCobrancaAsaas } from '@/lib/asaas'
 import { getAsaasKey } from '@/lib/getAsaasKey'
 import { gerarPixOuAgregarFamilia } from '@/lib/cobrancaFamilia'
 import { cancelarAssinaturaAsaas } from '@/lib/asaas'
@@ -56,20 +55,25 @@ async function propagarValorMensalidade(atletaId: string, escolaId: string, novo
   }
 
   // ── Passo 2: com PIX na Asaas — cancela e recria, uma por vez ──
+  //
+  // 25/08/2026 — esta era a QUARTA fonte de PIX orfao. O codigo antigo
+  // chamava cancelarCobrancaAsaas() (que engole o status da resposta) dentro
+  // de um try, e logo depois zerava o asaasId de qualquer jeito. Quando o
+  // Asaas recusava, o PIX velho continuava cobravel e o unico vinculo com
+  // ele — o asaasId — era apagado: orfao invisivel. Foi assim que as 3
+  // mensalidades de R$170 da familia Kaike+Rhyan sobreviveram a troca pra
+  // R$160. Agora o cancelamento e verificado, e sem confirmacao a cobranca
+  // fica exatamente como estava (valor antigo, PIX antigo, ainda rastreavel).
   const comPix = mensalidades.filter(c => c.asaasId)
   if (comPix.length) {
-    let apiKey: string | null = null
-    try { apiKey = await getAsaasKey(escolaId) } catch { apiKey = '' }
-
     for (const cob of comPix) {
-      if (!apiKey) {
-        avisos.push(`Cobrança ${cob.id}: sem chave Asaas configurada, PIX não regenerado (valor)`)
-        continue
-      }
-      try {
-        await cancelarCobrancaAsaas(apiKey, cob.asaasId as string)
-      } catch (e) {
-        avisos.push(`Cobrança ${cob.id}: falha ao cancelar PIX antigo (valor) — ${(e as Error).message}`)
+      const cancelou = await cancelarPixDaCobranca(cob.id)
+      if (!cancelou.ok) {
+        avisos.push(
+          `Cobranca de ${String(cob.vencimento).slice(0, 10)}: o PIX antigo NAO pode ser cancelado ` +
+          `(${cancelou.erro}). O valor dela ficou como estava, pra nao deixar um codigo PIX vivo sem dono. ` +
+          `Tente salvar de novo em alguns minutos.`
+        )
         continue
       }
       await supabaseAdmin.from('Cobranca').update({
@@ -123,20 +127,17 @@ async function propagarDiaVencimento(atletaId: string, escolaId: string, novoDia
   }
 
   // ── Passo 2: com PIX na Asaas — cancela e recria com a data nova ──
+  // Mesma correcao da propagacao de valor: cancelamento verificado antes de
+  // soltar o asaasId. Ver o comentario longo em propagarValorMensalidade.
   const comPix = comNovaData.filter(c => c.asaasId)
   if (comPix.length) {
-    let apiKey: string | null = null
-    try { apiKey = await getAsaasKey(escolaId) } catch { apiKey = '' }
-
     for (const cob of comPix) {
-      if (!apiKey) {
-        avisos.push(`Cobrança ${cob.id}: sem chave Asaas configurada, PIX não regenerado (vencimento)`)
-        continue
-      }
-      try {
-        await cancelarCobrancaAsaas(apiKey, cob.asaasId as string)
-      } catch (e) {
-        avisos.push(`Cobrança ${cob.id}: falha ao cancelar PIX antigo (vencimento) — ${(e as Error).message}`)
+      const cancelou = await cancelarPixDaCobranca(cob.id)
+      if (!cancelou.ok) {
+        avisos.push(
+          `Cobranca de ${String(cob.vencimento).slice(0, 10)}: o PIX antigo NAO pode ser cancelado ` +
+          `(${cancelou.erro}). O vencimento dela ficou como estava, pra nao deixar um codigo PIX vivo sem dono.`
+        )
         continue
       }
       await supabaseAdmin.from('Cobranca').update({
@@ -218,19 +219,36 @@ export async function toggleAtivoAtleta(id: string, ativo: boolean) {
       .gt('vencimento', hoje)
 
     if (futuras?.length) {
-      let apiKey: string | null = null
-      try { apiKey = await getAsaasKey(escolaId) } catch { apiKey = null }
+      // Cancela no Asaas ANTES de marcar. So marca como cancelada a mensalidade
+      // cujo PIX realmente morreu — o resto continua ativo no app, com o codigo
+      // ainda rastreavel, e o motivo sobe pra tela. Antes, o erro do Asaas era
+      // engolido e a linha era marcada assim mesmo: PIX vivo, cobranca sumida
+      // da tela (o "fantasma" que a conciliacao passou a pegar).
+      const okIds: string[] = []
+      const falhas: string[] = []
 
       for (const c of futuras) {
-        if (c.asaasId && apiKey) {
-          try { await cancelarCobrancaAsaas(apiKey, c.asaasId) } catch { /* ja cancelada */ }
+        if (!c.asaasId) { okIds.push(c.id); continue }
+        const r = await cancelarPixDaCobranca(c.id)
+        if (r.ok) okIds.push(c.id)
+        else falhas.push(r.erro)
+      }
+
+      if (okIds.length) {
+        const { error: eCanc } = await supabaseAdmin.from('Cobranca').update({
+          status: 'CANCELADO', excluidaEm: new Date().toISOString(),
+        }).in('id', okIds)
+        if (eCanc) return { ok: false as const, erro: 'Atleta desativado, mas FALHOU ao cancelar as mensalidades futuras: ' + eCanc.message + '. O PIX pode continuar ativo na Asaas.' }
+      }
+      canceladas = okIds.length
+
+      if (falhas.length) {
+        return {
+          ok: false as const,
+          erro: `Atleta desativado e ${okIds.length} mensalidade(s) futura(s) cancelada(s), mas ${falhas.length} nao pode(m) ser cancelada(s) na Asaas ` +
+            `(${falhas[0]}). Essa(s) continua(m) ativa(s) no app pra nao virar cobranca fantasma — tente desativar de novo em alguns minutos.`,
         }
       }
-      const { error: eCanc } = await supabaseAdmin.from('Cobranca').update({
-        status: 'CANCELADO', excluidaEm: new Date().toISOString(),
-      }).in('id', futuras.map(c => c.id))
-      if (eCanc) return { ok: false as const, erro: 'Atleta desativado, mas FALHOU ao cancelar as mensalidades futuras: ' + eCanc.message + '. O PIX pode continuar ativo na Asaas.' }
-      canceladas = futuras.length
     }
   }
 
