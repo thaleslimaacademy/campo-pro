@@ -36,7 +36,7 @@ export type DashboardFinanceiroData = {
   patrocinadores: number
 }
 
-const MESES_PT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+const MESES_PT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago','Set', 'Out', 'Nov', 'Dez']
 
 export async function getDashboardFinanceiro(): Promise<DashboardFinanceiroData> {
   await requireFinanceiro()
@@ -44,26 +44,45 @@ export async function getDashboardFinanceiro(): Promise<DashboardFinanceiroData>
 
   const agora = new Date()
   const inicioMesAtual = new Date(agora.getFullYear(), agora.getMonth(), 1)
-  const fimMesAtual = new Date(agora.getFullYear(), agora.getMonth() + 1, 0, 23, 59, 59)
+  const fimMesAtual = new Date(agora.getFullYear(), agora.getMonth() + 1,0, 23, 59, 59)
   const inicio12Meses = new Date(agora.getFullYear(), agora.getMonth() - 11, 1)
 
+  // 25/08/2026 — duas correcoes nesta consulta:
+  //
+  // 1) `.is('excluidaEm', null)`. O filtro era so `.neq(status,'CANCELADO')`,
+  //    e isso deixa passar cobranca EXCLUIDA que nao ficou com status
+  //    CANCELADO (acontecia no fluxo antigo de exclusao). Resultado: valor
+  //    excluido contando como vencido, inflando a inadimplencia do painel.
+  //
+  // 2) `familiaCobrancaId`. Cobranca de irmaos existe em DUAS camadas: a
+  //    linha da familia (o PIX unico que o pai paga, ex. R$160) e uma linha
+  //    por filho apontando pra ela (ex. R$80 + R$80). Somar as duas conta a
+  //    mesma mensalidade duas vezes.
   const { data: cobrancas12, error: err1 } = await supabaseAdmin
     .from('Cobranca')
-    .select('id, valor, status, vencimento, pagoEm, atletaId')
+    .select('id, valor, status, vencimento, pagoEm, atletaId, familiaCobrancaId')
     .eq('escolaId', escolaId)
     .gte('vencimento', inicio12Meses.toISOString())
     .neq('status', 'CANCELADO')
+    .is('excluidaEm', null)
     .order('vencimento', { ascending: true })
 
   if (err1) throw new Error(err1.message)
-  const cobrancas = cobrancas12 ?? []
+
+  // Descarta as linhas dos filhos e mantem a da familia: o dinheiro que
+  // entra e um PIX so, no valor da familia. As linhas de R$80 continuam
+  // aparecendo na ficha de cada atleta, que e onde elas fazem sentido.
+  //
+  // Efeito colateral aceito: a divida da familia aparece em "top devedores"
+  // sob o atleta dono da linha agregada, nao rateada entre os irmaos.
+  const cobrancas = (cobrancas12 ?? []).filter(c => !c.familiaCobrancaId)
 
   const cobrancasMesAtual = cobrancas.filter(c => {
     const v = new Date(c.vencimento)
     return v >= inicioMesAtual && v <= fimMesAtual
   })
 
-  const previsto = cobrancasMesAtual.reduce((s, c) => s + (c.valor ?? 0), 0)
+  const previsto = cobrancasMesAtual.reduce((s, c) => s + (c.valor ?? 0),0)
   const recebidoMes = cobrancasMesAtual.filter(c => c.status === 'PAGO').reduce((s, c) => s + (c.valor ?? 0), 0)
   const emAberto = cobrancasMesAtual.filter(c => c.status === 'PENDENTE').reduce((s, c) => s + (c.valor ?? 0), 0)
   const vencidoMes = cobrancasMesAtual.filter(c => c.status === 'VENCIDO').reduce((s, c) => s + (c.valor ?? 0), 0)
@@ -84,7 +103,7 @@ export async function getDashboardFinanceiro(): Promise<DashboardFinanceiroData>
     grafico12Meses.push({
       mes: mesStr,
       label: MESES_PT[d.getMonth()],
-      recebido: doMes.filter(c => c.status === 'PAGO').reduce((s, c) => s + (c.valor ?? 0), 0),
+      recebido: doMes.filter(c => c.status === 'PAGO').reduce((s, c) => s+ (c.valor ?? 0), 0),
       previsto: doMes.reduce((s, c) => s + (c.valor ?? 0), 0),
     })
   }
