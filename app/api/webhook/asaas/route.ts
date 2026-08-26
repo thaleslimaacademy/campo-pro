@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { waitUntil } from '@vercel/functions'
 import { supabaseAdmin } from '@/lib/supabase'
-import { enviarWhatsApp } from '@/lib/whatsapp'
-import { msgPagamentoConfirmado } from '@/lib/whatsapp-templates'
+import { msgPagamentoConfirmado, msgFotosProntas, msgPedidoConfirmado, msgPlanoAtivado } from '@/lib/whatsapp-templates'
 import { baixarCobrancaFamilia } from '@/lib/cobrancaFamilia'
 
 const STATUS_MAP: Record<string, string> = {
@@ -71,16 +70,15 @@ async function processar(body: Record<string, unknown>) {
         .eq('id', fotoCompra.id)
       if (novoStatus === 'PAGO' && !fotoCompra.linkEnviado) {
         try {
-          const { data: fotos } = await supabaseAdmin
-            .from('Foto').select('id, urlOriginal').in('id', fotoCompra.fotos)
-          const links = await Promise.all((fotos || []).map(async (f: {id:string;urlOriginal:string}, i: number) => {
-            const { data } = await supabaseAdmin.storage.from('fotos-originais')
-              .createSignedUrl(f.urlOriginal, 60 * 60 * 24 * 7)
-            return `📷 Foto ${i + 1}: ${data?.signedUrl || ''}`
-          }))
-          const primeiroNome = fotoCompra.compradorNome.split(' ')[0]
-          const msg = [`✅ *Pagamento confirmado!*`, ``, `Olá, *${primeiroNome}*! 🎉`, ``, `Suas fotos estão prontas. Links válidos por *7 dias*:`,``, ...links, ``, `⬇️ Clique em cada link para baixar.`, ``, `_GestãoFC · gestaofc.com.br_`].join('\n')
-          await enviarWhatsApp(fotoCompra.compradorTelefone, msg)
+          // O link aponta pra pagina /fotos-compra/[id], que gera as signed
+          // URLs na hora (o template Meta nao aguenta lista de links de
+          // tamanho variavel — ver lib/whatsapp-templates.ts)
+          const linkDownload = `https://gestaofc.com.br/fotos-compra/${fotoCompra.id}`
+          await msgFotosProntas({
+            telefone: fotoCompra.compradorTelefone,
+            nomeComprador: fotoCompra.compradorNome,
+            linkDownload,
+          })
           await supabaseAdmin.from('FotoCompra').update({ linkEnviado: true }).eq('id', fotoCompra.id)
         } catch (e) { console.error('Erro WhatsApp foto:', (e as Error).message) }
       }
@@ -100,12 +98,12 @@ async function processar(body: Record<string, unknown>) {
         .eq('id', pedido.id)
       if (novoStatus === 'PAGO') {
         try {
-          const primeiroNome = pedido.compradorNome.split(' ')[0]
-          const itensTexto = (pedido.itens as {nome:string;tamanho?:string;cor?:string;qtd:number;preco:number}[]).map(i =>
-            `• ${i.nome}${i.tamanho ? ` (${i.tamanho})` : ''}${i.cor ? ` - ${i.cor}` : ''} × ${i.qtd} — R$ ${(i.preco * i.qtd).toFixed(2).replace('.', ',')}`
-          ).join('\n')
-          const msg = [`✅ *Pedido confirmado!*`, ``, `Olá, *${primeiroNome}*! 🎉`, ``, `*Seus itens:*`, itensTexto, ``, `💰 Total: *R$ ${pedido.valor.toFixed(2).replace('.', ',')}*`, `📦 Entrega: *${pedido.tipoEntrega === 'RETIRADA' ? 'Retirada na escola' : 'Entrega no endereço'}*`, ``, `Em breve entraremos em contato! 👊`, `_GestãoFC · gestaofc.com.br_`].join('\n')
-          await enviarWhatsApp(pedido.compradorTelefone, msg)
+          await msgPedidoConfirmado({
+            telefone: pedido.compradorTelefone,
+            nomeComprador: pedido.compradorNome,
+            valor: pedido.valor,
+            tipoEntrega: pedido.tipoEntrega,
+          })
         } catch (e) { console.error('Erro WhatsApp pedido:', (e as Error).message) }
       }
       return
@@ -121,7 +119,7 @@ async function processar(body: Record<string, unknown>) {
         await supabaseAdmin.from('Escola').update({ ativo: true, statusPlano: 'ATIVO', maxModalidades: maxMod }).eq('id', escola.id)
         if (escola.whatsapp) {
           try {
-            await enviarWhatsApp(escola.whatsapp, `🏆 *GestãoFC — Plano Ativado!*\n\nOlá! Seu pagamento foi confirmado e o *${escola.nome}* já está ativo. 🎉\n\nAcesse: *gestaofc.com.br*\n\n_Bem-vindo(a)!_`)
+            await msgPlanoAtivado({ telefone: escola.whatsapp, nomeEscola: escola.nome })
           } catch (e) { console.error('Erro WhatsApp escola:', (e as Error).message) }
         }
         return

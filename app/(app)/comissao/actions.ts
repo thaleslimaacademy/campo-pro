@@ -1,7 +1,9 @@
 'use server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
-import { enviarWhatsApp } from '@/lib/whatsapp'
+// TODO: sem template proprio, so alcanca o convidado se ele ja tiver
+// escrito pro numero nas ultimas 24h (janela de conversa da Meta).
+import { enviarTextoMeta } from '@/lib/whatsapp-meta'
 
 export async function listarComissao() {
   const escolaId = await getEscolaIdServer()
@@ -53,7 +55,7 @@ export async function convidarMembro(p: {
       'Clique no link para ativar sua conta:',
       linkConvite,
     ].join('\n')
-    await enviarWhatsApp(p.whatsapp, msg).catch(() => {})
+    await enviarTextoMeta(p.whatsapp, msg).catch(() => {})
   }
 
   return { ok: true, tokenConvite, linkConvite }

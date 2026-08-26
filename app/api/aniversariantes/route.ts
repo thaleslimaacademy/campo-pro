@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { enviarWhatsApp } from '@/lib/whatsapp'
+// TODO: sem template proprio, so alcanca quem escreveu pro numero nas
+// ultimas 24h (janela de conversa da Meta). Migrar pra um template
+// 'aniversario' quando fizer sentido priorizar.
+import { enviarTextoMeta } from '@/lib/whatsapp-meta'
 
 function aplicarVariaveis(template: string, vars: Record<string, string>): string {
   let msg = template
@@ -56,8 +59,10 @@ export async function GET(req: NextRequest) {
         '{nome_escola}': escola.nome,
       })
 
-      await enviarWhatsApp(responsavel.whatsapp, mensagem)
-      totalEnviados++
+      try {
+        await enviarTextoMeta(responsavel.whatsapp, mensagem)
+        totalEnviados++
+      } catch (e) { console.error('Erro WhatsApp aniversario:', (e as Error).message) }
       await new Promise(r => setTimeout(r, 1000))
     }
   }

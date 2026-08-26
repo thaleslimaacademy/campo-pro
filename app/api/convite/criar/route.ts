@@ -1,33 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { requirePapel } from '@/lib/auth'
-
-async function enviarWhatsApp(telefone: string, mensagem: string) {
-  const instanceId = process.env.ZAPI_INSTANCE_ID
-  const token = process.env.ZAPI_TOKEN
-  const clientToken = process.env.ZAPI_CLIENT_TOKEN
-
-  const url = `https://api.z-api.io/instances/${instanceId}/token/${token}/send-text`
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Client-Token': clientToken!,
-    },
-    body: JSON.stringify({
-      phone: telefone,
-      message: mensagem,
-    }),
-  })
-
-  if (!res.ok) {
-    const body = await res.text()
-    throw new Error(`Z-API erro: ${body}`)
-  }
-
-  return res.json()
-}
+// Z-API foi desativado (26 ago) — este fluxo mandava WhatsApp por ele.
+// Sem template proprio, enviarTextoMeta so alcanca quem ja escreveu pro
+// numero nas ultimas 24h (janela de conversa da Meta).
+import { enviarTextoMeta } from '@/lib/whatsapp-meta'
 
 export async function POST(req: NextRequest) {
   try {
@@ -97,10 +74,10 @@ _GestãoFC_`
     let whatsappErro = null
 
     try {
-      await enviarWhatsApp(telefone, mensagem)
+      await enviarTextoMeta(telefone, mensagem)
       whatsappEnviado = true
     } catch (err: any) {
-      console.error('Erro Z-API:', err.message)
+      console.error('Erro WhatsApp convite:', err.message)
       whatsappErro = err.message
     }
 

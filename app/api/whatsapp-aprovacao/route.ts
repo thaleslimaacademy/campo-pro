@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { enviarWhatsApp } from '@/lib/whatsapp'
-import { enviarTemplateMeta, metaConfigurado } from '@/lib/whatsapp-meta'
+import { msgMatriculaAprovada, msgMatriculaRecusada } from '@/lib/whatsapp-templates'
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,42 +23,31 @@ export async function POST(req: NextRequest) {
 
     const whatsappEscola = escola?.whatsapp
       ? escola.whatsapp.replace(/\D/g, '').replace(/^(\d{2})(\d{2})(\d{5})(\d{4})$/, '($1) $2 $3-$4')
-      : null
+      : undefined
 
     const nomeResp = (nomeResponsavel || '').split(' ')[0]
     const linkPais = `https://gestaofc.com.br/pais/${tokenPais}`
 
     if (tipo === 'aprovacao') {
-      // A Meta so aceita template em mensagem proativa. Antes isso era texto
-      // livre e a Meta bloqueava em silencio — a boas-vindas nunca chegava.
-      if (metaConfigurado()) {
-        await enviarTemplateMeta({
-          to: whatsapp,
-          template: 'matricula_aprovada',
-          params: [nomeResp, nomeAtleta, nomeEscola, linkPais],
-        })
-      } else {
-        const mensagem =
-          `Ola ${nomeResp}! 👋\n\n` +
-          `A pre-matricula de *${nomeAtleta}* foi *APROVADA*! ✅\n\n` +
-          `Seu filho(a) ja esta matriculado(a) na *${nomeEscola}*.\n\n` +
-          `Acesse o link abaixo para acompanhar presenca e mensalidades:\n` +
-          `${linkPais}\n\n` +
-          `Bem-vindo(a) a familia TLFA! ⚽\n` +
-          `_${nomeEscola} - ${cidadeEstado}_`
-        await enviarWhatsApp(whatsapp, mensagem, escolaId)
-      }
+      await msgMatriculaAprovada({
+        telefone: whatsapp,
+        nomeResp,
+        nomeAtleta,
+        nomeEscola: nomeEscola || 'nossa academia',
+        cidadeEstado,
+        linkPais,
+        escolaId,
+      })
     } else {
-      // Recusa ainda nao tem template proprio — so chega se o pai tiver
-      // escrito nas ultimas 24h (janela de conversa da Meta). Fica pendente
-      // criar um template 'matricula_recusada'.
-      const mensagem =
-        `Ola ${nomeResp},\n\n` +
-        `Informamos que a pre-matricula de *${nomeAtleta}* nao foi aprovada no momento.\n\n` +
-        `Entre em contato conosco para mais informacoes:\n` +
-        (whatsappEscola ? `WhatsApp: ${whatsappEscola}\n\n` : '\n') +
-        `_${nomeEscola} - ${cidadeEstado}_`
-      await enviarWhatsApp(whatsapp, mensagem, escolaId)
+      await msgMatriculaRecusada({
+        telefone: whatsapp,
+        nomeResp,
+        nomeAtleta,
+        nomeEscola: nomeEscola || 'nossa academia',
+        cidadeEstado,
+        contato: whatsappEscola,
+        escolaId,
+      })
     }
 
     return NextResponse.json({ ok: true })

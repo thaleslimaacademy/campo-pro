@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { enviarWhatsApp } from '@/lib/whatsapp'
+// TODO: sem template proprio, so alcanca quem escreveu pro numero nas
+// ultimas 24h (janela de conversa da Meta). Migrar pra um template 'nps'
+// quando fizer sentido priorizar.
+import { enviarTextoMeta } from '@/lib/whatsapp-meta'
 
 export async function GET() {
   try {
@@ -35,7 +38,9 @@ export async function GET() {
           `De *0 a 10*, qual nota você dá para a nossa academia?\n\n` +
           `_Responda apenas com o número (ex: 9)_`
 
-        await enviarWhatsApp(mat.whatsappResponsavel, mensagem)
+        try {
+          await enviarTextoMeta(mat.whatsappResponsavel, mensagem)
+        } catch (e) { console.error('Erro WhatsApp NPS:', (e as Error).message) }
 
         await supabaseAdmin.from('NPS').insert({
           id: crypto.randomUUID(),

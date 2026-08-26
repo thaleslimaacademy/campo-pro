@@ -34,9 +34,17 @@ export async function GET(req: NextRequest) {
 
 // POST — recebe eventos da Meta
 export async function POST(req: NextRequest) {
-  // Responde 200 imediatamente — a Meta reenvia se demorar
+  // Espera o processamento terminar antes de responder — sem isso, a Vercel
+  // pode congelar a function assim que a resposta e enviada, cortando o
+  // encaminhamento pro admin no meio (testado: mensagem chegava no log, mas
+  // o encaminhamento nunca completava). Continua rapido o suficiente pra
+  // Meta nao reenviar (um POST no Graph API leva no maximo 1-2s).
   const body = await req.json()
-  processar(body).catch(err => console.error('Erro webhook Meta:', err))
+  try {
+    await processar(body)
+  } catch (err) {
+    console.error('Erro webhook Meta:', err)
+  }
   return NextResponse.json({ received: true })
 }
 
@@ -102,9 +110,13 @@ async function encaminharParaAdmin(msg: MsgMeta) {
   if (soDigitos(msg.from).slice(-8) === destino.slice(-8)) return
 
   const texto = msg.text?.body?.trim()
-  const conteudo = texto
-    ? texto.slice(0, 600)
+  const previaTexto = texto
+    ? texto.slice(0, 450)
     : `[mensagem do tipo ${msg.type} — abra o WhatsApp Manager para ver]`
+  // Sem o numero, a notificacao avisa mas nao da pra responder — o link
+  // wa.me abre o chat com o responsavel direto no WhatsApp pessoal do admin.
+  const linkResponder = `https://wa.me/${soDigitos(msg.from)}`
+  const conteudo = `${previaTexto}\n\n↩️ Responder: ${linkResponder}`
 
   const quem = await identificarRemetente(msg.from)
   const nomeResp  = quem?.nomeResponsavel || `Número ${msg.from.slice(-4)}`

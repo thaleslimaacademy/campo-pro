@@ -8,6 +8,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/inadimplentes(.*)', '/api/atleta-turma(.*)', '/home(.*)', '/api/aniversariantes(.*)', '/logout(.*)',
   '/pagar(.*)', '/pagar-atleta(.*)', '/convocacao(.*)', '/api/notificar-convocacao(.*)',
   '/api/pagar(.*)', '/api/pagar-atleta(.*)', '/api/whatsapp-aprovacao(.*)', '/galeria(.*)',
+  '/fotos-compra(.*)', '/api/fotos-compra(.*)',
   '/loja(.*)', '/pais(.*)', '/onboarding(.*)',
   '/sign-up(.*)', '/',
   '/privacidade(.*)', '/excluir-conta(.*)',

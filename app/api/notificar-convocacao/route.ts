@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { enviarWhatsApp } from '@/lib/whatsapp'
+import { msgConvocacao } from '@/lib/whatsapp-templates'
 
 export async function POST(req: NextRequest) {
   const authHeader = req.headers.get('authorization')
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
   for (const ca of atletasConvocados) {
     const { data: atleta } = await supabaseAdmin
       .from('Atleta')
-      .select('nome, telefone')
+      .select('nome, telefone, escolaId, tokenPais')
       .eq('id', ca.atletaId)
       .single()
 
@@ -49,21 +49,21 @@ export async function POST(req: NextRequest) {
     const whatsapp = responsaveis?.[0]?.whatsapp || atleta?.telefone
     if (!whatsapp || !atleta) continue
 
-    const nomeResp = responsaveis?.[0]?.nome?.split(' ')[0] || atleta.nome.split(' ')[0]
-
-    const mensagem = "Ola " + nomeResp + "! \n\n" +
-      "*" + atleta.nome + "* foi convocado(a) para:\n\n" +
-      "*" + (convocacao.titulo || 'Evento') + "*\n" +
-      "Tipo: " + (convocacao.tipo || '') + "\n" +
-      "Data: " + dataEvento + "\n" +
-      (convocacao.local ? "Local: " + convocacao.local + "\n" : '') +
-      (convocacao.horario ? "Horario: " + convocacao.horario + "\n" : '') +
-      "\nConfirme a presenca pelo link:\n" +
-      "https://gestaofc.com.br/pais/" + (atleta as any).tokenPais + "\n\n" +
-      "_Thales Lima Football Academy_"
-
-    await enviarWhatsApp(whatsapp, mensagem)
-    enviados++
+    try {
+      await msgConvocacao({
+        telefone: whatsapp,
+        nomeAtleta: atleta.nome,
+        titulo: convocacao.titulo || 'Evento',
+        data: dataEvento,
+        horario: convocacao.horario || 'a confirmar',
+        local: convocacao.local || 'a confirmar',
+        linkConfirmacao: atleta.tokenPais ? `https://gestaofc.com.br/pais/${atleta.tokenPais}` : undefined,
+        escolaId: atleta.escolaId,
+      })
+      enviados++
+    } catch (e) {
+      console.error('Erro WhatsApp convocacao:', (e as Error).message)
+    }
     await new Promise(r => setTimeout(r, 1000))
   }
 

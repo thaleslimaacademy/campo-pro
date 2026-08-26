@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { enviarWhatsApp } from '@/lib/whatsapp'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 import { cancelarPixDaCobranca, CAMPOS_PIX_LIMPOS } from '@/lib/cancelarPixDaCobranca'
+import { msgLembreteD3, msgVencimentoHoje, msgAtraso } from '@/lib/whatsapp-templates'
 
 /**
  * Esta rota usa supabaseAdmin (service role, ignora RLS). Sem checar a
@@ -114,14 +114,32 @@ export async function POST(req: NextRequest) {
 
   if (!responsavel?.whatsapp) return NextResponse.json({ error: 'Responsavel sem WhatsApp' }, { status: 400 })
 
-  const dataVenc = new Date((cobranca.vencimento || '').slice(0, 10) + 'T12:00:00').toLocaleDateString('pt-BR')
+  const vencISO = (cobranca.vencimento || '').slice(0, 10)
+  const dataVenc = new Date(vencISO + 'T12:00:00').toLocaleDateString('pt-BR')
   const nomeResp = responsavel.nome.split(' ')[0]
   const linkPag = `https://gestaofc.com.br/pagar/${cobrancaId}`
 
-  const mensagem = `Ola ${nomeResp}! 👋\n\nLembrete de cobranca de *${atleta?.nome}*.\n\n💰 *Valor:* R$ ${Number(cobranca.valor).toFixed(2)}\n📅 *Vencimento:* ${dataVenc}\n📝 ${cobranca.descricao || 'Mensalidade'}\n\nPague pelo link:\n👉 ${linkPag}\n\n_${atleta?.nome ? atleta.nome.split(' ')[0] : 'TLFA'} - GestãoFC_ ⚽`
+  // Reaproveita os templates ja aprovados da regua (lembrete/vencimento/atraso)
+  // em vez de texto livre — a Meta bloqueia texto livre proativo em silencio.
+  const diasParaVencer = Math.round((new Date(vencISO + 'T12:00:00').getTime() - Date.now()) / 86400000)
 
-  // TODO (item 4): enviarWhatsApp usa a Evolution, que nao esta mais paga.
-  await enviarWhatsApp(responsavel.whatsapp, mensagem, escolaId)
+  const params = {
+    telefone: responsavel.whatsapp,
+    nomeResp,
+    nomeAtleta: atleta.nome,
+    valor: Number(cobranca.valor),
+    linkPagamento: linkPag,
+    escolaId,
+  }
+
+  if (diasParaVencer > 0) {
+    await msgLembreteD3({ ...params, dataVenc, dias: diasParaVencer })
+  } else if (diasParaVencer === 0) {
+    await msgVencimentoHoje({ ...params, dataVenc })
+  } else {
+    await msgAtraso({ ...params, diasAtraso: -diasParaVencer })
+  }
+
   return NextResponse.json({ ok: true })
 }
 

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { enviarWhatsApp } from '@/lib/whatsapp'
+// TODO: sem template proprio, so alcanca a escola se ela tiver escrito pro
+// numero nas ultimas 24h (janela de conversa da Meta).
+import { enviarTextoMeta } from '@/lib/whatsapp-meta'
 
 // Rota pública — sem Clerk
 export async function POST(req: NextRequest) {
@@ -33,7 +35,9 @@ export async function POST(req: NextRequest) {
 ` +
       `_${escola.nome}_`
 
-    await enviarWhatsApp(escola.whatsapp, mensagem)
+    try {
+      await enviarTextoMeta(escola.whatsapp, mensagem)
+    } catch (e) { console.error('Erro WhatsApp aviso-admin:', (e as Error).message) }
     return NextResponse.json({ ok: true })
   } catch (err: any) {
     console.error('[aviso-admin]', err.message)

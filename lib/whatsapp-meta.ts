@@ -32,8 +32,22 @@ const PHONE_ID = () => process.env.META_PHONE_NUMBER_ID || ''
 // TEMPLATE: pagamento_confirmado
 //   "Olá {{1}}! ✅ Pagamento de *{{2}}* confirmado.\n💰 R$ {{4}} — {{3}}\nObrigado!"
 //
-// TEMPLATE: convocacao
-//   "⚽ {{1}}\n📅 {{2}} às {{3}}\n📍 {{4}}\n\nVocê está convocado(a)!"
+// TEMPLATE: convocacao (EDITADO 26/08 — 5o parametro com o link de
+// confirmacao; a versao antiga com 4 parametros continua valendo ate a
+// edicao ser aprovada)
+//   "⚽ {{1}}\n📅 {{2}} às {{3}}\n📍 {{4}}\n\nVocê está convocado(a)!\n\n🔗 Confirme sua presença: {{5}}"
+//
+// TEMPLATE: matricula_recusada
+//   "Olá {{1}}, informamos que a pré-matrícula de *{{2}}* não foi aprovada no momento.\nEntre em contato: {{3}}\n{{4}}"
+//
+// TEMPLATE: pedido_confirmado
+//   "Olá {{1}}! ✅ Seu pedido foi confirmado.\n💰 Total: R$ {{2}}\n📦 Entrega: {{3}}\nEm breve entraremos em contato!"
+//
+// TEMPLATE: plano_ativado
+//   "🏆 Olá! Seu pagamento foi confirmado e o *{{1}}* já está ativo no GestãoFC.\nAcesse: gestaofc.com.br"
+//
+// TEMPLATE: fotos_prontas
+//   "Olá {{1}}! 🎉 Suas fotos já estão prontas para download.\nAcesse o link abaixo:\n{{2}}"
 
 export type TemplateParams = {
   to: string                    // número com DDI: 5534999991234
