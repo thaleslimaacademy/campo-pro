@@ -109,14 +109,18 @@ async function encaminharParaAdmin(msg: MsgMeta) {
   // nao encaminha o que o proprio admin mandou (evita eco)
   if (soDigitos(msg.from).slice(-8) === destino.slice(-8)) return
 
-  const texto = msg.text?.body?.trim()
+  // Parametro de template da Meta nao aceita quebra de linha/tab nem mais de
+  // 4 espacos seguidos (erro 132018) — colapsa tudo em espaco simples, tanto
+  // no texto do pai (que pode vir com quebras de linha) quanto no separador
+  // que a gente adiciona.
+  const texto = msg.text?.body?.trim().replace(/\s+/g, ' ')
   const previaTexto = texto
     ? texto.slice(0, 450)
     : `[mensagem do tipo ${msg.type} — abra o WhatsApp Manager para ver]`
   // Sem o numero, a notificacao avisa mas nao da pra responder — o link
   // wa.me abre o chat com o responsavel direto no WhatsApp pessoal do admin.
   const linkResponder = `https://wa.me/${soDigitos(msg.from)}`
-  const conteudo = `${previaTexto}\n\n↩️ Responder: ${linkResponder}`
+  const conteudo = `${previaTexto} — Responder: ${linkResponder}`
 
   const quem = await identificarRemetente(msg.from)
   const nomeResp  = quem?.nomeResponsavel || `Número ${msg.from.slice(-4)}`
