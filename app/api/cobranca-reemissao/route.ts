@@ -39,17 +39,33 @@ async function garantirMensalidadesFuturas(meses: number) {
       .eq('escolaId', escola.id).eq('ativo', true).eq('bolsista', false)
       .neq('formaPagamento', 'CARTAO_RECORRENTE') // quem esta em debito automatico e cobrado pela propria assinatura Asaas, nao pela regua
 
-    for (const a of atletas || []) {
-      const { data: existentes } = await supabaseAdmin.from('Cobranca')
-        .select('competencia, descricao')
-        .eq('atletaId', a.id).is('excluidaEm', null)
+    const atletaIds = (atletas || []).map(a => a.id)
+
+    // Uma unica consulta pra TODOS os atletas da escola, em vez de uma
+    // consulta por atleta (N+1). Com poucas dezenas de alunos a diferenca
+    // e imperceptivel, mas esse cron roda todo santo dia pra sempre e a
+    // base so cresce — na escala de centenas de atletas o N+1 comeca a
+    // comer o tempo do cron a toa. 26 ago: otimizado antes da migracao da
+    // Iturama (170 atletas) dobrar o tamanho da base.
+    const jaTemPorAtleta: Record<string, Set<string>> = {}
+    if (atletaIds.length) {
+      const { data: existentesTodos } = await supabaseAdmin.from('Cobranca')
+        .select('atletaId, competencia, descricao')
+        .in('atletaId', atletaIds).is('excluidaEm', null)
         .in('status', ['PENDENTE', 'VENCIDO', 'PAGO'])
 
-      const jaTem = new Set(
-        (existentes || [])
-          .filter(c => c.competencia && String(c.descricao || '').trim().toLowerCase().startsWith('mensalidade'))
-          .map(c => String(c.competencia).slice(0, 10))
-      )
+      for (const c of existentesTodos || []) {
+        if (!c.competencia || !String(c.descricao || '').trim().toLowerCase().startsWith('mensalidade')) continue
+        if (!jaTemPorAtleta[c.atletaId]) jaTemPorAtleta[c.atletaId] = new Set()
+        jaTemPorAtleta[c.atletaId].add(String(c.competencia).slice(0, 10))
+      }
+    }
+
+    const todasNovas: Record<string, unknown>[] = []
+    const atletaPorNovas: Record<string, string> = {} // rastreia quantas novas por atleta pra contar atletasAfetados certo
+
+    for (const a of atletas || []) {
+      const jaTem = jaTemPorAtleta[a.id] || new Set<string>()
 
       // Dia PREFERIDO do atleta (1-31, sem clamp em 28). O clamp real pro
       // mes especifico acontece dentro de dataVencimentoNoMes(), que sabe
@@ -60,26 +76,52 @@ async function garantirMensalidadesFuturas(meses: number) {
         || Number(escola.valorMensalidade)
         || 85
 
-      const novas = []
+      let novasDoAtleta = 0
       for (let i = 0; i <= meses; i++) {
         const venc = dataVencimentoNoMes(hojeD.getUTCFullYear(), hojeD.getUTCMonth() + i, diaPreferido)
         const competencia = venc.slice(0, 7) + '-01'
         if (jaTem.has(competencia)) continue
         // nao cria retroativo: se o vencimento do mes corrente ja passou, pula
         if (venc < hojeISO) continue
-        novas.push({
+        todasNovas.push({
           id: crypto.randomUUID(), escolaId: escola.id, atletaId: a.id,
           atletaNome: (a.nome || '').trim() || null,
           valor, vencimento: venc, competencia,
           status: 'PENDENTE', tipo: 'MANUAL', descricao: 'Mensalidade',
         })
+        novasDoAtleta++
       }
+      if (novasDoAtleta) atletaPorNovas[a.id] = a.nome
+    }
 
-      if (novas.length) {
-        const { error } = await supabaseAdmin.from('Cobranca').insert(novas)
-        if (error) { console.error('Erro pre-gerando para', a.nome, error.message); continue }
-        criadas += novas.length
-        atletasAfetados++
+    // Insert em lote unico por escola em vez de um insert por atleta —
+    // mesma logica: menos round-trips ao banco, cron mais rapido e mais
+    // barato conforme a base cresce. Se o lote inteiro falhar (uma linha
+    // ruim derruba o insert todo no Postgres), cai pro fallback por atleta
+    // abaixo — mais lento, mas ninguem fica sem mensalidade por causa de
+    // UM atleta com dado invalido.
+    if (todasNovas.length) {
+      const { error } = await supabaseAdmin.from('Cobranca').insert(todasNovas)
+      if (!error) {
+        criadas += todasNovas.length
+        atletasAfetados += Object.keys(atletaPorNovas).length
+      } else {
+        console.error('Insert em lote falhou pra escola', escola.id, error.message, '— tentando atleta por atleta')
+        const porAtleta: Record<string, Record<string, unknown>[]> = {}
+        for (const n of todasNovas) {
+          const atletaId = n.atletaId as string
+          if (!porAtleta[atletaId]) porAtleta[atletaId] = []
+          porAtleta[atletaId].push(n)
+        }
+        for (const [atletaId, novas] of Object.entries(porAtleta)) {
+          const { error: eIndiv } = await supabaseAdmin.from('Cobranca').insert(novas)
+          if (eIndiv) {
+            console.error('Erro pre-gerando para atleta', atletaId, atletaPorNovas[atletaId], eIndiv.message)
+            continue
+          }
+          criadas += novas.length
+          atletasAfetados++
+        }
       }
     }
   }
