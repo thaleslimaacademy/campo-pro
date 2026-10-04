@@ -28,13 +28,13 @@ export default function AtivarDebitoAutomatico({ token, valorMensalidade, jaAtiv
     }
   }
 
-  const inputStyle: React.CSSProperties = { width: '100%', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 10, padding: '10px 12px', color: '#fff', fontSize: 13, boxSizing: 'border-box' }
+  const inputStyle: React.CSSProperties = { width: '100%', background: '#FFFFFF', border: '1px solid rgba(16,24,40,0.1)', borderRadius: 10, padding: '10px 12px', color: '#1F2937', fontSize: 13, boxSizing: 'border-box' }
 
   if (jaAtivo || sucesso) {
     return (
-      <div className="rounded-2xl p-4 border" style={{ background: 'rgba(57,255,20,0.05)', borderColor: 'rgba(57,255,20,0.25)' }}>
-        <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: '#39FF14' }}>✅ Débito automático ativo</p>
-        <p className="text-xs text-gray-400">A mensalidade é cobrada automaticamente no cartão cadastrado. Não é necessário fazer nada todo mês.</p>
+      <div className="rounded-2xl p-4 border" style={{ background: 'rgba(46,168,102,0.05)', borderColor: 'rgba(46,168,102,0.25)' }}>
+        <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: '#2EA866' }}>✅ Débito automático ativo</p>
+        <p className="text-xs text-gray-500">A mensalidade é cobrada automaticamente no cartão cadastrado. Não é necessário fazer nada todo mês.</p>
       </div>
     )
   }
@@ -42,15 +42,15 @@ export default function AtivarDebitoAutomatico({ token, valorMensalidade, jaAtiv
   if (!valorMensalidade) return null
 
   return (
-    <div className="rounded-2xl p-4 border" style={{ background: 'rgba(255,255,255,0.025)', borderColor: 'rgba(212,175,55,0.2)' }}>
-      <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: '#D4AF37' }}>💳 Débito automático</p>
+    <div className="rounded-2xl p-4 border" style={{ background: '#FFFFFF', borderColor: 'rgba(212,175,55,0.2)' }}>
+      <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: '#B7791F' }}>💳 Débito automático</p>
 
       {!aberto ? (
         <>
-          <p className="text-xs text-gray-400 mb-3">Cadastre o cartão uma vez e nunca mais se preocupe em pagar a mensalidade — cobramos sozinhos, todo mês, no vencimento.</p>
+          <p className="text-xs text-gray-500 mb-3">Cadastre o cartão uma vez e nunca mais se preocupe em pagar a mensalidade — cobramos sozinhos, todo mês, no vencimento.</p>
           <button onClick={() => setAberto(true)}
             className="w-full py-3 rounded-xl font-black text-sm"
-            style={{ background: 'rgba(212,175,55,0.12)', border: '1px solid rgba(212,175,55,0.3)', color: '#D4AF37', fontFamily: 'Syne, sans-serif' }}>
+            style={{ background: 'rgba(212,175,55,0.12)', border: '1px solid rgba(212,175,55,0.3)', color: '#B7791F', fontFamily: 'Syne, sans-serif' }}>
             Ativar débito automático
           </button>
         </>
@@ -69,16 +69,16 @@ export default function AtivarDebitoAutomatico({ token, valorMensalidade, jaAtiv
             <input placeholder="Número do endereço" inputMode="numeric" style={inputStyle} {...campo('numeroEndereco')} />
           </div>
 
-          {erro && <p style={{ color: '#FF4444', fontSize: 12 }}>{erro}</p>}
+          {erro && <p style={{ color: '#DC2626', fontSize: 12 }}>{erro}</p>}
 
           <button onClick={enviar} disabled={enviando}
-            style={{ width: '100%', padding: '12px', borderRadius: 12, fontWeight: 900, fontSize: 13, marginTop: 4, background: '#39FF14', color: '#050505', fontFamily: 'Syne, sans-serif', border: 'none', cursor: enviando ? 'not-allowed' : 'pointer', opacity: enviando ? 0.6 : 1 }}>
+            style={{ width: '100%', padding: '12px', borderRadius: 12, fontWeight: 900, fontSize: 13, marginTop: 4, background: '#2EA866', color: '#1F2937', fontFamily: 'Syne, sans-serif', border: 'none', cursor: enviando ? 'not-allowed' : 'pointer', opacity: enviando ? 0.6 : 1 }}>
             {enviando ? 'Processando…' : `Confirmar — R$ ${valorMensalidade.toFixed(2)}/mês`}
           </button>
-          <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', textAlign: 'center', marginTop: 2 }}>
+          <p style={{ fontSize: 10, color: '#6B7280', textAlign: 'center', marginTop: 2 }}>
             Pagamento processado com segurança pela Asaas. O sistema não guarda os dados do seu cartão.
           </p>
-          <button onClick={() => setAberto(false)} style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 12, cursor: 'pointer', marginTop: 4 }}>
+          <button onClick={() => setAberto(false)} style={{ background: 'transparent', border: 'none', color: '#6B7280', fontSize: 12, cursor: 'pointer', marginTop: 4 }}>
             Cancelar
           </button>
         </div>

@@ -17,10 +17,10 @@ export default function LogoutPage() {
   }, [])
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0A0E1A' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F6F8F7' }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'linear-gradient(135deg,#4169E1,#1A3FA8)', margin: '0 auto 16px' }} />
-        <p style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter, sans-serif', fontSize: 14 }}>Saindo...</p>
+        <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'linear-gradient(135deg,#2EA866,#23874F)', margin: '0 auto 16px' }} />
+        <p style={{ color: '#6B7280', fontFamily: 'Inter, sans-serif', fontSize: 14 }}>Saindo...</p>
       </div>
     </div>
   )

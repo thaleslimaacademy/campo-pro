@@ -4,15 +4,15 @@ import PlanoGate from '@/components/PlanoGate'
 import BottomNav from '@/components/ui/BottomNav'
 import { getCampeonatos, criarCampeonato, excluirCampeonato } from './actions'
 
-const T = { bg: '#0A0E1A', surface: '#0D1220', primary: '#4169E1', accent: '#00BFFF', text: '#F0F4FF', muted: 'rgba(240,244,255,0.4)', border: 'rgba(240,244,255,0.08)', green: '#00D67A', gold: '#FFD700' }
+const T = { bg: '#F6F8F7', surface: '#FFFFFF', primary: '#2EA866', accent: '#23874F', text: '#1F2937', muted: '#6B7280', border: 'rgba(16,24,40,0.1)', green: '#16A34A', gold: '#B7791F' }
 const SYNE = 'Syne, sans-serif'
-const INP: React.CSSProperties = { width: '100%', background: '#080C15', border: '1px solid rgba(240,244,255,0.1)', borderRadius: 8, padding: '11px 14px', color: T.text, fontFamily: 'Inter, sans-serif', fontSize: 13, marginTop: 4, boxSizing: 'border-box' }
+const INP: React.CSSProperties = { width: '100%', background: '#F6F8F7', border: '1px solid rgba(16,24,40,0.1)', borderRadius: 8, padding: '11px 14px', color: T.text, fontFamily: 'Inter, sans-serif', fontSize: 13, marginTop: 4, boxSizing: 'border-box' }
 const LBL: React.CSSProperties = { fontSize: 10, color: T.muted, textTransform: 'uppercase', letterSpacing: '0.8px' }
 const STATUS_COR: Record<string, { bg: string; color: string; label: string }> = {
-  rascunho:   { bg: 'rgba(240,244,255,0.06)', color: T.muted,      label: 'Rascunho'      },
+  rascunho:   { bg: '#F6F8F7', color: T.muted,      label: 'Rascunho'      },
   inscricoes: { bg: `${T.primary}20`,          color: T.primary,    label: 'Inscrições'    },
   andamento:  { bg: `${T.green}20`,            color: T.green,      label: 'Em andamento'  },
-  encerrado:  { bg: 'rgba(255,68,68,0.12)',    color: '#FF4444',    label: 'Encerrado'     },
+  encerrado:  { bg: '#F6F8F7',    color: '#DC2626',    label: 'Encerrado'     },
 }
 
 interface Campeonato { id: string; nome: string; formato: string; status: string; dataInicio: string; dataFim: string; descricao: string; createdAt: string }
@@ -46,13 +46,13 @@ export default function Campeonatos() {
   return (
     <PlanoGate feature="campeonatos" planoMinimo="PRO">
       <div style={{ minHeight: '100vh', background: T.bg, color: T.text, fontFamily: 'Inter, sans-serif', paddingBottom: 80 }}>
-        <div style={{ background: T.primary, padding: '20px 20px 20px' }}>
+        <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 20px 20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
-              <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Competição</div>
+              <div style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Competição</div>
               <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: T.text, letterSpacing: -0.8, textTransform: 'uppercase' }}>Campeonatos</div>
             </div>
-            <button onClick={() => setShowForm(!showForm)} style={{ background: T.text, color: T.primary, borderRadius: 8, padding: '10px 16px', fontFamily: SYNE, fontWeight: 800, fontSize: 12, border: 'none', cursor: 'pointer', textTransform: 'uppercase' }}>{showForm ? 'Fechar' : '+ Novo'}</button>
+            <button onClick={() => setShowForm(!showForm)} style={{ background: T.primary, color: '#fff', borderRadius: 8, padding: '10px 16px', fontFamily: SYNE, fontWeight: 800, fontSize: 12, border: 'none', cursor: 'pointer', textTransform: 'uppercase' }}>{showForm ? 'Fechar' : '+ Novo'}</button>
           </div>
         </div>
 
@@ -71,7 +71,7 @@ export default function Campeonatos() {
                 <div><label style={LBL}>Data fim</label><input type="date" value={form.dataFim} onChange={e => setForm(p => ({ ...p, dataFim: e.target.value }))} style={INP} /></div>
               </div>
               <div><label style={LBL}>Descrição</label><textarea value={form.descricao} onChange={e => setForm(p => ({ ...p, descricao: e.target.value }))} rows={2} style={{ ...INP, resize: 'none' }} placeholder="Detalhes..." /></div>
-              <button onClick={salvar} disabled={salvando} style={{ background: T.primary, color: T.text, padding: '13px', borderRadius: 8, fontFamily: SYNE, fontWeight: 800, fontSize: 13, border: 'none', cursor: 'pointer', textTransform: 'uppercase' }}>{salvando ? 'Salvando...' : 'Criar Campeonato'}</button>
+              <button onClick={salvar} disabled={salvando} style={{ background: T.primary, color: '#fff', padding: '13px', borderRadius: 8, fontFamily: SYNE, fontWeight: 800, fontSize: 13, border: 'none', cursor: 'pointer', textTransform: 'uppercase' }}>{salvando ? 'Salvando...' : 'Criar Campeonato'}</button>
             </div>
           </div>
         )}
@@ -103,7 +103,7 @@ export default function Campeonatos() {
                 )}
                 <div style={{ display: 'flex', gap: 8 }}>
                   <a href={`/campeonato/${c.id}`} style={{ flex: 1, background: `${T.primary}15`, border: `1px solid ${T.primary}33`, color: T.primary, textAlign: 'center', padding: '10px', borderRadius: 8, fontSize: 12, fontWeight: 800, fontFamily: SYNE, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: 0.5 }}>Gerenciar</a>
-                  <button onClick={() => { if (!confirm('Excluir este campeonato?')) return; startSave(async () => { await excluirCampeonato(c.id); carregar() }) }} style={{ background: 'rgba(255,68,68,0.08)', color: '#FF4444', padding: '10px 14px', borderRadius: 8, fontSize: 12, border: '1px solid rgba(255,68,68,0.2)', cursor: 'pointer' }}>
+                  <button onClick={() => { if (!confirm('Excluir este campeonato?')) return; startSave(async () => { await excluirCampeonato(c.id); carregar() }) }} style={{ background: 'rgba(255,68,68,0.08)', color: '#DC2626', padding: '10px 14px', borderRadius: 8, fontSize: 12, border: '1px solid rgba(255,68,68,0.2)', cursor: 'pointer' }}>
                     <i className="ti ti-trash" aria-hidden="true"></i>
                   </button>
                 </div>

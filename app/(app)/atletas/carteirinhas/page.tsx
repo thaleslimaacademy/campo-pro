@@ -79,8 +79,8 @@ export default function CarteirinhasEmMassa() {
   }
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', background: '#0A0E1A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'rgba(240,244,255,0.4)', fontFamily: INTER }}>Carregando...</p>
+    <div style={{ minHeight: '100vh', background: '#F6F8F7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: '#6B7280', fontFamily: INTER }}>Carregando...</p>
     </div>
   )
 
@@ -98,18 +98,18 @@ export default function CarteirinhasEmMassa() {
   const validadeStr = validade.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' })
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0A0E1A', color: '#F0F4FF', fontFamily: INTER, paddingBottom: 80 }}>
+    <div style={{ minHeight: '100vh', background: '#F6F8F7', color: '#1F2937', fontFamily: INTER, paddingBottom: 80 }}>
 
       {/* HEADER */}
-      <div style={{ background: '#4169E1', padding: '20px 20px 20px' }}>
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 20px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
           <div>
-            <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Atletas</div>
-            <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 22, color: '#F0F4FF', letterSpacing: -0.5, textTransform: 'uppercase' }}>🪪 Carteirinhas em massa</div>
+            <div style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Atletas</div>
+            <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 22, color: '#1F2937', letterSpacing: -0.5, textTransform: 'uppercase' }}>🪪 Carteirinhas em massa</div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <a href="/atletas" style={{ background: 'rgba(240,244,255,0.15)', border: '1px solid rgba(240,244,255,0.2)', color: '#F0F4FF', borderRadius: 8, padding: '8px 14px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: 0.5 }}>← Voltar</a>
-            <button onClick={imprimir} disabled={selecionados.size === 0} style={{ background: '#F0F4FF', color: '#4169E1', borderRadius: 8, padding: '8px 14px', fontFamily: SYNE, fontWeight: 800, fontSize: 11, border: 'none', cursor: selecionados.size ? 'pointer' : 'not-allowed', opacity: selecionados.size ? 1 : 0.5, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            <a href="/atletas" style={{ background: '#EEF1EF', border: '1px solid rgba(16,24,40,0.18)', color: '#1F2937', borderRadius: 8, padding: '8px 14px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: 0.5 }}>← Voltar</a>
+            <button onClick={imprimir} disabled={selecionados.size === 0} style={{ background: '#F0F4FF', color: '#2EA866', borderRadius: 8, padding: '8px 14px', fontFamily: SYNE, fontWeight: 800, fontSize: 11, border: 'none', cursor: selecionados.size ? 'pointer' : 'not-allowed', opacity: selecionados.size ? 1 : 0.5, textTransform: 'uppercase', letterSpacing: 0.5 }}>
               🖨️ Imprimir {selecionados.size} selecionada{selecionados.size !== 1 ? 's' : ''}
             </button>
           </div>
@@ -118,9 +118,9 @@ export default function CarteirinhasEmMassa() {
 
       {/* BARRA DE SELEÇÃO */}
       <div style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-        <p style={{ fontSize: 12, color: 'rgba(240,244,255,0.5)', margin: 0 }}>{atletas.length} atleta{atletas.length !== 1 ? 's' : ''} ativo{atletas.length !== 1 ? 's' : ''}</p>
-        <button onClick={selecionarTodos} style={{ background: 'transparent', border: '1px solid rgba(65,105,225,0.4)', color: '#4169E1', borderRadius: 6, padding: '4px 10px', fontSize: 11, cursor: 'pointer', fontFamily: SYNE, fontWeight: 700 }}>Selecionar todos</button>
-        <button onClick={limparSelecao} style={{ background: 'transparent', border: '1px solid rgba(240,244,255,0.15)', color: 'rgba(240,244,255,0.5)', borderRadius: 6, padding: '4px 10px', fontSize: 11, cursor: 'pointer', fontFamily: SYNE, fontWeight: 700 }}>Limpar</button>
+        <p style={{ fontSize: 12, color: '#374151', margin: 0 }}>{atletas.length} atleta{atletas.length !== 1 ? 's' : ''} ativo{atletas.length !== 1 ? 's' : ''}</p>
+        <button onClick={selecionarTodos} style={{ background: 'transparent', border: '1px solid rgba(46,168,102,0.4)', color: '#2EA866', borderRadius: 6, padding: '4px 10px', fontSize: 11, cursor: 'pointer', fontFamily: SYNE, fontWeight: 700 }}>Selecionar todos</button>
+        <button onClick={limparSelecao} style={{ background: 'transparent', border: '1px solid rgba(16,24,40,0.1)', color: '#374151', borderRadius: 6, padding: '4px 10px', fontSize: 11, cursor: 'pointer', fontFamily: SYNE, fontWeight: 700 }}>Limpar</button>
       </div>
 
       {/* GRADE (tela) */}
@@ -138,7 +138,7 @@ export default function CarteirinhasEmMassa() {
             <div key={atleta.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
                 <input type="checkbox" checked={selecionado} onChange={() => toggle(atleta.id)} />
-                <span style={{ fontSize: 11, color: 'rgba(240,244,255,0.5)' }}>{atleta.nome}</span>
+                <span style={{ fontSize: 11, color: '#374151' }}>{atleta.nome}</span>
               </label>
               <div
                 data-atleta-id={atleta.id}
@@ -149,7 +149,7 @@ export default function CarteirinhasEmMassa() {
                   borderRadius: 8,
                   padding: '3.5mm',
                   display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                  boxShadow: '0 8px 32px rgba(16,24,40,0.12)',
                   position: 'relative', overflow: 'hidden',
                   fontFamily: 'Arial, sans-serif',
                   border: `1px solid ${borderColor}`,
@@ -241,7 +241,7 @@ export default function CarteirinhasEmMassa() {
         })}
       </div>
 
-      <p style={{ color: 'rgba(240,244,255,0.25)', fontSize: 11, textAlign: 'center', padding: '0 24px' }}>
+      <p style={{ color: '#9CA3AF', fontSize: 11, textAlign: 'center', padding: '0 24px' }}>
         No diálogo de impressão, escolha A4 e ajuste a margem se necessário. Cada carteirinha sai no tamanho CNH (85.6 × 54mm) e pode ser recortada.
       </p>
     </div>

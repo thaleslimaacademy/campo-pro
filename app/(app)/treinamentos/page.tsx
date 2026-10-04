@@ -5,12 +5,12 @@ import DiagramaFase from './DiagramaFase'
 import { useRouter } from 'next/navigation'
 
 const SYNE = 'Syne, sans-serif'
-const NAVY = '#0A0E1A'
-const BLUE = '#4169E1'
-const CYAN = '#00BFFF'
-const SKY = '#7DD3FC'
-const OFF = '#F0F4FF'
-const CARD = 'rgba(65,105,225,0.08)'
+const NAVY = '#F6F8F7'
+const BLUE = '#2EA866'
+const CYAN = '#23874F'
+const SKY = '#4B5563'
+const OFF = '#1F2937'
+const CARD = 'rgba(46,168,102,0.08)'
 const BORDER = '1px solid rgba(65,105,225,0.25)'
 
 type Categoria = 'Sub-5' | 'Sub-7' | 'Sub-9' | 'Sub-11' | 'Sub-13' | 'Sub-15' | 'Sub-17' | 'Sub-20'
@@ -136,7 +136,7 @@ const FUNDAMENTOS: Fundamento[] = [
     id: 'passe',
     label: 'Passe e Transicao',
     icon: 'ti-arrows-exchange',
-    cor: '#4169E1',
+    cor: '#2EA866',
     exercicios: [
       {
         id: 'passe-1',
@@ -164,7 +164,7 @@ const FUNDAMENTOS: Fundamento[] = [
     id: 'chute',
     label: 'Chute e Finalizacao',
     icon: 'ti-circle-arrow-right',
-    cor: '#FF6B6B',
+    cor: '#DC2626',
     exercicios: [
       {
         id: 'chute-1',
@@ -192,7 +192,7 @@ const FUNDAMENTOS: Fundamento[] = [
     id: 'drible',
     label: 'Drible e Conducao',
     icon: 'ti-route',
-    cor: '#FFD700',
+    cor: '#B7791F',
     exercicios: [
       {
         id: 'drible-1',
@@ -220,7 +220,7 @@ const FUNDAMENTOS: Fundamento[] = [
     id: 'posicionamento',
     label: 'Posicionamento Tatico',
     icon: 'ti-layout-distribute-horizontal',
-    cor: '#00BFFF',
+    cor: '#23874F',
     exercicios: [
       {
         id: 'pos-1',
@@ -248,7 +248,7 @@ const FUNDAMENTOS: Fundamento[] = [
     id: 'aereo',
     label: 'Jogo Aereo',
     icon: 'ti-arrow-up',
-    cor: '#7DD3FC',
+    cor: '#4B5563',
     exercicios: [
       {
         id: 'aereo-1',
@@ -276,7 +276,7 @@ const FUNDAMENTOS: Fundamento[] = [
     id: 'goleiro',
     label: 'Treino de Goleiro',
     icon: 'ti-hand-stop',
-    cor: '#4ADE80',
+    cor: '#16A34A',
     exercicios: [
       {
         id: 'gol-1',
@@ -294,7 +294,7 @@ const FUNDAMENTOS: Fundamento[] = [
     id: 'fisico',
     label: 'Fisico e Aquecimento',
     icon: 'ti-run',
-    cor: '#FB923C',
+    cor: '#C2410C',
     exercicios: [
       {
         id: 'fis-1',
@@ -369,9 +369,9 @@ export default function TreinamentosPage() {
     <div style={{ minHeight: '100vh', background: NAVY, paddingBottom: 88, fontFamily: 'Inter, sans-serif', color: OFF }}>
 
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg, #1A3FA8 0%, #4169E1 100%)', padding: '16px 16px 20px' }}>
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '16px 16px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={() => router.back()} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: OFF }}>
+          <button onClick={() => router.back()} style={{ background: '#EEF1EF', border: 'none', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: OFF }}>
             <i className="ti ti-arrow-left" style={{ fontSize: 18 }} />
           </button>
           <div>
@@ -384,7 +384,7 @@ export default function TreinamentosPage() {
       <div style={{ padding: '16px 16px 0' }}>
 
         {/* Gerador de Plano IA */}
-        <div style={{ background: 'linear-gradient(135deg, rgba(65,105,225,0.15) 0%, rgba(0,191,255,0.1) 100%)', border: '1px solid rgba(0,191,255,0.3)', borderRadius: 14, padding: 16, marginBottom: 16 }}>
+        <div style={{ background: 'linear-gradient(135deg, rgba(46,168,102,0.15) 0%, rgba(46,168,102,0.1) 100%)', border: '1px solid rgba(46,168,102,0.3)', borderRadius: 14, padding: 16, marginBottom: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
             <i className="ti ti-brain" style={{ fontSize: 18, color: CYAN }} />
             <div style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 14, color: OFF, textTransform: 'uppercase', letterSpacing: 0.5 }}>Plano de Treino IA</div>
@@ -394,7 +394,7 @@ export default function TreinamentosPage() {
             <select
               value={categoriaSelecionada}
               onChange={e => setCategoriaSelecionada(e.target.value as Categoria)}
-              style={{ background: 'rgba(65,105,225,0.2)', border: '1px solid rgba(65,105,225,0.4)', borderRadius: 8, padding: '8px 12px', color: OFF, fontSize: 13, cursor: 'pointer' }}
+              style={{ background: 'rgba(46,168,102,0.2)', border: '1px solid rgba(46,168,102,0.4)', borderRadius: 8, padding: '8px 12px', color: OFF, fontSize: 13, cursor: 'pointer' }}
             >
               {(['Sub-5','Sub-7','Sub-9','Sub-11','Sub-13','Sub-15','Sub-17','Sub-20'] as Categoria[]).map(c => (
                 <option key={c} value={c}>{c}</option>
@@ -406,40 +406,40 @@ export default function TreinamentosPage() {
             onChange={e => setIdeiaTreino(e.target.value)}
             placeholder="Descreva a ideia do treino (opcional)... Ex: Foco em pressão alta e transição rápida, trabalhar saída de bola pelo goleiro"
             rows={3}
-            style={{ width: '100%', background: 'rgba(65,105,225,0.08)', border: '1px solid rgba(65,105,225,0.3)', borderRadius: 10, padding: '10px 12px', color: OFF, fontSize: 13, resize: 'none', marginBottom: 10, fontFamily: 'Inter, sans-serif', lineHeight: 1.5, boxSizing: 'border-box' }}
+            style={{ width: '100%', background: 'rgba(46,168,102,0.08)', border: '1px solid rgba(46,168,102,0.3)', borderRadius: 10, padding: '10px 12px', color: OFF, fontSize: 13, resize: 'none', marginBottom: 10, fontFamily: 'Inter, sans-serif', lineHeight: 1.5, boxSizing: 'border-box' }}
           />
           <button
             onClick={gerarPlanoIA}
             disabled={gerandoPlano}
-            style={{ width: '100%', background: gerandoPlano ? 'rgba(65,105,225,0.3)' : BLUE, border: 'none', borderRadius: 8, padding: '10px 16px', color: '#fff', fontSize: 13, fontWeight: 700, cursor: gerandoPlano ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+            style={{ width: '100%', background: gerandoPlano ? 'rgba(46,168,102,0.3)' : BLUE, border: 'none', borderRadius: 8, padding: '10px 16px', color: gerandoPlano ? '#1F2937' : '#fff', fontSize: 13, fontWeight: 700, cursor: gerandoPlano ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
           >
             <i className="ti ti-sparkles" style={{ fontSize: 14 }} />
             {gerandoPlano ? 'Gerando plano...' : 'Gerar Plano com IA'}
           </button>
           {plano && (
-            <div style={{ marginTop: 14, background: 'rgba(10,14,26,0.6)', borderRadius: 10, padding: 14, fontSize: 13, color: OFF, lineHeight: 1.7, whiteSpace: 'pre-wrap', border: '1px solid rgba(65,105,225,0.2)' }}>
+            <div style={{ marginTop: 14, background: 'rgba(16,24,40,0.35)', borderRadius: 10, padding: 14, fontSize: 13, color: OFF, lineHeight: 1.7, whiteSpace: 'pre-wrap', border: '1px solid rgba(46,168,102,0.2)' }}>
               {plano}
             </div>
           )}
 
           {planoEstruturado && (
             <div style={{ marginTop: 14 }}>
-              <div style={{ background: 'rgba(10,14,26,0.8)', borderRadius: 10, padding: '10px 14px', marginBottom: 12, border: '1px solid rgba(0,191,255,0.3)' }}>
+              <div style={{ background: 'rgba(16,24,40,0.35)', borderRadius: 10, padding: '10px 14px', marginBottom: 12, border: '1px solid rgba(46,168,102,0.3)' }}>
                 <div style={{ fontSize: 11, color: CYAN, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Plano — {planoEstruturado.categoria}</div>
                 <div style={{ fontSize: 12, color: SKY, marginTop: 2 }}>{planoEstruturado.contexto}</div>
               </div>
               {(planoEstruturado.fases || []).map((fase: any) => (
-                <div key={fase.id} style={{ background: 'rgba(10,14,26,0.7)', border: '1px solid rgba(65,105,225,0.2)', borderRadius: 12, marginBottom: 14, overflow: 'hidden' }}>
+                <div key={fase.id} style={{ background: 'rgba(16,24,40,0.35)', border: '1px solid rgba(46,168,102,0.2)', borderRadius: 12, marginBottom: 14, overflow: 'hidden' }}>
                   {fase.diagrama && <DiagramaFase dados={fase.diagrama} />}
                   <div style={{ padding: '12px 14px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                      <span style={{ fontSize: 10, color: CYAN, background: 'rgba(0,191,255,0.15)', padding: '2px 8px', borderRadius: 10, fontWeight: 700 }}>{fase.tempo}</span>
+                      <span style={{ fontSize: 10, color: CYAN, background: 'rgba(46,168,102,0.15)', padding: '2px 8px', borderRadius: 10, fontWeight: 700 }}>{fase.tempo}</span>
                       <span style={{ fontSize: 13, fontWeight: 700, color: OFF, fontFamily: SYNE, textTransform: 'uppercase' }}>{fase.nome}</span>
                     </div>
                     {fase.subtitulo && <div style={{ fontSize: 12, color: SKY, marginBottom: 8, fontStyle: 'italic' }}>"{fase.subtitulo}"</div>}
-                    <div style={{ fontSize: 13, color: 'rgba(240,244,255,0.8)', lineHeight: 1.6, marginBottom: 10 }}>{fase.descricao}</div>
+                    <div style={{ fontSize: 13, color: '#1F2937', lineHeight: 1.6, marginBottom: 10 }}>{fase.descricao}</div>
                     {fase.dica && (
-                      <div style={{ background: 'rgba(65,105,225,0.1)', border: '1px solid rgba(65,105,225,0.25)', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: SKY }}>
+                      <div style={{ background: 'rgba(46,168,102,0.1)', border: '1px solid rgba(46,168,102,0.25)', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: SKY }}>
                         <span style={{ fontWeight: 700, color: CYAN }}>💡 Dica: </span>{fase.dica}
                       </div>
                     )}
@@ -447,7 +447,7 @@ export default function TreinamentosPage() {
                 </div>
               ))}
               {planoEstruturado.objetivos?.length > 0 && (
-                <div style={{ background: 'rgba(10,14,26,0.7)', border: '1px solid rgba(65,105,225,0.2)', borderRadius: 10, padding: '12px 14px', marginBottom: 10 }}>
+                <div style={{ background: 'rgba(16,24,40,0.35)', border: '1px solid rgba(46,168,102,0.2)', borderRadius: 10, padding: '12px 14px', marginBottom: 10 }}>
                   <div style={{ fontSize: 11, color: CYAN, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>Objetivos do Treino</div>
                   {planoEstruturado.objetivos.map((o: string, i: number) => (
                     <div key={i} style={{ fontSize: 12, color: OFF, marginBottom: 4 }}>• {o}</div>
@@ -456,7 +456,7 @@ export default function TreinamentosPage() {
               )}
               {planoEstruturado.pontos_atencao?.length > 0 && (
                 <div style={{ background: 'rgba(251,191,36,0.05)', border: '1px solid rgba(251,191,36,0.2)', borderRadius: 10, padding: '12px 14px' }}>
-                  <div style={{ fontSize: 11, color: '#FBBF24', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>⚠️ Pontos de Atenção</div>
+                  <div style={{ fontSize: 11, color: '#B45309', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>⚠️ Pontos de Atenção</div>
                   {planoEstruturado.pontos_atencao.map((p: string, i: number) => (
                     <div key={i} style={{ fontSize: 12, color: OFF, marginBottom: 4 }}>• {p}</div>
                   ))}
@@ -496,7 +496,7 @@ export default function TreinamentosPage() {
                   <div style={{ position: 'relative' }}>
                     <div dangerouslySetInnerHTML={{ __html: ex.diagrama }} style={{ width: '100%' }} />
                     <button onClick={() => setExercicioEditando(ex.id)}
-                      style={{ position: 'absolute', bottom: 8, right: 8, background: 'rgba(65,105,225,0.9)', border: 'none', borderRadius: 8, padding: '5px 10px', color: '#fff', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+                      style={{ position: 'absolute', bottom: 8, right: 8, background: 'rgba(46,168,102,0.9)', border: 'none', borderRadius: 8, padding: '5px 10px', color: '#fff', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
                       ✏️ Editar
                     </button>
                   </div>
@@ -506,10 +506,10 @@ export default function TreinamentosPage() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
                       <div style={{ fontSize: 15, fontWeight: 700, color: OFF, fontFamily: SYNE }}>{ex.nome}</div>
                       <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                        <span style={{ fontSize: 10, color: SKY, background: 'rgba(65,105,225,0.15)', padding: '2px 8px', borderRadius: 10 }}>
+                        <span style={{ fontSize: 10, color: SKY, background: 'rgba(46,168,102,0.15)', padding: '2px 8px', borderRadius: 10 }}>
                           <i className="ti ti-clock" style={{ fontSize: 9, marginRight: 3 }} />{ex.duracao}
                         </span>
-                        <span style={{ fontSize: 10, color: SKY, background: 'rgba(65,105,225,0.15)', padding: '2px 8px', borderRadius: 10 }}>
+                        <span style={{ fontSize: 10, color: SKY, background: 'rgba(46,168,102,0.15)', padding: '2px 8px', borderRadius: 10 }}>
                           <i className="ti ti-users" style={{ fontSize: 9, marginRight: 3 }} />{ex.jogadores}
                         </span>
                       </div>
@@ -524,7 +524,7 @@ export default function TreinamentosPage() {
                       ))}
                     </div>
 
-                    <div style={{ fontSize: 13, color: 'rgba(240,244,255,0.75)', lineHeight: 1.6, marginBottom: 10 }}>{ex.descricao}</div>
+                    <div style={{ fontSize: 13, color: '#1F2937', lineHeight: 1.6, marginBottom: 10 }}>{ex.descricao}</div>
 
                     <button
                       onClick={() => setExercicioAberto(exercicioAberto === ex.id ? null : ex.id)}
@@ -537,9 +537,9 @@ export default function TreinamentosPage() {
                     {exercicioAberto === ex.id && (
                       <div style={{ borderTop: BORDER, paddingTop: 12, paddingBottom: 14 }}>
                         <div style={{ fontSize: 11, color: CYAN, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6, fontWeight: 700 }}>Orientacao Metodologica</div>
-                        <div style={{ fontSize: 13, color: 'rgba(240,244,255,0.8)', lineHeight: 1.7 }}>{ex.metodologia}</div>
+                        <div style={{ fontSize: 13, color: '#1F2937', lineHeight: 1.7 }}>{ex.metodologia}</div>
                         {ex.videoUrl && (
-                          <a href={ex.videoUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 12, background: 'rgba(255,107,107,0.15)', border: '1px solid rgba(255,107,107,0.4)', borderRadius: 8, padding: '6px 14px', color: '#FF6B6B', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>
+                          <a href={ex.videoUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 12, background: 'rgba(255,107,107,0.15)', border: '1px solid rgba(255,107,107,0.4)', borderRadius: 8, padding: '6px 14px', color: '#DC2626', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>
                             <i className="ti ti-brand-youtube" style={{ fontSize: 14 }} />
                             Ver video
                           </a>

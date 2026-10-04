@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { ShoppingCart, Check, Loader2, Copy, CreditCard, Plus, Minus, X } from 'lucide-react'
 import { listarProdutosPublicos, criarPedido } from './actions'
 
-const C = { bg: '#0F0F1A', surface: '#1A1A2E', orange: '#FF6B00', gold: '#FFD700', green: '#00C896', text: '#F0F0F0', muted: 'rgba(240,240,240,0.45)', border: 'rgba(255,255,255,0.08)' }
+const C = { bg: '#F6F8F7', surface: '#FFFFFF', orange: '#C2410C', gold: '#B7791F', green: '#16A34A', text: '#1F2937', muted: '#6B7280', border: 'rgba(16,24,40,0.1)' }
 const SYNE = 'Syne, sans-serif'
 const brl = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n)
 
@@ -74,18 +74,18 @@ export default function LojaPage() {
   return (
     <div style={{ minHeight: '100vh', background: C.bg, color: C.text }}>
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg, #FF6B00 0%, #1A1A2E 60%, #0F0F1A 100%)', padding: '16px 20px', position: 'sticky', top: 0, zIndex: 40 }}>
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '16px 20px', position: 'sticky', top: 0, zIndex: 40 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <img src="/gestaofc-logo.png" style={{ width: 36, height: 36, borderRadius: 10 }} alt="logo" onError={e => (e.currentTarget.style.display = 'none')} />
             <div>
-              <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 16, color: '#fff' }}>🛍️ Loja TLFA</div>
-              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)' }}>Produtos oficiais</div>
+              <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 16, color: '#1F2937' }}>🛍️ Loja TLFA</div>
+              <div style={{ fontSize: 10, color: '#374151' }}>Produtos oficiais</div>
             </div>
           </div>
           {qtdCarrinho > 0 && (
             <button onClick={() => setEtapa('carrinho')}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 12, padding: '8px 16px', color: '#fff', cursor: 'pointer', fontFamily: SYNE, fontWeight: 700 }}>
+              style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#EEF1EF', border: 'none', borderRadius: 12, padding: '8px 16px', color: '#1F2937', cursor: 'pointer', fontFamily: SYNE, fontWeight: 700 }}>
               <ShoppingCart size={18} />
               <span style={{ background: C.orange, borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>{qtdCarrinho}</span>
               {brl(totalCarrinho)}
@@ -138,7 +138,7 @@ export default function LojaPage() {
                           {varAtual ? brl(varAtual.preco) : p.ProdutoVariacao.length > 0 ? `A partir de ${brl(Math.min(...p.ProdutoVariacao.map(v => v.preco)))}` : '—'}
                         </div>
                         <button onClick={() => adicionarAoCarrinho(p)} disabled={!temEstoque}
-                          style={{ background: temEstoque ? C.orange : C.muted, color: '#fff', border: 'none', borderRadius: 10, padding: '8px 14px', fontFamily: SYNE, fontWeight: 700, fontSize: 12, cursor: temEstoque ? 'pointer' : 'not-allowed' }}>
+                          style={{ background: temEstoque ? C.orange : C.muted, color: temEstoque ? '#fff' : '#1F2937', border: 'none', borderRadius: 10, padding: '8px 14px', fontFamily: SYNE, fontWeight: 700, fontSize: 12, cursor: temEstoque ? 'pointer' : 'not-allowed' }}>
                           {temEstoque ? '+ Carrinho' : 'Esgotado'}
                         </button>
                       </div>
@@ -284,6 +284,6 @@ export default function LojaPage() {
 }
 
 function Campo({ label, children }: { label: string; children: React.ReactNode }) {
-  return <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12, color: 'rgba(240,240,240,0.45)' }}>{label}{children}</label>
+  return <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12, color: '#6B7280' }}>{label}{children}</label>
 }
-const inp: React.CSSProperties = { background: '#0F0F1A', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '12px 14px', color: '#F0F0F0', fontSize: 14, width: '100%', boxSizing: 'border-box' }
+const inp: React.CSSProperties = { background: '#FFFFFF', border: '1px solid rgba(16,24,40,0.1)', borderRadius: 10, padding: '12px 14px', color: '#1F2937', fontSize: 14, width: '100%', boxSizing: 'border-box' }

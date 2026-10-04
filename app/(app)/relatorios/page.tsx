@@ -157,13 +157,13 @@ export default function Relatorios() {
     setGerando(false)
   }
 
-  if (loading) return <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center"><p className="text-gray-400">Carregando...</p></div>
+  if (loading) return <div className="min-h-screen bg-[#F6F8F7] text-gray-900 flex items-center justify-center"><p className="text-gray-500">Carregando...</p></div>
 
   return (
     <PlanoGate feature="relatorios" planoMinimo="PRO">
-    <div style={{ minHeight: "100vh", color: "#F0F4FF", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
+    <div style={{ minHeight: "100vh", color: "#1F2937", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
-        <a href="/dashboard" className="text-gray-400">Voltar</a>
+        <a href="/dashboard" className="text-gray-500">Voltar</a>
         <h1 className="text-xl font-bold">Relatorios</h1>
       </div>
       <div style={{ display: "flex", gap: "8px", marginBottom: "20px" }}>
@@ -174,23 +174,23 @@ export default function Relatorios() {
         ))}
       </div>
       {aba === 'presenca' && (
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 space-y-4">
+        <div className="bg-white rounded-xl p-4 border border-gray-200 space-y-4">
           <p className="text-green-500 font-bold">Relatorio de Presenca por Atleta</p>
           <div>
-            <label className="text-sm text-gray-400">Atleta *</label>
-            <select value={atletaSelecionado} onChange={e => setAtletaSelecionado(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white">
+            <label className="text-sm text-gray-500">Atleta *</label>
+            <select value={atletaSelecionado} onChange={e => setAtletaSelecionado(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 mt-1 text-gray-900">
               <option value="">Selecione um atleta</option>
               {atletas.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
             </select>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-sm text-gray-400">Data inicio</label>
-              <input type="date" value={dataInicio} onChange={e => setDataInicio(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+              <label className="text-sm text-gray-500">Data inicio</label>
+              <input type="date" value={dataInicio} onChange={e => setDataInicio(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 mt-1 text-gray-900" />
             </div>
             <div>
-              <label className="text-sm text-gray-400">Data fim</label>
-              <input type="date" value={dataFim} onChange={e => setDataFim(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+              <label className="text-sm text-gray-500">Data fim</label>
+              <input type="date" value={dataFim} onChange={e => setDataFim(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 mt-1 text-gray-900" />
             </div>
           </div>
           <button onClick={gerarPresenca} disabled={gerando || !atletaSelecionado} className="w-full bg-green-600 text-white py-3 rounded-xl font-bold disabled:opacity-50">
@@ -199,11 +199,11 @@ export default function Relatorios() {
         </div>
       )}
       {aba === 'financeiro' && (
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 space-y-4">
+        <div className="bg-white rounded-xl p-4 border border-gray-200 space-y-4">
           <p className="text-green-500 font-bold">Relatorio Financeiro Mensal</p>
           <div>
-            <label className="text-sm text-gray-400">Mes de referencia</label>
-            <input type="month" value={mesFinanceiro} onChange={e => setMesFinanceiro(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white" />
+            <label className="text-sm text-gray-500">Mes de referencia</label>
+            <input type="month" value={mesFinanceiro} onChange={e => setMesFinanceiro(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 mt-1 text-gray-900" />
           </div>
           <button onClick={gerarFinanceiro} disabled={gerando} className="w-full bg-green-600 text-white py-3 rounded-xl font-bold disabled:opacity-50">
             {gerando ? 'Gerando...' : 'Gerar PDF Financeiro'}
@@ -211,11 +211,11 @@ export default function Relatorios() {
         </div>
       )}
       {aba === 'atletas' && (
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 space-y-4">
+        <div className="bg-white rounded-xl p-4 border border-gray-200 space-y-4">
           <p className="text-green-500 font-bold">Relatorio de Atletas</p>
           <div>
-            <label className="text-sm text-gray-400">Filtrar por turma (opcional)</label>
-            <select value={turmaSelecionada} onChange={e => setTurmaSelecionada(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 mt-1 text-white">
+            <label className="text-sm text-gray-500">Filtrar por turma (opcional)</label>
+            <select value={turmaSelecionada} onChange={e => setTurmaSelecionada(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 mt-1 text-gray-900">
               <option value="">Todas as turmas</option>
               {turmas.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
             </select>
@@ -225,11 +225,11 @@ export default function Relatorios() {
           </button>
         </div>
       )}
-      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
-        <a href="/dashboard" className="text-gray-400 text-xs text-center">Inicio</a>
-        <a href="/atletas" className="text-gray-400 text-xs text-center">Atletas</a>
-        <a href="/presenca" className="text-gray-400 text-xs text-center">Presenca</a>
-        <a href="/financeiro" className="text-gray-400 text-xs text-center">Financeiro</a>
+      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(16,24,40,0.1)", background: "rgba(255,255,255,0.97)", backdropFilter: "blur(10px)" }}>
+        <a href="/dashboard" className="text-gray-500 text-xs text-center">Inicio</a>
+        <a href="/atletas" className="text-gray-500 text-xs text-center">Atletas</a>
+        <a href="/presenca" className="text-gray-500 text-xs text-center">Presenca</a>
+        <a href="/financeiro" className="text-gray-500 text-xs text-center">Financeiro</a>
       </nav>
     </div>
     </PlanoGate>

@@ -2,8 +2,8 @@
 'use client'
 import { useEffect, useState } from 'react'
 
-const C = { bg:'#0A0E1A', card:'#141418', border:'#1E1E24', blue:'#4169E1',
-  cyan:'#00BFFF', sky:'#7DD3FC', green:'#4ADE80', red:'#FF6B6B', yellow:'#FBBF24', muted:'#6B7280' }
+const C = { bg:'#F6F8F7', card:'#FFFFFF', border:'#E3E8E5', blue:'#2EA866',
+  cyan:'#23874F', sky:'#6B7280', green:'#16A34A', red:'#DC2626', yellow:'#B45309', muted:'#6B7280' }
 
 export default function NPSPage() {
   const [data, setData] = useState<any>(null)
@@ -26,9 +26,9 @@ export default function NPSPage() {
   const maxMedia = data.grafico?.length ? Math.max(...data.grafico.map((g: any) => g.media), 1) : 10
 
   return (
-    <div style={{ minHeight:'100vh', background:C.bg, color:'#fff', paddingBottom:80 }}>
-      <div style={{ background:`linear-gradient(135deg,${C.blue},#2D4FC8)`, padding:'20px 16px 24px' }}>
-        <p style={{ fontSize:10, color:'rgba(255,255,255,0.6)', textTransform:'uppercase', letterSpacing:2, marginBottom:4 }}>Satisfação</p>
+    <div style={{ minHeight:'100vh', background:C.bg, color:'#1F2937', paddingBottom:80 }}>
+      <div style={{ background:'#FFFFFF', borderBottom: '1px solid #E3E8E5', padding:'20px 16px 24px' }}>
+        <p style={{ fontSize:10, color:'#374151', textTransform:'uppercase', letterSpacing:2, marginBottom:4 }}>Satisfação</p>
         <h1 style={{ fontFamily:'Syne,sans-serif', fontSize:28, fontWeight:900, margin:0, letterSpacing:-1 }}>NPS da Academia</h1>
       </div>
 

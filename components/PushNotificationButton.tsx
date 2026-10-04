@@ -52,13 +52,13 @@ export default function PushNotificationButton({ atletaId, escolaId }: { atletaI
   if (!suporte) return null
   if (permissao === 'denied') return (
     <div style={{ background:'rgba(255,68,68,0.08)', border:'1px solid rgba(255,68,68,0.2)', borderRadius:12, padding:'12px 14px', textAlign:'center', margin:'8px 0' }}>
-      <p style={{ fontSize:12, color:'rgba(240,244,255,0.5)', margin:0 }}>🔕 Notificações bloqueadas — ative nas configurações do navegador</p>
+      <p style={{ fontSize:12, color:'#374151', margin:0 }}>🔕 Notificações bloqueadas — ative nas configurações do navegador</p>
     </div>
   )
 
   return (
     <button onClick={toggleNotificacoes} disabled={loading}
-      style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'center', gap:10, background: inscrito ? 'rgba(0,214,122,0.1)' : 'rgba(65,105,225,0.1)', border:`1px solid ${inscrito ? 'rgba(0,214,122,0.3)' : 'rgba(65,105,225,0.3)'}`, color: inscrito ? '#00D67A' : '#4169E1', padding:'13px 16px', borderRadius:12, fontFamily:SYNE, fontWeight:700, fontSize:13, cursor:loading?'not-allowed':'pointer', textTransform:'uppercase', letterSpacing:0.5, opacity:loading?0.6:1, margin:'8px 0' }}>
+      style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'center', gap:10, background: inscrito ? 'rgba(0,214,122,0.1)' : 'rgba(46,168,102,0.1)', border:`1px solid ${inscrito ? 'rgba(0,214,122,0.3)' : 'rgba(46,168,102,0.3)'}`, color: inscrito ? '#16A34A' : '#2EA866', padding:'13px 16px', borderRadius:12, fontFamily:SYNE, fontWeight:700, fontSize:13, cursor:loading?'not-allowed':'pointer', textTransform:'uppercase', letterSpacing:0.5, opacity:loading?0.6:1, margin:'8px 0' }}>
       <span style={{ fontSize:18 }}>{loading ? '⏳' : inscrito ? '🔔' : '🔕'}</span>
       {loading ? 'Aguarde...' : inscrito ? 'Notificações ativas — toque para desativar' : 'Ativar notificações'}
     </button>

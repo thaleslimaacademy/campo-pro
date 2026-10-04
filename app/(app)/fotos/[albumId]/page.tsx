@@ -4,7 +4,7 @@ import { use, useEffect, useState, useRef } from 'react'
 import { ArrowLeft, Upload, Trash2, Loader2, DollarSign, Link } from 'lucide-react'
 import { listarFotos, uploadFoto, excluirFoto, atualizarValorFoto } from '../actions'
 
-const C = { bg: '#0A0E1A', surface: '#1A1A2E', orange: '#4169E1', gold: '#FFD700', text: '#F0F4FF', muted: 'rgba(240,240,240,0.45)', border: 'rgba(255,255,255,0.08)' }
+const C = { bg: '#F6F8F7', surface: '#FFFFFF', orange: '#2EA866', gold: '#B7791F', text: '#1F2937', muted: '#6B7280', border: 'rgba(16,24,40,0.1)' }
 const SYNE = 'Syne, sans-serif'
 
 type Foto = { id: string; urlWatermark: string; valor: number }
@@ -112,7 +112,7 @@ export default function AlbumAdminPage({ params }: { params: Promise<{ albumId: 
             <span style={{ fontSize: 13, color: C.muted }}>Valor padrão por foto:</span>
             <span style={{ color: C.muted, fontSize: 13 }}>R$</span>
             <input type="number" value={valorPadrao} onChange={e => setValorPadrao(Number(e.target.value))} min={1} step={0.5}
-              style={{ width: 70, background: '#0A0E1A', border: `1px solid ${C.border}`, borderRadius: 8, padding: '6px 10px', color: C.text, fontSize: 13, textAlign: 'center' }} />
+              style={{ width: 70, background: '#F6F8F7', border: `1px solid ${C.border}`, borderRadius: 8, padding: '6px 10px', color: C.text, fontSize: 13, textAlign: 'center' }} />
           </div>
 
           {processando ? (
@@ -150,7 +150,7 @@ export default function AlbumAdminPage({ params }: { params: Promise<{ albumId: 
                   <div style={{ position: 'relative' }}>
                     <img src={f.urlWatermark} style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', display: 'block' }} alt="" />
                     <button onClick={() => excluir(f.id)}
-                      style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,0.7)', border: 'none', borderRadius: 8, padding: 6, color: '#FF4757', cursor: 'pointer', display: 'flex' }}>
+                      style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,0.7)', border: 'none', borderRadius: 8, padding: 6, color: '#DC2626', cursor: 'pointer', display: 'flex' }}>
                       <Trash2 size={14} />
                     </button>
                   </div>

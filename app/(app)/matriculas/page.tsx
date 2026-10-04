@@ -4,13 +4,13 @@ import AdminGuard from '@/components/AdminGuard'
 import BottomNav from '@/components/ui/BottomNav'
 import { getMatriculas, aprovarMatricula, recusarMatricula, preGerarRestante } from './actions'
 
-const T = { bg: '#0A0E1A', surface: '#0D1220', primary: '#4169E1', accent: '#00BFFF', text: '#F0F4FF', muted: 'rgba(240,244,255,0.4)', border: 'rgba(240,244,255,0.08)', green: '#00D67A', red: '#FF4444', gold: '#FFD700' }
+const T = { bg: '#F6F8F7', surface: '#FFFFFF', primary: '#2EA866', accent: '#23874F', text: '#1F2937', muted: '#6B7280', border: 'rgba(16,24,40,0.1)', green: '#16A34A', red: '#DC2626', gold: '#B7791F' }
 const SYNE = 'Syne, sans-serif'
 type Matricula = { id: string; nomeAtleta: string; dataNascimento: string; cpf: string | null; rg: string | null; posicao: string | null; telefone: string | null; cep: string | null; endereco: string | null; numero: string | null; bairro: string | null; cidade: string | null; estado: string | null; nomeResponsavel: string; whatsappResponsavel: string; emailResponsavel: string | null; nomeAssinatura: string | null; dataAssinatura: string | null; status: string; atletaId: string | null; criadoEm: string }
 const STATUS_COR: Record<string, { color: string; bg: string; border: string }> = {
-  PENDENTE: { color: T.gold, bg: 'rgba(255,215,0,0.1)', border: 'rgba(255,215,0,0.25)' },
+  PENDENTE: { color: T.gold, bg: '#F6F8F7', border: 'rgba(255,215,0,0.25)' },
   APROVADO: { color: T.green, bg: `${T.green}12`, border: `${T.green}33` },
-  RECUSADO: { color: T.red, bg: 'rgba(255,68,68,0.1)', border: 'rgba(255,68,68,0.25)' },
+  RECUSADO: { color: T.red, bg: '#F6F8F7', border: 'rgba(255,68,68,0.25)' },
 }
 
 function MatriculasInner() {
@@ -141,7 +141,7 @@ function MatriculasInner() {
         ))}
         {selecionada.status === 'PENDENTE' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 20 }}>
-            <button onClick={() => aprovar(selecionada)} disabled={processando} style={{ background: T.primary, color: T.text, padding: 16, borderRadius: 8, fontFamily: SYNE, fontWeight: 800, fontSize: 14, border: 'none', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: 0.5, opacity: processando ? 0.6 : 1 }}>
+            <button onClick={() => aprovar(selecionada)} disabled={processando} style={{ background: T.primary, color: '#fff', padding: 16, borderRadius: 8, fontFamily: SYNE, fontWeight: 800, fontSize: 14, border: 'none', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: 0.5, opacity: processando ? 0.6 : 1 }}>
               {processando ? 'Processando...' : '✅ Aprovar e notificar WhatsApp'}
             </button>
             <button onClick={() => recusar(selecionada)} disabled={processando} style={{ background: 'rgba(255,68,68,0.08)', border: '1px solid rgba(255,68,68,0.25)', color: T.red, padding: 14, borderRadius: 8, fontFamily: SYNE, fontWeight: 700, fontSize: 13, cursor: 'pointer', textTransform: 'uppercase' }}>
@@ -154,7 +154,7 @@ function MatriculasInner() {
             <p style={{ color: T.green, fontFamily: SYNE, fontWeight: 800, marginBottom: 16, textTransform: 'uppercase', textAlign: 'center' }}>✅ Matrícula aprovada</p>
             {!painelCobranca ? (
               <button onClick={() => setPainelCobranca(true)}
-                style={{ width: '100%', background: T.primary, color: T.text, padding: '13px 20px', borderRadius: 8, fontFamily: SYNE, fontWeight: 800, fontSize: 13, border: 'none', cursor: 'pointer', textTransform: 'uppercase' }}>
+                style={{ width: '100%', background: T.primary, color: '#fff', padding: '13px 20px', borderRadius: 8, fontFamily: SYNE, fontWeight: 800, fontSize: 13, border: 'none', cursor: 'pointer', textTransform: 'uppercase' }}>
                 💰 Gerar 1ª mensalidade
               </button>
             ) : (
@@ -163,14 +163,14 @@ function MatriculasInner() {
                 <div>
                   <label style={{ fontSize: 10, color: T.muted, textTransform: 'uppercase', letterSpacing: 0.8, display: 'block', marginBottom: 4, fontFamily: SYNE, fontWeight: 700 }}>Valor da mensalidade (R$)</label>
                   <input type="number" value={valorCobranca} onChange={e => setValorCobranca(Number(e.target.value))}
-                    style={{ width: '100%', background: '#080C15', border: '1px solid rgba(240,244,255,0.15)', borderRadius: 8, padding: '12px 14px', color: T.text, fontSize: 15, fontWeight: 700, boxSizing: 'border-box' as const }} />
+                    style={{ width: '100%', background: '#F6F8F7', border: '1px solid rgba(16,24,40,0.1)', borderRadius: 8, padding: '12px 14px', color: T.text, fontSize: 15, fontWeight: 700, boxSizing: 'border-box' as const }} />
                 </div>
                 <div>
                   <label style={{ fontSize: 10, color: T.muted, textTransform: 'uppercase', letterSpacing: 0.8, display: 'block', marginBottom: 4, fontFamily: SYNE, fontWeight: 700 }}>Taxa de matrícula (R$) — opcional</label>
                   <input type="number" value={taxaMatricula} onChange={e => setTaxaMatricula(Number(e.target.value))} min={0}
                     placeholder="0 = sem taxa"
-                    style={{ width: '100%', background: '#080C15', border: '1px solid rgba(240,244,255,0.15)', borderRadius: 8, padding: '12px 14px', color: T.text, fontSize: 15, fontWeight: 700, boxSizing: 'border-box' as const }} />
-                  <p style={{ fontSize: 10, color: 'rgba(240,244,255,0.3)', margin: '4px 0 0' }}>Será somada na 1ª mensalidade e não volta a ser cobrada</p>
+                    style={{ width: '100%', background: '#F6F8F7', border: '1px solid rgba(16,24,40,0.1)', borderRadius: 8, padding: '12px 14px', color: T.text, fontSize: 15, fontWeight: 700, boxSizing: 'border-box' as const }} />
+                  <p style={{ fontSize: 10, color: '#6B7280', margin: '4px 0 0' }}>Será somada na 1ª mensalidade e não volta a ser cobrada</p>
                 </div>
                 <div>
                   <label style={{ fontSize: 10, color: T.muted, textTransform: 'uppercase', letterSpacing: 0.8, display: 'block', marginBottom: 4, fontFamily: SYNE, fontWeight: 700 }}>Data de vencimento da 1ª cobrança</label>
@@ -178,28 +178,28 @@ function MatriculasInner() {
                     setDataVencCobranca(e.target.value)
                     setDiaVencCobranca(Number(e.target.value.slice(8,10)))
                   }}
-                    style={{ width: '100%', background: '#080C15', border: '1px solid rgba(240,244,255,0.15)', borderRadius: 8, padding: '12px 14px', color: T.text, fontSize: 14, boxSizing: 'border-box' as const }} />
-                  <p style={{ fontSize: 10, color: 'rgba(240,244,255,0.3)', margin: '4px 0 0' }}>
+                    style={{ width: '100%', background: '#F6F8F7', border: '1px solid rgba(16,24,40,0.1)', borderRadius: 8, padding: '12px 14px', color: T.text, fontSize: 14, boxSizing: 'border-box' as const }} />
+                  <p style={{ fontSize: 10, color: '#6B7280', margin: '4px 0 0' }}>
                     O dia {'{'}diaVencCobranca || 10{'}'} será o vencimento fixo nos meses seguintes
                   </p>
                 </div>
-                <div style={{ background: 'rgba(65,105,225,0.08)', border: '1px solid rgba(65,105,225,0.2)', borderRadius: 8, padding: '10px 14px' }}>
-                  <p style={{ fontSize: 11, color: '#7DD3FC', margin: '0 0 4px', fontWeight: 700 }}>Resumo da 1ª cobrança:</p>
+                <div style={{ background: 'rgba(46,168,102,0.08)', border: '1px solid rgba(46,168,102,0.2)', borderRadius: 8, padding: '10px 14px' }}>
+                  <p style={{ fontSize: 11, color: '#4B5563', margin: '0 0 4px', fontWeight: 700 }}>Resumo da 1ª cobrança:</p>
                   <p style={{ fontSize: 12, color: T.text, margin: 0 }}>
                     Mensalidade: R$ {valorCobranca.toFixed(2)}
                     {taxaMatricula > 0 && ` + Taxa matrícula: R$ ${taxaMatricula.toFixed(2)}`}
-                    {` = `}<strong style={{ color: '#00D67A' }}>R$ {(valorCobranca + (taxaMatricula || 0)).toFixed(2)}</strong>
+                    {` = `}<strong style={{ color: '#16A34A' }}>R$ {(valorCobranca + (taxaMatricula || 0)).toFixed(2)}</strong>
                   </p>
                   <p style={{ fontSize: 10, color: T.muted, margin: '4px 0 0' }}>A partir do 2º mês: R$ {valorCobranca.toFixed(2)} · Todo dia {diaVencCobranca || 10}</p>
                 </div>
                 <div style={{ display: 'flex', gap: 10 }}>
                   <button onClick={() => setPainelCobranca(false)}
-                    style={{ flex: 1, background: 'transparent', border: '1px solid rgba(240,244,255,0.1)', color: T.muted, padding: 12, borderRadius: 8, cursor: 'pointer', fontFamily: SYNE, fontWeight: 700, fontSize: 13 }}>
+                    style={{ flex: 1, background: 'transparent', border: '1px solid rgba(16,24,40,0.1)', color: T.muted, padding: 12, borderRadius: 8, cursor: 'pointer', fontFamily: SYNE, fontWeight: 700, fontSize: 13 }}>
                     Cancelar
                   </button>
                   <button onClick={() => gerarCobrancaAtleta(selecionada.atletaId || '', selecionada.nomeAtleta)}
                     disabled={gerandoCobranca || !selecionada.atletaId || valorCobranca <= 0}
-                    style={{ flex: 2, background: T.primary, color: T.text, padding: 12, borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: SYNE, fontWeight: 800, fontSize: 13, textTransform: 'uppercase', opacity: gerandoCobranca ? 0.6 : 1 }}>
+                    style={{ flex: 2, background: T.primary, color: '#fff', padding: 12, borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: SYNE, fontWeight: 800, fontSize: 13, textTransform: 'uppercase', opacity: gerandoCobranca ? 0.6 : 1 }}>
                     {gerandoCobranca ? 'Gerando...' : `⚡ Gerar PIX — R$ ${(valorCobranca + (taxaMatricula || 0)).toFixed(2)}`}
                   </button>
                 </div>
@@ -224,12 +224,12 @@ function MatriculasInner() {
                 <img src={`data:image/png;base64,${pixResultado.pixQrCode}`} alt="QR Code" style={{ width: 160, height: 160, borderRadius: 8, background: 'white', padding: 8, display: 'block', margin: '0 auto' }} />
               </div>
             )}
-            <div style={{ background: '#080C15', border: '1px solid rgba(0,214,122,0.2)', borderRadius: 8, padding: 12, marginBottom: 12, wordBreak: 'break-all', fontSize: 11, color: T.green, fontFamily: 'monospace' }}>
+            <div style={{ background: '#F6F8F7', border: '1px solid rgba(0,214,122,0.2)', borderRadius: 8, padding: 12, marginBottom: 12, wordBreak: 'break-all', fontSize: 11, color: T.green, fontFamily: 'monospace' }}>
               {pixResultado.pixCopiaCola}
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={() => { navigator.clipboard.writeText(pixResultado.pixCopiaCola); alert('Código PIX copiado!') }}
-                style={{ flex: 2, background: T.green, color: '#000', padding: '13px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: SYNE, fontWeight: 900, fontSize: 13, textTransform: 'uppercase' }}>
+                style={{ flex: 2, background: T.green, color: '#fff', padding: '13px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: SYNE, fontWeight: 900, fontSize: 13, textTransform: 'uppercase' }}>
                 📋 Copiar PIX
               </button>
               <button onClick={() => setPixResultado(null)}
@@ -247,13 +247,13 @@ function MatriculasInner() {
 
   return (
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, padding: '0 0 80px', fontFamily: 'Inter, sans-serif' }}>
-      <div style={{ background: T.primary, padding: '20px 20px 20px' }}>
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 20px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div>
-            <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Gestão</div>
+            <div style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Gestão</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: T.text, letterSpacing: -0.8, textTransform: 'uppercase' }}>Pré-matrículas</div>
-              {pendentes > 0 && <span style={{ background: T.gold, color: '#0A0A00', fontSize: 10, fontWeight: 900, padding: '3px 8px', borderRadius: 4, fontFamily: SYNE }}>{pendentes}</span>}
+              {pendentes > 0 && <span style={{ background: T.gold, color: '#1F2937', fontSize: 10, fontWeight: 900, padding: '3px 8px', borderRadius: 4, fontFamily: SYNE }}>{pendentes}</span>}
             </div>
           </div>
         </div>

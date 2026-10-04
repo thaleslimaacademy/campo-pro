@@ -3,10 +3,10 @@ import { useEffect, useState, useTransition, useRef } from 'react'
 import BottomNav from '@/components/ui/BottomNav'
 import { getConvocacoesIniciais, criarConvocacao, encerrarConvocacao, excluirConvocacao } from './actions'
 
-const T = { bg:'#0A0E1A', surface:'#0D1220', primary:'#4169E1', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', border:'rgba(240,244,255,0.08)', green:'#00D67A', red:'#FF4444', gold:'#FFD700' }
+const T = { bg:'#F6F8F7', surface:'#FFFFFF', primary:'#2EA866', text:'#1F2937', muted:'#6B7280', border:'rgba(16,24,40,0.1)', green:'#16A34A', red:'#DC2626', gold:'#B7791F' }
 const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
-const INP: React.CSSProperties = { width:'100%', background:'#080C15', border:'1px solid rgba(240,244,255,0.1)', borderRadius:8, padding:'11px 14px', color:T.text, fontFamily:INTER, fontSize:13, marginTop:4, boxSizing:'border-box' }
+const INP: React.CSSProperties = { width:'100%', background:'#F6F8F7', border:'1px solid rgba(16,24,40,0.1)', borderRadius:8, padding:'11px 14px', color:T.text, fontFamily:INTER, fontSize:13, marginTop:4, boxSizing:'border-box' }
 const TIPO_COR: Record<string,string> = { amistoso:T.primary, 'jogo-treino':'#8B5CF6', campeonato:T.gold, treino:T.green }
 
 type Atleta = { id:string; nome:string; fotoUrl:string|null; turmaId:string|null; dataNascimento:string|null; posicao:string|null; categoriaId:string|null; statusMensalidade:string }
@@ -14,9 +14,9 @@ type Convocacao = { id:string; titulo:string; tipo:string; data:string; horario:
 type Turma = { id:string; nome:string }
 
 const statusMens = (s: string) => {
-  if (s === 'PAGO') return { label:'Em dia', cor:'#00D67A' }
-  if (s === 'VENCIDO') return { label:'Atrasado', cor:'#FF4444' }
-  if (s === 'PENDENTE') return { label:'Pendente', cor:'#FFD700' }
+  if (s === 'PAGO') return { label:'Em dia', cor:'#16A34A' }
+  if (s === 'VENCIDO') return { label:'Atrasado', cor:'#DC2626' }
+  if (s === 'PENDENTE') return { label:'Pendente', cor:'#B7791F' }
   return { label:'—', cor:'rgba(240,244,255,0.3)' }
 }
 
@@ -29,7 +29,7 @@ function FigurinhaCard({ atleta, turmaMap, selecionado, onToggle }: { atleta: At
   const ano = anoNasc(atleta.dataNascimento)
 
   return (
-    <div onClick={onToggle} style={{ position:'relative', cursor: onToggle ? 'pointer' : 'default', borderRadius:14, overflow:'hidden', border: selecionado ? `2px solid ${T.primary}` : '2px solid rgba(240,244,255,0.06)', boxShadow: selecionado ? `0 0 20px rgba(65,105,225,0.3)` : '0 4px 16px rgba(0,0,0,0.4)', background:'linear-gradient(160deg, #1A2744 0%, #0D1220 100%)', width:'100%', transition:'transform 0.15s', transform: selecionado ? 'scale(1.02)' : 'scale(1)' }}>
+    <div onClick={onToggle} style={{ position:'relative', cursor: onToggle ? 'pointer' : 'default', borderRadius:14, overflow:'hidden', border: selecionado ? `2px solid ${T.primary}` : '2px solid rgba(16,24,40,0.1)', boxShadow: selecionado ? `0 0 20px rgba(46,168,102,0.3)` : '0 4px 16px rgba(0,0,0,0.4)', background:'linear-gradient(160deg, #F3F5F4 0%, #FFFFFF 100%)', width:'100%', transition:'transform 0.15s', transform: selecionado ? 'scale(1.02)' : 'scale(1)' }}>
       {/* Check badge */}
       {onToggle && selecionado && <div style={{ position:'absolute', top:6, right:6, width:22, height:22, borderRadius:'50%', background:T.primary, display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, color:'#fff', fontWeight:900, zIndex:2 }}>✓</div>}
 
@@ -39,16 +39,16 @@ function FigurinhaCard({ atleta, turmaMap, selecionado, onToggle }: { atleta: At
       </div>
 
       {/* Foto */}
-      <div style={{ height:100, background:'linear-gradient(180deg, rgba(65,105,225,0.15) 0%, transparent 100%)', display:'flex', alignItems:'center', justifyContent:'center', position:'relative' }}>
+      <div style={{ height:100, background:'linear-gradient(180deg, rgba(46,168,102,0.15) 0%, transparent 100%)', display:'flex', alignItems:'center', justifyContent:'center', position:'relative' }}>
         {atleta.fotoUrl ? (
-          <img src={atleta.fotoUrl} alt={atleta.nome} style={{ width:72, height:72, borderRadius:'50%', objectFit:'cover', border:'3px solid rgba(65,105,225,0.4)', marginTop:12 }} />
+          <img src={atleta.fotoUrl} alt={atleta.nome} style={{ width:72, height:72, borderRadius:'50%', objectFit:'cover', border:'3px solid rgba(46,168,102,0.4)', marginTop:12 }} />
         ) : (
-          <div style={{ width:72, height:72, borderRadius:'50%', background:'linear-gradient(135deg,#1A3FA8,#4169E1)', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:SYNE, fontWeight:900, fontSize:22, color:'#fff', marginTop:12, border:'3px solid rgba(65,105,225,0.3)' }}>
+          <div style={{ width:72, height:72, borderRadius:'50%', background:'linear-gradient(135deg,#23874F,#2EA866)', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:SYNE, fontWeight:900, fontSize:22, color:'#fff', marginTop:12, border:'3px solid rgba(46,168,102,0.3)' }}>
             {iniciais(atleta.nome)}
           </div>
         )}
         {/* Número de camisa decorativo */}
-        <div style={{ position:'absolute', bottom:0, right:8, fontFamily:SYNE, fontWeight:900, fontSize:28, color:'rgba(65,105,225,0.15)', lineHeight:1 }}>⚽</div>
+        <div style={{ position:'absolute', bottom:0, right:8, fontFamily:SYNE, fontWeight:900, fontSize:28, color:'rgba(46,168,102,0.15)', lineHeight:1 }}>⚽</div>
       </div>
 
       {/* Info */}
@@ -58,8 +58,8 @@ function FigurinhaCard({ atleta, turmaMap, selecionado, onToggle }: { atleta: At
         </p>
         {atleta.posicao && <p style={{ fontSize:9, color:T.muted, margin:'0 0 4px', textTransform:'uppercase', letterSpacing:0.5 }}>{atleta.posicao}</p>}
         <div style={{ display:'flex', gap:4, justifyContent:'center', flexWrap:'wrap' }}>
-          {turma && <span style={{ background:'rgba(65,105,225,0.15)', color:'#7DD3FC', fontSize:8, fontWeight:700, padding:'2px 6px', borderRadius:10, fontFamily:SYNE }}>{turma}</span>}
-          {ano !== '—' && <span style={{ background:'rgba(240,244,255,0.06)', color:T.muted, fontSize:8, padding:'2px 6px', borderRadius:10 }}>{String(ano)}</span>}
+          {turma && <span style={{ background:'rgba(46,168,102,0.15)', color:'#4B5563', fontSize:8, fontWeight:700, padding:'2px 6px', borderRadius:10, fontFamily:SYNE }}>{turma}</span>}
+          {ano !== '—' && <span style={{ background:'#FFFFFF', color:T.muted, fontSize:8, padding:'2px 6px', borderRadius:10 }}>{String(ano)}</span>}
         </div>
       </div>
     </div>
@@ -238,14 +238,14 @@ export default function Convocacoes() {
     <div style={{ minHeight:'100vh', background:T.bg, color:T.text, fontFamily:INTER, paddingBottom:88 }}>
 
       {/* HEADER */}
-      <div style={{ background:'linear-gradient(135deg, #1A3FA8 0%, #4169E1 100%)', padding:'20px 18px 18px' }}>
+      <div style={{ background:'#FFFFFF', borderBottom: '1px solid #E3E8E5', padding:'20px 18px 18px' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
           <div>
-            <p style={{ fontSize:10, color:'rgba(240,244,255,0.6)', textTransform:'uppercase', letterSpacing:2, margin:'0 0 4px', fontFamily:SYNE }}>Gestão</p>
+            <p style={{ fontSize:10, color:'#374151', textTransform:'uppercase', letterSpacing:2, margin:'0 0 4px', fontFamily:SYNE }}>Gestão</p>
             <h1 style={{ fontFamily:SYNE, fontWeight:900, fontSize:26, margin:0, letterSpacing:-0.8, textTransform:'uppercase' }}>Convocações</h1>
           </div>
           <button onClick={() => setShowForm(!showForm)}
-            style={{ background:'rgba(255,255,255,0.15)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:10, padding:'10px 16px', color:'#fff', fontFamily:SYNE, fontWeight:800, fontSize:12, cursor:'pointer', textTransform:'uppercase' }}>
+            style={{ background:'#EEF1EF', border:'1px solid rgba(16,24,40,0.18)', borderRadius:10, padding:'10px 16px', color:'#1F2937', fontFamily:SYNE, fontWeight:800, fontSize:12, cursor:'pointer', textTransform:'uppercase' }}>
             {showForm ? '✕ Fechar' : '+ Nova'}
           </button>
         </div>
@@ -253,7 +253,7 @@ export default function Convocacoes() {
 
       {/* FORM NOVA CONVOCAÇÃO */}
       {showForm && (
-        <div style={{ background:'#0D1220', borderBottom:`1px solid ${T.border}`, padding:'18px 18px' }}>
+        <div style={{ background:'#FFFFFF', borderBottom:`1px solid ${T.border}`, padding:'18px 18px' }}>
           <p style={{ fontFamily:SYNE, fontWeight:900, fontSize:13, color:T.primary, textTransform:'uppercase', letterSpacing:0.5, margin:'0 0 14px' }}>Nova Convocação</p>
           <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
             <div><label style={{ fontSize:10, color:T.muted, textTransform:'uppercase', letterSpacing:0.8, fontFamily:SYNE }}>Título *</label>
@@ -302,7 +302,7 @@ export default function Convocacoes() {
             </div>
 
             <button onClick={salvarConvocacao} disabled={salvando || !form.titulo || !form.data || atletasSel.length === 0}
-              style={{ background:T.primary, color:T.text, padding:'14px', borderRadius:10, fontFamily:SYNE, fontWeight:900, fontSize:13, border:'none', cursor:'pointer', textTransform:'uppercase', opacity: (salvando || !form.titulo || !form.data || atletasSel.length === 0) ? 0.5 : 1 }}>
+              style={{ background:T.primary, color:'#fff', padding:'14px', borderRadius:10, fontFamily:SYNE, fontWeight:900, fontSize:13, border:'none', cursor:'pointer', textTransform:'uppercase', opacity: (salvando || !form.titulo || !form.data || atletasSel.length === 0) ? 0.5 : 1 }}>
               {salvando ? 'Salvando...' : `⚽ Criar convocação (${atletasSel.length} atletas)`}
             </button>
           </div>
@@ -350,7 +350,7 @@ export default function Convocacoes() {
                   {/* Botões de ação */}
                   <div style={{ display:'flex', gap:8, padding:'12px 14px', borderBottom:`1px solid ${T.border}` }}>
                     <button onClick={() => gerarPDF(conv)}
-                      style={{ flex:1, background:'rgba(65,105,225,0.1)', border:'1px solid rgba(65,105,225,0.25)', color:T.primary, padding:'9px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:11, cursor:'pointer', textTransform:'uppercase' }}>
+                      style={{ flex:1, background:'rgba(46,168,102,0.1)', border:'1px solid rgba(46,168,102,0.25)', color:T.primary, padding:'9px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:11, cursor:'pointer', textTransform:'uppercase' }}>
                       📄 Baixar PDF
                     </button>
                     <button onClick={() => compartilharWhatsApp(conv)}

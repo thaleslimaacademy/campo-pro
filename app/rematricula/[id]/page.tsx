@@ -47,8 +47,8 @@ function PainelAssinatura({ onAssinar, disabled }: { onAssinar: (img: string) =>
   const [temAssinatura, setTemAssinatura] = useState(false)
 
   const syne = 'Syne, sans-serif'
-  const neon = '#4169E1'
-  const gold = '#D4AF37'
+  const neon = '#2EA866'
+  const gold = '#B7791F'
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -120,16 +120,16 @@ function PainelAssinatura({ onAssinar, disabled }: { onAssinar: (img: string) =>
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-        <label style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Assine com o dedo *</label>
+        <label style={{ fontSize: '12px', color: '#374151', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Assine com o dedo *</label>
         {temAssinatura && (
-          <button onClick={limpar} type="button" style={{ fontSize: '11px', color: '#ff5555', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>Limpar</button>
+          <button onClick={limpar} type="button" style={{ fontSize: '11px', color: '#DC2626', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>Limpar</button>
         )}
       </div>
       <canvas
         ref={canvasRef}
         width={600}
         height={180}
-        style={{ width: '100%', borderRadius: '12px', border: '1.5px dashed rgba(65,105,225,0.4)', touchAction: 'none', display: 'block', background: '#0A0E1A' }}
+        style={{ width: '100%', borderRadius: '12px', border: '1.5px dashed rgba(46,168,102,0.4)', touchAction: 'none', display: 'block', background: '#F6F8F7' }}
         onMouseDown={iniciar}
         onMouseMove={desenhar}
         onMouseUp={parar}
@@ -139,7 +139,7 @@ function PainelAssinatura({ onAssinar, disabled }: { onAssinar: (img: string) =>
         onTouchEnd={parar}
       />
       {!temAssinatura && (
-        <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', textAlign: 'center', marginTop: '8px' }}>
+        <p style={{ fontSize: '11px', color: '#6B7280', textAlign: 'center', marginTop: '8px' }}>
           ✍️ Use o dedo para assinar
         </p>
       )}
@@ -147,7 +147,7 @@ function PainelAssinatura({ onAssinar, disabled }: { onAssinar: (img: string) =>
         <button
           type="button"
           onClick={confirmar}
-          style={{ width: '100%', marginTop: '12px', background: 'linear-gradient(135deg,#4169E1,#1A3FA8)', color: '#F0F4FF', padding: '10px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer' }}
+          style={{ width: '100%', marginTop: '12px', background: 'linear-gradient(135deg,#2EA866,#23874F)', color: '#F0F4FF', padding: '10px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer' }}
         >
           Usar esta assinatura ✓
         </button>
@@ -190,11 +190,11 @@ export default function Rematricula() {
 
   // Tokens visuais
   const syne = 'Syne, sans-serif'
-  const neon = '#4169E1'
-  const gold = '#D4AF37'
-  const cardBg = 'rgba(255,255,255,0.03)'
+  const neon = '#2EA866'
+  const gold = '#B7791F'
+  const cardBg = '#FFFFFF'
   const cardBorder = '1px solid rgba(255,255,255,0.07)'
-  const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 14px', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '4px', outline: 'none', boxSizing: 'border-box' as const }
+  const inputStyle = { width: '100%', background: '#FFFFFF', border: '1px solid rgba(16,24,40,0.1)', borderRadius: '10px', padding: '12px 14px', color: '#1F2937', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '4px', outline: 'none', boxSizing: 'border-box' as const }
 
   useEffect(() => {
     async function carregar() {
@@ -279,32 +279,32 @@ export default function Rematricula() {
 
   // ── Loading ──
   if (loading) return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0A0E1A,#0A0E1A,#0d1430)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter,sans-serif' }}>Carregando...</p>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#F6F8F7,#F6F8F7,#FFFFFF)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: '#6B7280', fontFamily: 'Inter,sans-serif' }}>Carregando...</p>
     </div>
   )
 
   if (!atleta) return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0A0E1A,#0A0E1A,#0d1430)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'rgba(255,255,255,0.4)' }}>Atleta não encontrado.</p>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#F6F8F7,#F6F8F7,#FFFFFF)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: '#6B7280' }}>Atleta não encontrado.</p>
     </div>
   )
 
   // ── Etapa: Sucesso ──
   if (etapa === 'sucesso') return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0A0E1A,#0A0E1A,#0d1430)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center', color: '#F0F0F0' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#F6F8F7,#F6F8F7,#FFFFFF)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center', color: '#1F2937' }}>
       <div style={{ fontSize: '64px', marginBottom: '16px' }}>🎉</div>
       <h2 style={{ fontFamily: syne, fontWeight: 800, fontSize: '26px', color: neon, margin: '0 0 8px' }}>Rematrícula enviada!</h2>
-      <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>Recebemos a solicitação de renovação.</p>
-      <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', marginBottom: '24px' }}>
+      <p style={{ color: '#374151', marginBottom: '4px' }}>Recebemos a solicitação de renovação.</p>
+      <p style={{ color: '#6B7280', fontSize: '13px', marginBottom: '24px' }}>
         A equipe da <span style={{ color: neon, fontWeight: 700 }}>Thales Lima Football Academy</span> irá confirmar em breve.
       </p>
-      <div style={{ background: cardBg, border: '1px solid rgba(65,105,225,0.2)', borderRadius: '16px', padding: '20px', width: '100%', maxWidth: '360px', textAlign: 'left' }}>
+      <div style={{ background: cardBg, border: '1px solid rgba(46,168,102,0.2)', borderRadius: '16px', padding: '20px', width: '100%', maxWidth: '360px', textAlign: 'left' }}>
         <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: neon, marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>Próximos passos</p>
         {['Nossa equipe analisa a renovação', 'Você recebe confirmação via WhatsApp', 'Matrícula renovada para o próximo período'].map((step, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
             <span style={{ fontFamily: syne, fontWeight: 800, fontSize: '12px', color: gold, minWidth: '18px' }}>{i + 1}.</span>
-            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px', margin: 0 }}>{step}</p>
+            <p style={{ color: '#374151', fontSize: '13px', margin: 0 }}>{step}</p>
           </div>
         ))}
       </div>
@@ -313,30 +313,30 @@ export default function Rematricula() {
 
   // ── Etapa: Contrato ──
   if (etapa === 'contrato') return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0A0E1A,#0A0E1A,#0d1430)', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', padding: '20px', paddingBottom: '40px' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#F6F8F7,#F6F8F7,#FFFFFF)', color: '#1F2937', fontFamily: 'Inter,sans-serif', padding: '20px', paddingBottom: '40px' }}>
 
       {/* Header contrato */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-        <button onClick={() => setEtapa('form')} style={{ color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px' }}>← Voltar</button>
+        <button onClick={() => setEtapa('form')} style={{ color: '#6B7280', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px' }}>← Voltar</button>
         <h1 style={{ fontFamily: syne, fontWeight: 800, fontSize: '20px', margin: 0 }}>Contrato de Renovação</h1>
       </div>
 
       {/* Card atleta */}
-      <div style={{ background: 'rgba(65,105,225,0.05)', border: '1px solid rgba(65,105,225,0.2)', borderRadius: '14px', padding: '14px', marginBottom: '14px', textAlign: 'center' }}>
-        <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '4px' }}>Renovação de Matrícula</p>
-        <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '18px', color: '#F0F0F0', margin: '0 0 2px' }}>{atleta.nome}</p>
+      <div style={{ background: 'rgba(46,168,102,0.05)', border: '1px solid rgba(46,168,102,0.2)', borderRadius: '14px', padding: '14px', marginBottom: '14px', textAlign: 'center' }}>
+        <p style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '4px' }}>Renovação de Matrícula</p>
+        <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '18px', color: '#1F2937', margin: '0 0 2px' }}>{atleta.nome}</p>
         <p style={{ fontSize: '12px', color: gold, margin: 0 }}>Thales Lima Football Academy</p>
       </div>
 
       {/* Texto do contrato */}
       <div
-        style={{ background: 'rgba(255,255,255,0.02)', border: cardBorder, borderRadius: '14px', padding: '16px', marginBottom: '14px', height: '280px', overflowY: 'auto' }}
+        style={{ background: '#FFFFFF', border: cardBorder, borderRadius: '14px', padding: '16px', marginBottom: '14px', height: '280px', overflowY: 'auto' }}
         onScroll={e => {
           const el = e.currentTarget
           if (el.scrollHeight - el.scrollTop <= el.clientHeight + 50) setContratoLido(true)
         }}
       >
-        <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'Inter,sans-serif', fontSize: '12px', color: 'rgba(255,255,255,0.6)', lineHeight: '1.7', margin: 0 }}>{CONTRATO}</pre>
+        <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'Inter,sans-serif', fontSize: '12px', color: '#374151', lineHeight: '1.7', margin: 0 }}>{CONTRATO}</pre>
         {contratoLido && (
           <p style={{ color: neon, textAlign: 'center', marginTop: '16px', fontWeight: 700, fontSize: '13px' }}>✓ Contrato lido!</p>
         )}
@@ -349,11 +349,11 @@ export default function Rematricula() {
       )}
 
       {/* Painel de assinatura */}
-      <div style={{ background: cardBg, border: contratoLido ? '1px solid rgba(65,105,225,0.2)' : cardBorder, borderRadius: '14px', padding: '16px', marginBottom: '14px', opacity: contratoLido ? 1 : 0.4, pointerEvents: contratoLido ? 'auto' : 'none', transition: 'opacity 0.3s' }}>
+      <div style={{ background: cardBg, border: contratoLido ? '1px solid rgba(46,168,102,0.2)' : cardBorder, borderRadius: '14px', padding: '16px', marginBottom: '14px', opacity: contratoLido ? 1 : 0.4, pointerEvents: contratoLido ? 'auto' : 'none', transition: 'opacity 0.3s' }}>
         <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: neon, marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '1px' }}>✍️ Assinatura Digital</p>
 
         <div style={{ marginBottom: '14px' }}>
-          <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Nome completo do responsável *</label>
+          <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Nome completo do responsável *</label>
           <input
             value={nomeAssinatura}
             onChange={e => setNomeAssinatura(e.target.value)}
@@ -365,22 +365,22 @@ export default function Rematricula() {
         <PainelAssinatura disabled={!contratoLido} onAssinar={(img) => setAssinaturaImg(img)} />
 
         {assinaturaImg && (
-          <div style={{ marginTop: '14px', border: '1px solid rgba(65,105,225,0.25)', borderRadius: '12px', padding: '12px', background: 'rgba(65,105,225,0.04)' }}>
+          <div style={{ marginTop: '14px', border: '1px solid rgba(46,168,102,0.25)', borderRadius: '12px', padding: '12px', background: 'rgba(46,168,102,0.04)' }}>
             <p style={{ fontSize: '11px', color: neon, marginBottom: '8px' }}>✓ Assinatura capturada</p>
-            <img src={assinaturaImg} alt="Assinatura" style={{ width: '100%', borderRadius: '8px', maxHeight: '96px', objectFit: 'contain', background: '#0A0E1A', display: 'block' }} />
-            <button onClick={() => setAssinaturaImg(null)} type="button" style={{ fontSize: '11px', color: '#ff5555', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', marginTop: '8px' }}>Refazer assinatura</button>
+            <img src={assinaturaImg} alt="Assinatura" style={{ width: '100%', borderRadius: '8px', maxHeight: '96px', objectFit: 'contain', background: '#F6F8F7', display: 'block' }} />
+            <button onClick={() => setAssinaturaImg(null)} type="button" style={{ fontSize: '11px', color: '#DC2626', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', marginTop: '8px' }}>Refazer assinatura</button>
           </div>
         )}
 
         <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer', marginTop: '16px' }}>
           <input type="checkbox" checked={aceito} onChange={e => setAceito(e.target.checked)} style={{ marginTop: '2px', width: '18px', height: '18px', accentColor: neon }} />
-          <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', lineHeight: '1.5' }}>Li e concordo com todos os termos do contrato de renovação.</span>
+          <span style={{ fontSize: '13px', color: '#374151', lineHeight: '1.5' }}>Li e concordo com todos os termos do contrato de renovação.</span>
         </label>
 
         {assinaturaImg && aceito && nomeAssinatura && (
-          <div style={{ marginTop: '14px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px' }}>
-            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>Assinado por: <span style={{ color: '#F0F0F0', fontWeight: 700 }}>{nomeAssinatura}</span></p>
-            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>{new Date().toLocaleDateString('pt-BR')} às {new Date().toLocaleTimeString('pt-BR')}</p>
+          <div style={{ marginTop: '14px', borderTop: '1px solid rgba(16,24,40,0.1)', paddingTop: '12px' }}>
+            <p style={{ fontSize: '11px', color: '#6B7280' }}>Assinado por: <span style={{ color: '#1F2937', fontWeight: 700 }}>{nomeAssinatura}</span></p>
+            <p style={{ fontSize: '11px', color: '#6B7280', marginTop: '2px' }}>{new Date().toLocaleDateString('pt-BR')} às {new Date().toLocaleTimeString('pt-BR')}</p>
           </div>
         )}
       </div>
@@ -388,7 +388,7 @@ export default function Rematricula() {
       <button
         onClick={confirmarRematricula}
         disabled={!aceito || !assinaturaImg || !nomeAssinatura.trim() || salvando}
-        style={{ width: '100%', background: (!aceito || !assinaturaImg || !nomeAssinatura.trim() || salvando) ? 'rgba(255,255,255,0.08)' : 'linear-gradient(135deg,#4169E1,#1A3FA8)', color: (!aceito || !assinaturaImg || !nomeAssinatura.trim() || salvando) ? 'rgba(255,255,255,0.3)' : '#050505', padding: '16px', borderRadius: '14px', fontWeight: 800, fontSize: '15px', fontFamily: syne, border: 'none', cursor: (!aceito || !assinaturaImg || !nomeAssinatura.trim() || salvando) ? 'not-allowed' : 'pointer', transition: 'all 0.3s' }}
+        style={{ width: '100%', background: (!aceito || !assinaturaImg || !nomeAssinatura.trim() || salvando) ? '#FFFFFF' : 'linear-gradient(135deg,#2EA866,#23874F)', color: (!aceito || !assinaturaImg || !nomeAssinatura.trim() || salvando) ? '#6B7280' : '#1F2937', padding: '16px', borderRadius: '14px', fontWeight: 800, fontSize: '15px', fontFamily: syne, border: 'none', cursor: (!aceito || !assinaturaImg || !nomeAssinatura.trim() || salvando) ? 'not-allowed' : 'pointer', transition: 'all 0.3s' }}
       >
         {salvando ? 'Enviando...' : 'Confirmar Rematrícula →'}
       </button>
@@ -397,15 +397,15 @@ export default function Rematricula() {
 
   // ── Etapa: Form ──
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0A0E1A,#0A0E1A,#0d1430)', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', paddingBottom: '48px' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#F6F8F7,#F6F8F7,#FFFFFF)', color: '#1F2937', fontFamily: 'Inter,sans-serif', paddingBottom: '48px' }}>
 
       {/* Header */}
-      <div style={{ position: 'relative', overflow: 'hidden', padding: '32px 20px 24px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+      <div style={{ position: 'relative', overflow: 'hidden', padding: '32px 20px 24px', textAlign: 'center', borderBottom: '1px solid rgba(16,24,40,0.1)' }}>
         <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
           <div style={{ width: '240px', height: '80px', borderRadius: '50%', filter: 'blur(40px)', opacity: 0.12, background: neon }} />
         </div>
         <div style={{ position: 'relative' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(65,105,225,0.08)', border: '1px solid rgba(65,105,225,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', margin: '0 auto 10px' }}>🔄</div>
+          <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(46,168,102,0.08)', border: '1px solid rgba(46,168,102,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', margin: '0 auto 10px' }}>🔄</div>
           <h1 style={{ fontFamily: syne, fontWeight: 800, fontSize: '18px', color: neon, margin: '0 0 4px' }}>Thales Lima Football Academy</h1>
           <span style={{ display: 'inline-block', fontSize: '11px', color: gold, background: 'rgba(212,175,55,0.1)', border: '1px solid rgba(212,175,55,0.25)', borderRadius: '20px', padding: '2px 10px', letterSpacing: '0.05em' }}>Renovação de Matrícula</span>
         </div>
@@ -415,22 +415,22 @@ export default function Rematricula() {
 
         {/* Card atleta */}
         <div style={{ background: cardBg, border: '1px solid rgba(212,175,55,0.2)', borderRadius: '14px', padding: '14px', marginBottom: '16px' }}>
-          <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>Atleta</p>
-          <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '17px', color: '#F0F0F0', margin: '0 0 4px' }}>{atleta.nome}</p>
+          <p style={{ fontSize: '10px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>Atleta</p>
+          <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '17px', color: '#1F2937', margin: '0 0 4px' }}>{atleta.nome}</p>
           {atleta.dataNascimento && (
             <p style={{ fontSize: '12px', color: gold, margin: '0 0 2px' }}>
               {new Date(atleta.dataNascimento + 'T12:00:00').toLocaleDateString('pt-BR')}
             </p>
           )}
-          {atleta.cpf && <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: '1px 0' }}>CPF: {atleta.cpf}</p>}
-          {atleta.rg && <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: '1px 0' }}>RG: {atleta.rg}</p>}
+          {atleta.cpf && <p style={{ fontSize: '11px', color: '#6B7280', margin: '1px 0' }}>CPF: {atleta.cpf}</p>}
+          {atleta.rg && <p style={{ fontSize: '11px', color: '#6B7280', margin: '1px 0' }}>RG: {atleta.rg}</p>}
         </div>
 
         {/* Erros */}
         {erros.length > 0 && (
           <div style={{ background: 'rgba(255,60,60,0.07)', border: '1px solid rgba(255,60,60,0.25)', borderRadius: '12px', padding: '14px', marginBottom: '14px' }}>
             {erros.map((erro, i) => (
-              <p key={i} style={{ color: '#ff5555', fontSize: '13px', fontWeight: 700, margin: i > 0 ? '6px 0 0' : '0' }}>❌ {erro}</p>
+              <p key={i} style={{ color: '#DC2626', fontSize: '13px', fontWeight: 700, margin: i > 0 ? '6px 0 0' : '0' }}>❌ {erro}</p>
             ))}
           </div>
         )}
@@ -441,7 +441,7 @@ export default function Rematricula() {
           <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '11px', color: neon, textTransform: 'uppercase', letterSpacing: '1px', margin: 0 }}>Dados do Atleta</p>
 
           <div>
-            <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Posição</label>
+            <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Posição</label>
             <select name="posicao" value={form.posicao} onChange={handleChange} style={{ ...inputStyle, appearance: 'none' as const }}>
               <option>Goleiro</option>
               <option>Zagueiro</option>
@@ -453,19 +453,19 @@ export default function Rematricula() {
           </div>
 
           <div>
-            <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Telefone do atleta</label>
+            <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Telefone do atleta</label>
             <input name="telefoneAtleta" value={form.telefoneAtleta} onChange={handleChange} type="tel" placeholder="(34) 99999-9999" style={inputStyle} />
           </div>
 
           <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '11px', color: neon, textTransform: 'uppercase', letterSpacing: '1px', margin: '4px 0 0' }}>Responsável</p>
 
           <div>
-            <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Nome do responsável *</label>
+            <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Nome do responsável *</label>
             <input name="nomeResponsavel" value={form.nomeResponsavel} onChange={handleChange} type="text" placeholder="Nome completo" style={inputStyle} />
           </div>
 
           <div>
-            <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+            <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
               CPF do responsável * <span style={{ color: gold, fontSize: '10px' }}>(obrigatório para boletos)</span>
             </label>
             <input
@@ -474,35 +474,35 @@ export default function Rematricula() {
               onChange={handleChange}
               type="text"
               placeholder="000.000.000-00"
-              style={{ ...inputStyle, borderColor: erros.some(e => e.includes('CPF')) ? 'rgba(255,60,60,0.6)' : 'rgba(255,255,255,0.1)' }}
+              style={{ ...inputStyle, borderColor: erros.some(e => e.includes('CPF')) ? 'rgba(255,60,60,0.6)' : 'rgba(16,24,40,0.1)' }}
             />
           </div>
 
           <div>
-            <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>WhatsApp *</label>
+            <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>WhatsApp *</label>
             <input name="whatsapp" value={form.whatsapp} onChange={handleChange} type="tel" placeholder="(34) 99999-9999" style={inputStyle} />
           </div>
 
           <div>
-            <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>E-mail</label>
+            <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>E-mail</label>
             <input name="email" value={form.email} onChange={handleChange} type="email" placeholder="email@exemplo.com" style={inputStyle} />
           </div>
 
           {/* 2o responsavel (opcional) */}
-          <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '11px', color: neon, textTransform: 'uppercase', letterSpacing: '1px', margin: '4px 0 0' }}>2º Responsável <span style={{ color: 'rgba(255,255,255,0.3)', textTransform: 'none', letterSpacing: 0 }}>(opcional)</span></p>
+          <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '11px', color: neon, textTransform: 'uppercase', letterSpacing: '1px', margin: '4px 0 0' }}>2º Responsável <span style={{ color: '#6B7280', textTransform: 'none', letterSpacing: 0 }}>(opcional)</span></p>
 
           <div>
-            <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Nome</label>
+            <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Nome</label>
             <input name="nomeResponsavel2" value={form.nomeResponsavel2} onChange={handleChange} type="text" placeholder="Nome completo" style={inputStyle} />
           </div>
 
           <div style={{ display: 'flex', gap: '10px' }}>
             <div style={{ flex: 1 }}>
-              <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>WhatsApp</label>
+              <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>WhatsApp</label>
               <input name="whatsappResponsavel2" value={form.whatsappResponsavel2} onChange={handleChange} type="tel" placeholder="(34) 99999-9999" style={inputStyle} />
             </div>
             <div style={{ flex: 1 }}>
-              <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Parentesco</label>
+              <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Parentesco</label>
               <input name="parentesco2" value={form.parentesco2} onChange={handleChange} type="text" placeholder="Ex: Mãe, Pai" style={inputStyle} />
             </div>
           </div>
@@ -512,33 +512,33 @@ export default function Rematricula() {
 
           <div style={{ display: 'flex', gap: '10px' }}>
             <div style={{ flex: '0 0 40%' }}>
-              <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>CEP</label>
+              <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>CEP</label>
               <input name="cep" value={form.cep} onChange={handleChange} type="text" placeholder="00000-000" style={inputStyle} />
             </div>
             <div style={{ flex: 1 }}>
-              <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Rua</label>
+              <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Rua</label>
               <input name="endereco" value={form.endereco} onChange={handleChange} type="text" placeholder="Logradouro" style={inputStyle} />
             </div>
           </div>
 
           <div style={{ display: 'flex', gap: '10px' }}>
             <div style={{ flex: '0 0 30%' }}>
-              <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Número</label>
+              <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Número</label>
               <input name="numero" value={form.numero} onChange={handleChange} type="text" placeholder="Nº" style={inputStyle} />
             </div>
             <div style={{ flex: 1 }}>
-              <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Bairro</label>
+              <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Bairro</label>
               <input name="bairro" value={form.bairro} onChange={handleChange} type="text" placeholder="Bairro" style={inputStyle} />
             </div>
           </div>
 
           <div style={{ display: 'flex', gap: '10px' }}>
             <div style={{ flex: 1 }}>
-              <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Cidade</label>
+              <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Cidade</label>
               <input name="cidade" value={form.cidade} onChange={handleChange} type="text" placeholder="Cidade" style={inputStyle} />
             </div>
             <div style={{ flex: '0 0 25%' }}>
-              <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>UF</label>
+              <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>UF</label>
               <input name="estado" value={form.estado} onChange={handleChange} type="text" placeholder="MG" maxLength={2} style={inputStyle} />
             </div>
           </div>
@@ -547,7 +547,7 @@ export default function Rematricula() {
           <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '11px', color: neon, textTransform: 'uppercase', letterSpacing: '1px', margin: '4px 0 0' }}>Outros</p>
 
           <div>
-            <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Tamanho de uniforme</label>
+            <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Tamanho de uniforme</label>
             <select name="tamanhoUniforme" value={form.tamanhoUniforme} onChange={handleChange} style={{ ...inputStyle, appearance: 'none' as const }}>
               <option value="">Selecionar</option>
               <option value="2">2 anos</option>
@@ -565,14 +565,14 @@ export default function Rematricula() {
             </select>
           </div>
 
-          <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer', background: 'rgba(65,105,225,0.05)', border: '1px solid rgba(65,105,225,0.2)', borderRadius: '12px', padding: '14px' }}>
+          <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer', background: 'rgba(46,168,102,0.05)', border: '1px solid rgba(46,168,102,0.2)', borderRadius: '12px', padding: '14px' }}>
             <input type="checkbox" name="autorizacaoImagem" checked={form.autorizacaoImagem} onChange={handleChange} style={{ marginTop: '2px', width: '18px', height: '18px', accentColor: neon, flexShrink: 0 }} />
-            <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', lineHeight: '1.5' }}>Autorizo o uso da imagem do atleta em fotos e vídeos da academia para divulgação em redes sociais e materiais institucionais.</span>
+            <span style={{ fontSize: '12px', color: '#374151', lineHeight: '1.5' }}>Autorizo o uso da imagem do atleta em fotos e vídeos da academia para divulgação em redes sociais e materiais institucionais.</span>
           </label>
 
           <button
             type="submit"
-            style={{ width: '100%', background: 'linear-gradient(135deg,#4169E1,#1A3FA8)', color: '#F0F4FF', padding: '16px', borderRadius: '14px', fontWeight: 800, fontSize: '15px', fontFamily: syne, border: 'none', cursor: 'pointer', marginTop: '8px', boxShadow: '0 0 24px rgba(65,105,225,0.35)' }}
+            style={{ width: '100%', background: 'linear-gradient(135deg,#2EA866,#23874F)', color: '#F0F4FF', padding: '16px', borderRadius: '14px', fontWeight: 800, fontSize: '15px', fontFamily: syne, border: 'none', cursor: 'pointer', marginTop: '8px', boxShadow: '0 0 24px rgba(46,168,102,0.35)' }}
           >
             Avançar para o Contrato →
           </button>

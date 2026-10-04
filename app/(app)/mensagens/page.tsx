@@ -4,13 +4,13 @@ import PlanoGate from '@/components/PlanoGate'
 import BottomNav from '@/components/ui/BottomNav'
 import { getMensagens } from './actions'
 
-const T = { bg: '#0A0E1A', surface: '#0D1220', primary: '#4169E1', accent: '#00BFFF', text: '#F0F4FF', muted: 'rgba(240,244,255,0.4)', border: 'rgba(240,244,255,0.08)', green: '#00D67A' }
+const T = { bg: '#F6F8F7', surface: '#FFFFFF', primary: '#2EA866', accent: '#23874F', text: '#1F2937', muted: '#6B7280', border: 'rgba(16,24,40,0.1)', green: '#16A34A' }
 const SYNE = 'Syne, sans-serif'
 
 type Mensagem = { id: string; titulo: string | null; conteudo: string; tipo: string; totalEnviados: number; criadoEm: string }
 
 const TIPO_COR: Record<string, { color: string; bg: string }> = {
-  TURMA:      { color: '#8B5CF6', bg: 'rgba(139,92,246,0.12)' },
+  TURMA:      { color: '#8B5CF6', bg: '#F6F8F7' },
   TODOS:      { color: T.primary, bg: `${T.primary}18` },
   INDIVIDUAL: { color: T.green,   bg: `${T.green}18` },
 }
@@ -35,13 +35,13 @@ export default function Mensagens() {
   return (
     <PlanoGate feature="mensagens" planoMinimo="PRO">
       <div style={{ minHeight: '100vh', background: T.bg, color: T.text, fontFamily: 'Inter, sans-serif', paddingBottom: 80 }}>
-        <div style={{ background: T.primary, padding: '20px 20px 20px' }}>
+        <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 20px 20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
-              <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Comunicação</div>
+              <div style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Comunicação</div>
               <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: T.text, letterSpacing: -0.8, textTransform: 'uppercase' }}>Mensagens</div>
             </div>
-            <a href="/mensagens/nova" style={{ background: T.text, color: T.primary, borderRadius: 8, padding: '10px 16px', fontFamily: SYNE, fontWeight: 800, fontSize: 12, textDecoration: 'none', textTransform: 'uppercase' }}>+ Nova</a>
+            <a href="/mensagens/nova" style={{ background: T.primary, color: '#fff', borderRadius: 8, padding: '10px 16px', fontFamily: SYNE, fontWeight: 800, fontSize: 12, textDecoration: 'none', textTransform: 'uppercase' }}>+ Nova</a>
           </div>
         </div>
 

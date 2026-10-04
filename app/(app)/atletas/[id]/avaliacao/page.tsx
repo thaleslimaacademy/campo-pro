@@ -28,12 +28,12 @@ function calcularIMC(peso: number, altura: number) {
 
 function NotaSelector({ label, name, value, onChange }: { label: string; name: string; value: number; onChange: (name: string, val: number) => void }) {
   return (
-    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 0", borderBottom:"1px solid rgba(240,244,255,0.07)" }}>
-      <span style={{ fontSize:13, color:"rgba(240,244,255,0.7)" }}>{label}</span>
+    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 0", borderBottom:"1px solid rgba(16,24,40,0.1)" }}>
+      <span style={{ fontSize:13, color:"#374151" }}>{label}</span>
       <div style={{ display:"flex", gap:4 }}>
         {[1, 2, 3, 4, 5].map(n => (
           <button key={n} type="button" onClick={() => onChange(name, n)}
-            style={{ width:32, height:32, borderRadius:"50%", fontSize:12, fontWeight:"bold", border:"none", cursor:"pointer", background: value === n ? (n <= 2 ? "#FF4444" : n === 3 ? "#FFD700" : "#00D67A") : "rgba(240,244,255,0.1)", color: value === n ? (n === 3 ? "#000" : "#fff") : "rgba(240,244,255,0.4)" }}>
+            style={{ width:32, height:32, borderRadius:"50%", fontSize:12, fontWeight:"bold", border:"none", cursor:"pointer", background: value === n ? (n <= 2 ? "#FF4444" : n === 3 ? "#FFD700" : "#00D67A") : "#FFFFFF", color: value === n ? (n === 3 ? "#1F2937" : "#fff") : "#6B7280" }}>
             {n}
           </button>
         ))}
@@ -49,20 +49,20 @@ function GraficoEvolucao({ avaliacoes }: { avaliacoes: any[] }) {
   const minPeso = Math.min(...dados.filter(a => a.peso).map(a => a.peso))
 
   return (
-    <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginTop: "16px" }}>
-      <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#4169E1", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Evolucao do Atleta</p>
+    <div style={{ background: "#FFFFFF", borderRadius: "16px", padding: "16px", border: "1px solid rgba(16,24,40,0.1)", marginTop: "16px" }}>
+      <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#2EA866", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Evolucao do Atleta</p>
       <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
         {dados[0]?.peso && (
           <div>
-            <p style={{ fontSize:11, color:"rgba(240,244,255,0.4)", marginBottom:8 }}>Peso (kg)</p>
+            <p style={{ fontSize:11, color:"#6B7280", marginBottom:8 }}>Peso (kg)</p>
             <div style={{ display:"flex", alignItems:"flex-end", gap:8, height:64 }}>
               {dados.map((a, i) => {
                 const h = maxPeso > 0 ? Math.round((a.peso / maxPeso) * 100) : 50
                 return (
                   <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
-                    <span style={{ fontSize:11, color:"rgba(240,244,255,0.5)" }}>{a.peso}</span>
+                    <span style={{ fontSize:11, color:"#374151" }}>{a.peso}</span>
                     <div style={{ width:"100%", background:"#00D67A", borderRadius:"3px 3px 0 0", height: h + "%", minHeight:8 }} />
-                    <span style={{ fontSize:10, color:"rgba(240,244,255,0.3)" }}>{new Date(a.dataAvaliacao + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'short' })}</span>
+                    <span style={{ fontSize:10, color:"#6B7280" }}>{new Date(a.dataAvaliacao + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'short' })}</span>
                   </div>
                 )
               })}
@@ -71,16 +71,16 @@ function GraficoEvolucao({ avaliacoes }: { avaliacoes: any[] }) {
         )}
         {dados[0]?.percentualGordura && (
           <div>
-            <p style={{ fontSize:11, color:"rgba(240,244,255,0.4)", marginBottom:8 }}>% Gordura</p>
+            <p style={{ fontSize:11, color:"#6B7280", marginBottom:8 }}>% Gordura</p>
             <div style={{ display:"flex", alignItems:"flex-end", gap:8, height:64 }}>
               {dados.map((a, i) => {
                 const h = Math.round((a.percentualGordura / 30) * 100)
                 const cor = a.percentualGordura <= 10 ? "#00D67A" : a.percentualGordura <= 15 ? "#FFD700" : "#FF4444"
                 return (
                   <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
-                    <span style={{ fontSize:11, color:"rgba(240,244,255,0.5)" }}>{a.percentualGordura}%</span>
+                    <span style={{ fontSize:11, color:"#374151" }}>{a.percentualGordura}%</span>
                     <div style={{ width:"100%", background:cor, borderRadius:"3px 3px 0 0", height: h + "%", minHeight:8 }} />
-                    <span style={{ fontSize:10, color:"rgba(240,244,255,0.3)" }}>{new Date(a.dataAvaliacao + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'short' })}</span>
+                    <span style={{ fontSize:10, color:"#6B7280" }}>{new Date(a.dataAvaliacao + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'short' })}</span>
                   </div>
                 )
               })}
@@ -89,16 +89,16 @@ function GraficoEvolucao({ avaliacoes }: { avaliacoes: any[] }) {
         )}
         {dados[0]?.notaGeral && (
           <div>
-            <p style={{ fontSize:11, color:"rgba(240,244,255,0.4)", marginBottom:8 }}>Nota Geral</p>
+            <p style={{ fontSize:11, color:"#6B7280", marginBottom:8 }}>Nota Geral</p>
             <div style={{ display:"flex", alignItems:"flex-end", gap:8, height:64 }}>
               {dados.map((a, i) => {
                 const h = Math.round((a.notaGeral / 10) * 100)
                 const cor = a.notaGeral >= 7 ? "#00D67A" : a.notaGeral >= 5 ? "#FFD700" : "#FF4444"
                 return (
                   <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
-                    <span style={{ fontSize:11, color:"rgba(240,244,255,0.5)" }}>{a.notaGeral}</span>
+                    <span style={{ fontSize:11, color:"#374151" }}>{a.notaGeral}</span>
                     <div style={{ width:"100%", background:cor, borderRadius:"3px 3px 0 0", height: h + "%", minHeight:8 }} />
-                    <span style={{ fontSize:10, color:"rgba(240,244,255,0.3)" }}>{new Date(a.dataAvaliacao + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'short' })}</span>
+                    <span style={{ fontSize:10, color:"#6B7280" }}>{new Date(a.dataAvaliacao + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'short' })}</span>
                   </div>
                 )
               })}
@@ -301,22 +301,22 @@ export default function AvaliacaoAtleta() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", color: "#F0F4FF", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
+    <div style={{ minHeight: "100vh", color: "#1F2937", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <a href={"/atletas/" + id} style={{ color: "rgba(255,255,255,0.4)", textDecoration: "none", fontSize: "13px" }}>Voltar</a>
-          <h1 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "22px", color: "#F0F4FF" }}>Avaliacao</h1>
+          <a href={"/atletas/" + id} style={{ color: "#6B7280", textDecoration: "none", fontSize: "13px" }}>Voltar</a>
+          <h1 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "22px", color: "#1F2937" }}>Avaliacao</h1>
         </div>
         {notaGeral > 0 && (
-          <div style={{ width: "48px", height: "48px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "18px", background: notaGeral >= 7 ? "linear-gradient(135deg,#4169E1,#00D67A)" : notaGeral >= 5 ? "#FFD700" : "#ff5555", color: notaGeral >= 5 ? "#000" : "#fff" }}>
+          <div style={{ width: "48px", height: "48px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "18px", background: notaGeral >= 7 ? "linear-gradient(135deg,#2EA866,#00D67A)" : notaGeral >= 5 ? "#FFD700" : "#ff5555", color: notaGeral >= 5 ? "#1F2937" : "#fff" }}>
             {notaGeral}
           </div>
         )}
       </div>
 
       <div className="flex gap-2 mb-4">
-        <button onClick={() => setAba('form')} style={{ flex: 1, padding: "10px", borderRadius: "12px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer", border: "none", background: aba === "form" ? "#4169E1" : "rgba(255,255,255,0.05)", color: aba === "form" ? "#000" : "rgba(255,255,255,0.4)" }}>Nova Avaliacao</button>
-        <button onClick={() => setAba('historico')} style={{ flex: 1, padding: "10px", borderRadius: "12px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer", border: "none", background: aba === "historico" ? "#4169E1" : "rgba(255,255,255,0.05)", color: aba === "historico" ? "#000" : "rgba(255,255,255,0.4)" }}>
+        <button onClick={() => setAba('form')} style={{ flex: 1, padding: "10px", borderRadius: "12px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer", border: "none", background: aba === "form" ? "#2EA866" : "#FFFFFF", color: aba === "form" ? "#1F2937" : "#6B7280" }}>Nova Avaliacao</button>
+        <button onClick={() => setAba('historico')} style={{ flex: 1, padding: "10px", borderRadius: "12px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer", border: "none", background: aba === "historico" ? "#2EA866" : "#FFFFFF", color: aba === "historico" ? "#1F2937" : "#6B7280" }}>
           Historico {avaliacoes.length > 0 ? '(' + avaliacoes.length + ')' : ''}
         </button>
       </div>
@@ -325,11 +325,11 @@ export default function AvaliacaoAtleta() {
         <div>
           <GraficoEvolucao avaliacoes={avaliacoes} />
           {avaliacoes.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "48px 0", color: "rgba(255,255,255,0.4)", fontFamily: "Inter, sans-serif" }}>Nenhuma avaliacao registrada.</div>
+            <div style={{ textAlign: "center", padding: "48px 0", color: "#6B7280", fontFamily: "Inter, sans-serif" }}>Nenhuma avaliacao registrada.</div>
           ) : (
             <div className="space-y-3 mt-4">
               {avaliacoes.map(a => (
-                <div key={a.id} style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <div key={a.id} style={{ background: "#FFFFFF", borderRadius: "16px", padding: "16px", border: "1px solid rgba(16,24,40,0.1)" }}>
                   <div className="flex justify-between items-center mb-2">
                     <p className="font-bold">{new Date(a.dataAvaliacao + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
                     <div className="flex items-center gap-2">
@@ -338,12 +338,12 @@ export default function AvaliacaoAtleta() {
                           Nota: {a.notaGeral}
                         </span>
                       )}
-                      <button onClick={() => gerarPDF(a)} disabled={gerando} className="bg-blue-600/20 text-blue-400 px-2 py-1 rounded-lg text-xs font-bold">
+                      <button onClick={() => gerarPDF(a)} disabled={gerando} className="bg-[#2EA866]/20 text-blue-400 px-2 py-1 rounded-lg text-xs font-bold">
                         PDF
                       </button>
                     </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 text-xs text-gray-400">
+                  <div className="grid grid-cols-3 gap-2 text-xs text-gray-500">
                     {a.peso && <span>Peso: {a.peso}kg</span>}
                     {a.altura && <span>Altura: {a.altura}cm</span>}
                     {a.imc && <span>IMC: {a.imc}</span>}
@@ -362,54 +362,54 @@ export default function AvaliacaoAtleta() {
 
       {aba === 'form' && (
         <div>
-          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "14px", padding: "12px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "14px", color: "#4169E1" }}>{atletaNome}</p>
-            <input name="dataAvaliacao" value={form.dataAvaliacao} onChange={handleChange} type="date" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "8px 12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px" }} />
+          <div style={{ background: "#FFFFFF", borderRadius: "14px", padding: "12px", border: "1px solid rgba(16,24,40,0.1)", marginBottom: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "14px", color: "#2EA866" }}>{atletaNome}</p>
+            <input name="dataAvaliacao" value={form.dataAvaliacao} onChange={handleChange} type="date" style={{ background: "#FFFFFF", border: "1px solid rgba(16,24,40,0.1)", borderRadius: "10px", padding: "8px 12px", color: "#1F2937", fontFamily: "Inter, sans-serif", fontSize: "13px" }} />
           </div>
 
           {sucesso && (
-            <div style={{ background: "rgba(57,255,20,0.08)", border: "1px solid rgba(57,255,20,0.25)", borderRadius: "12px", padding: "12px", textAlign: "center", marginBottom: "12px" }}>
-              <p style={{ color: "#4169E1", fontFamily: "Syne, sans-serif", fontWeight: 700, margin: 0 }}>Avaliacao salva!</p>
+            <div style={{ background: "rgba(46,168,102,0.08)", border: "1px solid rgba(46,168,102,0.25)", borderRadius: "12px", padding: "12px", textAlign: "center", marginBottom: "12px" }}>
+              <p style={{ color: "#2EA866", fontFamily: "Syne, sans-serif", fontWeight: 700, margin: 0 }}>Avaliacao salva!</p>
             </div>
           )}
 
-          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#4169E1", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Dados Antropometricos</p>
+          <div style={{ background: "#FFFFFF", borderRadius: "16px", padding: "16px", border: "1px solid rgba(16,24,40,0.1)", marginBottom: "12px" }}>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#2EA866", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Dados Antropometricos</p>
             <div className="grid grid-cols-2 gap-3 mb-3">
-              <div><label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Peso (kg)</label><input name="peso" value={form.peso} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="70.5" /></div>
-              <div><label style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px" }}>Altura (cm)</label><input name="altura" value={form.altura} onChange={handleChange} type="number" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="175" /></div>
+              <div><label style={{ fontSize: "10px", color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.8px" }}>Peso (kg)</label><input name="peso" value={form.peso} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "#FFFFFF", border: "1px solid rgba(16,24,40,0.1)", borderRadius: "10px", padding: "12px", color: "#1F2937", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="70.5" /></div>
+              <div><label style={{ fontSize: "10px", color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.8px" }}>Altura (cm)</label><input name="altura" value={form.altura} onChange={handleChange} type="number" style={{ width: "100%", background: "#FFFFFF", border: "1px solid rgba(16,24,40,0.1)", borderRadius: "10px", padding: "12px", color: "#1F2937", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="175" /></div>
             </div>
-            {imc && <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: "12px", padding: "12px", marginBottom: "12px" }}><div className="flex justify-between"><span className="text-sm text-gray-400">IMC</span><span className="font-bold">{imc.imc} - {imc.classificacao}</span></div></div>}
-            <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: "8px", marginTop: "12px" }}>Dobras Cutaneas (mm)</p>
+            {imc && <div style={{ background: "#FFFFFF", borderRadius: "12px", padding: "12px", marginBottom: "12px" }}><div className="flex justify-between"><span className="text-sm text-gray-500">IMC</span><span className="font-bold">{imc.imc} - {imc.classificacao}</span></div></div>}
+            <p style={{ fontSize: "10px", color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: "8px", marginTop: "12px" }}>Dobras Cutaneas (mm)</p>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
               {[{name:'dobraTricipal',label:'Triceps'},{name:'dobraSubescapular',label:'Subescapular'},{name:'dobraSuprailiaca',label:'Suprailiaca'},{name:'dobraAbdominal',label:'Abdominal'},{name:'dobraPeitoral',label:'Peitoral'},{name:'dobraCoxa',label:'Coxa'}].map(d => (
-                <div key={d.name}><label style={{ fontSize:11, color:"rgba(240,244,255,0.5)" }}>{d.label}</label><input name={d.name} value={(form as any)[d.name]} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "10px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="mm" /></div>
+                <div key={d.name}><label style={{ fontSize:11, color:"#374151" }}>{d.label}</label><input name={d.name} value={(form as any)[d.name]} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "#FFFFFF", border: "1px solid rgba(16,24,40,0.1)", borderRadius: "10px", padding: "10px", color: "#1F2937", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="mm" /></div>
               ))}
             </div>
             {gordura && (
-              <div style={{ background: "rgba(57,255,20,0.06)", border: "1px solid rgba(57,255,20,0.2)", borderRadius: "14px", padding: "14px", marginTop: "14px" }}>
-                <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#4169E1", marginBottom: "10px", textTransform: "uppercase", letterSpacing: "1px" }}>Composicao Corporal (Faulkner)</p>
+              <div style={{ background: "rgba(46,168,102,0.06)", border: "1px solid rgba(46,168,102,0.2)", borderRadius: "14px", padding: "14px", marginTop: "14px" }}>
+                <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#2EA866", marginBottom: "10px", textTransform: "uppercase", letterSpacing: "1px" }}>Composicao Corporal (Faulkner)</p>
                 <div className="space-y-2">
-                  <div className="flex justify-between"><span className="text-sm text-gray-300">% Gordura</span><span className="font-bold">{gordura.percentual}% - {gordura.classificacao}</span></div>
-                  {massaGorda && <div className="flex justify-between"><span className="text-sm text-gray-300">Massa Gorda</span><span className="font-bold text-red-400">{massaGorda} kg</span></div>}
-                  {massaMagra && <div className="flex justify-between"><span className="text-sm text-gray-300">Massa Magra</span><span className="font-bold text-green-400">{massaMagra} kg</span></div>}
+                  <div className="flex justify-between"><span className="text-sm text-gray-700">% Gordura</span><span className="font-bold">{gordura.percentual}% - {gordura.classificacao}</span></div>
+                  {massaGorda && <div className="flex justify-between"><span className="text-sm text-gray-700">Massa Gorda</span><span className="font-bold text-red-400">{massaGorda} kg</span></div>}
+                  {massaMagra && <div className="flex justify-between"><span className="text-sm text-gray-700">Massa Magra</span><span className="font-bold text-green-400">{massaMagra} kg</span></div>}
                 </div>
               </div>
             )}
           </div>
 
-          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#4169E1", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Testes Fisicos</p>
+          <div style={{ background: "#FFFFFF", borderRadius: "16px", padding: "16px", border: "1px solid rgba(16,24,40,0.1)", marginBottom: "12px" }}>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#2EA866", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Testes Fisicos</p>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
-              <div><label style={{ fontSize:11, color:"rgba(240,244,255,0.5)" }}>Velocidade 40m (seg)</label><input name="velocidade40m" value={form.velocidade40m} onChange={handleChange} type="number" step="0.01" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="5.20" /></div>
-              <div><label style={{ fontSize:11, color:"rgba(240,244,255,0.5)" }}>Cooper (metros)</label><input name="cooper" value={form.cooper} onChange={handleChange} type="number" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="2800" /></div>
-              <div><label style={{ fontSize:11, color:"rgba(240,244,255,0.5)" }}>Salto Vertical (cm)</label><input name="saltoVertical" value={form.saltoVertical} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="45" /></div>
-              <div><label style={{ fontSize:11, color:"rgba(240,244,255,0.5)" }}>Salto Horizontal (cm)</label><input name="saltoHorizontal" value={form.saltoHorizontal} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="180" /></div>
+              <div><label style={{ fontSize:11, color:"#374151" }}>Velocidade 40m (seg)</label><input name="velocidade40m" value={form.velocidade40m} onChange={handleChange} type="number" step="0.01" style={{ width: "100%", background: "#FFFFFF", border: "1px solid rgba(16,24,40,0.1)", borderRadius: "10px", padding: "12px", color: "#1F2937", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="5.20" /></div>
+              <div><label style={{ fontSize:11, color:"#374151" }}>Cooper (metros)</label><input name="cooper" value={form.cooper} onChange={handleChange} type="number" style={{ width: "100%", background: "#FFFFFF", border: "1px solid rgba(16,24,40,0.1)", borderRadius: "10px", padding: "12px", color: "#1F2937", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="2800" /></div>
+              <div><label style={{ fontSize:11, color:"#374151" }}>Salto Vertical (cm)</label><input name="saltoVertical" value={form.saltoVertical} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "#FFFFFF", border: "1px solid rgba(16,24,40,0.1)", borderRadius: "10px", padding: "12px", color: "#1F2937", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="45" /></div>
+              <div><label style={{ fontSize:11, color:"#374151" }}>Salto Horizontal (cm)</label><input name="saltoHorizontal" value={form.saltoHorizontal} onChange={handleChange} type="number" step="0.1" style={{ width: "100%", background: "#FFFFFF", border: "1px solid rgba(16,24,40,0.1)", borderRadius: "10px", padding: "12px", color: "#1F2937", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", boxSizing: "border-box" }} placeholder="180" /></div>
             </div>
           </div>
 
-          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#4169E1", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Tecnica</p>
+          <div style={{ background: "#FFFFFF", borderRadius: "16px", padding: "16px", border: "1px solid rgba(16,24,40,0.1)", marginBottom: "12px" }}>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#2EA866", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Tecnica</p>
             <NotaSelector label="Passe" name="notaPasse" value={form.notaPasse} onChange={handleNota} />
             <NotaSelector label="Chute" name="notaChute" value={form.notaChute} onChange={handleNota} />
             <NotaSelector label="Drible" name="notaDrible" value={form.notaDrible} onChange={handleNota} />
@@ -417,8 +417,8 @@ export default function AvaliacaoAtleta() {
             <NotaSelector label="Cabecio" name="notaCabecio" value={form.notaCabecio} onChange={handleNota} />
           </div>
 
-          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#4169E1", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Fisico</p>
+          <div style={{ background: "#FFFFFF", borderRadius: "16px", padding: "16px", border: "1px solid rgba(16,24,40,0.1)", marginBottom: "12px" }}>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#2EA866", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Fisico</p>
             <NotaSelector label="Velocidade" name="notaVelocidade" value={form.notaVelocidade} onChange={handleNota} />
             <NotaSelector label="Resistencia" name="notaResistencia" value={form.notaResistencia} onChange={handleNota} />
             <NotaSelector label="Forca" name="notaForca" value={form.notaForca} onChange={handleNota} />
@@ -426,8 +426,8 @@ export default function AvaliacaoAtleta() {
             <NotaSelector label="Saltabilidade" name="notaSaltabilidade" value={form.notaSaltabilidade} onChange={handleNota} />
           </div>
 
-          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#4169E1", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Tatico</p>
+          <div style={{ background: "#FFFFFF", borderRadius: "16px", padding: "16px", border: "1px solid rgba(16,24,40,0.1)", marginBottom: "12px" }}>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#2EA866", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Tatico</p>
             <NotaSelector label="Posicionamento" name="notaPosicionamento" value={form.notaPosicionamento} onChange={handleNota} />
             <NotaSelector label="Visao de jogo" name="notaVisaoJogo" value={form.notaVisaoJogo} onChange={handleNota} />
             <NotaSelector label="Marcacao" name="notaMarcacao" value={form.notaMarcacao} onChange={handleNota} />
@@ -435,32 +435,32 @@ export default function AvaliacaoAtleta() {
             <NotaSelector label="Concentracao" name="notaConcentracao" value={form.notaConcentracao} onChange={handleNota} />
           </div>
 
-          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
-            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#4169E1", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Anamnese</p>
+          <div style={{ background: "#FFFFFF", borderRadius: "16px", padding: "16px", border: "1px solid rgba(16,24,40,0.1)", marginBottom: "12px" }}>
+            <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "12px", color: "#2EA866", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>Anamnese</p>
             {[{name:'historicoCirurgias',label:'Historico de cirurgias'},{name:'historicoLesoes',label:'Historico de lesoes'},{name:'medicamentosUso',label:'Medicamentos em uso'},{name:'doencasCronicas',label:'Doencas cronicas'},{name:'praticaOutroEsporte',label:'Pratica outro esporte?'},{name:'observacoes',label:'Observacoes gerais'}].map(f => (
               <div key={f.name} className="mb-3">
-                <label style={{ fontSize:11, color:"rgba(240,244,255,0.5)" }}>{f.label}</label>
-                <textarea name={f.name} value={(form as any)[f.name]} onChange={handleChange} rows={2} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "10px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", resize: "none", boxSizing: "border-box" }} placeholder="Digite aqui..." />
+                <label style={{ fontSize:11, color:"#374151" }}>{f.label}</label>
+                <textarea name={f.name} value={(form as any)[f.name]} onChange={handleChange} rows={2} style={{ width: "100%", background: "#FFFFFF", border: "1px solid rgba(16,24,40,0.1)", borderRadius: "10px", padding: "10px", color: "#1F2937", fontFamily: "Inter, sans-serif", fontSize: "13px", marginTop: "4px", resize: "none", boxSizing: "border-box" }} placeholder="Digite aqui..." />
               </div>
             ))}
           </div>
 
           <div className="flex gap-3">
-            <button onClick={salvar} disabled={salvando} style={{ flex: 1, background: "linear-gradient(135deg,#4169E1,#00D67A)", color: "#000", padding: "16px", borderRadius: "14px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", border: "none", cursor: "pointer", boxShadow: "0 0 16px rgba(57,255,20,0.3)" }}>
+            <button onClick={salvar} disabled={salvando} style={{ flex: 1, background: "linear-gradient(135deg,#2EA866,#00D67A)", color: '#fff', padding: "16px", borderRadius: "14px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", border: "none", cursor: "pointer", boxShadow: "0 0 16px rgba(46,168,102,0.3)" }}>
               {salvando ? 'Salvando...' : 'Salvar Avaliacao'}
             </button>
-            <button onClick={() => gerarPDF()} disabled={gerando} style={{ background: "rgba(59,130,246,0.15)", border: "1px solid rgba(59,130,246,0.3)", color: "#60a5fa", padding: "16px 20px", borderRadius: "14px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", cursor: "pointer" }}>
+            <button onClick={() => gerarPDF()} disabled={gerando} style={{ background: "rgba(59,130,246,0.15)", border: "1px solid rgba(59,130,246,0.3)", color: "#2563EB", padding: "16px 20px", borderRadius: "14px", fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "14px", cursor: "pointer" }}>
               {gerando ? '...' : 'PDF'}
             </button>
           </div>
         </div>
       )}
 
-      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
-        <a href="/dashboard" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Inicio</a>
-        <a href="/atletas" style={{ textDecoration: "none", color: "#4169E1", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif", fontWeight: 700 }}>Atletas</a>
-        <a href="/presenca" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Presenca</a>
-        <a href="/financeiro" style={{ textDecoration: "none", color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Financeiro</a>
+      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(16,24,40,0.1)", background: "rgba(255,255,255,0.97)", backdropFilter: "blur(10px)" }}>
+        <a href="/dashboard" style={{ textDecoration: "none", color: "#6B7280", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Inicio</a>
+        <a href="/atletas" style={{ textDecoration: "none", color: "#2EA866", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif", fontWeight: 700 }}>Atletas</a>
+        <a href="/presenca" style={{ textDecoration: "none", color: "#6B7280", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Presenca</a>
+        <a href="/financeiro" style={{ textDecoration: "none", color: "#6B7280", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.5px", fontFamily: "Syne, sans-serif" }}>Financeiro</a>
       </nav>
     </div>
   )

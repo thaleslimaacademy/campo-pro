@@ -10,8 +10,8 @@ function fmt(v: number) {
 function MiniBar({ recebido, previsto }: { recebido: number; previsto: number }) {
   const pct = previsto > 0 ? Math.min((recebido / previsto) * 100, 100) : 0
   return (
-    <div style={{ width: '100%', height: 4, background: 'rgba(65,105,225,0.2)', borderRadius: 2, marginTop: 6 }}>
-      <div style={{ width: pct + '%', height: 4, background: '#00BFFF', borderRadius: 2, transition: 'width 0.6s ease' }} />
+    <div style={{ width: '100%', height: 4, background: 'rgba(46,168,102,0.2)', borderRadius: 2, marginTop: 6 }}>
+      <div style={{ width: pct + '%', height: 4, background: '#23874F', borderRadius: 2, transition: 'width 0.6s ease' }} />
     </div>
   )
 }
@@ -28,14 +28,14 @@ function GraficoBarras({ dados }: { dados: DashboardFinanceiroData['grafico12Mes
             <div style={{ width: '100%', display: 'flex', alignItems: 'flex-end', gap: 2, height: 100 }}>
               <div
                 title={'Previsto: ' + fmt(d.previsto)}
-                style={{ flex: 1, height: hPrev + '%', background: 'rgba(65,105,225,0.35)', borderRadius: '3px 3px 0 0', transition: 'height 0.4s' }}
+                style={{ flex: 1, height: hPrev + '%', background: 'rgba(46,168,102,0.35)', borderRadius: '3px 3px 0 0', transition: 'height 0.4s' }}
               />
               <div
                 title={'Recebido: ' + fmt(d.recebido)}
-                style={{ flex: 1, height: hRec + '%', background: '#00BFFF', borderRadius: '3px 3px 0 0', transition: 'height 0.4s' }}
+                style={{ flex: 1, height: hRec + '%', background: '#23874F', borderRadius: '3px 3px 0 0', transition: 'height 0.4s' }}
               />
             </div>
-            <span style={{ fontSize: 9, color: '#7DD3FC', whiteSpace: 'nowrap' }}>{d.label}</span>
+            <span style={{ fontSize: 9, color: '#4B5563', whiteSpace: 'nowrap' }}>{d.label}</span>
           </div>
         )
       })}
@@ -48,12 +48,12 @@ export default function DashboardFinanceiroClient({ data }: { data: DashboardFin
   const { resumo, grafico12Meses, topDevedores, patrocinadores } = data
 
   const cards = [
-    { label: 'Previsto',       valor: fmt(resumo.previsto),                          sub: 'mes atual',                                    cor: '#7DD3FC',  icon: 'ti-calendar-dollar', bar: false },
-    { label: 'Recebido',       valor: fmt(resumo.recebido),                          sub: 'mes atual',                                    cor: '#00BFFF',  icon: 'ti-circle-check',    bar: true  },
+    { label: 'Previsto',       valor: fmt(resumo.previsto),                          sub: 'mes atual',                                    cor: '#4B5563',  icon: 'ti-calendar-dollar', bar: false },
+    { label: 'Recebido',       valor: fmt(resumo.recebido),                          sub: 'mes atual',                                    cor: '#23874F',  icon: 'ti-circle-check',    bar: true  },
     { label: 'Em Aberto',      valor: fmt(resumo.emAberto),                          sub: 'pendente',                                     cor: '#F0F4FF',  icon: 'ti-clock',           bar: false },
     { label: 'Inadimplencia',  valor: resumo.inadimplencia.toFixed(1) + '%',         sub: fmt(resumo.vencido) + ' vencido',               cor: resumo.inadimplencia > 20 ? '#FF6B6B' : resumo.inadimplencia > 10 ? '#FFB347' : '#4ADE80', icon: 'ti-alert-triangle', bar: false },
-    { label: 'Ticket Medio',   valor: fmt(resumo.ticketMedio),                       sub: resumo.totalAtivosComCobranca + ' pagantes',    cor: '#7DD3FC',  icon: 'ti-user-dollar',     bar: false },
-    { label: 'Patrocinadores', valor: String(patrocinadores),                        sub: 'ativos',                                       cor: '#00BFFF',  icon: 'ti-award',           bar: false },
+    { label: 'Ticket Medio',   valor: fmt(resumo.ticketMedio),                       sub: resumo.totalAtivosComCobranca + ' pagantes',    cor: '#4B5563',  icon: 'ti-user-dollar',     bar: false },
+    { label: 'Patrocinadores', valor: String(patrocinadores),                        sub: 'ativos',                                       cor: '#23874F',  icon: 'ti-award',           bar: false },
   ]
 
   const atalhos = [
@@ -63,24 +63,24 @@ export default function DashboardFinanceiroClient({ data }: { data: DashboardFin
   ]
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0A0E1A', paddingBottom: 88, fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: '#F6F8F7', paddingBottom: 88, fontFamily: 'Inter, sans-serif' }}>
 
-      <div style={{ background: 'linear-gradient(135deg, #1A3FA8 0%, #4169E1 100%)', padding: '16px 16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '16px 16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
         <button
           onClick={() => router.back()}
-          style={{ background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#F0F4FF' }}
+          style={{ background: '#EEF1EF', border: 'none', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#1F2937' }}
         >
           <i className="ti ti-arrow-left" style={{ fontSize: 18 }} />
         </button>
         <div>
-          <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 18, color: '#F0F4FF', textTransform: 'uppercase', letterSpacing: 1 }}>
+          <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 18, color: '#1F2937', textTransform: 'uppercase', letterSpacing: 1 }}>
             Financeiro
           </div>
-          <div style={{ fontSize: 12, color: '#7DD3FC' }}>Dashboard inteligente</div>
+          <div style={{ fontSize: 12, color: '#4B5563' }}>Dashboard inteligente</div>
         </div>
         <button
           onClick={() => router.push('/financeiro/boleto')}
-          style={{ marginLeft: 'auto', background: 'rgba(0,191,255,0.2)', border: '1px solid #00BFFF', borderRadius: 8, padding: '6px 12px', color: '#00BFFF', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+          style={{ marginLeft: 'auto', background: 'rgba(46,168,102,0.2)', border: '1px solid #23874F', borderRadius: 8, padding: '6px 12px', color: '#23874F', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
         >
           <i className="ti ti-file-invoice" style={{ fontSize: 14 }} />
           Boleto
@@ -91,32 +91,32 @@ export default function DashboardFinanceiroClient({ data }: { data: DashboardFin
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
           {cards.map((c) => (
-            <div key={c.label} style={{ background: 'rgba(65,105,225,0.08)', border: '1px solid rgba(65,105,225,0.25)', borderRadius: 12, padding: '14px 14px 12px' }}>
+            <div key={c.label} style={{ background: 'rgba(46,168,102,0.08)', border: '1px solid rgba(46,168,102,0.25)', borderRadius: 12, padding: '14px 14px 12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                 <i className={'ti ' + c.icon} style={{ fontSize: 16, color: c.cor }} />
-                <span style={{ fontSize: 11, color: '#7DD3FC', textTransform: 'uppercase', letterSpacing: 0.5 }}>{c.label}</span>
+                <span style={{ fontSize: 11, color: '#4B5563', textTransform: 'uppercase', letterSpacing: 0.5 }}>{c.label}</span>
               </div>
               <div style={{ fontSize: 20, fontWeight: 700, color: c.cor, fontFamily: 'Syne, sans-serif' }}>{c.valor}</div>
-              <div style={{ fontSize: 11, color: 'rgba(240,244,255,0.5)', marginTop: 2 }}>{c.sub}</div>
+              <div style={{ fontSize: 11, color: '#374151', marginTop: 2 }}>{c.sub}</div>
               {c.bar && <MiniBar recebido={resumo.recebido} previsto={resumo.previsto} />}
             </div>
           ))}
         </div>
 
-        <div style={{ background: 'rgba(65,105,225,0.08)', border: '1px solid rgba(65,105,225,0.25)', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+        <div style={{ background: 'rgba(46,168,102,0.08)', border: '1px solid rgba(46,168,102,0.25)', borderRadius: 12, padding: 16, marginBottom: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
             <div>
-              <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 14, color: '#F0F4FF', textTransform: 'uppercase', letterSpacing: 0.5 }}>Receita 12 Meses</div>
-              <div style={{ fontSize: 11, color: '#7DD3FC', marginTop: 2 }}>previsto vs recebido</div>
+              <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 14, color: '#1F2937', textTransform: 'uppercase', letterSpacing: 0.5 }}>Receita 12 Meses</div>
+              <div style={{ fontSize: 11, color: '#4B5563', marginTop: 2 }}>previsto vs recebido</div>
             </div>
             <div style={{ display: 'flex', gap: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <div style={{ width: 10, height: 10, borderRadius: 2, background: 'rgba(65,105,225,0.35)' }} />
-                <span style={{ fontSize: 10, color: '#7DD3FC' }}>Previsto</span>
+                <div style={{ width: 10, height: 10, borderRadius: 2, background: 'rgba(46,168,102,0.35)' }} />
+                <span style={{ fontSize: 10, color: '#4B5563' }}>Previsto</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <div style={{ width: 10, height: 10, borderRadius: 2, background: '#00BFFF' }} />
-                <span style={{ fontSize: 10, color: '#7DD3FC' }}>Recebido</span>
+                <div style={{ width: 10, height: 10, borderRadius: 2, background: '#23874F' }} />
+                <span style={{ fontSize: 10, color: '#4B5563' }}>Recebido</span>
               </div>
             </div>
           </div>
@@ -124,32 +124,32 @@ export default function DashboardFinanceiroClient({ data }: { data: DashboardFin
         </div>
 
         {topDevedores.length > 0 && (
-          <div style={{ background: 'rgba(65,105,225,0.08)', border: '1px solid rgba(65,105,225,0.25)', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+          <div style={{ background: 'rgba(46,168,102,0.08)', border: '1px solid rgba(46,168,102,0.25)', borderRadius: 12, padding: 16, marginBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
               <div>
-                <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 14, color: '#F0F4FF', textTransform: 'uppercase', letterSpacing: 0.5 }}>Top Devedores</div>
-                <div style={{ fontSize: 11, color: '#7DD3FC', marginTop: 2 }}>cobrancas vencidas</div>
+                <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 14, color: '#1F2937', textTransform: 'uppercase', letterSpacing: 0.5 }}>Top Devedores</div>
+                <div style={{ fontSize: 11, color: '#4B5563', marginTop: 2 }}>cobrancas vencidas</div>
               </div>
               <button
                 onClick={() => router.push('/financeiro/mensalidades?status=VENCIDO')}
-                style={{ background: 'none', border: '1px solid rgba(65,105,225,0.4)', borderRadius: 8, padding: '4px 10px', color: '#7DD3FC', fontSize: 11, cursor: 'pointer' }}
+                style={{ background: 'none', border: '1px solid rgba(46,168,102,0.4)', borderRadius: 8, padding: '4px 10px', color: '#4B5563', fontSize: 11, cursor: 'pointer' }}
               >
                 Ver todos
               </button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {topDevedores.map((d, i) => (
-                <div key={d.atletaId} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: 'rgba(10,14,26,0.5)', borderRadius: 10, border: '1px solid rgba(65,105,225,0.15)' }}>
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: i === 0 ? 'rgba(255,107,107,0.2)' : 'rgba(65,105,225,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: i === 0 ? '#FF6B6B' : '#7DD3FC', flexShrink: 0 }}>
+                <div key={d.atletaId} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: 'rgba(16,24,40,0.35)', borderRadius: 10, border: '1px solid rgba(46,168,102,0.15)' }}>
+                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: i === 0 ? 'rgba(255,107,107,0.2)' : 'rgba(46,168,102,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: i === 0 ? '#DC2626' : '#4B5563', flexShrink: 0 }}>
                     {i + 1}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, color: '#F0F4FF', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.nome}</div>
-                    <div style={{ fontSize: 11, color: '#7DD3FC' }}>{d.qtdCobrancas} cobranca{d.qtdCobrancas > 1 ? 's' : ''} vencida{d.qtdCobrancas > 1 ? 's' : ''}</div>
+                    <div style={{ fontSize: 13, color: '#1F2937', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.nome}</div>
+                    <div style={{ fontSize: 11, color: '#4B5563' }}>{d.qtdCobrancas} cobranca{d.qtdCobrancas > 1 ? 's' : ''} vencida{d.qtdCobrancas > 1 ? 's' : ''}</div>
                   </div>
                   <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#FF6B6B' }}>{fmt(d.totalVencido)}</div>
-                    <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.4)' }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: '#DC2626' }}>{fmt(d.totalVencido)}</div>
+                    <div style={{ fontSize: 10, color: '#6B7280' }}>
                       desde {new Date(d.vencimentoMaisAntigo).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' })}
                     </div>
                   </div>
@@ -164,10 +164,10 @@ export default function DashboardFinanceiroClient({ data }: { data: DashboardFin
             <button
               key={a.label}
               onClick={() => router.push(a.href)}
-              style={{ background: 'rgba(65,105,225,0.1)', border: '1px solid rgba(65,105,225,0.3)', borderRadius: 10, padding: '12px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer' }}
+              style={{ background: 'rgba(46,168,102,0.1)', border: '1px solid rgba(46,168,102,0.3)', borderRadius: 10, padding: '12px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer' }}
             >
-              <i className={'ti ' + a.icon} style={{ fontSize: 20, color: '#4169E1' }} />
-              <span style={{ fontSize: 11, color: '#7DD3FC', textAlign: 'center' }}>{a.label}</span>
+              <i className={'ti ' + a.icon} style={{ fontSize: 20, color: '#2EA866' }} />
+              <span style={{ fontSize: 11, color: '#4B5563', textAlign: 'center' }}>{a.label}</span>
             </button>
           ))}
         </div>

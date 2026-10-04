@@ -40,12 +40,12 @@ export default function Sumula() {
   const [formEvento, setFormEvento] = useState({ tipo: 'gol', timeId: '', atletaNome: '', minuto: '' })
 
   const syne = 'Syne, sans-serif'
-  const neon = '#FF6B00'
-  const gold = '#FFD700'
-  const bg = 'linear-gradient(160deg,#0F0F1A,#0F0F1A,#111003)'
-  const cardBg = 'rgba(255,255,255,0.03)'
+  const neon = '#C2410C'
+  const gold = '#B7791F'
+  const bg = '#F6F8F7'
+  const cardBg = '#FFFFFF'
   const cardBorder = '1px solid rgba(255,255,255,0.07)'
-  const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 12px', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '6px', outline: 'none', boxSizing: 'border-box' as const }
+  const inputStyle = { width: '100%', background: '#FFFFFF', border: '1px solid rgba(16,24,40,0.1)', borderRadius: '10px', padding: '10px 12px', color: '#1F2937', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '6px', outline: 'none', boxSizing: 'border-box' as const }
 
   const tipoIcon: Record<string, string> = { gol: '⚽', cartao_amarelo: '🟨', cartao_vermelho: '🟥' }
   const tipoLabel: Record<string, string> = { gol: 'Gol', cartao_amarelo: 'Cartão Amarelo', cartao_vermelho: 'Cartão Vermelho' }
@@ -114,13 +114,13 @@ export default function Sumula() {
 
   if (loading) return (
     <div style={{ minHeight: '100vh', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter,sans-serif' }}>Carregando...</p>
+      <p style={{ color: '#6B7280', fontFamily: 'Inter,sans-serif' }}>Carregando...</p>
     </div>
   )
 
   if (!jogo || !timeA || !timeB) return (
     <div style={{ minHeight: '100vh', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'rgba(255,255,255,0.4)' }}>Jogo não encontrado.</p>
+      <p style={{ color: '#6B7280' }}>Jogo não encontrado.</p>
     </div>
   )
 
@@ -129,53 +129,53 @@ export default function Sumula() {
   const scoreColor = isAndamento ? neon : isEncerrado ? gold : 'rgba(255,255,255,0.6)'
 
   return (
-    <div style={{ minHeight: '100vh', background: bg, color: '#F0F0F0', fontFamily: 'Inter,sans-serif', paddingBottom: '96px' }}>
+    <div style={{ minHeight: '100vh', background: bg, color: '#1F2937', fontFamily: 'Inter,sans-serif', paddingBottom: '96px' }}>
 
       <div style={{ padding: '20px 20px 0', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-        <a href={'/campeonato/' + jogo.campeonatoId} style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', textDecoration: 'none' }}>← Voltar</a>
-        <h1 style={{ fontFamily: syne, fontWeight: 800, fontSize: '20px', color: '#F0F0F0', margin: 0 }}>📋 Súmula</h1>
+        <a href={'/campeonato/' + jogo.campeonatoId} style={{ color: '#6B7280', fontSize: '13px', textDecoration: 'none' }}>← Voltar</a>
+        <h1 style={{ fontFamily: syne, fontWeight: 800, fontSize: '20px', color: '#1F2937', margin: 0 }}>📋 Súmula</h1>
       </div>
 
       <div style={{ padding: '0 20px' }}>
 
-        <div style={{ background: cardBg, border: isAndamento ? '1px solid rgba(57,255,20,0.2)' : isEncerrado ? '1px solid rgba(212,175,55,0.2)' : cardBorder, borderRadius: '20px', padding: '20px', marginBottom: '12px' }}>
+        <div style={{ background: cardBg, border: isAndamento ? '1px solid rgba(46,168,102,0.2)' : isEncerrado ? '1px solid rgba(212,175,55,0.2)' : cardBorder, borderRadius: '20px', padding: '20px', marginBottom: '12px' }}>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>
+            <span style={{ fontSize: '11px', color: '#6B7280' }}>
               {jogo.fase}{jogo.grupo ? ' · Grupo ' + jogo.grupo : ''}
             </span>
             <span style={{
               fontSize: '11px', padding: '3px 10px', borderRadius: '20px', fontWeight: 700, fontFamily: syne,
-              background: isEncerrado ? 'rgba(57,255,20,0.08)' : isAndamento ? 'rgba(212,175,55,0.1)' : 'rgba(255,255,255,0.07)',
-              color: isEncerrado ? neon : isAndamento ? gold : 'rgba(255,255,255,0.4)',
-              border: isEncerrado ? '1px solid rgba(57,255,20,0.2)' : isAndamento ? '1px solid rgba(212,175,55,0.25)' : '1px solid rgba(255,255,255,0.1)',
+              background: isEncerrado ? 'rgba(46,168,102,0.08)' : isAndamento ? 'rgba(212,175,55,0.1)' : '#FFFFFF',
+              color: isEncerrado ? neon : isAndamento ? gold : '#6B7280',
+              border: isEncerrado ? '1px solid rgba(46,168,102,0.2)' : isAndamento ? '1px solid rgba(212,175,55,0.25)' : '1px solid rgba(16,24,40,0.1)',
             }}>
               {isAndamento ? '● Em andamento' : isEncerrado ? '✓ Encerrado' : 'Agendado'}
             </span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '20px' }}>
-            <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '15px', color: '#F0F0F0', flex: 1, textAlign: 'right', margin: 0 }}>{timeA.nome}</p>
-            <div style={{ background: 'rgba(0,0,0,0.3)', borderRadius: '16px', padding: '12px 20px', textAlign: 'center', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '15px', color: '#1F2937', flex: 1, textAlign: 'right', margin: 0 }}>{timeA.nome}</p>
+            <div style={{ background: 'rgba(0,0,0,0.3)', borderRadius: '16px', padding: '12px 20px', textAlign: 'center', border: '1px solid rgba(16,24,40,0.1)' }}>
               <p style={{ fontFamily: syne, fontWeight: 900, fontSize: '42px', color: scoreColor, margin: 0, lineHeight: 1, textShadow: isAndamento ? '0 0 20px rgba(57,255,20,0.5)' : 'none' }}>
                 {jogo.golsA} × {jogo.golsB}
               </p>
             </div>
-            <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '15px', color: '#F0F0F0', flex: 1, textAlign: 'left', margin: 0 }}>{timeB.nome}</p>
+            <p style={{ fontFamily: syne, fontWeight: 800, fontSize: '15px', color: '#1F2937', flex: 1, textAlign: 'left', margin: 0 }}>{timeB.nome}</p>
           </div>
 
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
             {jogo.status === 'agendado' && (
-              <button onClick={iniciarJogo} style={{ background: 'linear-gradient(135deg,#FF6B00,#2bcc0f)', color: '#0F0F1A', padding: '10px 24px', borderRadius: '12px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', boxShadow: '0 0 16px rgba(57,255,20,0.3)' }}>
+              <button onClick={iniciarJogo} style={{ background: 'linear-gradient(135deg,#FF6B00,#23874F)', color: '#1F2937', padding: '10px 24px', borderRadius: '12px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', boxShadow: '0 0 16px rgba(46,168,102,0.3)' }}>
                 ▶ Iniciar Jogo
               </button>
             )}
             {jogo.status === 'andamento' && (
               <>
-                <button onClick={() => setShowAddEvento(!showAddEvento)} style={{ background: showAddEvento ? 'rgba(255,255,255,0.05)' : 'rgba(57,255,20,0.1)', border: showAddEvento ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(57,255,20,0.3)', color: showAddEvento ? 'rgba(255,255,255,0.4)' : neon, padding: '10px 20px', borderRadius: '12px', fontSize: '13px', fontWeight: 700, fontFamily: syne, cursor: 'pointer' }}>
+                <button onClick={() => setShowAddEvento(!showAddEvento)} style={{ background: showAddEvento ? '#FFFFFF' : 'rgba(46,168,102,0.1)', border: showAddEvento ? '1px solid rgba(16,24,40,0.1)' : '1px solid rgba(46,168,102,0.3)', color: showAddEvento ? '#6B7280' : neon, padding: '10px 20px', borderRadius: '12px', fontSize: '13px', fontWeight: 700, fontFamily: syne, cursor: 'pointer' }}>
                   {showAddEvento ? 'Fechar' : '+ Evento'}
                 </button>
-                <button onClick={encerrarJogo} style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#F87171', padding: '10px 20px', borderRadius: '12px', fontSize: '13px', fontWeight: 700, fontFamily: syne, cursor: 'pointer' }}>
+                <button onClick={encerrarJogo} style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#DC2626', padding: '10px 20px', borderRadius: '12px', fontSize: '13px', fontWeight: 700, fontFamily: syne, cursor: 'pointer' }}>
                   Encerrar
                 </button>
               </>
@@ -189,11 +189,11 @@ export default function Sumula() {
         </div>
 
         {showAddEvento && (
-          <div style={{ background: 'rgba(57,255,20,0.03)', border: '1px solid rgba(57,255,20,0.15)', borderRadius: '16px', padding: '16px', marginBottom: '12px' }}>
+          <div style={{ background: 'rgba(46,168,102,0.03)', border: '1px solid rgba(46,168,102,0.15)', borderRadius: '16px', padding: '16px', marginBottom: '12px' }}>
             <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: neon, marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '1px' }}>Registrar Evento</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div>
-                <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Tipo</label>
+                <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Tipo</label>
                 <select value={formEvento.tipo} onChange={e => setFormEvento(p => ({ ...p, tipo: e.target.value }))} style={{ ...inputStyle, appearance: 'none' as const }}>
                   <option value="gol">⚽ Gol</option>
                   <option value="cartao_amarelo">🟨 Cartão Amarelo</option>
@@ -201,7 +201,7 @@ export default function Sumula() {
                 </select>
               </div>
               <div>
-                <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Time</label>
+                <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Time</label>
                 <select value={formEvento.timeId} onChange={e => setFormEvento(p => ({ ...p, timeId: e.target.value, atletaNome: '' }))} style={{ ...inputStyle, appearance: 'none' as const }}>
                   <option value="">Selecione o time</option>
                   <option value={timeA.id}>{timeA.nome}</option>
@@ -210,7 +210,7 @@ export default function Sumula() {
               </div>
               {formEvento.timeId && (
                 <div>
-                  <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Atleta</label>
+                  <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Atleta</label>
                   {atletasDoTime.length > 0 ? (
                     <select value={formEvento.atletaNome} onChange={e => setFormEvento(p => ({ ...p, atletaNome: e.target.value }))} style={{ ...inputStyle, appearance: 'none' as const }}>
                       <option value="">Selecione o atleta</option>
@@ -228,10 +228,10 @@ export default function Sumula() {
                 </div>
               )}
               <div>
-                <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Minuto (opcional)</label>
+                <label style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Minuto (opcional)</label>
                 <input value={formEvento.minuto} onChange={e => setFormEvento(p => ({ ...p, minuto: e.target.value }))} type="number" placeholder="Ex: 23" style={inputStyle} />
               </div>
-              <button onClick={adicionarEvento} disabled={salvando} style={{ width: '100%', background: salvando ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg,#FF6B00,#2bcc0f)', color: salvando ? 'rgba(255,255,255,0.3)' : '#0F0F1A', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer' }}>
+              <button onClick={adicionarEvento} disabled={salvando} style={{ width: '100%', background: salvando ? '#FFFFFF' : 'linear-gradient(135deg,#FF6B00,#23874F)', color: salvando ? '#6B7280' : '#1F2937', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer' }}>
                 {salvando ? 'Salvando...' : 'Registrar Evento'}
               </button>
             </div>
@@ -246,36 +246,36 @@ export default function Sumula() {
               onChange={e => setRelatorio(e.target.value)}
               rows={5}
               placeholder="Descreva ocorrências, incidentes, observações do jogo..."
-              style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px', color: '#F0F0F0', fontFamily: 'Inter,sans-serif', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const, resize: 'vertical' as const }}
+              style={{ width: '100%', background: '#FFFFFF', border: '1px solid rgba(16,24,40,0.1)', borderRadius: '10px', padding: '12px', color: '#1F2937', fontFamily: 'Inter,sans-serif', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const, resize: 'vertical' as const }}
             />
-            <button onClick={salvarRelatorio} disabled={salvando} style={{ width: '100%', background: salvando ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg,#FFD700,#a88520)', color: salvando ? 'rgba(255,255,255,0.3)' : '#0F0F1A', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', marginTop: '10px' }}>
+            <button onClick={salvarRelatorio} disabled={salvando} style={{ width: '100%', background: salvando ? '#FFFFFF' : 'linear-gradient(135deg,#FFD700,#a88520)', color: salvando ? '#6B7280' : '#1F2937', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', marginTop: '10px' }}>
               {salvando ? 'Salvando...' : 'Salvar Relatório'}
             </button>
           </div>
         )}
 
         <div style={{ background: cardBg, border: cardBorder, borderRadius: '16px', marginBottom: '12px', overflow: 'hidden' }}>
-          <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: neon, padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', textTransform: 'uppercase', letterSpacing: '1px', margin: 0 }}>
+          <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: neon, padding: '12px 16px', borderBottom: '1px solid rgba(16,24,40,0.1)', textTransform: 'uppercase', letterSpacing: '1px', margin: 0 }}>
             Eventos ({eventos.length})
           </p>
           {eventos.length === 0 ? (
-            <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '13px', textAlign: 'center', padding: '24px 0' }}>Nenhum evento registrado.</p>
+            <p style={{ color: '#6B7280', fontSize: '13px', textAlign: 'center', padding: '24px 0' }}>Nenhum evento registrado.</p>
           ) : (
             <div>
               {eventos.map((e, i) => (
-                <div key={e.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: i < eventos.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
+                <div key={e.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: i < eventos.length - 1 ? '1px solid rgba(16,24,40,0.1)' : 'none' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <span style={{ fontSize: '20px' }}>{tipoIcon[e.tipo]}</span>
                     <div>
-                      <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '13px', color: '#F0F0F0', margin: 0 }}>{e.atletaNome}</p>
-                      <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: '2px 0 0' }}>
+                      <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '13px', color: '#1F2937', margin: 0 }}>{e.atletaNome}</p>
+                      <p style={{ fontSize: '11px', color: '#6B7280', margin: '2px 0 0' }}>
                         {tipoLabel[e.tipo]} · {e.timeId === timeA.id ? timeA.nome : timeB.nome}
                         {e.minuto ? " · " + e.minuto + "'" : ''}
                       </p>
                     </div>
                   </div>
                   {!isEncerrado && (
-                    <button onClick={() => removerEvento(e.id)} style={{ fontSize: '11px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#F87171', padding: '4px 10px', borderRadius: '8px', cursor: 'pointer' }}>
+                    <button onClick={() => removerEvento(e.id)} style={{ fontSize: '11px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#DC2626', padding: '4px 10px', borderRadius: '8px', cursor: 'pointer' }}>
                       Remover
                     </button>
                   )}
@@ -295,10 +295,10 @@ export default function Sumula() {
               <div key={tId} style={{ background: cardBg, border: cardBorder, borderRadius: '14px', padding: '14px' }}>
                 <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '12px', color: neon, marginBottom: '8px' }}>{time.nome}</p>
                 {gols.length === 0 ? (
-                  <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>Sem gols</p>
+                  <p style={{ fontSize: '11px', color: '#6B7280' }}>Sem gols</p>
                 ) : (
                   gols.map(e => (
-                    <p key={e.id} style={{ fontSize: '12px', color: '#F0F0F0', margin: '3px 0' }}>
+                    <p key={e.id} style={{ fontSize: '12px', color: '#1F2937', margin: '3px 0' }}>
                       {'⚽ ' + e.atletaNome + (e.minuto ? " " + e.minuto + "'" : '')}
                     </p>
                   ))
@@ -310,7 +310,7 @@ export default function Sumula() {
 
       </div>
 
-      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-around', padding: '12px 0 20px', borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(5,5,5,0.95)', backdropFilter: 'blur(10px)' }}>
+      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-around', padding: '12px 0 20px', borderTop: '1px solid rgba(16,24,40,0.1)', background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(10px)' }}>
         {[
           { href: '/dashboard', label: 'Inicio', icon: '🏠' },
           { href: '/atletas', label: 'Atletas', icon: '👥' },
@@ -319,7 +319,7 @@ export default function Sumula() {
         ].map(item => (
           <a key={item.href} href={item.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textDecoration: 'none' }}>
             <span style={{ fontSize: '16px' }}>{item.icon}</span>
-            <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'rgba(255,255,255,0.4)', fontFamily: syne }}>{item.label}</span>
+            <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#6B7280', fontFamily: syne }}>{item.label}</span>
           </a>
         ))}
       </nav>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { listarAlbunsPublicos } from './actions'
 
-const C = { bg: '#0F0F1A', surface: '#1A1A2E', orange: '#FF6B00', gold: '#FFD700', text: '#F0F0F0', muted: 'rgba(240,240,240,0.45)', border: 'rgba(255,255,255,0.08)' }
+const C = { bg: '#F6F8F7', surface: '#FFFFFF', orange: '#C2410C', gold: '#B7791F', text: '#1F2937', muted: '#6B7280', border: 'rgba(16,24,40,0.1)' }
 const SYNE = 'Syne, sans-serif'
 
 type Album = { id: string; titulo: string; descricao: string | null; dataEvento: string | null; capa: string | null }
@@ -19,13 +19,13 @@ export default function GaleriaPage() {
   return (
     <div style={{ minHeight: '100vh', background: C.bg, color: C.text }}>
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg, #FF6B00 0%, #1A1A2E 60%, #0F0F1A 100%)', padding: '20px 20px 28px' }}>
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 20px 28px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <img src="/gestaofc-logo.png" style={{ width: 40, height: 40, borderRadius: 10 }} alt="logo"
             onError={e => (e.currentTarget.style.display = 'none')} />
           <div>
-            <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 18, color: '#fff' }}>Galeria de Fotos</div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)' }}>Thales Lima Football Academy</div>
+            <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 18, color: '#1F2937' }}>Galeria de Fotos</div>
+            <div style={{ fontSize: 11, color: '#374151' }}>Thales Lima Football Academy</div>
           </div>
         </div>
       </div>

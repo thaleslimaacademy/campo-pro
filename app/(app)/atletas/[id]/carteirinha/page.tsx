@@ -19,11 +19,11 @@ const PALETA_BG = [
 ]
 
 const PALETA_ACCENT = [
-  { label: 'Azul', value: '#4169E1' },
-  { label: 'Ciano', value: '#00BFFF' },
-  { label: 'Verde', value: '#00D67A' },
-  { label: 'Dourado', value: '#FFD700' },
-  { label: 'Vermelho', value: '#FF4444' },
+  { label: 'Azul', value: '#2EA866' },
+  { label: 'Ciano', value: '#23874F' },
+  { label: 'Verde', value: '#16A34A' },
+  { label: 'Dourado', value: '#B7791F' },
+  { label: 'Vermelho', value: '#DC2626' },
   { label: 'Roxo', value: '#8B5CF6' },
   { label: 'Laranja', value: '#FF6B35' },
   { label: 'Rosa', value: '#EC4899' },
@@ -123,13 +123,13 @@ export default function Carteirinha() {
   }
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', background: '#0A0E1A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'rgba(240,244,255,0.4)', fontFamily: INTER }}>Carregando...</p>
+    <div style={{ minHeight: '100vh', background: '#F6F8F7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: '#6B7280', fontFamily: INTER }}>Carregando...</p>
     </div>
   )
   if (!atleta) return (
-    <div style={{ minHeight: '100vh', background: '#0A0E1A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'rgba(240,244,255,0.4)', fontFamily: INTER }}>Atleta não encontrado.</p>
+    <div style={{ minHeight: '100vh', background: '#F6F8F7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: '#6B7280', fontFamily: INTER }}>Atleta não encontrado.</p>
     </div>
   )
 
@@ -148,20 +148,20 @@ export default function Carteirinha() {
   const cidade_estado = escola?.cidade && escola?.estado ? `${escola.cidade} - ${escola.estado}` : 'Iturama - MG'
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0A0E1A', color: '#F0F4FF', fontFamily: INTER, paddingBottom: 80 }}>
+    <div style={{ minHeight: '100vh', background: '#F6F8F7', color: '#1F2937', fontFamily: INTER, paddingBottom: 80 }}>
 
       {/* HEADER */}
-      <div style={{ background: '#4169E1', padding: '20px 20px 20px' }}>
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 20px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Atleta</div>
-            <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 22, color: '#F0F4FF', letterSpacing: -0.5, textTransform: 'uppercase' }}>🪪 Carteirinha</div>
+            <div style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Atleta</div>
+            <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 22, color: '#1F2937', letterSpacing: -0.5, textTransform: 'uppercase' }}>🪪 Carteirinha</div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => setEditando(!editando)} style={{ background: 'rgba(240,244,255,0.15)', border: '1px solid rgba(240,244,255,0.2)', color: '#F0F4FF', borderRadius: 8, padding: '8px 14px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            <button onClick={() => setEditando(!editando)} style={{ background: '#EEF1EF', border: '1px solid rgba(16,24,40,0.18)', color: '#1F2937', borderRadius: 8, padding: '8px 14px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: 0.5 }}>
               {editando ? 'Fechar' : '✏️ Editar'}
             </button>
-            <button onClick={imprimir} style={{ background: '#F0F4FF', color: '#4169E1', borderRadius: 8, padding: '8px 14px', fontFamily: SYNE, fontWeight: 800, fontSize: 11, border: 'none', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            <button onClick={imprimir} style={{ background: '#F0F4FF', color: '#2EA866', borderRadius: 8, padding: '8px 14px', fontFamily: SYNE, fontWeight: 800, fontSize: 11, border: 'none', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: 0.5 }}>
               🖨️ Imprimir
             </button>
           </div>
@@ -170,66 +170,66 @@ export default function Carteirinha() {
 
       {/* PAINEL DE EDIÇÃO */}
       {editando && (
-        <div style={{ margin: '16px 20px', background: '#0D1220', border: '1px solid rgba(65,105,225,0.2)', borderLeft: '3px solid #4169E1', borderRadius: 8, padding: 16 }}>
-          <p style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 12, color: '#4169E1', marginBottom: 14, textTransform: 'uppercase', letterSpacing: 0.5 }}>Personalizar carteirinha</p>
+        <div style={{ margin: '16px 20px', background: '#FFFFFF', border: '1px solid rgba(46,168,102,0.2)', borderLeft: '3px solid #2EA866', borderRadius: 8, padding: 16 }}>
+          <p style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 12, color: '#2EA866', marginBottom: 14, textTransform: 'uppercase', letterSpacing: 0.5 }}>Personalizar carteirinha</p>
 
           {/* LOGO */}
           <div style={{ marginBottom: 16 }}>
-            <p style={{ fontSize: 10, color: 'rgba(240,244,255,0.5)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>Logo da escolinha</p>
+            <p style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>Logo da escolinha</p>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               {logoPreview ? (
                 <img src={logoPreview} alt="Logo" style={{ width: 64, height: 64, objectFit: 'contain', background: '#fff', borderRadius: 8, padding: 4 }} />
               ) : (
-                <div style={{ width: 64, height: 64, background: '#121A2E', border: '1px dashed rgba(65,105,225,0.4)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>⚽</div>
+                <div style={{ width: 64, height: 64, background: '#F3F5F4', border: '1px dashed rgba(46,168,102,0.4)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>⚽</div>
               )}
-              <label style={{ background: '#4169E1', color: '#F0F4FF', borderRadius: 6, padding: '8px 14px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              <label style={{ background: '#2EA866', color: '#F0F4FF', borderRadius: 6, padding: '8px 14px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 {uploadingLogo ? 'Enviando...' : 'Escolher logo'}
                 <input type="file" accept="image/*" onChange={uploadLogo} style={{ display: 'none' }} disabled={uploadingLogo} />
               </label>
-              <p style={{ fontSize: 10, color: 'rgba(240,244,255,0.35)' }}>PNG ou SVG recomendado</p>
+              <p style={{ fontSize: 10, color: '#6B7280' }}>PNG ou SVG recomendado</p>
             </div>
           </div>
 
           {/* COR DE FUNDO */}
           <div style={{ marginBottom: 14 }}>
-            <p style={{ fontSize: 10, color: 'rgba(240,244,255,0.5)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>Cor de fundo</p>
+            <p style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>Cor de fundo</p>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               {PALETA_BG.map(c => (
                 <button key={c.value} onClick={() => setBgColor(c.value)} title={c.label}
-                  style={{ width: 32, height: 32, borderRadius: 6, background: c.value, border: bgColor === c.value ? '2px solid #00BFFF' : '1px solid rgba(240,244,255,0.15)', cursor: 'pointer', transition: 'border 0.15s' }} />
+                  style={{ width: 32, height: 32, borderRadius: 6, background: c.value, border: bgColor === c.value ? '2px solid #23874F' : '1px solid rgba(16,24,40,0.1)', cursor: 'pointer', transition: 'border 0.15s' }} />
               ))}
               <input type="color" value={bgColor} onChange={e => setBgColor(e.target.value)} title="Cor personalizada"
-                style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid rgba(240,244,255,0.2)', cursor: 'pointer', padding: 2, background: 'transparent' }} />
+                style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid rgba(16,24,40,0.18)', cursor: 'pointer', padding: 2, background: 'transparent' }} />
             </div>
           </div>
 
           {/* COR DE DESTAQUE */}
           <div style={{ marginBottom: 14 }}>
-            <p style={{ fontSize: 10, color: 'rgba(240,244,255,0.5)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>Cor de destaque</p>
+            <p style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>Cor de destaque</p>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               {PALETA_ACCENT.map(c => (
                 <button key={c.value} onClick={() => setAccentColor(c.value)} title={c.label}
-                  style={{ width: 32, height: 32, borderRadius: 6, background: c.value, border: accentColor === c.value ? '2px solid #fff' : '1px solid rgba(240,244,255,0.15)', cursor: 'pointer', transition: 'border 0.15s' }} />
+                  style={{ width: 32, height: 32, borderRadius: 6, background: c.value, border: accentColor === c.value ? '2px solid #E3E8E5' : '1px solid rgba(16,24,40,0.1)', cursor: 'pointer', transition: 'border 0.15s' }} />
               ))}
               <input type="color" value={accentColor} onChange={e => setAccentColor(e.target.value)} title="Cor personalizada"
-                style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid rgba(240,244,255,0.2)', cursor: 'pointer', padding: 2, background: 'transparent' }} />
+                style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid rgba(16,24,40,0.18)', cursor: 'pointer', padding: 2, background: 'transparent' }} />
             </div>
           </div>
 
           {/* COR DO TEXTO */}
           <div style={{ marginBottom: 16 }}>
-            <p style={{ fontSize: 10, color: 'rgba(240,244,255,0.5)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>Cor do texto</p>
+            <p style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>Cor do texto</p>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               {PALETA_TEXTO.map(c => (
                 <button key={c.value} onClick={() => setTextColor(c.value)} title={c.label}
-                  style={{ width: 32, height: 32, borderRadius: 6, background: c.value, border: textColor === c.value ? '2px solid #00BFFF' : '1px solid rgba(240,244,255,0.15)', cursor: 'pointer', transition: 'border 0.15s' }} />
+                  style={{ width: 32, height: 32, borderRadius: 6, background: c.value, border: textColor === c.value ? '2px solid #23874F' : '1px solid rgba(16,24,40,0.1)', cursor: 'pointer', transition: 'border 0.15s' }} />
               ))}
               <input type="color" value={textColor} onChange={e => setTextColor(e.target.value)} title="Cor personalizada"
-                style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid rgba(240,244,255,0.2)', cursor: 'pointer', padding: 2, background: 'transparent' }} />
+                style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid rgba(16,24,40,0.18)', cursor: 'pointer', padding: 2, background: 'transparent' }} />
             </div>
           </div>
 
-          <button onClick={salvarCores} style={{ background: '#4169E1', color: '#F0F4FF', padding: '12px 20px', borderRadius: 8, fontFamily: SYNE, fontWeight: 800, fontSize: 12, border: 'none', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: 0.5, width: '100%' }}>
+          <button onClick={salvarCores} style={{ background: '#2EA866', color: '#F0F4FF', padding: '12px 20px', borderRadius: 8, fontFamily: SYNE, fontWeight: 800, fontSize: 12, border: 'none', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: 0.5, width: '100%' }}>
             Salvar configurações
           </button>
         </div>
@@ -245,7 +245,7 @@ export default function Carteirinha() {
           borderRadius: 8,
           padding: '3.5mm',
           display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+          boxShadow: '0 8px 32px rgba(16,24,40,0.12)',
           position: 'relative', overflow: 'hidden',
           fontFamily: 'Arial, sans-serif',
           border: `1px solid ${borderColor}`,
@@ -345,7 +345,7 @@ export default function Carteirinha() {
         </div>
       </div>
 
-      <p style={{ color: 'rgba(240,244,255,0.25)', fontSize: 11, textAlign: 'center', padding: '0 24px' }}>
+      <p style={{ color: '#9CA3AF', fontSize: 11, textAlign: 'center', padding: '0 24px' }}>
         No diálogo de impressão defina o tamanho como Personalizado 85.6 × 54mm ou imprima em A4 e recorte.
       </p>
     </div>

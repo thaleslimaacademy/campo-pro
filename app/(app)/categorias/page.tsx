@@ -4,10 +4,10 @@ import AdminGuard from '@/components/AdminGuard'
 import BottomNav from '@/components/ui/BottomNav'
 import { getCategorias, criarCategoria, editarCategoria, excluirCategoria, vincularTurmaCategoria } from './actions'
 
-const T = { bg:'#0A0E1A', surface:'#0D1220', surface2:'#121A2E', primary:'#4169E1', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', border:'rgba(240,244,255,0.08)', green:'#00D67A', red:'#FF4444', gold:'#FFD700' }
+const T = { bg:'#F6F8F7', surface:'#FFFFFF', surface2:'#F3F5F4', primary:'#2EA866', text:'#1F2937', muted:'#6B7280', border:'rgba(16,24,40,0.1)', green:'#16A34A', red:'#DC2626', gold:'#B7791F' }
 const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
-const INP: React.CSSProperties = { width:'100%', background:'#080C15', border:`1px solid rgba(240,244,255,0.1)`, borderRadius:8, padding:'11px 14px', color:T.text, fontFamily:INTER, fontSize:13, boxSizing:'border-box' }
+const INP: React.CSSProperties = { width:'100%', background:'#F6F8F7', border:`1px solid rgba(16,24,40,0.1)`, borderRadius:8, padding:'11px 14px', color:T.text, fontFamily:INTER, fontSize:13, boxSizing:'border-box' }
 const LBL: React.CSSProperties = { fontSize:10, color:T.muted, textTransform:'uppercase', letterSpacing:'0.8px', display:'block', marginBottom:4 }
 
 const CORES = ['#4169E1','#00BFFF','#00D67A','#FFD700','#FF9500','#FF4444','#8B5CF6','#EC4899','#06B6D4','#F97316']
@@ -16,7 +16,7 @@ const MODALIDADES = ['futebol','futsal','futvolei','artes_marciais','outras']
 type Categoria = { id: string; nome: string; descricao: string | null; idadeMin: number | null; idadeMax: number | null; modalidade: string; cor: string }
 type Turma = { id: string; nome: string; categoriaId: string | null }
 
-const FORM_VAZIO = { nome:'', descricao:'', idadeMin:'', idadeMax:'', modalidade:'futebol', cor:'#4169E1' }
+const FORM_VAZIO = { nome:'', descricao:'', idadeMin:'', idadeMax:'', modalidade:'futebol', cor:'#2EA866' }
 
 function CategoriasInner() {
   const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -69,13 +69,13 @@ function CategoriasInner() {
     <div style={{ minHeight:'100vh', background:T.bg, color:T.text, fontFamily:INTER, paddingBottom:80 }}>
 
       {/* HEADER */}
-      <div style={{ background:T.primary, padding:'20px 20px 20px' }}>
+      <div style={{ background:'#FFFFFF', borderBottom: '1px solid #E3E8E5', padding:'20px 20px 20px' }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
           <div>
-            <div style={{ fontSize:10, color:'rgba(240,244,255,0.65)', textTransform:'uppercase', letterSpacing:2, fontWeight:700, marginBottom:2 }}>Elenco</div>
+            <div style={{ fontSize:10, color:'#374151', textTransform:'uppercase', letterSpacing:2, fontWeight:700, marginBottom:2 }}>Elenco</div>
             <div style={{ fontFamily:SYNE, fontWeight:900, fontSize:22, color:T.text, letterSpacing:-0.5, textTransform:'uppercase' }}>Categorias</div>
           </div>
-          <button onClick={abrirNova} style={{ background:'rgba(240,244,255,0.15)', border:'1px solid rgba(240,244,255,0.2)', color:T.text, borderRadius:10, padding:'10px 14px', fontFamily:SYNE, fontWeight:700, fontSize:12, cursor:'pointer', textTransform:'uppercase' }}>
+          <button onClick={abrirNova} style={{ background:'#EEF1EF', border:'1px solid rgba(16,24,40,0.18)', color:T.text, borderRadius:10, padding:'10px 14px', fontFamily:SYNE, fontWeight:700, fontSize:12, cursor:'pointer', textTransform:'uppercase' }}>
             + Nova
           </button>
         </div>
@@ -165,7 +165,7 @@ function CategoriasInner() {
                 <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginTop:4, alignItems:'center' }}>
                   {CORES.map(cor => (
                     <button key={cor} onClick={() => setForm(p=>({...p,cor}))}
-                      style={{ width:32, height:32, borderRadius:8, background:cor, border:`2px solid ${form.cor===cor?'#fff':cor+'44'}`, cursor:'pointer' }} />
+                      style={{ width:32, height:32, borderRadius:8, background:cor, border:`2px solid ${form.cor===cor?'#E3E8E5':cor+'44'}`, cursor:'pointer' }} />
                   ))}
                   <input type="color" value={form.cor} onChange={e => setForm(p=>({...p,cor:e.target.value}))}
                     style={{ width:32, height:32, borderRadius:8, border:`1px solid ${T.border}`, cursor:'pointer', padding:2, background:'transparent' }} />
@@ -173,7 +173,7 @@ function CategoriasInner() {
               </div>
               <div style={{ display:'flex', gap:10, marginTop:4 }}>
                 <button onClick={() => setModal(null)} style={{ flex:1, background:'transparent', border:`1px solid ${T.border}`, color:T.muted, padding:'13px', borderRadius:10, fontFamily:SYNE, fontWeight:600, fontSize:13, cursor:'pointer' }}>Cancelar</button>
-                <button onClick={salvar} disabled={!form.nome || salvando} style={{ flex:2, background:T.primary, color:T.text, padding:'13px', borderRadius:10, fontFamily:SYNE, fontWeight:800, fontSize:13, border:'none', cursor:'pointer', textTransform:'uppercase', opacity:(!form.nome||salvando)?0.5:1 }}>
+                <button onClick={salvar} disabled={!form.nome || salvando} style={{ flex:2, background:T.primary, color:'#fff', padding:'13px', borderRadius:10, fontFamily:SYNE, fontWeight:800, fontSize:13, border:'none', cursor:'pointer', textTransform:'uppercase', opacity:(!form.nome||salvando)?0.5:1 }}>
                   {salvando ? 'Salvando...' : 'Salvar'}
                 </button>
               </div>
@@ -208,7 +208,7 @@ function CategoriasInner() {
                 )
               })}
             </div>
-            <button onClick={() => { setModal(null); carregar() }} style={{ width:'100%', marginTop:16, background:T.primary, color:T.text, padding:'13px', borderRadius:10, fontFamily:SYNE, fontWeight:800, fontSize:13, border:'none', cursor:'pointer', textTransform:'uppercase' }}>
+            <button onClick={() => { setModal(null); carregar() }} style={{ width:'100%', marginTop:16, background:T.primary, color:'#fff', padding:'13px', borderRadius:10, fontFamily:SYNE, fontWeight:800, fontSize:13, border:'none', cursor:'pointer', textTransform:'uppercase' }}>
               Concluir
             </button>
           </div>

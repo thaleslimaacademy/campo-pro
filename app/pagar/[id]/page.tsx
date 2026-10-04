@@ -16,19 +16,19 @@ type Cobranca = {
 
 // ── Design system do app ──
 const T = {
-  bg:       '#0A0E1A',
-  surface:  '#0D1220',
-  surface2: '#121A2E',
-  primary:  '#4169E1',
-  cobalt:   '#1A3FA8',
-  sky:      '#7DD3FC',
-  text:     '#F0F4FF',
-  muted:    'rgba(240,244,255,0.45)',
-  faint:    'rgba(240,244,255,0.25)',
-  border:   'rgba(240,244,255,0.08)',
-  green:    '#00D67A',
-  red:      '#FF4444',
-  gold:     '#FFD700',
+  bg:       '#F6F8F7',
+  surface:  '#FFFFFF',
+  surface2: '#F3F5F4',
+  primary:  '#2EA866',
+  cobalt:   '#23874F',
+  sky:      '#6B7280',
+  text:     '#1F2937',
+  muted:    '#6B7280',
+  faint:    '#9CA3AF',
+  border:   'rgba(16,24,40,0.1)',
+  green:    '#16A34A',
+  red:      '#DC2626',
+  gold:     '#B7791F',
 }
 const SYNE  = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'

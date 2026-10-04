@@ -157,7 +157,7 @@ export default function MatriculaClient({ escolaId, escolaNome, escolaLogoUrl, v
             {STEPS.map((s, i) => (
               <div key={s} style={{ display:'flex', alignItems:'center', flex: i < STEPS.length-1 ? 1 : 'none' }}>
                 <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:4 }}>
-                  <div style={{ width:28, height:28, borderRadius:'50%', background: i <= stepIdx ? accent : borderCol, border: `2px solid ${i <= stepIdx ? accent : borderCol}`, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:SYNE, fontWeight:800, fontSize:12, color: i <= stepIdx ? '#fff' : mutedCol, transition:'all 0.2s' }}>
+                  <div style={{ width:28, height:28, borderRadius:'50%', background: i <= stepIdx ? accent : borderCol, border: `2px solid ${i <= stepIdx ? accent : borderCol}`, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:SYNE, fontWeight:800, fontSize:12, color: i <= stepIdx ? '#1F2937' : mutedCol, transition:'all 0.2s' }}>
                     {i < stepIdx ? '✓' : i+1}
                   </div>
                   <span style={{ fontSize:10, color: i <= stepIdx ? accent : mutedCol, fontWeight: i === stepIdx ? 700 : 400, whiteSpace:'nowrap' }}>{s}</span>
@@ -173,7 +173,7 @@ export default function MatriculaClient({ escolaId, escolaNome, escolaLogoUrl, v
 
         {erro && (
           <div style={{ background:'rgba(255,68,68,0.1)', border:'1px solid rgba(255,68,68,0.3)', borderRadius:10, padding:'11px 14px', marginBottom:16 }}>
-            <p style={{ color:'#FF4444', fontSize:13, margin:0 }}>❌ {erro}</p>
+            <p style={{ color:'#DC2626', fontSize:13, margin:0 }}>❌ {erro}</p>
           </div>
         )}
 
@@ -268,7 +268,7 @@ export default function MatriculaClient({ escolaId, escolaNome, escolaLogoUrl, v
               </div>
             </div>
 
-            <button onClick={avancarParaContrato} style={{ width:'100%', background:accent, color:'#fff', padding:'16px', borderRadius:12, fontFamily:SYNE, fontWeight:800, fontSize:15, border:'none', cursor:'pointer', textTransform:'uppercase', letterSpacing:0.5 }}>
+            <button onClick={avancarParaContrato} style={{ width:'100%', background:accent, color:'#1F2937', padding:'16px', borderRadius:12, fontFamily:SYNE, fontWeight:800, fontSize:15, border:'none', cursor:'pointer', textTransform:'uppercase', letterSpacing:0.5 }}>
               Continuar para o contrato →
             </button>
           </>
@@ -305,7 +305,7 @@ export default function MatriculaClient({ escolaId, escolaNome, escolaLogoUrl, v
             <div style={{ display:'flex', gap:10 }}>
               <button onClick={() => { setStep('form'); setErro('') }} style={{ flex:1, background:'transparent', border:`1px solid ${borderCol}`, color:mutedCol, padding:'14px', borderRadius:12, fontFamily:SYNE, fontWeight:700, fontSize:13, cursor:'pointer' }}>← Voltar</button>
               <button onClick={assinarEEnviar} disabled={enviando || !contratoLido || !assinatura.trim()}
-                style={{ flex:2, background:enviando||!contratoLido||!assinatura.trim()?borderCol:accent, color:'#fff', padding:'14px', borderRadius:12, fontFamily:SYNE, fontWeight:800, fontSize:14, border:'none', cursor:enviando?'not-allowed':'pointer', textTransform:'uppercase', letterSpacing:0.5, opacity:!contratoLido||!assinatura.trim()?0.5:1 }}>
+                style={{ flex:2, background:enviando||!contratoLido||!assinatura.trim()?borderCol:accent, color:'#1F2937', padding:'14px', borderRadius:12, fontFamily:SYNE, fontWeight:800, fontSize:14, border:'none', cursor:enviando?'not-allowed':'pointer', textTransform:'uppercase', letterSpacing:0.5, opacity:!contratoLido||!assinatura.trim()?0.5:1 }}>
                 {enviando ? 'Enviando...' : '✅ Assinar e enviar'}
               </button>
             </div>

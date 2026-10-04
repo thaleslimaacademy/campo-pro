@@ -3,7 +3,7 @@ import { useState, useRef } from 'react'
 import { importarAtletas, type AtletaImport } from './actions'
 import Link from 'next/link'
 
-const C = { bg: '#0A0E1A', surface: '#1A1A2E', orange: '#4169E1', gold: '#FFD700', green: '#00D67A', red: '#FF4B4B', muted: 'rgba(255,255,255,0.4)', border: 'rgba(255,255,255,0.08)' }
+const C = { bg: '#F6F8F7', surface: '#FFFFFF', orange: '#2EA866', gold: '#B7791F', green: '#16A34A', red: '#DC2626', muted: '#6B7280', border: 'rgba(16,24,40,0.1)' }
 const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
 
@@ -118,7 +118,7 @@ export default function ImportarPage() {
   const erros = resultados.filter(r => !r.ok).length
 
   return (
-    <div style={{ minHeight: '100vh', background: C.bg, color: '#F0F4FF', fontFamily: INTER, padding: '0 0 80px' }}>
+    <div style={{ minHeight: '100vh', background: C.bg, color: '#1F2937', fontFamily: INTER, padding: '0 0 80px' }}>
 
       <div style={{ padding: '20px 20px 16px' }}>
         <p style={{ color: C.muted, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>Atletas</p>
@@ -141,7 +141,7 @@ export default function ImportarPage() {
             style={{ border: `2px dashed ${C.border}`, borderRadius: 16, padding: '48px 24px', textAlign: 'center', cursor: 'pointer', background: C.surface, transition: 'border-color 0.2s' }}
           >
             <div style={{ fontSize: 48, marginBottom: 12 }}>📂</div>
-            <p style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 16, color: '#fff', marginBottom: 8 }}>Arraste ou clique para enviar</p>
+            <p style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 16, color: '#1F2937', marginBottom: 8 }}>Arraste ou clique para enviar</p>
             <p style={{ color: C.muted, fontSize: 13 }}>Excel (.xlsx, .xls) ou CSV (.csv)</p>
             <input ref={inputRef} type="file" accept=".xlsx,.xls,.csv" style={{ display: 'none' }}
               onChange={e => { const f = e.target.files?.[0]; if(f) handleFile(f) }} />
@@ -160,7 +160,7 @@ export default function ImportarPage() {
       {step === 'mapear' && (
         <div style={{ padding: '0 20px' }}>
           <div style={{ background: C.surface, borderRadius: 16, padding: 20, border: `1px solid ${C.border}`, marginBottom: 16 }}>
-            <p style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 14, color: '#fff', marginBottom: 4 }}>
+            <p style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 14, color: '#1F2937', marginBottom: 4 }}>
               {linhas.length} linhas encontradas
             </p>
             <p style={{ color: C.muted, fontSize: 12 }}>Confirme o mapeamento das colunas:</p>
@@ -169,12 +169,12 @@ export default function ImportarPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
             {colunas.map(col => (
               <div key={col} style={{ display: 'flex', alignItems: 'center', gap: 12, background: C.surface, borderRadius: 12, padding: '12px 16px', border: `1px solid ${C.border}` }}>
-                <span style={{ flex: 1, fontSize: 13, color: '#fff', fontFamily: SYNE }}>{col}</span>
+                <span style={{ flex: 1, fontSize: 13, color: '#1F2937', fontFamily: SYNE }}>{col}</span>
                 <span style={{ color: C.muted, fontSize: 12 }}>→</span>
                 <select
                   value={mapeamento[col] || ''}
                   onChange={e => setMapeamento(prev => ({ ...prev, [col]: e.target.value as keyof AtletaImport | '' }))}
-                  style={{ background: '#0A0E1A', border: `1px solid ${C.border}`, color: mapeamento[col] ? C.orange : C.muted, padding: '6px 10px', borderRadius: 8, fontFamily: INTER, fontSize: 12 }}
+                  style={{ background: '#F6F8F7', border: `1px solid ${C.border}`, color: mapeamento[col] ? C.orange : C.muted, padding: '6px 10px', borderRadius: 8, fontFamily: INTER, fontSize: 12 }}
                 >
                   <option value="">— ignorar —</option>
                   {CAMPOS.map(c => <option key={c.key} value={c.key}>{c.label}{c.required ? ' *' : ''}</option>)}
@@ -194,7 +194,7 @@ export default function ImportarPage() {
       {step === 'preview' && (
         <div style={{ padding: '0 20px' }}>
           <div style={{ background: C.surface, borderRadius: 12, padding: '12px 16px', marginBottom: 16, border: `1px solid ${C.border}` }}>
-            <p style={{ color: '#fff', fontFamily: SYNE, fontWeight: 700, fontSize: 14 }}>
+            <p style={{ color: '#1F2937', fontFamily: SYNE, fontWeight: 700, fontSize: 14 }}>
               {atletasParaImportar().length} atletas prontos para importar
             </p>
             <p style={{ color: C.muted, fontSize: 12, marginTop: 4 }}>Primeiros 5 registros:</p>
@@ -203,7 +203,7 @@ export default function ImportarPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
             {atletasParaImportar().slice(0, 5).map((a, i) => (
               <div key={i} style={{ background: C.surface, borderRadius: 12, padding: '12px 16px', border: `1px solid ${C.border}` }}>
-                <p style={{ fontFamily: SYNE, fontWeight: 700, color: '#fff', fontSize: 14, margin: '0 0 4px' }}>{a.nome}</p>
+                <p style={{ fontFamily: SYNE, fontWeight: 700, color: '#1F2937', fontSize: 14, margin: '0 0 4px' }}>{a.nome}</p>
                 <p style={{ color: C.muted, fontSize: 12 }}>
                   {[a.posicao, a.cidade, a.nomeResponsavel].filter(Boolean).join(' · ')}
                 </p>
@@ -217,7 +217,7 @@ export default function ImportarPage() {
               ← Voltar
             </button>
             <button onClick={importar} disabled={importando}
-              style={{ flex: 2, background: importando ? C.surface : C.green, color: '#fff', padding: '15px', borderRadius: 14, fontFamily: SYNE, fontWeight: 800, fontSize: 14, border: 'none', cursor: importando ? 'not-allowed' : 'pointer' }}>
+              style={{ flex: 2, background: importando ? C.surface : C.green, color: importando ? '#1F2937' : '#fff', padding: '15px', borderRadius: 14, fontFamily: SYNE, fontWeight: 800, fontSize: 14, border: 'none', cursor: importando ? 'not-allowed' : 'pointer' }}>
               {importando ? 'Importando...' : `🚀 Importar ${atletasParaImportar().length} atletas`}
             </button>
           </div>

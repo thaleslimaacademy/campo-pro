@@ -53,9 +53,9 @@ export default function QRCodeMatricula() {
         </div>
 
         <div className="border-t border-gray-200 pt-4 space-y-1">
-          <p className="text-xs text-gray-400">✅ Ficha completa online</p>
-          <p className="text-xs text-gray-400">✅ Contrato com assinatura digital</p>
-          <p className="text-xs text-gray-400">✅ Confirmação via WhatsApp</p>
+          <p className="text-xs text-gray-500">✅ Ficha completa online</p>
+          <p className="text-xs text-gray-500">✅ Contrato com assinatura digital</p>
+          <p className="text-xs text-gray-500">✅ Confirmação via WhatsApp</p>
         </div>
       </div>
 
@@ -67,7 +67,7 @@ export default function QRCodeMatricula() {
         🖨️ Imprimir QR Code
       </button>
 
-      <p className="text-gray-400 text-xs mt-4 print:hidden">
+      <p className="text-gray-500 text-xs mt-4 print:hidden">
         Acesse esta página em: <span className="text-green-600">campo-pro.vercel.app/qrcode</span>
       </p>
 

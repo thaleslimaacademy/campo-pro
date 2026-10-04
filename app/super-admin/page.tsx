@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 
-const T = { bg:'#0A0E1A', surface:'#0D1220', surface2:'#121A2E', primary:'#4169E1', accent:'#00BFFF', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', border:'rgba(240,244,255,0.08)', green:'#00D67A', gold:'#FFD700', red:'#FF4444' }
+const T = { bg:'#F6F8F7', surface:'#FFFFFF', surface2:'#F3F5F4', primary:'#2EA866', accent:'#23874F', text:'#1F2937', muted:'#6B7280', border:'rgba(16,24,40,0.1)', green:'#16A34A', gold:'#B7791F', red:'#DC2626' }
 const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
 const CARD: React.CSSProperties = { background:T.surface, border:`1px solid ${T.border}`, borderRadius:14, padding:16, marginBottom:12 }
@@ -105,7 +105,7 @@ export default function SuperAdmin() {
               <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:12, color:T.gold, margin:'0 0 2px', textTransform:'uppercase' }}>⚡ Modo gestor ativo</p>
               <p style={{ fontSize:12, color:T.muted, margin:0 }}>Você está visualizando outra escola. Dashboard e dados refletem essa escola.</p>
             </div>
-            <button onClick={() => trocarEscola(null)} style={{ background:'rgba(255,68,68,0.1)', border:'1px solid rgba(255,68,68,0.3)', color:'#FF4444', padding:'8px 14px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:11, cursor:'pointer', textTransform:'uppercase', flexShrink:0, marginLeft:12 }}>
+            <button onClick={() => trocarEscola(null)} style={{ background:'rgba(255,68,68,0.1)', border:'1px solid rgba(255,68,68,0.3)', color:'#DC2626', padding:'8px 14px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:11, cursor:'pointer', textTransform:'uppercase', flexShrink:0, marginLeft:12 }}>
               ✕ Sair
             </button>
           </div>
@@ -145,7 +145,7 @@ export default function SuperAdmin() {
               {acao.tipo === 'plano' ? (
                 <div>
                   <p style={{ fontSize:11, color:T.muted, marginBottom:8, textTransform:'uppercase', letterSpacing:0.8 }}>Novo plano</p>
-                  <select value={novoPlano} onChange={e => setNovoPlano(e.target.value)} style={{ width:'100%', background:'#080C15', border:`1px solid ${T.border}`, borderRadius:8, padding:'11px 14px', color:T.text, fontFamily:INTER, fontSize:13, marginBottom:16 }}>
+                  <select value={novoPlano} onChange={e => setNovoPlano(e.target.value)} style={{ width:'100%', background:'#F6F8F7', border:`1px solid ${T.border}`, borderRadius:8, padding:'11px 14px', color:T.text, fontFamily:INTER, fontSize:13, marginBottom:16 }}>
                     <option value="ELITE">Elite — R$199/mês</option>
                     <option value="PRO">Pro — R$129/mês</option>
                     <option value="STARTER">Starter — R$79/mês</option>
@@ -154,12 +154,12 @@ export default function SuperAdmin() {
               ) : (
                 <div>
                   <p style={{ fontSize:11, color:T.muted, marginBottom:8, textTransform:'uppercase', letterSpacing:0.8 }}>Dias de trial</p>
-                  <input type="number" value={diasTrial} onChange={e => setDiasTrial(e.target.value)} style={{ width:'100%', background:'#080C15', border:`1px solid ${T.border}`, borderRadius:8, padding:'11px 14px', color:T.text, fontFamily:INTER, fontSize:13, marginBottom:16, boxSizing:'border-box' }} />
+                  <input type="number" value={diasTrial} onChange={e => setDiasTrial(e.target.value)} style={{ width:'100%', background:'#F6F8F7', border:`1px solid ${T.border}`, borderRadius:8, padding:'11px 14px', color:T.text, fontFamily:INTER, fontSize:13, marginBottom:16, boxSizing:'border-box' }} />
                 </div>
               )}
               <div style={{ display:'flex', gap:10 }}>
                 <button onClick={() => setAcao(null)} style={{ flex:1, background:'transparent', border:`1px solid ${T.border}`, color:T.muted, padding:'12px', borderRadius:8, fontFamily:SYNE, fontWeight:600, fontSize:13, cursor:'pointer' }}>Cancelar</button>
-                <button onClick={aplicarAcao} disabled={salvando} style={{ flex:2, background:T.primary, color:T.text, padding:'12px', borderRadius:8, fontFamily:SYNE, fontWeight:800, fontSize:13, border:'none', cursor:'pointer', textTransform:'uppercase' }}>
+                <button onClick={aplicarAcao} disabled={salvando} style={{ flex:2, background:T.primary, color:'#fff', padding:'12px', borderRadius:8, fontFamily:SYNE, fontWeight:800, fontSize:13, border:'none', cursor:'pointer', textTransform:'uppercase' }}>
                   {salvando ? 'Salvando...' : 'Confirmar'}
                 </button>
               </div>

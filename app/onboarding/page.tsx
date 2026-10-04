@@ -4,10 +4,10 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
-const T = { bg:'#0A0E1A', surface:'#0D1220', primary:'#4169E1', accent:'#00BFFF', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', border:'rgba(240,244,255,0.08)', green:'#00D67A', red:'#FF4444' }
+const T = { bg:'#F6F8F7', surface:'#FFFFFF', primary:'#2EA866', accent:'#23874F', text:'#1F2937', muted:'#6B7280', border:'rgba(16,24,40,0.1)', green:'#16A34A', red:'#DC2626' }
 const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
-const INP: React.CSSProperties = { width:'100%', background:'#080C15', border:`1px solid rgba(240,244,255,0.12)`, borderRadius:10, padding:'13px 14px', color:T.text, fontFamily:INTER, fontSize:14, boxSizing:'border-box', outline:'none', marginTop:6 }
+const INP: React.CSSProperties = { width:'100%', background:'#F6F8F7', border:`1px solid rgba(16,24,40,0.1)`, borderRadius:10, padding:'13px 14px', color:T.text, fontFamily:INTER, fontSize:14, boxSizing:'border-box', outline:'none', marginTop:6 }
 const LBL: React.CSSProperties = { fontSize:11, color:T.muted, textTransform:'uppercase', letterSpacing:'0.8px' }
 const ESTADOS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO']
 
@@ -136,13 +136,13 @@ function OnboardingContent() {
           )}
           {step === 1 && (
             <button onClick={() => { if (!form.nomeEscola) { setErro('Nome da escola obrigatório.'); return }; setErro(''); setStep(2) }}
-              style={{ flex:1, background:T.primary, color:T.text, padding:'15px', borderRadius:12, fontFamily:SYNE, fontWeight:800, fontSize:14, border:'none', cursor:'pointer', textTransform:'uppercase', letterSpacing:0.5 }}>
+              style={{ flex:1, background:T.primary, color:'#fff', padding:'15px', borderRadius:12, fontFamily:SYNE, fontWeight:800, fontSize:14, border:'none', cursor:'pointer', textTransform:'uppercase', letterSpacing:0.5 }}>
               Continuar →
             </button>
           )}
           {step === 2 && (
             <button onClick={finalizar} disabled={salvando}
-              style={{ flex:2, background:salvando?T.border:T.primary, color:T.text, padding:'15px', borderRadius:12, fontFamily:SYNE, fontWeight:800, fontSize:14, border:'none', cursor:salvando?'not-allowed':'pointer', textTransform:'uppercase', letterSpacing:0.5, opacity:salvando?0.7:1 }}>
+              style={{ flex:2, background:salvando?T.border:T.primary, color:'#fff', padding:'15px', borderRadius:12, fontFamily:SYNE, fontWeight:800, fontSize:14, border:'none', cursor:salvando?'not-allowed':'pointer', textTransform:'uppercase', letterSpacing:0.5, opacity:salvando?0.7:1 }}>
               {salvando ? 'Criando...' : '🚀 Começar grátis'}
             </button>
           )}

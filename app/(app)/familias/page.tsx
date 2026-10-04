@@ -4,7 +4,7 @@ import AdminGuard from '@/components/AdminGuard'
 import BottomNav from '@/components/ui/BottomNav'
 import { listarFamiliasPendentes, confirmarFamilia, rejeitarFamilia, desvincularAtleta } from './actions'
 
-const T = { bg: '#0A0E1A', surface: '#0D1220', primary: '#4169E1', accent: '#00BFFF', text: '#F0F4FF', muted: 'rgba(240,244,255,0.4)', border: 'rgba(240,244,255,0.08)', green: '#00D67A', red: '#FF4444', gold: '#FFD700' }
+const T = { bg: '#F6F8F7', surface: '#FFFFFF', primary: '#2EA866', accent: '#23874F', text: '#1F2937', muted: '#6B7280', border: 'rgba(16,24,40,0.1)', green: '#16A34A', red: '#DC2626', gold: '#B7791F' }
 const SYNE = 'Syne, sans-serif'
 
 type Atleta = { id: string; nome: string; familiaId: string | null; valorMensalidade: number | null; diaVencimento: number | null }
@@ -57,10 +57,10 @@ function FamiliasInner() {
 
   return (
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, padding: '0 0 80px', fontFamily: 'Inter, sans-serif' }}>
-      <div style={{ background: T.primary, padding: '20px 20px 16px' }}>
-        <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Financeiro</div>
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 20px 16px' }}>
+        <div style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Financeiro</div>
         <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: T.text, letterSpacing: -0.8, textTransform: 'uppercase' }}>
-          Famílias <span style={{ color: '#7DD3FC', fontStyle: 'italic' }}>{familias.length}</span>
+          Famílias <span style={{ color: '#4B5563', fontStyle: 'italic' }}>{familias.length}</span>
         </div>
       </div>
 
@@ -116,7 +116,7 @@ function FamiliasInner() {
               <button
                 onClick={() => confirmar(familia.id)}
                 disabled={processando}
-                style={{ flex: 1, background: T.green, color: '#001', padding: '11px', borderRadius: 8, fontFamily: SYNE, fontWeight: 800, fontSize: 12, border: 'none', cursor: 'pointer', textTransform: 'uppercase', opacity: processando ? 0.6 : 1 }}
+                style={{ flex: 1, background: T.green, color: '#fff', padding: '11px', borderRadius: 8, fontFamily: SYNE, fontWeight: 800, fontSize: 12, border: 'none', cursor: 'pointer', textTransform: 'uppercase', opacity: processando ? 0.6 : 1 }}
               >
                 ✅ Confirmar
               </button>

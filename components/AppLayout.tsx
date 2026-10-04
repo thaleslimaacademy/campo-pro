@@ -6,12 +6,12 @@ import { usePerfil } from '@/lib/usePerfil'
 import AccountButton from '@/components/AccountButton'
 
 const T = {
-  bg:      '#0A0E1A',
-  primary: '#4169E1',
-  accent:  '#00BFFF',
-  text:    '#F0F4FF',
-  muted:   'rgba(240,244,255,0.35)',
-  border:  'rgba(65,105,225,0.12)',
+  bg:      '#F6F8F7',
+  primary: '#2EA866',
+  accent:  '#23874F',
+  text:    '#1F2937',
+  muted:   '#6B7280',
+  border:  'rgba(46,168,102,0.12)',
 }
 const SYNE  = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
@@ -75,7 +75,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* BOTTOM NAV */}
       <nav style={{
         position: 'fixed', bottom: 0, left: 0, right: 0,
-        background: 'rgba(10,14,26,0.97)',
+        background: 'rgba(255,255,255,0.97)',
         backdropFilter: 'blur(16px)',
         borderTop: `1px solid ${T.border}`,
         display: 'flex', justifyContent: 'space-around',
@@ -95,7 +95,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <div style={{
                   position: 'absolute', top: -2, left: '50%', transform: 'translateX(-50%)',
                   width: 44, height: 40, borderRadius: 10,
-                  background: 'rgba(65,105,225,0.12)', border: '1px solid rgba(65,105,225,0.22)',
+                  background: 'rgba(46,168,102,0.12)', border: '1px solid rgba(46,168,102,0.22)',
                 }} />
               )}
               <i

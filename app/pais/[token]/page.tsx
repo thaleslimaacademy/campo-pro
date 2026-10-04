@@ -3,12 +3,12 @@ import PushNotificationButton from '@/components/PushNotificationButton'
 import AtivarDebitoAutomatico from './AtivarDebitoAutomatico'
 
 const T = {
-  bg: '#060B05',
-  surface: 'rgba(244,251,239,0.025)',
+  bg: '#F6F8F7',
+  surface: '#FFFFFF',
   turf: '#3ED54A',
-  gold: '#D4AF37',
+  gold: '#B7791F',
   chalk: '#F4FBEF',
-  muted: 'rgba(244,251,239,0.45)',
+  muted: '#6B7280',
   alert: '#FF5252',
 }
 const SYNE = 'Syne, sans-serif'
@@ -26,11 +26,11 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
 
   if (!atleta) {
     return (
-      <div style={{ background: T.bg, fontFamily: INTER }} className="min-h-screen text-white flex flex-col items-center justify-center p-6">
+      <div style={{ background: T.bg, fontFamily: INTER }} className="min-h-screen text-gray-900 flex flex-col items-center justify-center p-6">
         <div className="text-center">
           <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-3xl mx-auto mb-4">❌</div>
           <h2 className="text-xl font-black" style={{ fontFamily: SYNE }}>Link inválido</h2>
-          <p className="text-gray-400 mt-2 text-sm">Este link não existe ou expirou.</p>
+          <p className="text-gray-500 mt-2 text-sm">Este link não existe ou expirou.</p>
         </div>
       </div>
     )
@@ -85,15 +85,15 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
   const barColor = percentual >= 75 ? T.turf : percentual >= 50 ? T.gold : T.alert
   const barLabel = percentual >= 75 ? 'Frequência em dia' : percentual === 0 ? 'Nenhum treino registrado este mês' : 'Frequência abaixo do ideal'
 
-  const CARD: React.CSSProperties = { background: T.surface, border: '1px solid rgba(244,251,239,0.08)', borderRadius: 18, padding: 18 }
+  const CARD: React.CSSProperties = { background: T.surface, border: '1px solid rgba(16,24,40,0.1)', borderRadius: 18, padding: 18 }
   const EYEBROW: React.CSSProperties = { fontFamily: SYNE, fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: T.gold, marginBottom: 14 }
 
   return (
-    <div style={{ background: `linear-gradient(180deg, ${T.bg} 0%, #050705 45%, #030402 100%)`, fontFamily: INTER }} className="min-h-screen text-white pb-14">
+    <div style={{ background: `linear-gradient(180deg, ${T.bg} 0%, #FFFFFF 45%, #FFFFFF 100%)`, fontFamily: INTER }} className="min-h-screen text-gray-900 pb-14">
       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" />
 
       {/* ── HERO / CARTÃO DE ESCALAÇÃO ── */}
-      <div style={{ position: 'relative', overflow: 'hidden', padding: '38px 20px 26px', borderBottom: '1px solid rgba(244,251,239,0.06)' }}>
+      <div style={{ position: 'relative', overflow: 'hidden', padding: '38px 20px 26px', borderBottom: '1px solid rgba(16,24,40,0.1)' }}>
         {/* marcação de campo, decorativa, baixa opacidade */}
         <svg viewBox="0 0 400 220" style={{ position: 'absolute', top: -20, left: '50%', transform: 'translateX(-50%)', width: 460, opacity: 0.1, pointerEvents: 'none' }}>
           <line x1="200" y1="0" x2="200" y2="220" stroke={T.turf} strokeWidth="1.5" />
@@ -124,17 +124,17 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
         </div>
 
         {/* faixa estilo placar */}
-        <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'center', gap: 28, marginTop: 24, paddingTop: 18, borderTop: '1px solid rgba(244,251,239,0.06)' }}>
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'center', gap: 28, marginTop: 24, paddingTop: 18, borderTop: '1px solid rgba(16,24,40,0.1)' }}>
           <div style={{ textAlign: 'center' }}>
             <p style={{ fontFamily: MONO, fontWeight: 700, fontSize: 20, color: barColor }}>{percentual}%</p>
             <p style={{ fontSize: 9, color: T.muted, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 2 }}>Presença</p>
           </div>
-          <div style={{ width: 1, background: 'rgba(244,251,239,0.1)' }} />
+          <div style={{ width: 1, background: '#E5E7EB' }} />
           <div style={{ textAlign: 'center' }}>
             <p style={{ fontFamily: MONO, fontWeight: 700, fontSize: 20, color: T.gold }}>{totalConquistas}</p>
             <p style={{ fontSize: 9, color: T.muted, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 2 }}>Conquistas</p>
           </div>
-          <div style={{ width: 1, background: 'rgba(244,251,239,0.1)' }} />
+          <div style={{ width: 1, background: '#E5E7EB' }} />
           <div style={{ textAlign: 'center' }}>
             <p style={{ fontFamily: MONO, fontWeight: 700, fontSize: 20, color: temInadimplencia ? T.alert : T.chalk }}>{'R$' + totalPendente.toFixed(0)}</p>
             <p style={{ fontSize: 9, color: T.muted, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 2 }}>A pagar</p>
@@ -151,12 +151,12 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
           <div className="flex items-end gap-4 mb-3">
             <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 44, lineHeight: 1, color: barColor }}>{percentual}%</span>
             <div className="pb-1">
-              <p className="text-sm font-semibold text-white">{presentes} de {total} treinos</p>
+              <p className="text-sm font-semibold text-gray-900">{presentes} de {total} treinos</p>
               <p className="text-xs mt-0.5" style={{ color: barColor + 'CC' }}>{barLabel}</p>
             </div>
           </div>
           {total > 0 && (
-            <div style={{ width: '100%', borderRadius: 999, height: 6, background: 'rgba(244,251,239,0.07)' }}>
+            <div style={{ width: '100%', borderRadius: 999, height: 6, background: '#E5E7EB' }}>
               <div style={{ width: percentual + '%', height: 6, borderRadius: 999, background: barColor, boxShadow: `0 0 10px ${barColor}70`, transition: 'width 0.7s' }} />
             </div>
           )}
@@ -178,8 +178,8 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
               <p style={{ fontFamily: MONO, fontWeight: 700, fontSize: 17, color: T.turf }}>{'R$ ' + totalPago.toFixed(2)}</p>
               <p className="text-xs mt-1" style={{ color: T.muted }}>Total pago</p>
             </div>
-            <div className="rounded-xl p-3 text-center" style={{ background: totalPendente > 0 ? `${T.gold}0A` : 'rgba(244,251,239,0.03)', border: totalPendente > 0 ? `1px solid ${T.gold}35` : '1px solid rgba(244,251,239,0.07)' }}>
-              <p style={{ fontFamily: MONO, fontWeight: 700, fontSize: 17, color: totalPendente > 0 ? T.gold : '#4B5563' }}>{'R$ ' + totalPendente.toFixed(2)}</p>
+            <div className="rounded-xl p-3 text-center" style={{ background: totalPendente > 0 ? `${T.gold}0A` : '#FFFFFF', border: totalPendente > 0 ? `1px solid ${T.gold}35` : '1px solid rgba(16,24,40,0.1)' }}>
+              <p style={{ fontFamily: MONO, fontWeight: 700, fontSize: 17, color: totalPendente > 0 ? T.gold : '#1F2937' }}>{'R$ ' + totalPendente.toFixed(2)}</p>
               <p className="text-xs mt-1" style={{ color: T.muted }}>A pagar</p>
             </div>
           </div>
@@ -189,10 +189,10 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
           ) : (
             <div className="space-y-2">
               {cobrancas.map(c => (
-                <div key={c.id} className="rounded-xl p-3" style={{ background: statusBg[c.status] || 'rgba(244,251,239,0.03)', border: `1px solid ${statusBorder[c.status] || 'rgba(244,251,239,0.07)'}` }}>
+                <div key={c.id} className="rounded-xl p-3" style={{ background: statusBg[c.status] || '#FFFFFF', border: `1px solid ${statusBorder[c.status] || 'rgba(16,24,40,0.1)'}` }}>
                   <div className="flex justify-between items-start mb-1.5">
                     <p className="text-sm font-semibold">{c.descricao || 'Mensalidade'}</p>
-                    <span className="text-xs font-black px-2 py-0.5 rounded-full ml-2 flex-shrink-0" style={{ color: statusCor[c.status] || '#9CA3AF', background: (statusCor[c.status] || '#9CA3AF') + '18' }}>{c.status}</span>
+                    <span className="text-xs font-black px-2 py-0.5 rounded-full ml-2 flex-shrink-0" style={{ color: statusCor[c.status] || '#6B7280', background: (statusCor[c.status] || '#E5E7EB') + '18' }}>{c.status}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <p style={{ fontFamily: MONO, fontSize: 11, color: T.muted }}>{'Vence ' + new Date((c.vencimento || '').slice(0, 10) + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
@@ -228,7 +228,7 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
                 </span>
               ))}
               {premiacoes.length > 8 && (
-                <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'rgba(244,251,239,0.05)', color: T.muted }}>+{premiacoes.length - 8} mais</span>
+                <span className="text-xs px-2 py-1 rounded-full" style={{ background: '#FFFFFF', color: T.muted }}>+{premiacoes.length - 8} mais</span>
               )}
             </div>
           </div>
@@ -277,7 +277,7 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
           <p style={EYEBROW}>Fale conosco</p>
           <a href="https://wa.me/5534998168467" target="_blank" rel="noreferrer"
             className="flex items-center justify-center gap-2 w-full py-4 rounded-xl font-black text-sm transition-all active:scale-95"
-            style={{ background: `linear-gradient(135deg, ${T.turf} 0%, #2bb83c 100%)`, color: '#050705', fontFamily: SYNE, boxShadow: `0 0 24px ${T.turf}30, 0 4px 12px rgba(0,0,0,0.4)`, letterSpacing: '0.02em' }}>
+            style={{ background: `linear-gradient(135deg, ${T.turf} 0%, #2bb83c 100%)`, color: '#1F2937', fontFamily: SYNE, boxShadow: `0 0 24px ${T.turf}30, 0 4px 12px rgba(16,24,40,0.12)`, letterSpacing: '0.02em' }}>
             💬 Falar com a academia
           </a>
         </div>

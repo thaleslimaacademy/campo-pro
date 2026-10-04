@@ -134,22 +134,22 @@ function AlteracaoMassaInner() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <p className="text-gray-400">Carregando...</p>
+      <div className="min-h-screen bg-[#F6F8F7] text-gray-900 flex items-center justify-center">
+        <p className="text-gray-500">Carregando...</p>
       </div>
     )
   }
 
   return (
-    <div style={{ minHeight: "100vh", color: "#F0F4FF", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
+    <div style={{ minHeight: "100vh", color: "#1F2937", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
       <div className="flex items-center gap-3 mb-6">
-        <a href="/dashboard" className="text-gray-400">Voltar</a>
+        <a href="/dashboard" className="text-gray-500">Voltar</a>
         <h1 className="text-xl font-bold">Alteracao em Massa</h1>
       </div>
 
       {sucesso && (
         <div className="bg-green-600 rounded-xl p-3 mb-4 text-center">
-          <p className="text-white font-bold">{sucesso}</p>
+          <p className="text-gray-900 font-bold">{sucesso}</p>
         </div>
       )}
 
@@ -178,14 +178,14 @@ function AlteracaoMassaInner() {
 
       {aba === 'aniversario' ? (
         <div>
-          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
+          <div style={{ background: "#FFFFFF", borderRadius: "16px", padding: "16px", border: "1px solid rgba(16,24,40,0.1)", marginBottom: "12px" }}>
             <p className="text-green-500 font-bold text-sm mb-1">Aniversariantes de {mesAtual}</p>
             <p className="text-gray-500 text-xs">{aniversariantes.length} atleta(s)</p>
           </div>
           {aniversariantes.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-4xl mb-3">🎂</p>
-              <p className="text-gray-400">Nenhum aniversariante este mes.</p>
+              <p className="text-gray-500">Nenhum aniversariante este mes.</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -202,8 +202,8 @@ function AlteracaoMassaInner() {
                         {isHoje ? '🎂' : a.nome[0]}
                       </div>
                       <div>
-                        <p className="font-bold text-white text-sm">{a.nome}</p>
-                        <p className="text-gray-400 text-xs">Dia {dia} - {idade} anos</p>
+                        <p className="font-bold text-gray-900 text-sm">{a.nome}</p>
+                        <p className="text-gray-500 text-xs">Dia {dia} - {idade} anos</p>
                       </div>
                     </div>
                     {isHoje && (
@@ -219,7 +219,7 @@ function AlteracaoMassaInner() {
         </div>
       ) : (
         <div>
-          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
+          <div style={{ background: "#FFFFFF", borderRadius: "16px", padding: "16px", border: "1px solid rgba(16,24,40,0.1)", marginBottom: "12px" }}>
             <p className="text-green-500 font-bold text-sm mb-3">
               {aba === 'vencimento' ? 'Novo dia de vencimento' :
                aba === 'mensalidade' ? 'Novo valor de mensalidade' :
@@ -227,7 +227,7 @@ function AlteracaoMassaInner() {
             </p>
 
             {aba === 'vencimento' && (
-              <select value={novoVencimento} onChange={e => setNovoVencimento(e.target.value)} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", boxSizing: "border-box" }}>
+              <select value={novoVencimento} onChange={e => setNovoVencimento(e.target.value)} style={{ width: "100%", background: "#FFFFFF", border: "1px solid rgba(16,24,40,0.1)", borderRadius: "10px", padding: "12px", color: "#1F2937", fontFamily: "Inter, sans-serif", fontSize: "13px", boxSizing: "border-box" }}>
                 {[1, 5, 10, 15, 20, 25, 30].map(d => (
                   <option key={d} value={d}>Dia {d}</option>
                 ))}
@@ -239,13 +239,13 @@ function AlteracaoMassaInner() {
                 type="number"
                 value={novaMensalidade}
                 onChange={e => setNovaMensalidade(e.target.value)}
-                style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", boxSizing: "border-box" }}
+                style={{ width: "100%", background: "#FFFFFF", border: "1px solid rgba(16,24,40,0.1)", borderRadius: "10px", padding: "12px", color: "#1F2937", fontFamily: "Inter, sans-serif", fontSize: "13px", boxSizing: "border-box" }}
                 placeholder="Ex: 150.00"
               />
             )}
 
             {aba === 'turma' && (
-              <select value={novaTurma} onChange={e => setNovaTurma(e.target.value)} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "12px", color: "#F0F4FF", fontFamily: "Inter, sans-serif", fontSize: "13px", boxSizing: "border-box" }}>
+              <select value={novaTurma} onChange={e => setNovaTurma(e.target.value)} style={{ width: "100%", background: "#FFFFFF", border: "1px solid rgba(16,24,40,0.1)", borderRadius: "10px", padding: "12px", color: "#1F2937", fontFamily: "Inter, sans-serif", fontSize: "13px", boxSizing: "border-box" }}>
                 <option value="">Selecione uma turma</option>
                 {turmas.map(t => (
                   <option key={t.id} value={t.id}>{t.nome}</option>
@@ -254,7 +254,7 @@ function AlteracaoMassaInner() {
             )}
           </div>
 
-          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: "12px" }}>
+          <div style={{ background: "#FFFFFF", borderRadius: "16px", padding: "16px", border: "1px solid rgba(16,24,40,0.1)", marginBottom: "12px" }}>
             <div className="flex justify-between items-center mb-3">
               <p className="text-green-500 font-bold text-sm">Selecionar atletas</p>
               <button onClick={selecionarTodos} className="text-xs text-blue-400 font-bold">
@@ -266,10 +266,10 @@ function AlteracaoMassaInner() {
               <input
                 value={filtroNome}
                 onChange={e => setFiltroNome(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm"
+                className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-gray-900 text-sm"
                 placeholder="Buscar por nome..."
               />
-              <select value={filtroTurma} onChange={e => setFiltroTurma(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
+              <select value={filtroTurma} onChange={e => setFiltroTurma(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-gray-900 text-sm">
                 <option value="">Todas as turmas</option>
                 {turmas.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
               </select>
@@ -285,10 +285,10 @@ function AlteracaoMassaInner() {
                   className={"flex items-center gap-3 p-2 rounded-lg cursor-pointer " + (selecionados.includes(a.id) ? 'bg-green-600/20 border border-green-600/40' : 'bg-gray-800')}
                 >
                   <div className={"w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 " + (selecionados.includes(a.id) ? 'bg-green-600 border-green-600' : 'border-gray-600')}>
-                    {selecionados.includes(a.id) && <span className="text-white text-xs">✓</span>}
+                    {selecionados.includes(a.id) && <span className="text-gray-900 text-xs">✓</span>}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-white truncate">{a.nome}</p>
+                    <p className="text-sm text-gray-900 truncate">{a.nome}</p>
                     <p className="text-xs text-gray-500">
                       {aba === 'vencimento' ? 'Venc: dia ' + (a.diaVencimento || '-') :
                        aba === 'mensalidade' ? 'R$ ' + (a.valorMensalidade?.toFixed(2) || '-') :
@@ -310,11 +310,11 @@ function AlteracaoMassaInner() {
         </div>
       )}
 
-      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
-        <a href="/dashboard" className="text-gray-400 text-xs text-center">Inicio</a>
-        <a href="/atletas" className="text-gray-400 text-xs text-center">Atletas</a>
-        <a href="/presenca" className="text-gray-400 text-xs text-center">Presenca</a>
-        <a href="/financeiro" className="text-gray-400 text-xs text-center">Financeiro</a>
+      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(16,24,40,0.1)", background: "rgba(255,255,255,0.97)", backdropFilter: "blur(10px)" }}>
+        <a href="/dashboard" className="text-gray-500 text-xs text-center">Inicio</a>
+        <a href="/atletas" className="text-gray-500 text-xs text-center">Atletas</a>
+        <a href="/presenca" className="text-gray-500 text-xs text-center">Presenca</a>
+        <a href="/financeiro" className="text-gray-500 text-xs text-center">Financeiro</a>
       </nav>
     </div>
   )

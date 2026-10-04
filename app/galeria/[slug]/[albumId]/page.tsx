@@ -3,7 +3,7 @@ import { use, useEffect, useState } from 'react'
 import { ShoppingCart, Check, Loader2, Copy, CreditCard } from 'lucide-react'
 import { listarFotosPublicas, criarCompraPublica } from '../actions'
 
-const C = { bg: '#0F0F1A', surface: '#1A1A2E', orange: '#FF6B00', green: '#00C896', text: '#F0F0F0', muted: 'rgba(240,240,240,0.45)', border: 'rgba(255,255,255,0.08)' }
+const C = { bg: '#F6F8F7', surface: '#FFFFFF', orange: '#C2410C', green: '#16A34A', text: '#1F2937', muted: '#6B7280', border: 'rgba(16,24,40,0.1)' }
 const SYNE = 'Syne, sans-serif'
 const brl = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n)
 
@@ -58,10 +58,10 @@ export default function GaleriaAlbumPage({ params }: { params: Promise<{ slug: s
 
   return (
     <div style={{ minHeight: '100vh', background: C.bg, color: C.text }}>
-      <div style={{ background: 'linear-gradient(135deg, #FF6B00 0%, #1A1A2E 60%, #0F0F1A 100%)', padding: '16px 20px' }}>
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '16px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <a href={`/galeria/${slug}`} style={{ color: 'rgba(255,255,255,0.7)', fontSize: 20, textDecoration: 'none' }}>←</a>
-          <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 16, color: '#fff' }}>Galeria de Fotos</div>
+          <a href={`/galeria/${slug}`} style={{ color: '#374151', fontSize: 20, textDecoration: 'none' }}>←</a>
+          <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 16, color: '#1F2937' }}>Galeria de Fotos</div>
         </div>
       </div>
 
@@ -87,7 +87,7 @@ export default function GaleriaAlbumPage({ params }: { params: Promise<{ slug: s
                       </div>
                     )}
                     <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.8))', padding: '16px 8px 8px', textAlign: 'center' }}>
-                      <span style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 12, color: '#fff' }}>{brl(f.valor)}</span>
+                      <span style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 12, color: '#1F2937' }}>{brl(f.valor)}</span>
                     </div>
                   </div>
                 )
@@ -181,6 +181,6 @@ export default function GaleriaAlbumPage({ params }: { params: Promise<{ slug: s
 }
 
 function Campo({ label, children }: { label: string; children: React.ReactNode }) {
-  return <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12, color: 'rgba(240,240,240,0.45)' }}>{label}{children}</label>
+  return <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12, color: '#6B7280' }}>{label}{children}</label>
 }
-const inp: React.CSSProperties = { background: '#0F0F1A', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '12px 14px', color: '#F0F0F0', fontSize: 14, width: '100%', boxSizing: 'border-box' }
+const inp: React.CSSProperties = { background: '#FFFFFF', border: '1px solid rgba(16,24,40,0.1)', borderRadius: 10, padding: '12px 14px', color: '#1F2937', fontSize: 14, width: '100%', boxSizing: 'border-box' }

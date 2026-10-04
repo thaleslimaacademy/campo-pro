@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Gestão de escolinha de futebol',
     start_url: '/dashboard',
     display: 'standalone',
-    background_color: '#0A0E1A',
-    theme_color: '#4169E1',
+    background_color: '#F6F8F7',
+    theme_color: '#2EA866',
     orientation: 'portrait',
     categories: ['sports', 'business', 'education'],
     icons: [

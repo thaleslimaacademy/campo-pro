@@ -130,31 +130,35 @@
   }
 }
 :root {
-  --brand-primary: #39FF14;
-  --brand-gold: #D4AF37;
-  --brand-black: #050505;
-  --brand-surface: #0D0D0D;
-  --brand-card: rgba(255,255,255,0.06);
-  --brand-border: rgba(255,255,255,0.08);
-  --brand-muted: rgba(255,255,255,0.45);
+  --brand-primary: #2EA866;
+  --brand-gold: #B7791F;
+  --brand-black: #1F2937;
+  --brand-surface: #FFFFFF;
+  --brand-card: #FFFFFF;
+  --brand-border: #E3E8E5;
+  --brand-muted: #6B7280;
   --font-syne: 'Syne', sans-serif;
   --font-inter: 'Inter', sans-serif;
 }
 
 body {
-  background: linear-gradient(160deg, #0a1a06 0%, #050505 35%, #111003 65%, #050505 100%) !important;
-  background-attachment: fixed !important;
+  background: #F6F8F7 !important;
   font-family: var(--font-inter) !important;
-  color: #F0F0F0 !important;
+  color: #1F2937 !important;
   min-height: 100vh;
 }
+
+/* inputs nativos: placeholder e foco no tema claro */
+input::placeholder, textarea::placeholder { color: #9CA3AF; }
+input:focus, textarea:focus, select:focus { outline: 2px solid rgba(46,168,102,0.35); outline-offset: 1px; }
+select option { background: #FFFFFF; color: #1F2937; }
 
 .cl-formFieldInput,
 .cl-formFieldInput:focus,
 .cl-formFieldInput:active {
-  background: #1a1a1a !important;
-  color: #F0F0F0 !important;
-  border-color: rgba(255,255,255,0.15) !important;
+  background: #FFFFFF !important;
+  color: #1F2937 !important;
+  border-color: #E3E8E5 !important;
 }
 
 .cl-formFieldLabel,
@@ -166,16 +170,16 @@ body {
 .cl-identityPreviewText,
 .cl-formFieldHintText,
 .cl-formFieldErrorText {
-  color: rgba(255,255,255,0.6) !important;
+  color: #4B5563 !important;
 }
 
 .cl-internal-b3fm6y,
 .cl-badge {
-  color: rgba(255,255,255,0.5) !important;
-  background: rgba(255,255,255,0.08) !important;
+  color: #4B5563 !important;
+  background: #EEF1EF !important;
 }
 
 .cl-card {
-  background: #111111 !important;
-  border: 1px solid rgba(255,255,255,0.08) !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E3E8E5 !important;
 }

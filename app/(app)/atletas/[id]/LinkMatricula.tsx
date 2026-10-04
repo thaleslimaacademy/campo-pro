@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { usePerfil } from '@/lib/usePerfil'
 
-const T = { primary:'#4169E1', green:'#00D67A', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', border:'rgba(240,244,255,0.08)', surface:'#0D1220' }
+const T = { primary:'#2EA866', green:'#16A34A', text:'#1F2937', muted:'#6B7280', border:'rgba(16,24,40,0.1)', surface:'#FFFFFF' }
 const SYNE = 'Syne, sans-serif'
 
 export default function LinkMatricula({ atletaNome, whatsappResponsavel }: { atletaNome?: string; whatsappResponsavel?: string }) {
@@ -45,7 +45,7 @@ export default function LinkMatricula({ atletaNome, whatsappResponsavel }: { atl
       <p style={{ fontFamily:SYNE, fontWeight:700, fontSize:11, color:T.primary, textTransform:'uppercase', letterSpacing:0.8, margin:'0 0 8px' }}>📲 Link de Pré-matrícula</p>
       <p style={{ fontSize:11, color:T.muted, wordBreak:'break-all', margin:'0 0 10px' }}>{link}</p>
       <div style={{ display:'flex', gap:8 }}>
-        <button onClick={copiar} style={{ flex:1, background:copiado?`${T.green}15`:T.primary, border:`1px solid ${copiado?T.green+'30':T.primary}`, color:T.text, padding:'10px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:12, cursor:'pointer', textTransform:'uppercase', transition:'all 0.2s' }}>
+        <button onClick={copiar} style={{ flex:1, background:copiado?`${T.green}15`:T.primary, border:`1px solid ${copiado?T.green+'30':T.primary}`, color:'#fff', padding:'10px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:12, cursor:'pointer', textTransform:'uppercase', transition:'all 0.2s' }}>
           {copiado ? '✅ Copiado!' : '📋 Copiar'}
         </button>
         <button onClick={enviarWhatsApp} style={{ flex:1, background:`${T.green}12`, border:`1px solid ${T.green}30`, color:T.green, padding:'10px', borderRadius:8, fontFamily:SYNE, fontWeight:700, fontSize:12, cursor:'pointer', textTransform:'uppercase' }}>

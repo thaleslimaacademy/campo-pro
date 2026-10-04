@@ -67,17 +67,17 @@ function RematriculasInner() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <p className="text-gray-400">Carregando...</p>
+      <div className="min-h-screen bg-[#F6F8F7] text-gray-900 flex items-center justify-center">
+        <p className="text-gray-500">Carregando...</p>
       </div>
     )
   }
 
   return (
-    <div style={{ minHeight: "100vh", color: "#F0F0F0", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
+    <div style={{ minHeight: "100vh", color: "#1F2937", padding: "20px 20px 80px", fontFamily: "Inter, sans-serif" }}>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <a href="/dashboard" className="text-gray-400">Voltar</a>
+          <a href="/dashboard" className="text-gray-500">Voltar</a>
           <h1 className="text-xl font-bold">Rematriculas</h1>
         </div>
         {pendentes > 0 && (
@@ -103,7 +103,7 @@ function RematriculasInner() {
       {filtradas.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-4xl mb-3">🔄</p>
-          <p className="text-gray-400">
+          <p className="text-gray-500">
             {filtro === 'PENDENTE' ? 'Nenhuma rematricula pendente.' :
              filtro === 'APROVADO' ? 'Nenhuma rematricula aprovada.' :
              'Nenhuma rematricula rejeitada.'}
@@ -112,13 +112,13 @@ function RematriculasInner() {
       ) : (
         <div className="space-y-4">
           {filtradas.map(r => (
-            <div key={r.id} style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "16px", border: "1px solid rgba(255,255,255,0.07)" }}>
+            <div key={r.id} style={{ background: "#FFFFFF", borderRadius: "16px", padding: "16px", border: "1px solid rgba(16,24,40,0.1)" }}>
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <p className="font-bold text-white text-lg">{r.nomeAtleta}</p>
+                  <p className="font-bold text-gray-900 text-lg">{r.nomeAtleta}</p>
                   <p className="text-green-500 text-sm">{r.posicao}</p>
                   {r.dataNascimento && (
-                    <p className="text-gray-400 text-xs">
+                    <p className="text-gray-500 text-xs">
                       {new Date(r.dataNascimento + 'T12:00:00').toLocaleDateString('pt-BR')}
                     </p>
                   )}
@@ -133,16 +133,16 @@ function RematriculasInner() {
               </div>
 
               <div className="space-y-1 mb-3">
-                {r.cpf && <p className="text-gray-400 text-xs">CPF atleta: {r.cpf}</p>}
-                {r.rg && <p className="text-gray-400 text-xs">RG atleta: {r.rg}</p>}
+                {r.cpf && <p className="text-gray-500 text-xs">CPF atleta: {r.cpf}</p>}
+                {r.rg && <p className="text-gray-500 text-xs">RG atleta: {r.rg}</p>}
               </div>
 
-              <div className="bg-gray-800 rounded-xl p-3 mb-3">
-                <p className="text-gray-400 text-xs font-bold mb-1">Responsavel</p>
-                <p className="text-white text-sm font-bold">{r.nomeResponsavel}</p>
-                {r.cpfResponsavel && <p className="text-gray-400 text-xs">CPF: {r.cpfResponsavel}</p>}
-                {r.whatsappResponsavel && <p className="text-gray-400 text-xs">WhatsApp: {r.whatsappResponsavel}</p>}
-                {r.emailResponsavel && <p className="text-gray-400 text-xs">Email: {r.emailResponsavel}</p>}
+              <div className="bg-gray-50 rounded-xl p-3 mb-3">
+                <p className="text-gray-500 text-xs font-bold mb-1">Responsavel</p>
+                <p className="text-gray-900 text-sm font-bold">{r.nomeResponsavel}</p>
+                {r.cpfResponsavel && <p className="text-gray-500 text-xs">CPF: {r.cpfResponsavel}</p>}
+                {r.whatsappResponsavel && <p className="text-gray-500 text-xs">WhatsApp: {r.whatsappResponsavel}</p>}
+                {r.emailResponsavel && <p className="text-gray-500 text-xs">Email: {r.emailResponsavel}</p>}
               </div>
 
               <p className="text-gray-500 text-xs mb-3">
@@ -171,7 +171,7 @@ function RematriculasInner() {
                       href={"https://wa.me/" + r.whatsappResponsavel.replace(/[^0-9]/g, "")}
                       target="_blank"
                       rel="noreferrer"
-                      className="bg-gray-800 text-gray-300 px-3 py-2 rounded-xl text-sm"
+                      className="bg-gray-50 text-gray-700 px-3 py-2 rounded-xl text-sm"
                     >
                       WA
                     </a>
@@ -192,11 +192,11 @@ function RematriculasInner() {
         </div>
       )}
 
-      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,5,5,0.95)", backdropFilter: "blur(10px)" }}>
-        <a href="/dashboard" className="text-gray-400 text-xs text-center">inicio</a>
-        <a href="/atletas" className="text-gray-400 text-xs text-center">Atletas</a>
-        <a href="/presenca" className="text-gray-400 text-xs text-center">Presenca</a>
-        <a href="/financeiro" className="text-gray-400 text-xs text-center">Financeiro</a>
+      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "space-around", padding: "12px 0 20px", borderTop: "1px solid rgba(16,24,40,0.1)", background: "rgba(255,255,255,0.97)", backdropFilter: "blur(10px)" }}>
+        <a href="/dashboard" className="text-gray-500 text-xs text-center">inicio</a>
+        <a href="/atletas" className="text-gray-500 text-xs text-center">Atletas</a>
+        <a href="/presenca" className="text-gray-500 text-xs text-center">Presenca</a>
+        <a href="/financeiro" className="text-gray-500 text-xs text-center">Financeiro</a>
       </nav>
     </div>
   )

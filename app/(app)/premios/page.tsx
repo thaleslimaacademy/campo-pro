@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { listarAtletasParaPremio, listarPremiacoes, concederPremio, removerPremio } from './actions'
 import { CATALOGO, NIVEL_POR_CONQUISTAS } from './constants'
 
-const C = { bg:'#0A0E1A', surface:'#1A1A2E', orange:'#4169E1', gold:'#FFD700', green:'#00D67A', muted:'rgba(255,255,255,0.4)', border:'rgba(255,255,255,0.08)' }
+const C = { bg:'#F6F8F7', surface:'#FFFFFF', orange:'#2EA866', gold:'#B7791F', green:'#16A34A', muted:'#6B7280', border:'rgba(16,24,40,0.1)' }
 const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
 
@@ -56,7 +56,7 @@ export default function PremiosPage() {
   const atletasFiltrados = atletas.filter(a => a.nome.toLowerCase().includes(busca.toLowerCase()))
 
   return (
-    <div style={{ minHeight:'100vh', background:C.bg, color:'#F0F4FF', fontFamily:INTER, paddingBottom:80 }}>
+    <div style={{ minHeight:'100vh', background:C.bg, color:'#1F2937', fontFamily:INTER, paddingBottom:80 }}>
 
       <div style={{ padding:'20px 20px 16px' }}>
         <p style={{ color:C.muted, fontSize:11, textTransform:'uppercase', letterSpacing:1, marginBottom:4 }}>Sistema de Conquistas</p>
@@ -68,7 +68,7 @@ export default function PremiosPage() {
           <input
             placeholder="Buscar atleta..."
             value={busca} onChange={e => setBusca(e.target.value)}
-            style={{ width:'100%', background:C.surface, border:`1px solid ${C.border}`, color:'#fff', padding:'12px 16px', borderRadius:12, fontFamily:INTER, fontSize:14, marginBottom:16, boxSizing:'border-box' as const }}
+            style={{ width:'100%', background:C.surface, border:`1px solid ${C.border}`, color:'#1F2937', padding:'12px 16px', borderRadius:12, fontFamily:INTER, fontSize:14, marginBottom:16, boxSizing:'border-box' as const }}
           />
           <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
             {atletasFiltrados.map(a => (
@@ -78,7 +78,7 @@ export default function PremiosPage() {
                   {a.fotoUrl ? <img src={a.fotoUrl} style={{ width:44, height:44, borderRadius:12, objectFit:'cover' }} /> : a.nome[0]}
                 </div>
                 <div>
-                  <p style={{ fontFamily:SYNE, fontWeight:700, fontSize:15, color:'#fff', margin:0 }}>{a.nome}</p>
+                  <p style={{ fontFamily:SYNE, fontWeight:700, fontSize:15, color:'#1F2937', margin:0 }}>{a.nome}</p>
                   <p style={{ color:C.muted, fontSize:12, marginTop:2 }}>{a.posicao || 'Sem posição'}</p>
                 </div>
                 <span style={{ marginLeft:'auto', color:C.orange, fontSize:18 }}>→</span>
@@ -97,7 +97,7 @@ export default function PremiosPage() {
                 {atletaSel.fotoUrl ? <img src={atletaSel.fotoUrl} style={{ width:44, height:44, borderRadius:12, objectFit:'cover' }} /> : atletaSel.nome[0]}
               </div>
               <div>
-                <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:16, color:'#fff', margin:0 }}>{atletaSel.nome}</p>
+                <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:16, color:'#1F2937', margin:0 }}>{atletaSel.nome}</p>
                 <p style={{ color:C.muted, fontSize:12 }}>{nivel.emoji} {nivel.label} · {premiacoes.length} conquistas</p>
               </div>
             </div>
@@ -141,7 +141,7 @@ export default function PremiosPage() {
                   disabled={!!salvando || temPremio}
                   style={{ background: temPremio ? `${C.gold}15` : C.surface, border:`1px solid ${temPremio ? C.gold : C.border}`, borderRadius:14, padding:'14px 12px', cursor: temPremio ? 'default' : 'pointer', textAlign:'left', opacity: salvando===p.titulo ? 0.6 : 1 }}>
                   <div style={{ fontSize:28, marginBottom:6 }}>{p.icone}</div>
-                  <p style={{ fontFamily:SYNE, fontWeight:700, fontSize:12, color: temPremio ? C.gold : '#fff', margin:'0 0 4px' }}>{p.titulo}</p>
+                  <p style={{ fontFamily:SYNE, fontWeight:700, fontSize:12, color: temPremio ? C.gold : '#1F2937', margin:'0 0 4px' }}>{p.titulo}</p>
                   <p style={{ color:C.muted, fontSize:10, lineHeight:1.4, margin:0 }}>{p.descricao}</p>
                   {temPremio && <p style={{ color:C.gold, fontSize:10, marginTop:4 }}>✓ Conquistado</p>}
                 </button>

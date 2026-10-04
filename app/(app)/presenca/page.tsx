@@ -3,7 +3,7 @@ import { useEffect, useState, useTransition, useCallback } from 'react'
 import BottomNav from '@/components/ui/BottomNav'
 import { getPresencaData, marcarPresenca } from './actions'
 
-const T = { bg: '#0A0E1A', surface: '#0D1220', primary: '#4169E1', accent: '#00BFFF', text: '#F0F4FF', muted: 'rgba(240,244,255,0.4)', border: 'rgba(240,244,255,0.08)', green: '#00D67A', red: '#FF4444' }
+const T = { bg: '#F6F8F7', surface: '#FFFFFF', primary: '#2EA866', accent: '#23874F', text: '#1F2937', muted: '#6B7280', border: 'rgba(16,24,40,0.1)', green: '#16A34A', red: '#DC2626' }
 const SYNE = 'Syne, sans-serif'
 
 type Atleta = { id: string; nome: string; posicao: string | null; turmaId: string | null }
@@ -52,25 +52,25 @@ export default function Presenca() {
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, fontFamily: 'Inter, sans-serif', paddingBottom: 80 }}>
 
       {/* HEADER */}
-      <div style={{ background: T.primary, padding: '20px 20px 20px' }}>
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 20px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Elenco</div>
+            <div style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Elenco</div>
             <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: T.text, letterSpacing: -0.8, textTransform: 'uppercase' }}>Presença</div>
           </div>
           <input type="date" value={dataSel} max={hoje}
             onChange={e => { setDataSel(e.target.value); setPresencas({}) }}
-            style={{ background: 'rgba(240,244,255,0.15)', border: '1px solid rgba(240,244,255,0.2)', borderRadius: 8, padding: '8px 12px', color: T.text, fontSize: 13, fontFamily: 'Inter, sans-serif' }} />
+            style={{ background: '#EEF1EF', border: '1px solid rgba(16,24,40,0.18)', borderRadius: 8, padding: '8px 12px', color: T.text, fontSize: 13, fontFamily: 'Inter, sans-serif' }} />
         </div>
       </div>
 
       {/* STATS STRIP */}
       {!loading && (
-        <div style={{ display: 'flex', background: '#080C15', borderBottom: `1px solid ${T.border}` }}>
+        <div style={{ display: 'flex', background: '#F6F8F7', borderBottom: `1px solid ${T.border}` }}>
           {[
             { label: 'Presentes', valor: String(presentes), color: T.green },
             { label: 'Ausentes',  valor: String(ausentes),  color: T.red  },
-            { label: 'Taxa',      valor: pct + '%',          color: pct >= 75 ? T.green : pct > 0 ? '#FFD700' : T.muted },
+            { label: 'Taxa',      valor: pct + '%',          color: pct >= 75 ? T.green : pct > 0 ? '#B7791F' : T.muted },
             { label: 'Marcados',  valor: `${marcados}/${atletasFiltrados.length}`, color: T.accent },
           ].map((s, i, arr) => (
             <div key={s.label} style={{ flex: 1, padding: '13px 0 11px', textAlign: 'center', borderRight: i < arr.length - 1 ? `1px solid ${T.border}` : 'none' }}>
@@ -122,7 +122,7 @@ export default function Presenca() {
               </div>
               <div style={{ display: 'flex', gap: 6 }}>
                 <button onClick={() => marcar(atleta.id, 'PRESENTE')} disabled={isSalvando}
-                  style={{ width: 40, height: 40, borderRadius: 8, border: `1.5px solid ${status === 'PRESENTE' ? T.green : T.border}`, cursor: 'pointer', background: status === 'PRESENTE' ? T.green : 'transparent', color: status === 'PRESENTE' ? '#000' : T.muted, fontWeight: 900, fontSize: 14, fontFamily: SYNE, transition: 'all 0.15s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  style={{ width: 40, height: 40, borderRadius: 8, border: `1.5px solid ${status === 'PRESENTE' ? T.green : T.border}`, cursor: 'pointer', background: status === 'PRESENTE' ? T.green : 'transparent', color: status === 'PRESENTE' ? '#1F2937' : T.muted, fontWeight: 900, fontSize: 14, fontFamily: SYNE, transition: 'all 0.15s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <i className="ti ti-check" style={{ fontSize: 16 }} aria-hidden="true"></i>
                 </button>
                 <button onClick={() => marcar(atleta.id, 'AUSENTE')} disabled={isSalvando}

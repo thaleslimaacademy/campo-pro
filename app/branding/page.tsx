@@ -4,19 +4,19 @@ import { supabase } from '@/lib/supabase'
 import { salvarBranding, uploadLogo } from './actions'
 import BottomNav from '@/components/ui/BottomNav'
 
-const T = { bg:'#0A0E1A', surface:'#0D1220', primary:'#4169E1', text:'#F0F4FF', muted:'rgba(240,244,255,0.45)', border:'rgba(240,244,255,0.08)', green:'#00D67A', red:'#FF4444' }
+const T = { bg:'#F6F8F7', surface:'#FFFFFF', primary:'#2EA866', text:'#1F2937', muted:'#6B7280', border:'rgba(16,24,40,0.1)', green:'#16A34A', red:'#DC2626' }
 const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
 
 const PALETAS = [
-  { nome:'Azul Royal (padrão)', primary:'#4169E1', secondary:'#1A3FA8', texto:'#ffffff' },
-  { nome:'Verde', primary:'#16a34a', secondary:'#15803d', texto:'#ffffff' },
-  { nome:'Vermelho', primary:'#dc2626', secondary:'#b91c1c', texto:'#ffffff' },
-  { nome:'Laranja', primary:'#ea580c', secondary:'#c2410c', texto:'#ffffff' },
-  { nome:'Roxo', primary:'#7c3aed', secondary:'#6d28d9', texto:'#ffffff' },
-  { nome:'Preto & Dourado', primary:'#ca8a04', secondary:'#a16207', texto:'#000000' },
-  { nome:'Azul Marinho', primary:'#0f172a', secondary:'#1e293b', texto:'#ffffff' },
-  { nome:'Rosa', primary:'#db2777', secondary:'#be185d', texto:'#ffffff' },
+  { nome:'Azul Royal (padrão)', primary:'#2EA866', secondary:'#23874F', texto:'#ffffff' },
+  { nome:'Verde', primary:'#2EA866', secondary:'#15803d', texto:'#ffffff' },
+  { nome:'Vermelho', primary:'#2EA866', secondary:'#b91c1c', texto:'#ffffff' },
+  { nome:'Laranja', primary:'#2EA866', secondary:'#c2410c', texto:'#ffffff' },
+  { nome:'Roxo', primary:'#2EA866', secondary:'#6d28d9', texto:'#ffffff' },
+  { nome:'Preto & Dourado', primary:'#2EA866', secondary:'#a16207', texto:'#000000' },
+  { nome:'Azul Marinho', primary:'#2EA866', secondary:'#1e293b', texto:'#ffffff' },
+  { nome:'Rosa', primary:'#2EA866', secondary:'#be185d', texto:'#ffffff' },
 ]
 
 export default function BrandingPage() {
@@ -85,7 +85,7 @@ export default function BrandingPage() {
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, fontFamily: INTER, paddingBottom: 80 }}>
 
       {/* HEADER */}
-      <div style={{ background: `linear-gradient(135deg, ${corPrimaria}22 0%, #0D1220 100%)`, borderBottom: `1px solid ${corPrimaria}30`, padding: '20px 20px 20px' }}>
+      <div style={{ background: `linear-gradient(135deg, ${corPrimaria}22 0%, #FFFFFF 100%)`, borderBottom: `1px solid ${corPrimaria}30`, padding: '20px 20px 20px' }}>
         <a href="/configuracoes" style={{ fontSize: 12, color: T.muted, textDecoration: 'none', display: 'block', marginBottom: 8 }}>← Configurações</a>
         <h1 style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 22, color: T.text, margin: 0, textTransform: 'uppercase', letterSpacing: -0.5 }}>Visual da Escola</h1>
         <p style={{ fontSize: 12, color: T.muted, margin: '4px 0 0' }}>Cores e logo do seu app</p>
@@ -96,7 +96,7 @@ export default function BrandingPage() {
         {/* PREVIEW */}
         <div style={{ ...SEC, borderLeft: `3px solid ${corPrimaria}` }}>
           <p style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 11, color: corPrimaria, textTransform: 'uppercase', letterSpacing: 0.8, margin: '0 0 12px' }}>Preview</p>
-          <div style={{ background: '#0A0E1A', borderRadius: 10, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ background: '#F6F8F7', borderRadius: 10, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
             {(previewLogo || logoUrl)
               ? <img src={previewLogo || logoUrl} style={{ width: 36, height: 36, borderRadius: 8, objectFit: 'contain', background: 'white', padding: 2 }} alt="logo" />
               : <div style={{ width: 36, height: 36, borderRadius: 8, background: `${corPrimaria}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>⚽</div>

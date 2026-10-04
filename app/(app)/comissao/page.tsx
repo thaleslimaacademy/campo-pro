@@ -6,19 +6,19 @@ import { useRouter } from 'next/navigation'
 
 const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
-const NAVY = '#0A0E1A'
-const BLUE = '#4169E1'
-const CYAN = '#00BFFF'
-const SKY = '#7DD3FC'
-const OFF = '#F0F4FF'
-const CARD = 'rgba(65,105,225,0.08)'
-const BORDER = 'rgba(65,105,225,0.25)'
+const NAVY = '#F6F8F7'
+const BLUE = '#2EA866'
+const CYAN = '#23874F'
+const SKY = '#4B5563'
+const OFF = '#1F2937'
+const CARD = 'rgba(46,168,102,0.08)'
+const BORDER = 'rgba(46,168,102,0.25)'
 
 const ROLES = [
-  { value: 'admin',      label: 'Admin',      desc: 'Acesso total', cor: '#00BFFF' },
-  { value: 'diretor',    label: 'Diretor',    desc: 'Admin sem configuracoes', cor: '#7DD3FC' },
-  { value: 'professor',  label: 'Professor',  desc: 'Atletas, presenca, turmas', cor: '#4ADE80' },
-  { value: 'preparador', label: 'Preparador', desc: 'Atletas, presenca, turmas', cor: '#FB923C' },
+  { value: 'admin',      label: 'Admin',      desc: 'Acesso total', cor: '#23874F' },
+  { value: 'diretor',    label: 'Diretor',    desc: 'Admin sem configuracoes', cor: '#4B5563' },
+  { value: 'professor',  label: 'Professor',  desc: 'Atletas, presenca, turmas', cor: '#16A34A' },
+  { value: 'preparador', label: 'Preparador', desc: 'Atletas, presenca, turmas', cor: '#C2410C' },
 ]
 
 type Usuario = { id: string; nome: string; email: string; perfil: string; ativo: boolean; clerkUserId: string | null }
@@ -75,9 +75,9 @@ export default function ComissaoPage() {
   return (
     <div style={{ minHeight: '100vh', background: NAVY, paddingBottom: 88, fontFamily: INTER, color: OFF }}>
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg, #1A3FA8 0%, #4169E1 100%)', padding: '16px 16px 20px' }}>
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '16px 16px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={() => router.back()} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: OFF }}>
+          <button onClick={() => router.back()} style={{ background: '#EEF1EF', border: 'none', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: OFF }}>
             <i className="ti ti-arrow-left" style={{ fontSize: 18 }} />
           </button>
           <div style={{ flex: 1 }}>
@@ -87,7 +87,7 @@ export default function ComissaoPage() {
           {isAdmin && (
             <button
               onClick={() => { setMostrarForm(!mostrarForm); setErro(''); setSucesso('') }}
-              style={{ background: mostrarForm ? 'rgba(255,107,107,0.2)' : 'rgba(0,191,255,0.2)', border: mostrarForm ? '1px solid rgba(255,107,107,0.4)' : '1px solid rgba(0,191,255,0.4)', borderRadius: 8, padding: '6px 14px', color: mostrarForm ? '#FF6B6B' : CYAN, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: SYNE, display: 'flex', alignItems: 'center', gap: 6 }}
+              style={{ background: mostrarForm ? 'rgba(255,107,107,0.2)' : 'rgba(46,168,102,0.2)', border: mostrarForm ? '1px solid rgba(255,107,107,0.4)' : '1px solid rgba(46,168,102,0.4)', borderRadius: 8, padding: '6px 14px', color: mostrarForm ? '#DC2626' : CYAN, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: SYNE, display: 'flex', alignItems: 'center', gap: 6 }}
             >
               <i className={mostrarForm ? 'ti ti-x' : 'ti ti-plus'} style={{ fontSize: 14 }} />
               {mostrarForm ? 'Fechar' : 'Adicionar'}
@@ -100,31 +100,31 @@ export default function ComissaoPage() {
 
         {/* Form adicionar */}
         {isAdmin && mostrarForm && (
-          <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderLeft: '3px solid #4169E1', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+          <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderLeft: '3px solid #2EA866', borderRadius: 12, padding: 16, marginBottom: 16 }}>
             <div style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 13, color: OFF, marginBottom: 14, textTransform: 'uppercase', letterSpacing: 0.5 }}>Novo Membro</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <input
                 placeholder="Nome completo"
                 value={form.nome}
                 onChange={e => setForm(f => ({ ...f, nome: e.target.value }))}
-                style={{ width: '100%', background: 'rgba(65,105,225,0.1)', border: `1px solid ${BORDER}`, borderRadius: 8, padding: '10px 14px', color: OFF, fontFamily: INTER, fontSize: 14, boxSizing: 'border-box' as const, outline: 'none' }}
+                style={{ width: '100%', background: 'rgba(46,168,102,0.1)', border: `1px solid ${BORDER}`, borderRadius: 8, padding: '10px 14px', color: OFF, fontFamily: INTER, fontSize: 14, boxSizing: 'border-box' as const, outline: 'none' }}
               />
               <input
                 placeholder="E-mail (usado no login Google)"
                 type="email"
                 value={form.email}
                 onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                style={{ width: '100%', background: 'rgba(65,105,225,0.1)', border: `1px solid ${BORDER}`, borderRadius: 8, padding: '10px 14px', color: OFF, fontFamily: INTER, fontSize: 14, boxSizing: 'border-box' as const, outline: 'none' }}
+                style={{ width: '100%', background: 'rgba(46,168,102,0.1)', border: `1px solid ${BORDER}`, borderRadius: 8, padding: '10px 14px', color: OFF, fontFamily: INTER, fontSize: 14, boxSizing: 'border-box' as const, outline: 'none' }}
               />
               <select
                 value={form.perfil}
                 onChange={e => setForm(f => ({ ...f, perfil: e.target.value }))}
-                style={{ width: '100%', background: 'rgba(65,105,225,0.1)', border: `1px solid ${BORDER}`, borderRadius: 8, padding: '10px 14px', color: OFF, fontFamily: INTER, fontSize: 14, boxSizing: 'border-box' as const, cursor: 'pointer' }}
+                style={{ width: '100%', background: 'rgba(46,168,102,0.1)', border: `1px solid ${BORDER}`, borderRadius: 8, padding: '10px 14px', color: OFF, fontFamily: INTER, fontSize: 14, boxSizing: 'border-box' as const, cursor: 'pointer' }}
               >
                 {ROLES.map(r => <option key={r.value} value={r.value}>{r.label} — {r.desc}</option>)}
               </select>
-              {erro && <div style={{ color: '#FF6B6B', fontSize: 12, fontFamily: INTER }}>{erro}</div>}
-              {sucesso && <div style={{ color: '#4ADE80', fontSize: 12, fontFamily: INTER }}>{sucesso}</div>}
+              {erro && <div style={{ color: '#DC2626', fontSize: 12, fontFamily: INTER }}>{erro}</div>}
+              {sucesso && <div style={{ color: '#16A34A', fontSize: 12, fontFamily: INTER }}>{sucesso}</div>}
               <button
                 onClick={adicionar}
                 disabled={salvando}
@@ -137,7 +137,7 @@ export default function ComissaoPage() {
         )}
 
         {sucesso && !mostrarForm && (
-          <div style={{ background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.3)', borderRadius: 10, padding: '10px 14px', marginBottom: 12, fontSize: 13, color: '#4ADE80' }}>
+          <div style={{ background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.3)', borderRadius: 10, padding: '10px 14px', marginBottom: 12, fontSize: 13, color: '#16A34A' }}>
             {sucesso}
           </div>
         )}
@@ -150,7 +150,7 @@ export default function ComissaoPage() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: 40, color: SKY, fontSize: 13 }}>Carregando...</div>
         ) : usuarios.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: 40, color: 'rgba(240,244,255,0.3)', fontSize: 13 }}>Nenhum membro cadastrado.</div>
+          <div style={{ textAlign: 'center', padding: 40, color: '#6B7280', fontSize: 13 }}>Nenhum membro cadastrado.</div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {usuarios.map(u => (
@@ -165,8 +165,8 @@ export default function ComissaoPage() {
                     </div>
                     <div>
                       <div style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 14, color: OFF }}>{u.nome}</div>
-                      <div style={{ fontSize: 11, color: 'rgba(240,244,255,0.45)', marginTop: 1 }}>{u.email}</div>
-                      <div style={{ fontSize: 10, color: u.clerkUserId && u.clerkUserId !== 'pending' ? '#4ADE80' : '#FBBF24', marginTop: 3, display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <div style={{ fontSize: 11, color: '#6B7280', marginTop: 1 }}>{u.email}</div>
+                      <div style={{ fontSize: 10, color: u.clerkUserId && u.clerkUserId !== 'pending' ? '#16A34A' : '#B45309', marginTop: 3, display: 'flex', alignItems: 'center', gap: 4 }}>
                         <i className={u.clerkUserId && u.clerkUserId !== 'pending' ? 'ti ti-circle-check' : 'ti ti-clock'} style={{ fontSize: 11 }} />
                         {u.clerkUserId && u.clerkUserId !== 'pending' ? 'Conta vinculada' : 'Aguardando primeiro acesso'}
                       </div>
@@ -175,7 +175,7 @@ export default function ComissaoPage() {
                   {isAdmin && (
                     <button
                       onClick={() => toggleAtivo(u)}
-                      style={{ background: u.ativo ? 'rgba(255,107,107,0.1)' : 'rgba(74,222,128,0.1)', color: u.ativo ? '#FF6B6B' : '#4ADE80', border: `1px solid ${u.ativo ? 'rgba(255,107,107,0.3)' : 'rgba(74,222,128,0.3)'}`, borderRadius: 8, padding: '5px 12px', fontSize: 11, fontFamily: SYNE, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' as const }}
+                      style={{ background: u.ativo ? 'rgba(255,107,107,0.1)' : 'rgba(74,222,128,0.1)', color: u.ativo ? '#DC2626' : '#16A34A', border: `1px solid ${u.ativo ? 'rgba(255,107,107,0.3)' : 'rgba(74,222,128,0.3)'}`, borderRadius: 8, padding: '5px 12px', fontSize: 11, fontFamily: SYNE, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' as const }}
                     >
                       {u.ativo ? 'Desativar' : 'Reativar'}
                     </button>

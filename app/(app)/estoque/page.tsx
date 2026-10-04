@@ -4,13 +4,13 @@ import { useEffect, useState, useRef } from 'react'
 import { Plus, Trash2, Edit3, Package, ChevronRight, ToggleLeft, ToggleRight } from 'lucide-react'
 import { listarProdutos, criarProduto, excluirProduto, atualizarProduto, uploadFotoProduto, criarVariacao, excluirVariacao, atualizarVariacao, listarPedidos, atualizarStatusPedido } from './actions'
 
-const C = { bg: '#0A0E1A', surface: '#1A1A2E', orange: '#4169E1', gold: '#FFD700', green: '#00D67A', text: '#F0F4FF', muted: 'rgba(240,240,240,0.45)', border: 'rgba(255,255,255,0.08)', red: '#FF4757' }
+const C = { bg: '#F6F8F7', surface: '#FFFFFF', orange: '#2EA866', gold: '#B7791F', green: '#16A34A', text: '#1F2937', muted: '#6B7280', border: 'rgba(16,24,40,0.1)', red: '#DC2626' }
 const SYNE = 'Syne, sans-serif'
 const brl = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n)
 
 const CATEGORIAS = ['Uniforme', 'Chuteira', 'Bola', 'Material de Treino', 'Acessório', 'Personalizado', 'Outro']
 const STATUS_PEDIDO = ['AGUARDANDO', 'PAGO', 'SEPARADO', 'ENTREGUE', 'CANCELADO']
-const STATUS_COR: Record<string, string> = { AGUARDANDO: '#FFD700', PAGO: '#00D67A', SEPARADO: '#4169E1', ENTREGUE: '#00D67A', CANCELADO: '#FF4757' }
+const STATUS_COR: Record<string, string> = { AGUARDANDO: '#B7791F', PAGO: '#16A34A', SEPARADO: '#2EA866', ENTREGUE: '#16A34A', CANCELADO: '#DC2626' }
 
 type Variacao = { id: string; tamanho?: string; cor?: string; preco: number; estoque: number }
 type Produto = { id: string; nome: string; descricao?: string; categoria?: string; foto?: string; ativo: boolean; ProdutoVariacao: Variacao[] }
@@ -184,7 +184,7 @@ export default function EstoquePage() {
                             {p.ProdutoVariacao.length > 0 && (
                               <div style={{ display: 'grid', gap: 8, marginBottom: 14 }}>
                                 {p.ProdutoVariacao.map(v => (
-                                  <div key={v.id} style={{ background: '#0A0E1A', borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                                  <div key={v.id} style={{ background: '#F6F8F7', borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
                                     <span style={{ color: C.gold, fontFamily: SYNE, fontWeight: 700, fontSize: 13, minWidth: 40 }}>{v.tamanho || '—'}</span>
                                     {v.cor && <span style={{ color: C.muted, fontSize: 12 }}>{v.cor}</span>}
                                     <span style={{ color: C.orange, fontFamily: SYNE, fontWeight: 700, fontSize: 13 }}>{brl(v.preco)}</span>
@@ -192,7 +192,7 @@ export default function EstoquePage() {
                                       <span style={{ fontSize: 11, color: C.muted }}>Estoque:</span>
                                       <input type="number" defaultValue={v.estoque} min={0}
                                         onBlur={e => atualizarVariacao(v.id, { estoque: Number(e.target.value) }).then(carregar)}
-                                        style={{ width: 50, background: '#1A1A2E', border: `1px solid ${C.border}`, borderRadius: 6, padding: '4px 8px', color: C.text, fontSize: 12, textAlign: 'center' }} />
+                                        style={{ width: 50, background: '#F3F5F4', border: `1px solid ${C.border}`, borderRadius: 6, padding: '4px 8px', color: C.text, fontSize: 12, textAlign: 'center' }} />
                                       <button onClick={() => excluirVariacao(v.id).then(carregar)}
                                         style={{ background: 'transparent', border: 'none', color: C.red, cursor: 'pointer' }}>
                                         <Trash2 size={14} />
@@ -204,7 +204,7 @@ export default function EstoquePage() {
                             )}
 
                             {/* Nova variação */}
-                            <div style={{ background: '#0A0E1A', borderRadius: 10, padding: 12 }}>
+                            <div style={{ background: '#F6F8F7', borderRadius: 10, padding: 12 }}>
                               <p style={{ fontSize: 11, color: C.muted, marginBottom: 8 }}>+ Adicionar variação</p>
                               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: 8, alignItems: 'end' }}>
                                 <Campo label="Tamanho">
@@ -263,7 +263,7 @@ export default function EstoquePage() {
                         </div>
 
                         {/* Itens */}
-                        <div style={{ background: '#0A0E1A', borderRadius: 10, padding: '8px 12px', marginBottom: 12 }}>
+                        <div style={{ background: '#F6F8F7', borderRadius: 10, padding: '8px 12px', marginBottom: 12 }}>
                           {(ped.itens || []).map((item: any, i: number) => (
                             <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: C.muted, padding: '3px 0' }}>
                               <span>{item.nome} {item.tamanho ? `(${item.tamanho})` : ''} {item.cor ? `- ${item.cor}` : ''} × {item.qtd}</span>
@@ -278,7 +278,7 @@ export default function EstoquePage() {
                             {ped.status}
                           </span>
                           <select value={ped.status} onChange={e => atualizarStatusPedido(ped.id, e.target.value).then(carregar)}
-                            style={{ background: '#0A0E1A', border: `1px solid ${C.border}`, borderRadius: 8, padding: '4px 10px', color: C.muted, fontSize: 12, cursor: 'pointer' }}>
+                            style={{ background: '#F6F8F7', border: `1px solid ${C.border}`, borderRadius: 8, padding: '4px 10px', color: C.muted, fontSize: 12, cursor: 'pointer' }}>
                             {STATUS_PEDIDO.map(s => <option key={s} value={s}>{s}</option>)}
                           </select>
                           <span style={{ fontSize: 10, color: C.muted, marginLeft: 'auto' }}>
@@ -299,7 +299,7 @@ export default function EstoquePage() {
 }
 
 function Campo({ label, children }: { label: string; children: React.ReactNode }) {
-  return <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 11, color: 'rgba(240,240,240,0.45)' }}>{label}{children}</label>
+  return <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 11, color: '#6B7280' }}>{label}{children}</label>
 }
-const inp: React.CSSProperties = { background: '#0A0E1A', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '10px 14px', color: '#F0F4FF', fontSize: 14, width: '100%', boxSizing: 'border-box' }
-const inpSm: React.CSSProperties = { background: '#1A1A2E', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '7px 10px', color: '#F0F4FF', fontSize: 13, width: '100%', boxSizing: 'border-box' }
+const inp: React.CSSProperties = { background: '#F6F8F7', border: '1px solid rgba(16,24,40,0.1)', borderRadius: 10, padding: '10px 14px', color: '#1F2937', fontSize: 14, width: '100%', boxSizing: 'border-box' }
+const inpSm: React.CSSProperties = { background: '#F3F5F4', border: '1px solid rgba(16,24,40,0.1)', borderRadius: 8, padding: '7px 10px', color: '#1F2937', fontSize: 13, width: '100%', boxSizing: 'border-box' }

@@ -38,12 +38,12 @@ export default function TurmaDetalhes() {
   const [formEdit, setFormEdit] = useState({ nome: '', diasSemana: '', horario: '', descricao: '' })
 
   const syne = 'Syne, sans-serif'
-  const blue = '#4169E1'
-  const cyan = '#00BFFF'
-  const skyBlue = '#7DD3FC'
-  const offWhite = '#F0F4FF'
-  const navy = '#0A0E1A'
-  const cardBg = 'rgba(65,105,225,0.08)'
+  const blue = '#2EA866'
+  const cyan = '#23874F'
+  const skyBlue = '#4B5563'
+  const offWhite = '#1F2937'
+  const navy = '#F6F8F7'
+  const cardBg = 'rgba(46,168,102,0.08)'
   const cardBorder = '1px solid rgba(65,105,225,0.25)'
 
   const anoNasc = (d: string | null) => {
@@ -111,7 +111,7 @@ export default function TurmaDetalhes() {
 
   if (!turma) return (
     <div style={{ minHeight: '100vh', background: navy, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ color: '#FF6B6B', fontFamily: syne, fontSize: 14 }}>Turma nao encontrada.</div>
+      <div style={{ color: '#DC2626', fontFamily: syne, fontSize: 14 }}>Turma nao encontrada.</div>
     </div>
   )
 
@@ -119,11 +119,11 @@ export default function TurmaDetalhes() {
     <div style={{ minHeight: '100vh', background: navy, paddingBottom: 88, fontFamily: 'Inter, sans-serif', color: offWhite }}>
 
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg, #1A3FA8 0%, #4169E1 100%)', padding: '16px 16px 20px' }}>
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '16px 16px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
           <button
             onClick={() => router.back()}
-            style={{ background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: offWhite, flexShrink: 0 }}
+            style={{ background: '#EEF1EF', border: 'none', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: offWhite, flexShrink: 0 }}
           >
             <i className="ti ti-arrow-left" style={{ fontSize: 18 }} />
           </button>
@@ -139,20 +139,20 @@ export default function TurmaDetalhes() {
           </div>
           <button
             onClick={() => setEditando(true)}
-            style={{ background: 'rgba(0,191,255,0.15)', border: '1px solid #00BFFF', borderRadius: 8, padding: '6px 12px', color: cyan, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+            style={{ background: 'rgba(46,168,102,0.15)', border: '1px solid #23874F', borderRadius: 8, padding: '6px 12px', color: cyan, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
           >
             <i className="ti ti-pencil" style={{ fontSize: 13, marginRight: 4 }} />
             Editar
           </button>
           <button
             onClick={excluirTurma}
-            style={{ background: 'rgba(255,107,107,0.15)', border: '1px solid rgba(255,107,107,0.4)', borderRadius: 8, padding: '6px 12px', color: '#FF6B6B', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+            style={{ background: 'rgba(255,107,107,0.15)', border: '1px solid rgba(255,107,107,0.4)', borderRadius: 8, padding: '6px 12px', color: '#DC2626', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
           >
             Excluir
           </button>
         </div>
         {turma.descricao && (
-          <div style={{ fontSize: 13, color: 'rgba(240,244,255,0.7)', marginLeft: 48 }}>{turma.descricao}</div>
+          <div style={{ fontSize: 13, color: '#374151', marginLeft: 48 }}>{turma.descricao}</div>
         )}
         <div style={{ marginLeft: 48, marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
           <i className="ti ti-users" style={{ fontSize: 13, color: cyan }} />
@@ -168,14 +168,14 @@ export default function TurmaDetalhes() {
             Atletas na Turma
           </div>
           {atletasTurma.length === 0 ? (
-            <div style={{ background: cardBg, border: cardBorder, borderRadius: 12, padding: '20px', textAlign: 'center', color: 'rgba(240,244,255,0.4)', fontSize: 13 }}>
+            <div style={{ background: cardBg, border: cardBorder, borderRadius: 12, padding: '20px', textAlign: 'center', color: '#6B7280', fontSize: 13 }}>
               Nenhum atleta adicionado ainda.
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {atletasTurma.map(a => (
                 <div key={a.id} style={{ background: cardBg, border: cardBorder, borderRadius: 12, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'rgba(65,105,225,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: cyan, flexShrink: 0, overflow: 'hidden' }}>
+                  <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'rgba(46,168,102,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: cyan, flexShrink: 0, overflow: 'hidden' }}>
                     {a.fotoUrl ? <img src={a.fotoUrl} alt={a.nome} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : iniciais(a.nome)}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -184,7 +184,7 @@ export default function TurmaDetalhes() {
                   </div>
                   <button
                     onClick={() => removerAtleta(a.id)}
-                    style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: 8, padding: '5px 10px', color: '#FF6B6B', fontSize: 11, cursor: 'pointer', flexShrink: 0 }}
+                    style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: 8, padding: '5px 10px', color: '#DC2626', fontSize: 11, cursor: 'pointer', flexShrink: 0 }}
                   >
                     Remover
                   </button>
@@ -202,7 +202,7 @@ export default function TurmaDetalhes() {
             </div>
             <button
               onClick={() => setAdicionando(!adicionando)}
-              style={{ background: adicionando ? 'rgba(255,107,107,0.1)' : 'rgba(0,191,255,0.1)', border: adicionando ? '1px solid rgba(255,107,107,0.4)' : '1px solid rgba(0,191,255,0.4)', borderRadius: 8, padding: '5px 12px', color: adicionando ? '#FF6B6B' : cyan, fontSize: 12, cursor: 'pointer' }}
+              style={{ background: adicionando ? 'rgba(255,107,107,0.1)' : 'rgba(46,168,102,0.1)', border: adicionando ? '1px solid rgba(255,107,107,0.4)' : '1px solid rgba(46,168,102,0.4)', borderRadius: 8, padding: '5px 12px', color: adicionando ? '#DC2626' : cyan, fontSize: 12, cursor: 'pointer' }}
             >
               {adicionando ? 'Fechar' : 'Abrir lista'}
             </button>
@@ -211,13 +211,13 @@ export default function TurmaDetalhes() {
           {adicionando && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {atletasSemTurma.length === 0 ? (
-                <div style={{ background: cardBg, border: cardBorder, borderRadius: 12, padding: '20px', textAlign: 'center', color: 'rgba(240,244,255,0.4)', fontSize: 13 }}>
+                <div style={{ background: cardBg, border: cardBorder, borderRadius: 12, padding: '20px', textAlign: 'center', color: '#6B7280', fontSize: 13 }}>
                   Todos os atletas ja estao nesta turma.
                 </div>
               ) : (
                 atletasSemTurma.map(a => (
                   <div key={a.id} style={{ background: cardBg, border: cardBorder, borderRadius: 12, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'rgba(65,105,225,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: skyBlue, flexShrink: 0, overflow: 'hidden' }}>
+                    <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'rgba(46,168,102,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: skyBlue, flexShrink: 0, overflow: 'hidden' }}>
                       {a.fotoUrl ? <img src={a.fotoUrl} alt={a.nome} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : iniciais(a.nome)}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -226,7 +226,7 @@ export default function TurmaDetalhes() {
                     </div>
                     <button
                       onClick={() => adicionarAtleta(a.id)}
-                      style={{ background: 'rgba(65,105,225,0.2)', border: '1px solid rgba(65,105,225,0.5)', borderRadius: 8, padding: '5px 12px', color: cyan, fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}
+                      style={{ background: 'rgba(46,168,102,0.2)', border: '1px solid rgba(46,168,102,0.5)', borderRadius: 8, padding: '5px 12px', color: cyan, fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}
                     >
                       + Adicionar
                     </button>
@@ -240,8 +240,8 @@ export default function TurmaDetalhes() {
 
       {/* Modal Editar */}
       {editando && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(10,14,26,0.92)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 200 }}>
-          <div style={{ width: '100%', maxHeight: '88vh', overflowY: 'auto', background: '#0F1629', borderRadius: '20px 20px 0 0', padding: '24px 20px 40px', border: '1px solid rgba(65,105,225,0.3)', boxSizing: 'border-box' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(255,255,255,0.97)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 200 }}>
+          <div style={{ width: '100%', maxHeight: '88vh', overflowY: 'auto', background: '#FFFFFF', borderRadius: '20px 20px 0 0', padding: '24px 20px 40px', border: '1px solid rgba(46,168,102,0.3)', boxSizing: 'border-box' }}>
             <div style={{ fontFamily: syne, fontWeight: 700, fontSize: 16, color: offWhite, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 20 }}>Editar Turma</div>
             {[
               { label: 'Nome', key: 'nome', placeholder: 'Ex: Sub-11' },
@@ -255,12 +255,12 @@ export default function TurmaDetalhes() {
                   value={formEdit[f.key as keyof typeof formEdit]}
                   onChange={e => setFormEdit(prev => ({ ...prev, [f.key]: e.target.value }))}
                   placeholder={f.placeholder}
-                  style={{ width: '100%', background: 'rgba(65,105,225,0.1)', border: '1px solid rgba(65,105,225,0.3)', borderRadius: 10, padding: '10px 14px', color: offWhite, fontSize: 14, boxSizing: 'border-box', outline: 'none' }}
+                  style={{ width: '100%', background: 'rgba(46,168,102,0.1)', border: '1px solid rgba(46,168,102,0.3)', borderRadius: 10, padding: '10px 14px', color: offWhite, fontSize: 14, boxSizing: 'border-box', outline: 'none' }}
                 />
               </div>
             ))}
             <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
-              <button onClick={() => setEditando(false)} style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '12px', color: offWhite, fontSize: 14, cursor: 'pointer' }}>Cancelar</button>
+              <button onClick={() => setEditando(false)} style={{ flex: 1, background: '#FFFFFF', border: '1px solid rgba(16,24,40,0.1)', borderRadius: 10, padding: '12px', color: offWhite, fontSize: 14, cursor: 'pointer' }}>Cancelar</button>
               <button onClick={salvarEdicao} style={{ flex: 2, background: blue, border: 'none', borderRadius: 10, padding: '12px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Salvar</button>
             </div>
           </div>

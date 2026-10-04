@@ -4,7 +4,7 @@ import { Trash2, RotateCcw, Plus, Loader2, FileText, Search, X } from 'lucide-re
 import { listarMensalidades, listarAtletas, gerarMensalidades, softDeleteCobranca, restaurarCobranca, excluirDefinitivo, marcarPago, cancelarCobranca } from './actions'
 import { gerarRecibo } from '@/lib/gerarRecibo'
 
-const T = { bg: '#0A0E1A', surface: '#0D1220', primary: '#4169E1', accent: '#00BFFF', text: '#F0F4FF', muted: 'rgba(240,244,255,0.4)', border: 'rgba(240,244,255,0.08)', green: '#00D67A', red: '#FF4444', gold: '#FFD700' }
+const T = { bg: '#F6F8F7', surface: '#FFFFFF', primary: '#2EA866', accent: '#23874F', text: '#1F2937', muted: '#6B7280', border: 'rgba(16,24,40,0.1)', green: '#16A34A', red: '#DC2626', gold: '#B7791F' }
 const SYNE = 'Syne, sans-serif'
 const brl = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n || 0)
 const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']
@@ -15,7 +15,7 @@ const corStatus = (s: string) => ({ PAGO: T.green, PENDENTE: T.gold, VENCIDO: T.
 
 type Cobranca = { id: string; valor: number; status: string; competencia: string | null; vencimento: string | null; descricao: string | null; excluidaEm: string | null; atletaNome?: string | null; pagoEm?: string | null; atleta?: { nome: string } | null; pixCopiaCola?: string | null; pixQrCode?: string | null }
 const STATUS = [{ key: 'todas', label: 'Todas' }, { key: 'PENDENTE', label: 'Pendentes' }, { key: 'PAGO', label: 'Pagas' }, { key: 'VENCIDO', label: 'Vencidas' }, { key: 'CANCELADO', label: 'Canceladas' }]
-const INP: React.CSSProperties = { background: '#080C15', border: '1px solid rgba(240,244,255,0.1)', borderRadius: 8, padding: '10px 12px', color: T.text, fontSize: 13, width: '100%' }
+const INP: React.CSSProperties = { background: '#F6F8F7', border: '1px solid rgba(16,24,40,0.1)', borderRadius: 8, padding: '10px 12px', color: T.text, fontSize: 13, width: '100%' }
 
 export default function MensalidadesPage() {
   const [filtro, setFiltro] = useState('todas')
@@ -91,13 +91,13 @@ export default function MensalidadesPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, paddingBottom: 40 }}>
-      <div style={{ background: T.primary, padding: '20px 24px 20px' }}>
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 24px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Financeiro</div>
+            <div style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Financeiro</div>
             <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: T.text, letterSpacing: -0.8, textTransform: 'uppercase' }}>Mensalidades</div>
           </div>
-          <button onClick={() => setShowForm(v => !v)} style={{ background: T.text, color: T.primary, borderRadius: 8, padding: '10px 16px', fontFamily: SYNE, fontWeight: 800, fontSize: 12, border: 'none', cursor: 'pointer', textTransform: 'uppercase' }}>
+          <button onClick={() => setShowForm(v => !v)} style={{ background: T.primary, color: '#fff', borderRadius: 8, padding: '10px 16px', fontFamily: SYNE, fontWeight: 800, fontSize: 12, border: 'none', cursor: 'pointer', textTransform: 'uppercase' }}>
             {showForm ? 'Fechar' : '+ Lançar'}
           </button>
         </div>
@@ -125,7 +125,7 @@ export default function MensalidadesPage() {
                 <button key={q} onClick={() => setQuantidade(q)} style={{ background: quantidade === q ? T.primary : 'transparent', color: quantidade === q ? T.text : T.primary, border: `1px solid ${T.primary}`, borderRadius: 6, padding: '5px 12px', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>{q} meses</button>
               ))}
             </div>
-            <button onClick={lancar} disabled={salvando} style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 8, background: T.primary, color: T.text, border: 'none', borderRadius: 8, padding: '11px 20px', fontWeight: 800, cursor: 'pointer', fontFamily: SYNE, fontSize: 12, textTransform: 'uppercase', opacity: salvando ? 0.6 : 1 }}>
+            <button onClick={lancar} disabled={salvando} style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 8, background: T.primary, color: '#fff', border: 'none', borderRadius: 8, padding: '11px 20px', fontWeight: 800, cursor: 'pointer', fontFamily: SYNE, fontSize: 12, textTransform: 'uppercase', opacity: salvando ? 0.6 : 1 }}>
               {salvando ? <Loader2 size={15} className="spin" /> : <Plus size={15} />} Lançar {quantidade} mensalidades
             </button>
           </div>
@@ -190,7 +190,7 @@ export default function MensalidadesPage() {
                               <button onClick={() => gerarReciboCobranca(c)} style={ICON_BTN} title="Gerar recibo"><FileText size={14} /></button>
                             )}
                             {!excluida && c.pixCopiaCola && (
-                              <button onClick={() => setModalPix(c)} style={{ ...ICON_BTN, color: '#00D67A' }} title="Ver código PIX">⚡</button>
+                              <button onClick={() => setModalPix(c)} style={{ ...ICON_BTN, color: '#16A34A' }} title="Ver código PIX">⚡</button>
                             )}
                             {excluida ? (
                               <>
@@ -203,7 +203,7 @@ export default function MensalidadesPage() {
                                   <button onClick={() => marcar(c.id)} style={{ ...ICON_BTN, color: T.green }} title="Marcar pago">✓</button>
                                 )}
                                 {c.status === 'VENCIDO' && (
-                                  <button onClick={() => cancelar(c.id)} style={{ ...ICON_BTN, color: '#fb923c' }} title="Cancelar">✕</button>
+                                  <button onClick={() => cancelar(c.id)} style={{ ...ICON_BTN, color: '#C2410C' }} title="Cancelar">✕</button>
                                 )}
                                 <button onClick={() => apagar(c.id)} style={ICON_BTN} title="Apagar"><Trash2 size={14} /></button>
                               </>
@@ -224,10 +224,10 @@ export default function MensalidadesPage() {
       {/* MODAL PIX */}
       {modalPix && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.85)', display:'flex', alignItems:'flex-end', justifyContent:'center', zIndex:200 }}>
-          <div style={{ background:'#0D1220', borderRadius:'20px 20px 0 0', padding:24, width:'100%', maxWidth:480 }}>
-            <p style={{ fontFamily:'Syne,sans-serif', fontWeight:900, fontSize:16, color:'#F0F4FF', margin:'0 0 4px', textTransform:'uppercase' }}>⚡ Código PIX</p>
-            <p style={{ fontSize:12, color:'rgba(240,244,255,0.45)', margin:'0 0 16px' }}>{modalPix.atleta?.nome || modalPix.atletaNome || '—'} · {brl(modalPix.valor)}</p>
-            <div style={{ background:'#080C15', border:'1px solid rgba(240,244,255,0.1)', borderRadius:10, padding:14, marginBottom:14, wordBreak:'break-all', fontSize:12, color:'#00D67A', fontFamily:'monospace' }}>
+          <div style={{ background:'#FFFFFF', borderRadius:'20px 20px 0 0', padding:24, width:'100%', maxWidth:480 }}>
+            <p style={{ fontFamily:'Syne,sans-serif', fontWeight:900, fontSize:16, color:'#1F2937', margin:'0 0 4px', textTransform:'uppercase' }}>⚡ Código PIX</p>
+            <p style={{ fontSize:12, color:'#6B7280', margin:'0 0 16px' }}>{modalPix.atleta?.nome || modalPix.atletaNome || '—'} · {brl(modalPix.valor)}</p>
+            <div style={{ background:'#F6F8F7', border:'1px solid rgba(16,24,40,0.1)', borderRadius:10, padding:14, marginBottom:14, wordBreak:'break-all', fontSize:12, color:'#16A34A', fontFamily:'monospace' }}>
               {modalPix.pixCopiaCola}
             </div>
             {modalPix.pixQrCode && (
@@ -236,14 +236,14 @@ export default function MensalidadesPage() {
               </div>
             )}
             <div style={{ display:'flex', gap:10 }}>
-              <button onClick={() => setModalPix(null)} style={{ flex:1, background:'transparent', border:'1px solid rgba(240,244,255,0.1)', color:'rgba(240,244,255,0.45)', padding:13, borderRadius:10, cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:700, fontSize:13 }}>
+              <button onClick={() => setModalPix(null)} style={{ flex:1, background:'transparent', border:'1px solid rgba(16,24,40,0.1)', color:'#6B7280', padding:13, borderRadius:10, cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:700, fontSize:13 }}>
                 Fechar
               </button>
-              <button onClick={() => copiarPix(modalPix.pixCopiaCola!)} style={{ flex:2, background:'#00D67A', color:'#000', padding:13, borderRadius:10, border:'none', cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:900, fontSize:13, textTransform:'uppercase' }}>
+              <button onClick={() => copiarPix(modalPix.pixCopiaCola!)} style={{ flex:2, background:'#00D67A', color:'#fff', padding:13, borderRadius:10, border:'none', cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:900, fontSize:13, textTransform:'uppercase' }}>
                 📋 Copiar código PIX
               </button>
             </div>
-            <p style={{ fontSize:11, color:'rgba(240,244,255,0.3)', textAlign:'center', margin:'12px 0 0' }}>Cole no app do banco para pagar</p>
+            <p style={{ fontSize:11, color:'#6B7280', textAlign:'center', margin:'12px 0 0' }}>Cole no app do banco para pagar</p>
           </div>
         </div>
       )}
@@ -253,7 +253,7 @@ export default function MensalidadesPage() {
 }
 
 function Campo({ label, children }: { label: string; children: React.ReactNode }) {
-  return <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 10, color: 'rgba(240,244,255,0.4)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}{children}</label>
+  return <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 10, color: '#6B7280', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}{children}</label>
 }
 
-const ICON_BTN: React.CSSProperties = { background: 'transparent', border: '1px solid rgba(240,244,255,0.1)', borderRadius: 6, padding: 6, color: 'rgba(240,244,255,0.4)', cursor: 'pointer', display: 'inline-flex' }
+const ICON_BTN: React.CSSProperties = { background: 'transparent', border: '1px solid rgba(16,24,40,0.1)', borderRadius: 6, padding: 6, color: '#6B7280', cursor: 'pointer', display: 'inline-flex' }

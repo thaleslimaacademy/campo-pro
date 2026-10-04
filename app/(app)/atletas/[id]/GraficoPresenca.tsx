@@ -1,6 +1,6 @@
 'use client'
 
-const T = { green:'#00D67A', gold:'#FFD700', red:'#FF4444', muted:'rgba(240,244,255,0.4)', faint:'rgba(240,244,255,0.25)', border:'rgba(240,244,255,0.08)' }
+const T = { green:'#16A34A', gold:'#B7791F', red:'#DC2626', muted:'#6B7280', faint:'#9CA3AF', border:'rgba(16,24,40,0.1)' }
 
 type Dado = { mes: string; presentes: number; total: number; percentual: number }
 
@@ -15,7 +15,7 @@ export default function GraficoPresenca({ dados }: { dados: Dado[] }) {
           <div key={d.mes}>
             <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:3 }}>
               <span style={{ fontSize:10, color:T.muted, width:50, flexShrink:0, textTransform:'lowercase' }}>{d.mes}</span>
-              <div style={{ flex:1, background:'rgba(240,244,255,0.07)', borderRadius:4, height:18, overflow:'hidden' }}>
+              <div style={{ flex:1, background:'#FFFFFF', borderRadius:4, height:18, overflow:'hidden' }}>
                 <div style={{ height:'100%', borderRadius:4, background:cor, width: d.total === 0 ? '0%' : `${(d.presentes / maxTotal) * 100}%`, transition:'width 0.4s ease' }} />
               </div>
               <div style={{ width:36, textAlign:'right', flexShrink:0 }}>

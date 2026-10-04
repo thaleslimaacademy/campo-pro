@@ -16,11 +16,11 @@ const POSICOES: Record<string, string[]> = {
 const DIAS_VENC = [1,5,10,15,20,25,28]
 const TURNOS = ['Matutino','Vespertino','Noturno','Integral']
 
-const T = { bg:'#0A0E1A', surface:'#0D1220', primary:'#4169E1', text:'#F0F4FF', muted:'rgba(240,244,255,0.45)', border:'rgba(240,244,255,0.08)', green:'#00D67A', red:'#FF4444' }
+const T = { bg:'#F6F8F7', surface:'#FFFFFF', primary:'#2EA866', text:'#1F2937', muted:'#6B7280', border:'rgba(16,24,40,0.1)', green:'#16A34A', red:'#DC2626' }
 const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
-const INP: React.CSSProperties = { width:'100%', background:'#080C15', border:`1px solid rgba(240,244,255,0.1)`, borderRadius:8, padding:'12px 14px', color:T.text, fontFamily:INTER, fontSize:14, boxSizing:'border-box', outline:'none' }
-const SEL: React.CSSProperties = { ...{}, width:'100%', background:'#080C15', border:`1px solid rgba(240,244,255,0.1)`, borderRadius:8, padding:'12px 14px', color:T.text, fontFamily:INTER, fontSize:14 }
+const INP: React.CSSProperties = { width:'100%', background:'#F6F8F7', border:`1px solid rgba(16,24,40,0.1)`, borderRadius:8, padding:'12px 14px', color:T.text, fontFamily:INTER, fontSize:14, boxSizing:'border-box', outline:'none' }
+const SEL: React.CSSProperties = { ...{}, width:'100%', background:'#F6F8F7', border:`1px solid rgba(16,24,40,0.1)`, borderRadius:8, padding:'12px 14px', color:T.text, fontFamily:INTER, fontSize:14 }
 const LBL: React.CSSProperties = { fontSize:10, color:T.muted, textTransform:'uppercase', letterSpacing:'0.8px', display:'block', marginBottom:4, fontFamily:SYNE, fontWeight:700 }
 const SEC: React.CSSProperties = { background:T.surface, border:`1px solid ${T.border}`, borderRadius:14, padding:18, marginBottom:14 }
 const SEC_TITLE = (cor: string) => ({ fontFamily:SYNE, fontWeight:800, fontSize:13, color:cor, textTransform:'uppercase' as const, letterSpacing:0.5, margin:'0 0 14px' })
@@ -122,8 +122,8 @@ export default function NovoAtleta() {
     <div style={{ minHeight:'100vh', background:T.bg, color:T.text, fontFamily:INTER, paddingBottom:80 }}>
 
       {/* HEADER */}
-      <div style={{ background:T.primary, padding:'20px 20px 20px' }}>
-        <a href="/atletas" style={{ fontSize:12, color:'rgba(240,244,255,0.65)', textDecoration:'none', display:'block', marginBottom:8 }}>← Atletas</a>
+      <div style={{ background:'#FFFFFF', borderBottom: '1px solid #E3E8E5', padding:'20px 20px 20px' }}>
+        <a href="/atletas" style={{ fontSize:12, color:'#374151', textDecoration:'none', display:'block', marginBottom:8 }}>← Atletas</a>
         <h1 style={{ fontFamily:SYNE, fontWeight:900, fontSize:22, color:T.text, margin:0, textTransform:'uppercase', letterSpacing:-0.5 }}>Novo Atleta</h1>
       </div>
 
@@ -275,7 +275,7 @@ export default function NovoAtleta() {
         {erro && <div style={{ background:'rgba(255,68,68,0.1)', border:'1px solid rgba(255,68,68,0.3)', borderRadius:10, padding:'12px 14px', marginBottom:14 }}><p style={{ color:T.red, fontSize:13, margin:0 }}>❌ {erro}</p></div>}
 
         <button type="submit" disabled={loading}
-          style={{ width:'100%', background:T.primary, color:T.text, padding:'16px', borderRadius:12, fontFamily:SYNE, fontWeight:900, fontSize:15, border:'none', cursor:loading?'not-allowed':'pointer', textTransform:'uppercase', letterSpacing:0.5, opacity:loading?0.6:1 }}>
+          style={{ width:'100%', background:T.primary, color:'#fff', padding:'16px', borderRadius:12, fontFamily:SYNE, fontWeight:900, fontSize:15, border:'none', cursor:loading?'not-allowed':'pointer', textTransform:'uppercase', letterSpacing:0.5, opacity:loading?0.6:1 }}>
           {loading ? 'Salvando...' : '✅ Cadastrar Atleta'}
         </button>
       </form>

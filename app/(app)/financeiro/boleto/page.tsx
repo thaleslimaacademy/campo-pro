@@ -89,12 +89,12 @@ export default function BoletoPage() {
     if (b.status === 'CANCELADO') return { label: 'Cancelado', cor: '#666' }
     if (b.status === 'PAGO') {
       return calcularJuros(b.valor, b.vencimento, b.pagoEm) > 0
-        ? { label: 'Pago com atraso', cor: '#4169E1' }
-        : { label: 'Pago', cor: '#00D67A' }
+        ? { label: 'Pago com atraso', cor: '#2EA866' }
+        : { label: 'Pago', cor: '#16A34A' }
     }
     return new Date(b.vencimento) < new Date()
-      ? { label: 'Vencido', cor: '#FF4444' }
-      : { label: 'A vencer', cor: '#FFD700' }
+      ? { label: 'Vencido', cor: '#DC2626' }
+      : { label: 'A vencer', cor: '#B7791F' }
   }
 
   const handleCancelar = async (id: string, asaasId: string) => {
@@ -116,14 +116,14 @@ export default function BoletoPage() {
   const fmtDate = (d: string) => d ? new Date(d.length === 10 ? d + 'T12:00:00' : d).toLocaleDateString('pt-BR') : '-'
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #0A0E1A, #0A0E1A, #0A0E1A)', color: '#fff', padding: 24, display: 'flex', justifyContent: 'center' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #F6F8F7, #F6F8F7, #F6F8F7)', color: '#1F2937', padding: 24, display: 'flex', justifyContent: 'center' }}>
       <div style={{ width: '100%', maxWidth: 560 }}>
-        <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 28, fontWeight: 800, color: '#4169E1', margin: '0 0 16px' }}>Boleto</h1>
+        <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 28, fontWeight: 800, color: '#2EA866', margin: '0 0 16px' }}>Boleto</h1>
 
         <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
           {(['novo', 'historico'] as const).map(a => (
             <button key={a} onClick={() => setAba(a)}
-              style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 13, background: aba === a ? '#4169E1' : 'rgba(255,255,255,0.06)', color: aba === a ? '#fff' : 'rgba(255,255,255,0.4)' }}>
+              style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 13, background: aba === a ? '#2EA866' : '#FFFFFF', color: aba === a ? '#fff' : '#6B7280' }}>
               {a === 'novo' ? '➕ Novo Boleto' : '📋 Enviados (' + boletos.length + ')'}
             </button>
           ))}
@@ -132,46 +132,46 @@ export default function BoletoPage() {
         {aba === 'historico' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {boletos.length === 0 && (
-              <p style={{ color: 'rgba(255,255,255,0.3)', textAlign: 'center', marginTop: 40 }}>Nenhum boleto enviado ainda.</p>
+              <p style={{ color: '#6B7280', textAlign: 'center', marginTop: 40 }}>Nenhum boleto enviado ainda.</p>
             )}
             {boletos.map(b => {
               const st = statusBoleto(b)
               const juros = calcularJuros(b.valor, b.vencimento, b.pagoEm)
               return (
-                <div key={b.id} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: 16 }}>
+                <div key={b.id} style={{ background: '#FFFFFF', border: '1px solid rgba(16,24,40,0.1)', borderRadius: 14, padding: 16 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
                     <div>
-                      <p style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 14, color: '#fff', margin: 0 }}>{b.atletaNome || '-'}</p>
-                      <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, marginTop: 2 }}>{b.descricao || 'Mensalidade'}</p>
+                      <p style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 14, color: '#1F2937', margin: 0 }}>{b.atletaNome || '-'}</p>
+                      <p style={{ color: '#6B7280', fontSize: 11, marginTop: 2 }}>{b.descricao || 'Mensalidade'}</p>
                     </div>
                     <span style={{ background: st.cor + '22', color: st.cor, border: '1px solid ' + st.cor + '55', borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' as const }}>{st.label}</span>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 10 }}>
-                    <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 8, padding: '8px 10px' }}>
-                      <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, margin: 0 }}>Valor</p>
-                      <p style={{ color: '#FFD700', fontWeight: 700, fontSize: 14, margin: 0 }}>{'R$ ' + Number(b.valor).toFixed(2)}</p>
+                    <div style={{ background: '#FFFFFF', borderRadius: 8, padding: '8px 10px' }}>
+                      <p style={{ color: '#6B7280', fontSize: 10, margin: 0 }}>Valor</p>
+                      <p style={{ color: '#B7791F', fontWeight: 700, fontSize: 14, margin: 0 }}>{'R$ ' + Number(b.valor).toFixed(2)}</p>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 8, padding: '8px 10px' }}>
-                      <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, margin: 0 }}>Vencimento</p>
-                      <p style={{ color: '#fff', fontWeight: 600, fontSize: 13, margin: 0 }}>{fmtDate(b.vencimento)}</p>
+                    <div style={{ background: '#FFFFFF', borderRadius: 8, padding: '8px 10px' }}>
+                      <p style={{ color: '#6B7280', fontSize: 10, margin: 0 }}>Vencimento</p>
+                      <p style={{ color: '#1F2937', fontWeight: 600, fontSize: 13, margin: 0 }}>{fmtDate(b.vencimento)}</p>
                     </div>
                     {b.pagoEm && (
                       <div style={{ background: 'rgba(0,214,122,0.08)', borderRadius: 8, padding: '8px 10px' }}>
-                        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, margin: 0 }}>Pago em</p>
-                        <p style={{ color: '#00D67A', fontWeight: 600, fontSize: 13, margin: 0 }}>{fmtDate(b.pagoEm)}</p>
+                        <p style={{ color: '#6B7280', fontSize: 10, margin: 0 }}>Pago em</p>
+                        <p style={{ color: '#16A34A', fontWeight: 600, fontSize: 13, margin: 0 }}>{fmtDate(b.pagoEm)}</p>
                       </div>
                     )}
                     {juros > 0 && (
-                      <div style={{ background: 'rgba(65,105,225,0.08)', borderRadius: 8, padding: '8px 10px' }}>
-                        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, margin: 0 }}>Juros/Multa</p>
-                        <p style={{ color: '#4169E1', fontWeight: 700, fontSize: 13, margin: 0 }}>{'+ R$ ' + juros.toFixed(2)}</p>
+                      <div style={{ background: 'rgba(46,168,102,0.08)', borderRadius: 8, padding: '8px 10px' }}>
+                        <p style={{ color: '#6B7280', fontSize: 10, margin: 0 }}>Juros/Multa</p>
+                        <p style={{ color: '#2EA866', fontWeight: 700, fontSize: 13, margin: 0 }}>{'+ R$ ' + juros.toFixed(2)}</p>
                       </div>
                     )}
                   </div>
                   <div style={{ display: 'flex', gap: 8 }}>
                     {b.bankSlipUrl && (
                       <a href={b.bankSlipUrl} target="_blank" rel="noreferrer"
-                        style={{ flex: 1, background: 'rgba(65,105,225,0.1)', border: '1px solid rgba(65,105,225,0.3)', color: '#4169E1', borderRadius: 8, padding: '8px', textAlign: 'center' as const, fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>
+                        style={{ flex: 1, background: 'rgba(46,168,102,0.1)', border: '1px solid rgba(46,168,102,0.3)', color: '#2EA866', borderRadius: 8, padding: '8px', textAlign: 'center' as const, fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>
                         {'📄 Ver boleto'}
                       </a>
                     )}
@@ -179,7 +179,7 @@ export default function BoletoPage() {
                       <button
                         onClick={() => handleCancelar(b.id, b.asaasId)}
                         disabled={cancelando === b.id}
-                        style={{ flex: 1, background: cancelando === b.id ? 'rgba(255,68,68,0.04)' : 'rgba(255,68,68,0.08)', border: '1px solid rgba(255,68,68,0.25)', color: '#FF4444', borderRadius: 8, padding: '8px', fontSize: 12, fontWeight: 600, cursor: cancelando === b.id ? 'not-allowed' : 'pointer', opacity: cancelando === b.id ? 0.5 : 1 }}>
+                        style={{ flex: 1, background: cancelando === b.id ? 'rgba(255,68,68,0.04)' : 'rgba(255,68,68,0.08)', border: '1px solid rgba(255,68,68,0.25)', color: '#DC2626', borderRadius: 8, padding: '8px', fontSize: 12, fontWeight: 600, cursor: cancelando === b.id ? 'not-allowed' : 'pointer', opacity: cancelando === b.id ? 0.5 : 1 }}>
                         {cancelando === b.id ? '⏳ Cancelando…' : '🚫 Cancelar'}
                       </button>
                     )}
@@ -196,25 +196,25 @@ export default function BoletoPage() {
               <div style={card}>
                 <div style={{ textAlign: 'center', marginBottom: 24 }}>
                   <CheckCircle size={48} color="#4169E1" />
-                  <h2 style={{ fontFamily: 'Syne, sans-serif', color: '#4169E1', margin: '12px 0 4px' }}>
+                  <h2 style={{ fontFamily: 'Syne, sans-serif', color: '#2EA866', margin: '12px 0 4px' }}>
                     {resultados.length} boleto{resultados.length > 1 ? 's' : ''} gerado{resultados.length > 1 ? 's' : ''}!
                   </h2>
-                  <p style={{ color: '#9aa', fontSize: 13 }}>{atletaNome}</p>
+                  <p style={{ color: '#6B7280', fontSize: 13 }}>{atletaNome}</p>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
                   {resultados.map(r => (
-                    <div key={r.id} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, padding: 12 }}>
-                      <p style={{ fontSize: 12, color: '#9aa', margin: '0 0 8px', textTransform: 'capitalize' as const }}>
+                    <div key={r.id} style={{ background: '#FFFFFF', border: '1px solid rgba(16,24,40,0.1)', borderRadius: 12, padding: 12 }}>
+                      <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 8px', textTransform: 'capitalize' as const }}>
                         Venc. {r.vencimento.split('-').reverse().join('/')}
                       </p>
                       <div style={{ display: 'flex', gap: 8 }}>
                         <a href={r.bankSlipUrl} target="_blank" rel="noreferrer"
-                          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: '#4169E1', color: '#fff', borderRadius: 8, padding: '10px', fontWeight: 700, fontFamily: 'Syne, sans-serif', textDecoration: 'none', fontSize: 12 }}>
+                          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: '#2EA866', color: '#fff', borderRadius: 8, padding: '10px', fontWeight: 700, fontFamily: 'Syne, sans-serif', textDecoration: 'none', fontSize: 12 }}>
                           <ExternalLink size={14} /> Abrir
                         </a>
                         <button onClick={() => copiar(r.id, r.bankSlipUrl)}
-                          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: 'transparent', border: '1px solid #FFD700', color: '#FFD700', borderRadius: 8, padding: '10px', fontWeight: 600, cursor: 'pointer', fontSize: 12 }}>
+                          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: 'transparent', border: '1px solid #B7791F', color: '#B7791F', borderRadius: 8, padding: '10px', fontWeight: 600, cursor: 'pointer', fontSize: 12 }}>
                           {copiadoId === r.id ? <><CheckCircle size={14} /> Copiado!</> : <><Copy size={14} /> Copiar</>}
                         </button>
                       </div>
@@ -232,11 +232,11 @@ export default function BoletoPage() {
                     escolaNome: escola?.nome, escolaCidade: escola?.cidade, escolaEstado: escola?.estado, escolaLogoUrl: escola?.logoUrl,
                     corPrimaria: escola?.corPrimaria, corSecundaria: escola?.corSecundaria,
                   })}
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'transparent', border: '1px solid #2A2A4A', color: '#cdd', borderRadius: 12, padding: '12px 20px', cursor: 'pointer' }}>
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'transparent', border: '1px solid #E3E8E5', color: '#374151', borderRadius: 12, padding: '12px 20px', cursor: 'pointer' }}>
                     <FileText size={16} /> Gerar recibo PDF
                   </button>
                   <button onClick={() => { setEstado('form'); setResultados(null); setValorBoleto(''); setValorMensalidade(''); setCpf(''); setMeses(1) }}
-                    style={{ color: '#9aa', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 13, marginTop: 4 }}>
+                    style={{ color: '#6B7280', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 13, marginTop: 4 }}>
                     Gerar novo boleto
                   </button>
                 </div>
@@ -263,12 +263,12 @@ export default function BoletoPage() {
                 </div>
 
                 {desconto > 0 && (
-                  <p style={{ fontSize: 12, color: '#00D67A', margin: '-6px 0 12px', background: 'rgba(0,214,122,0.08)', borderRadius: 8, padding: '8px 10px' }}>
+                  <p style={{ fontSize: 12, color: '#16A34A', margin: '-6px 0 12px', background: 'rgba(0,214,122,0.08)', borderRadius: 8, padding: '8px 10px' }}>
                     💚 Desconto de R$ {desconto.toFixed(2)} se pago até o vencimento — o responsável paga R$ {Number(valorMensalidade).toFixed(2)}
                   </p>
                 )}
                 {desconto < 0 && (
-                  <p style={{ fontSize: 12, color: '#FF4444', margin: '-6px 0 12px' }}>
+                  <p style={{ fontSize: 12, color: '#DC2626', margin: '-6px 0 12px' }}>
                     O valor do boleto está menor que o da mensalidade — confira os valores.
                   </p>
                 )}
@@ -287,12 +287,12 @@ export default function BoletoPage() {
                 <Campo label="Descrição">
                   <input value={descricao} onChange={e => setDescricao(e.target.value)} style={inp} />
                 </Campo>
-                {erro && <p style={{ color: '#FF4757', fontSize: 13, margin: '8px 0 0' }}>{erro}</p>}
+                {erro && <p style={{ color: '#DC2626', fontSize: 13, margin: '8px 0 0' }}>{erro}</p>}
                 <button onClick={gerar} disabled={estado === 'loading'}
-                  style={{ marginTop: 20, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#4169E1', color: '#04130a', border: 'none', borderRadius: 12, padding: '14px 20px', fontWeight: 700, fontFamily: 'Syne, sans-serif', fontSize: 15, cursor: 'pointer', opacity: estado === 'loading' ? 0.7 : 1 }}>
+                  style={{ marginTop: 20, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#2EA866', color: '#fff', border: 'none', borderRadius: 12, padding: '14px 20px', fontWeight: 700, fontFamily: 'Syne, sans-serif', fontSize: 15, cursor: 'pointer', opacity: estado === 'loading' ? 0.7 : 1 }}>
                   {estado === 'loading' ? <><Loader2 size={18} className="spin" /> Gerando…</> : `Gerar ${meses > 1 ? meses + ' Boletos' : 'Boleto'}`}
                 </button>
-                <p style={{ color: '#9aa', fontSize: 11, marginTop: 12, textAlign: 'center' }}>
+                <p style={{ color: '#6B7280', fontSize: 11, marginTop: 12, textAlign: 'center' }}>
                   {cpf ? '✅ CPF encontrado — pré-preenchido do cadastro.' : 'O CPF será salvo opcionalmente após gerar o boleto.'}
                 </p>
               </div>
@@ -306,8 +306,8 @@ export default function BoletoPage() {
 }
 
 function Campo({ label, children }: { label: string; children: React.ReactNode }) {
-  return <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12, color: '#9aa', marginBottom: 12 }}>{label}{children}</label>
+  return <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12, color: '#6B7280', marginBottom: 12 }}>{label}{children}</label>
 }
 
-const card: React.CSSProperties = { background: 'rgba(255,255,255,0.03)', border: '1px solid #1A1A2E', borderRadius: 20, padding: 28 }
-const inp: React.CSSProperties = { background: '#0a0f08', border: '1px solid #2A2A4A', borderRadius: 10, padding: '11px 14px', color: '#fff', fontSize: 14, width: '100%', boxSizing: 'border-box' }
+const card: React.CSSProperties = { background: '#FFFFFF', border: '1px solid #E3E8E5', borderRadius: 20, padding: 28 }
+const inp: React.CSSProperties = { background: '#FFFFFF', border: '1px solid #E3E8E5', borderRadius: 10, padding: '11px 14px', color: '#1F2937', fontSize: 14, width: '100%', boxSizing: 'border-box' }

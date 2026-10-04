@@ -2,10 +2,10 @@
 import { useState, useEffect } from 'react'
 
 
-const T = { surface:'#0D1220', primary:'#4169E1', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', border:'rgba(240,244,255,0.08)', green:'#00D67A', red:'#FF4444', amber:'#FFB84D' }
+const T = { surface:'#FFFFFF', primary:'#2EA866', text:'#1F2937', muted:'#6B7280', border:'rgba(16,24,40,0.1)', green:'#16A34A', red:'#DC2626', amber:'#FFB84D' }
 const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
-const INP: React.CSSProperties = { width:'100%', background:'#080C15', border:`1px solid rgba(240,244,255,0.1)`, borderRadius:8, padding:'11px 14px', color:T.text, fontFamily:INTER, fontSize:13, boxSizing:'border-box' }
+const INP: React.CSSProperties = { width:'100%', background:'#F6F8F7', border:`1px solid rgba(16,24,40,0.1)`, borderRadius:8, padding:'11px 14px', color:T.text, fontFamily:INTER, fontSize:13, boxSizing:'border-box' }
 const LBL: React.CSSProperties = { fontSize:10, color:T.muted, textTransform:'uppercase', letterSpacing:'0.8px', display:'block', marginBottom:4 }
 
 const DIAS = ['1','5','10','15','20','25','28']
@@ -73,7 +73,7 @@ export default function GerarCobranca({ atletaId, atletaNome, escolaId }: { atle
     <div style={{ background:`${T.green}08`, border:`1px solid ${T.green}25`, borderRadius:14, padding:16, marginBottom:12 }}>
       <p style={{ fontFamily:SYNE, fontWeight:800, fontSize:13, color:T.green, marginBottom:12, textAlign:'center' }}>✅ PIX gerado!</p>
       {pix.qrCode && <div style={{ display:'flex', justifyContent:'center', marginBottom:14 }}><img src={`data:image/png;base64,${pix.qrCode}`} alt="QR PIX" style={{ width:176, height:176, borderRadius:10, background:'#fff', padding:6 }} /></div>}
-      <button onClick={copiar} style={{ width:'100%', background:copiado?`${T.green}20`:T.primary, border:`1px solid ${copiado?T.green+'44':T.primary}`, color:T.text, padding:'13px', borderRadius:8, fontFamily:SYNE, fontWeight:800, fontSize:12, cursor:'pointer', textTransform:'uppercase', marginBottom:8 }}>
+      <button onClick={copiar} style={{ width:'100%', background:copiado?`${T.green}20`:T.primary, border:`1px solid ${copiado?T.green+'44':T.primary}`, color:'#fff', padding:'13px', borderRadius:8, fontFamily:SYNE, fontWeight:800, fontSize:12, cursor:'pointer', textTransform:'uppercase', marginBottom:8 }}>
         {copiado ? '✅ Copiado!' : '📋 Copiar PIX Copia e Cola'}
       </button>
       <button onClick={() => { setPix(null); setAberto(false) }} style={{ width:'100%', background:'transparent', border:`1px solid ${T.border}`, color:T.muted, padding:'10px', borderRadius:8, fontFamily:SYNE, fontWeight:600, fontSize:12, cursor:'pointer' }}>Fechar</button>
@@ -102,7 +102,7 @@ export default function GerarCobranca({ atletaId, atletaNome, escolaId }: { atle
           <button
             onClick={() => gerarAsaas(true)}
             disabled={gerando}
-            style={{ width:'100%', background:T.amber, color:'#1a1200', padding:'11px', borderRadius:8, fontFamily:SYNE, fontWeight:800, fontSize:12, border:'none', cursor:gerando?'not-allowed':'pointer', textTransform:'uppercase', opacity:gerando?0.5:1 }}>
+            style={{ width:'100%', background:T.amber, color:'#1F2937', padding:'11px', borderRadius:8, fontFamily:SYNE, fontWeight:800, fontSize:12, border:'none', cursor:gerando?'not-allowed':'pointer', textTransform:'uppercase', opacity:gerando?0.5:1 }}>
             {gerando ? 'Substituindo...' : 'Cancelar a anterior e substituir'}
           </button>
         </div>
@@ -144,7 +144,7 @@ export default function GerarCobranca({ atletaId, atletaNome, escolaId }: { atle
         <button
           onClick={() => { setConflito(null); temAsaas ? gerarAsaas(false) : gerarManual() }}
           disabled={gerando || (temAsaas ? !vencimento : false)}
-          style={{ background:T.primary, color:T.text, padding:'13px', borderRadius:8, fontFamily:SYNE, fontWeight:800, fontSize:13, border:'none', cursor:gerando?'not-allowed':'pointer', textTransform:'uppercase', letterSpacing:0.5, opacity:gerando?0.5:1 }}>
+          style={{ background:T.primary, color:'#fff', padding:'13px', borderRadius:8, fontFamily:SYNE, fontWeight:800, fontSize:13, border:'none', cursor:gerando?'not-allowed':'pointer', textTransform:'uppercase', letterSpacing:0.5, opacity:gerando?0.5:1 }}>
           {gerando ? 'Gerando...' : temAsaas ? 'Gerar PIX' : `Gerar cobrança${periodo!=='mensal'?` (${periodo==='semestral'?6:12}x)`:''}`}
         </button>
       </div>

@@ -4,12 +4,12 @@ import { usePerfil } from '@/lib/usePerfil'
 import { usePlano } from '@/lib/usePlano'
 import BottomNav from '@/components/ui/BottomNav'
 
-const T = { bg:'#0A0E1A', surface:'#0D1220', primary:'#4169E1', accent:'#00BFFF', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', border:'rgba(240,244,255,0.08)', green:'#00D67A', gold:'#FFD700' }
+const T = { bg:'#F6F8F7', surface:'#FFFFFF', primary:'#2EA866', accent:'#23874F', text:'#1F2937', muted:'#6B7280', border:'rgba(16,24,40,0.1)', green:'#16A34A', gold:'#B7791F' }
 const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
 
 const PLANOS = [
-  { id:'BASICO', label:'Básico', preco:79, precoAnual:65, cor:'#7DD3FC', limite:'Até 50 atletas', features:['50 atletas','1 admin','3 turmas','Presença','Mensalidades'], nao:['WhatsApp auto','App dos pais','Multi-modalidade'] },
+  { id:'BASICO', label:'Básico', preco:79, precoAnual:65, cor:'#4B5563', limite:'Até 50 atletas', features:['50 atletas','1 admin','3 turmas','Presença','Mensalidades'], nao:['WhatsApp auto','App dos pais','Multi-modalidade'] },
   { id:'PRO', label:'Pro', preco:129, precoAnual:107, cor:T.primary, popular:true, limite:'Até 150 atletas', features:['150 atletas','3 usuários','Turmas ilimitadas','WhatsApp auto','Dashboard financeiro','3 modalidades','Campeonatos'], nao:['App dos pais'] },
   { id:'ELITE', label:'Elite', preco:199, precoAnual:165, cor:T.gold, limite:'Ilimitado', features:['Atletas ilimitados','Usuários ilimitados','Todas modalidades','WhatsApp auto','App dos pais','IA de treinamentos','Múltiplas unidades'], nao:[] },
 ]
@@ -36,11 +36,11 @@ export default function PlanosApp() {
 
   return (
     <div style={{ minHeight:'100vh', background:T.bg, color:T.text, fontFamily:INTER, paddingBottom:80 }}>
-      <div style={{ background:T.primary, padding:'20px 20px 20px' }}>
+      <div style={{ background:'#FFFFFF', borderBottom: '1px solid #E3E8E5', padding:'20px 20px 20px' }}>
         <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-          <a href="/dashboard" style={{ color:'rgba(240,244,255,0.7)', textDecoration:'none', fontSize:16 }}>←</a>
+          <a href="/dashboard" style={{ color:'#374151', textDecoration:'none', fontSize:16 }}>←</a>
           <div>
-            <div style={{ fontSize:10, color:'rgba(240,244,255,0.65)', textTransform:'uppercase', letterSpacing:2, fontWeight:700, marginBottom:2 }}>GestãoFC</div>
+            <div style={{ fontSize:10, color:'#374151', textTransform:'uppercase', letterSpacing:2, fontWeight:700, marginBottom:2 }}>GestãoFC</div>
             <div style={{ fontFamily:SYNE, fontWeight:900, fontSize:22, color:T.text, letterSpacing:-0.5, textTransform:'uppercase' }}>Planos</div>
           </div>
         </div>
@@ -63,13 +63,13 @@ export default function PlanosApp() {
 
         <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:14, marginBottom:20 }}>
           <span style={{ fontSize:13, color:anual?T.muted:T.text }}>Mensal</span>
-          <button onClick={() => setAnual(!anual)} style={{ width:48, height:26, borderRadius:13, background:anual?T.primary:'rgba(240,244,255,0.15)', border:'none', cursor:'pointer', position:'relative', transition:'background 0.2s' }}>
+          <button onClick={() => setAnual(!anual)} style={{ width:48, height:26, borderRadius:13, background:anual?T.primary:'#EEF1EF', border:'none', cursor:'pointer', position:'relative', transition:'background 0.2s' }}>
             <span style={{ position:'absolute', top:3, left:anual?24:3, width:20, height:20, borderRadius:'50%', background:'#fff', transition:'left 0.2s', display:'block' }} />
           </button>
           <span style={{ fontSize:13, color:anual?T.text:T.muted }}>Anual <span style={{ background:`${T.green}15`, color:T.green, fontSize:10, padding:'2px 7px', borderRadius:8, fontWeight:700 }}>-18%</span></span>
         </div>
 
-        {erro && <div style={{ background:'rgba(255,68,68,0.1)', border:'1px solid rgba(255,68,68,0.25)', borderRadius:10, padding:'11px 14px', marginBottom:16 }}><p style={{ color:'#FF4444', fontSize:13, margin:0 }}>❌ {erro}</p></div>}
+        {erro && <div style={{ background:'rgba(255,68,68,0.1)', border:'1px solid rgba(255,68,68,0.25)', borderRadius:10, padding:'11px 14px', marginBottom:16 }}><p style={{ color:'#DC2626', fontSize:13, margin:0 }}>❌ {erro}</p></div>}
 
         <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
           {PLANOS.map(p => {
@@ -80,7 +80,7 @@ export default function PlanosApp() {
             return (
               <div key={p.id} style={{ background:T.surface, border:`2px solid ${p.popular?T.primary:p.id==='ELITE'?`${T.gold}44`:T.border}`, borderRadius:14, padding:20, position:'relative', boxShadow:p.popular?`0 0 24px ${T.primary}18`:undefined }}>
                 {p.popular && <div style={{ position:'absolute', top:-12, left:'50%', transform:'translateX(-50%)', background:T.primary, color:'#fff', fontSize:10, fontWeight:800, padding:'3px 14px', borderRadius:20, fontFamily:SYNE, whiteSpace:'nowrap' }}>MAIS POPULAR</div>}
-                {p.id==='ELITE' && <div style={{ position:'absolute', top:-12, left:'50%', transform:'translateX(-50%)', background:T.gold, color:'#0A0E1A', fontSize:10, fontWeight:800, padding:'3px 14px', borderRadius:20, fontFamily:SYNE, whiteSpace:'nowrap' }}>COMPLETO</div>}
+                {p.id==='ELITE' && <div style={{ position:'absolute', top:-12, left:'50%', transform:'translateX(-50%)', background:T.gold, color:'#1F2937', fontSize:10, fontWeight:800, padding:'3px 14px', borderRadius:20, fontFamily:SYNE, whiteSpace:'nowrap' }}>COMPLETO</div>}
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:14 }}>
                   <div>
                     <p style={{ fontFamily:SYNE, fontWeight:900, fontSize:20, color:p.cor, margin:'0 0 3px' }}>{p.label}</p>
@@ -92,7 +92,7 @@ export default function PlanosApp() {
                   </div>
                 </div>
                 <div style={{ display:'flex', flexDirection:'column', gap:6, marginBottom:14 }}>
-                  {p.features.map(f => <div key={f} style={{ display:'flex', alignItems:'center', gap:8 }}><span style={{ color:T.green, fontSize:12 }}>✓</span><span style={{ fontSize:12, color:'rgba(240,244,255,0.8)' }}>{f}</span></div>)}
+                  {p.features.map(f => <div key={f} style={{ display:'flex', alignItems:'center', gap:8 }}><span style={{ color:T.green, fontSize:12 }}>✓</span><span style={{ fontSize:12, color:'#1F2937' }}>{f}</span></div>)}
                   {p.nao.map(f => <div key={f} style={{ display:'flex', alignItems:'center', gap:8 }}><span style={{ color:T.muted, fontSize:12 }}>✗</span><span style={{ fontSize:12, color:T.muted }}>{f}</span></div>)}
                 </div>
                 {atual ? (
@@ -104,7 +104,7 @@ export default function PlanosApp() {
                     <p style={{ color:T.muted, fontSize:12, margin:0 }}>Plano inferior ao atual</p>
                   </div>
                 ) : (
-                  <button onClick={() => assinar(p.id)} disabled={!!processando} style={{ width:'100%', background:loading?T.border:p.id==='ELITE'?T.gold:T.primary, color:p.id==='ELITE'&&!loading?'#0A0E1A':T.text, padding:14, borderRadius:10, fontFamily:SYNE, fontWeight:800, fontSize:13, border:'none', cursor:processando?'not-allowed':'pointer', textTransform:'uppercase', letterSpacing:0.5, opacity:loading?0.7:1 }}>
+                  <button onClick={() => assinar(p.id)} disabled={!!processando} style={{ width:'100%', background:loading?T.border:p.id==='ELITE'?T.gold:T.primary, color:p.id==='ELITE'&&!loading?'#1F2937':T.text, padding:14, borderRadius:10, fontFamily:SYNE, fontWeight:800, fontSize:13, border:'none', cursor:processando?'not-allowed':'pointer', textTransform:'uppercase', letterSpacing:0.5, opacity:loading?0.7:1 }}>
                     {loading ? 'Gerando link...' : trialAtivo ? `Assinar ${p.label}` : `Upgrade para ${p.label}`}
                   </button>
                 )}

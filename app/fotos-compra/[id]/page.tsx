@@ -5,8 +5,8 @@ import { useParams } from 'next/navigation'
 type FotoLink = { numero: number; url: string }
 
 const T = {
-  bg: '#0A0E1A', surface: '#0D1220', primary: '#4169E1', text: '#F0F4FF',
-  muted: 'rgba(240,244,255,0.45)', border: 'rgba(240,244,255,0.08)', green: '#00D67A', red: '#FF4444',
+  bg: '#F6F8F7', surface: '#FFFFFF', primary: '#2EA866', text: '#1F2937',
+  muted: '#6B7280', border: 'rgba(16,24,40,0.1)', green: '#16A34A', red: '#DC2626',
 }
 const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'

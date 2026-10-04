@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { Trash2, Plus, TrendingUp, TrendingDown, DollarSign, Wallet } from 'lucide-react'
 import { carregarCaixa, criarReceita, criarDespesa, excluirReceita, excluirDespesa } from './actions'
 
-const T = { bg: '#0A0E1A', surface: '#0D1220', primary: '#4169E1', accent: '#00BFFF', text: '#F0F4FF', muted: 'rgba(240,244,255,0.4)', border: 'rgba(240,244,255,0.08)', green: '#00D67A', red: '#FF4444' }
+const T = { bg: '#F6F8F7', surface: '#FFFFFF', primary: '#2EA866', accent: '#23874F', text: '#1F2937', muted: '#6B7280', border: 'rgba(16,24,40,0.1)', green: '#16A34A', red: '#DC2626' }
 const SYNE = 'Syne, sans-serif'
 const brl = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n || 0)
 const mesAtual = () => new Date().toISOString().slice(0, 7)
@@ -14,7 +14,7 @@ const dataLabel = (d: string) => d?.slice(0, 10).split('-').reverse().join('/')
 
 type Item = { id: string; valor: number; descricao?: string | null; categoria?: string; data?: string; nome?: string }
 
-const INP: React.CSSProperties = { background: '#080C15', border: '1px solid rgba(240,244,255,0.1)', borderRadius: 8, padding: '10px 12px', color: T.text, fontSize: 13, width: '100%' }
+const INP: React.CSSProperties = { background: '#F6F8F7', border: '1px solid rgba(16,24,40,0.1)', borderRadius: 8, padding: '10px 12px', color: T.text, fontSize: 13, width: '100%' }
 
 export default function CaixaPage() {
   const [mes, setMes] = useState(mesAtual)
@@ -70,22 +70,22 @@ export default function CaixaPage() {
   return (
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, paddingBottom: 40 }}>
       {/* HEADER */}
-      <div style={{ background: T.primary, padding: '20px 24px 20px' }}>
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 24px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Financeiro</div>
+            <div style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Financeiro</div>
             <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: T.text, letterSpacing: -0.8, textTransform: 'uppercase' }}>Caixa</div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <input type="month" value={mes} onChange={e => setMes(e.target.value)}
-              style={{ background: 'rgba(240,244,255,0.15)', border: '1px solid rgba(240,244,255,0.2)', borderRadius: 8, padding: '8px 12px', color: T.text, fontSize: 13, fontFamily: 'Inter, sans-serif' }} />
-            {carregando && <span style={{ color: 'rgba(240,244,255,0.6)', fontSize: 12 }}>Carregando…</span>}
+              style={{ background: '#EEF1EF', border: '1px solid rgba(16,24,40,0.18)', borderRadius: 8, padding: '8px 12px', color: T.text, fontSize: 13, fontFamily: 'Inter, sans-serif' }} />
+            {carregando && <span style={{ color: '#374151', fontSize: 12 }}>Carregando…</span>}
           </div>
         </div>
       </div>
 
       {/* STATS STRIP */}
-      <div style={{ display: 'flex', background: '#080C15', borderBottom: `1px solid ${T.border}` }}>
+      <div style={{ display: 'flex', background: '#F6F8F7', borderBottom: `1px solid ${T.border}` }}>
         {[
           { label: 'Mensalidades', valor: totalMensal, color: T.accent },
           { label: 'Outras receitas', valor: totalRec, color: T.primary },
@@ -110,14 +110,14 @@ export default function CaixaPage() {
             </button>
           </div>
           {showRec && (
-            <div style={{ background: '#080C15', border: `1px solid ${T.border}`, borderRadius: 8, padding: 14, marginBottom: 14 }}>
+            <div style={{ background: '#F6F8F7', border: `1px solid ${T.border}`, borderRadius: 8, padding: 14, marginBottom: 14 }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10 }}>
                 <Campo label="Categoria"><select value={fCat} onChange={e => setFCat(e.target.value)} style={INP}>{CATS_RECEITA.map(c => <option key={c} value={c}>{catLabel(c)}</option>)}</select></Campo>
                 <Campo label="Valor (R$)"><input type="number" min={0} step="0.01" value={fValor} onChange={e => setFValor(e.target.value)} placeholder="0,00" style={INP} /></Campo>
                 <Campo label="Descrição"><input type="text" value={fDesc} onChange={e => setFDesc(e.target.value)} placeholder="Ex: venda bar" style={INP} /></Campo>
                 <Campo label="Data"><input type="date" value={fData} onChange={e => setFData(e.target.value)} style={INP} /></Campo>
               </div>
-              <button onClick={addReceita} disabled={salvando} style={{ marginTop: 12, background: T.green, color: '#001A00', border: 'none', borderRadius: 8, padding: '10px 20px', fontWeight: 800, cursor: 'pointer', fontFamily: SYNE, fontSize: 12, textTransform: 'uppercase' }}>Salvar entrada</button>
+              <button onClick={addReceita} disabled={salvando} style={{ marginTop: 12, background: T.green, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontWeight: 800, cursor: 'pointer', fontFamily: SYNE, fontSize: 12, textTransform: 'uppercase' }}>Salvar entrada</button>
             </div>
           )}
           {mensalidades.length > 0 && (
@@ -141,7 +141,7 @@ export default function CaixaPage() {
             </button>
           </div>
           {showDesp && (
-            <div style={{ background: '#080C15', border: `1px solid ${T.border}`, borderRadius: 8, padding: 14, marginBottom: 14 }}>
+            <div style={{ background: '#F6F8F7', border: `1px solid ${T.border}`, borderRadius: 8, padding: 14, marginBottom: 14 }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10 }}>
                 <Campo label="Categoria"><select value={dCat} onChange={e => setDCat(e.target.value)} style={INP}>{CATS_DESPESA.map(c => <option key={c} value={c}>{catLabel(c)}</option>)}</select></Campo>
                 <Campo label="Valor (R$)"><input type="number" min={0} step="0.01" value={dValor} onChange={e => setDValor(e.target.value)} placeholder="0,00" style={INP} /></Campo>
@@ -163,7 +163,7 @@ export default function CaixaPage() {
 }
 
 function Tile({ label, valor, cor }: { label: string; valor: number; cor: string }) {
-  const T2 = { surface: '#0D1220', border: 'rgba(240,244,255,0.08)', muted: 'rgba(240,244,255,0.4)' }
+  const T2 = { surface: '#FFFFFF', border: 'rgba(16,24,40,0.1)', muted: '#6B7280' }
   const brl2 = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n || 0)
   return (
     <div style={{ background: T2.surface, border: `1px solid ${T2.border}`, borderRadius: 8, padding: '16px 18px' }}>
@@ -174,12 +174,12 @@ function Tile({ label, valor, cor }: { label: string; valor: number; cor: string
 }
 
 function Row({ label, sub, data, valor, cor, onDelete }: { label: string; sub: string; data?: string; valor: number; cor: string; onDelete?: () => void }) {
-  const T2 = { border: 'rgba(240,244,255,0.08)', muted: 'rgba(240,244,255,0.4)', surface: '#0D1220' }
+  const T2 = { border: 'rgba(16,24,40,0.1)', muted: '#6B7280', surface: '#FFFFFF' }
   const brl2 = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n || 0)
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 0', borderBottom: `1px solid ${T2.border}` }}>
       <div style={{ flex: 1 }}>
-        <span style={{ fontWeight: 700, fontSize: 13, color: '#F0F4FF' }}>{label}</span>
+        <span style={{ fontWeight: 700, fontSize: 13, color: '#1F2937' }}>{label}</span>
         {sub && <span style={{ color: T2.muted, fontSize: 12, marginLeft: 8 }}>{sub}</span>}
         {data && <span style={{ color: T2.muted, fontSize: 11, marginLeft: 8 }}>{data}</span>}
       </div>
@@ -190,5 +190,5 @@ function Row({ label, sub, data, valor, cor, onDelete }: { label: string; sub: s
 }
 
 function Campo({ label, children }: { label: string; children: React.ReactNode }) {
-  return <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 11, color: 'rgba(240,244,255,0.4)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}{children}</label>
+  return <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 11, color: '#6B7280', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}{children}</label>
 }

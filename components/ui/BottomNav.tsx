@@ -18,7 +18,7 @@ export default function BottomNav() {
   const items = NAV.filter(i => FINANCEIRO_OK.includes(role || '') || !i.href.startsWith('/financeiro'))
 
   return (
-    <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-around', padding: '10px 0 20px', borderTop: `1px solid ${T.borderBlue}`, background: 'rgba(10,14,26,0.97)', backdropFilter: 'blur(12px)', zIndex: 50 }}>
+    <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-around', padding: '10px 0 20px', borderTop: `1px solid ${T.borderBlue}`, background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(12px)', zIndex: 50 }}>
       {items.map(item => {
         const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
         return (

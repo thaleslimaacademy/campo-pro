@@ -69,8 +69,8 @@ function formatarData(data: string): string {
 
 function Secao({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
-    <div className="bg-[#1A1A2E] rounded-2xl p-5 border border-white/5">
-      <h2 className="text-white font-bold text-base mb-4">{titulo}</h2>
+    <div className="bg-white rounded-2xl p-5 border border-gray-200">
+      <h2 className="text-gray-900 font-bold text-base mb-4">{titulo}</h2>
       {children}
     </div>
   )
@@ -81,11 +81,11 @@ export default function FichaAtletaClient({
   mensalidades, avaliacoes, convocacoes, premiacoes,
 }: Props) {
   return (
-    <div className="min-h-screen bg-[#0F0F1A] p-6">
+    <div className="min-h-screen bg-[#F6F8F7] p-6">
       <div className="max-w-2xl mx-auto flex flex-col gap-5">
 
         {/* Header */}
-        <div className="bg-[#1A1A2E] rounded-2xl p-6 border border-[#FF6B00]/20 flex items-center gap-5">
+        <div className="bg-white rounded-2xl p-6 border border-[#FF6B00]/20 flex items-center gap-5">
           <div className="w-20 h-20 rounded-full bg-[#FF6B00]/20 flex items-center justify-center overflow-hidden shrink-0">
             {atleta.foto ? (
               <img src={atleta.foto} alt={atleta.nome} className="w-full h-full object-cover" />
@@ -94,8 +94,8 @@ export default function FichaAtletaClient({
             )}
           </div>
           <div>
-            <p className="text-white font-bold text-xl">{atleta.nome}</p>
-            <p className="text-gray-400 text-sm">{calcularIdade(atleta.dataNascimento)}</p>
+            <p className="text-gray-900 font-bold text-xl">{atleta.nome}</p>
+            <p className="text-gray-500 text-sm">{calcularIdade(atleta.dataNascimento)}</p>
             {atleta.Turma && <p className="text-[#FF6B00] text-sm font-medium mt-1">{atleta.Turma.nome}</p>}
             {atleta.posicao && <p className="text-gray-500 text-xs mt-1">{atleta.posicao}</p>}
           </div>
@@ -108,12 +108,12 @@ export default function FichaAtletaClient({
           ) : (
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-400 text-sm">{presentes} de {totalAulas} aulas</span>
+                <span className="text-gray-500 text-sm">{presentes} de {totalAulas} aulas</span>
                 <span className={`text-lg font-bold ${frequencia >= 75 ? 'text-green-400' : frequencia >= 50 ? 'text-yellow-400' : 'text-red-400'}`}>
                   {frequencia}%
                 </span>
               </div>
-              <div className="w-full bg-white/5 rounded-full h-3">
+              <div className="w-full bg-gray-50 rounded-full h-3">
                 <div
                   className={`h-3 rounded-full transition-all ${frequencia >= 75 ? 'bg-green-400' : frequencia >= 50 ? 'bg-yellow-400' : 'bg-red-400'}`}
                   style={{ width: frequencia + '%' }}
@@ -132,13 +132,13 @@ export default function FichaAtletaClient({
               {mensalidades.map((m, i) => {
                 const s = STATUS_LABEL[m.status] ?? { label: m.status, cor: 'text-gray-400 bg-white/5' }
                 return (
-                  <div key={i} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+                  <div key={i} className="flex items-center justify-between py-2 border-b border-gray-200 last:border-0">
                     <div>
-                      <p className="text-white text-sm font-medium">{m.mes}</p>
+                      <p className="text-gray-900 text-sm font-medium">{m.mes}</p>
                       <p className="text-gray-500 text-xs">Venc. {formatarData(m.vencimento)}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-white text-sm">R$ {Number(m.valor).toFixed(2)}</span>
+                      <span className="text-gray-900 text-sm">R$ {Number(m.valor).toFixed(2)}</span>
                       <span className={'text-xs px-2 py-1 rounded-full font-medium ' + s.cor}>{s.label}</span>
                     </div>
                   </div>
@@ -155,15 +155,15 @@ export default function FichaAtletaClient({
           ) : (
             <div className="flex flex-col gap-4">
               {avaliacoes.map((a, i) => (
-                <div key={i} className="bg-[#0F0F1A] rounded-xl p-4 border border-white/5">
+                <div key={i} className="bg-[#F6F8F7] rounded-xl p-4 border border-gray-200">
                   <p className="text-[#FF6B00] text-xs font-medium mb-3">{formatarData(a.data)}</p>
                   <div className="grid grid-cols-2 gap-2">
-                    {a.peso && <div><p className="text-gray-500 text-xs">Peso</p><p className="text-white text-sm font-medium">{a.peso} kg</p></div>}
-                    {a.altura && <div><p className="text-gray-500 text-xs">Altura</p><p className="text-white text-sm font-medium">{a.altura} cm</p></div>}
-                    {a.imc && <div><p className="text-gray-500 text-xs">IMC</p><p className="text-white text-sm font-medium">{a.imc}</p></div>}
-                    {a.gordura && <div><p className="text-gray-500 text-xs">Gordura</p><p className="text-white text-sm font-medium">{a.gordura}%</p></div>}
+                    {a.peso && <div><p className="text-gray-500 text-xs">Peso</p><p className="text-gray-900 text-sm font-medium">{a.peso} kg</p></div>}
+                    {a.altura && <div><p className="text-gray-500 text-xs">Altura</p><p className="text-gray-900 text-sm font-medium">{a.altura} cm</p></div>}
+                    {a.imc && <div><p className="text-gray-500 text-xs">IMC</p><p className="text-gray-900 text-sm font-medium">{a.imc}</p></div>}
+                    {a.gordura && <div><p className="text-gray-500 text-xs">Gordura</p><p className="text-gray-900 text-sm font-medium">{a.gordura}%</p></div>}
                   </div>
-                  {a.observacoes && <p className="text-gray-400 text-xs mt-3 italic">{a.observacoes}</p>}
+                  {a.observacoes && <p className="text-gray-500 text-xs mt-3 italic">{a.observacoes}</p>}
                 </div>
               ))}
             </div>
@@ -177,11 +177,11 @@ export default function FichaAtletaClient({
           ) : (
             <div className="flex flex-col gap-2">
               {convocacoes.map((c, i) => (
-                <div key={i} className="flex items-start gap-3 py-2 border-b border-white/5 last:border-0">
+                <div key={i} className="flex items-start gap-3 py-2 border-b border-gray-200 last:border-0">
                   <span className="text-xl mt-0.5">📋</span>
                   <div>
-                    <p className="text-white text-sm font-medium">{c.titulo}</p>
-                    <p className="text-gray-400 text-xs">{formatarData(c.data)}{c.local ? ' · ' + c.local : ''}</p>
+                    <p className="text-gray-900 text-sm font-medium">{c.titulo}</p>
+                    <p className="text-gray-500 text-xs">{formatarData(c.data)}{c.local ? ' · ' + c.local : ''}</p>
                     {c.tipo && <span className="text-xs text-[#FF6B00] bg-[#FF6B00]/10 px-2 py-0.5 rounded-full mt-1 inline-block">{c.tipo}</span>}
                   </div>
                 </div>
@@ -197,10 +197,10 @@ export default function FichaAtletaClient({
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {premiacoes.map((p, i) => (
-                <div key={i} className="bg-[#0F0F1A] rounded-xl p-4 border border-[#FFD700]/20 text-center">
+                <div key={i} className="bg-[#F6F8F7] rounded-xl p-4 border border-[#FFD700]/20 text-center">
                   <span className="text-3xl">{p.icone}</span>
-                  <p className="text-white text-sm font-bold mt-2">{p.titulo}</p>
-                  {p.descricao && <p className="text-gray-400 text-xs mt-1">{p.descricao}</p>}
+                  <p className="text-gray-900 text-sm font-bold mt-2">{p.titulo}</p>
+                  {p.descricao && <p className="text-gray-500 text-xs mt-1">{p.descricao}</p>}
                   <p className="text-[#FFD700] text-xs mt-2">{formatarData(p.dataConquista)}</p>
                 </div>
               ))}

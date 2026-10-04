@@ -1,7 +1,7 @@
 'use client'
 import { usePushNotification } from '@/lib/usePushNotification'
 
-const T = { primary:'#4169E1', green:'#00D67A', red:'#FF4444', text:'#F0F4FF', muted:'rgba(240,244,255,0.5)', border:'rgba(240,244,255,0.1)' }
+const T = { primary:'#2EA866', green:'#16A34A', red:'#DC2626', text:'#1F2937', muted:'#6B7280', border:'rgba(16,24,40,0.1)' }
 const SYNE = 'Syne, sans-serif'
 
 export default function BotaoPushNotification({ atletaId, escolaId }: { atletaId: string; escolaId: string }) {

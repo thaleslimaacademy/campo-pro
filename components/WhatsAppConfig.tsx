@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 
-const T = { bg:'#0A0E1A', surface:'#0D1220', primary:'#4169E1', green:'#00D67A', gold:'#FFD700', red:'#FF4444', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', border:'rgba(240,244,255,0.08)' }
+const T = { bg:'#F6F8F7', surface:'#FFFFFF', primary:'#2EA866', green:'#16A34A', gold:'#B7791F', red:'#DC2626', text:'#1F2937', muted:'#6B7280', border:'rgba(16,24,40,0.1)' }
 const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
 
@@ -121,7 +121,7 @@ export default function WhatsAppConfig() {
             Conecte o WhatsApp desta escola para enviar mensagens automáticas de cobranças, convocações e notificações diretamente pelo seu número.
           </p>
           <button onClick={conectar} disabled={conectando}
-            style={{ width: '100%', background: T.primary, color: T.text, padding: '13px', borderRadius: 10, fontFamily: SYNE, fontWeight: 800, fontSize: 13, border: 'none', cursor: conectando ? 'not-allowed' : 'pointer', textTransform: 'uppercase', letterSpacing: 0.5, opacity: conectando ? 0.6 : 1 }}>
+            style={{ width: '100%', background: T.primary, color: '#fff', padding: '13px', borderRadius: 10, fontFamily: SYNE, fontWeight: 800, fontSize: 13, border: 'none', cursor: conectando ? 'not-allowed' : 'pointer', textTransform: 'uppercase', letterSpacing: 0.5, opacity: conectando ? 0.6 : 1 }}>
             {conectando ? 'Gerando QR Code...' : '📱 Conectar WhatsApp'}
           </button>
         </div>

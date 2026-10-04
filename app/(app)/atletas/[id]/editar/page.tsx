@@ -3,9 +3,9 @@ import { useEffect, useState, useTransition } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { getAtletaParaEditar, salvarAtleta, toggleAtivoAtleta, excluirAtleta } from './actions'
 
-const T = { bg:'#0A0E1A', surface:'#0D1220', surface2:'#121A2E', primary:'#4169E1', accent:'#00BFFF', text:'#F0F4FF', muted:'rgba(240,244,255,0.4)', border:'rgba(240,244,255,0.08)', green:'#00D67A', red:'#FF4444', gold:'#FFD700' }
+const T = { bg:'#F6F8F7', surface:'#FFFFFF', surface2:'#F3F5F4', primary:'#2EA866', accent:'#23874F', text:'#1F2937', muted:'#6B7280', border:'rgba(16,24,40,0.1)', green:'#16A34A', red:'#DC2626', gold:'#B7791F' }
 const SYNE = 'Syne, sans-serif'
-const INP: React.CSSProperties = { width:'100%', background:'#080C15', border:`1px solid rgba(240,244,255,0.1)`, borderRadius:8, padding:'11px 14px', color:T.text, fontFamily:'Inter,sans-serif', fontSize:13, boxSizing:'border-box' }
+const INP: React.CSSProperties = { width:'100%', background:'#F6F8F7', border:`1px solid rgba(16,24,40,0.1)`, borderRadius:8, padding:'11px 14px', color:T.text, fontFamily:'Inter,sans-serif', fontSize:13, boxSizing:'border-box' }
 const LBL: React.CSSProperties = { fontSize:10, color:T.muted, textTransform:'uppercase', letterSpacing:'0.8px', display:'block', marginBottom:4 }
 const SEC: React.CSSProperties = { background:T.surface, border:`1px solid ${T.border}`, borderRadius:12, padding:16, marginBottom:12 }
 const SEC_TITLE: React.CSSProperties = { fontFamily:SYNE, fontWeight:700, fontSize:11, color:T.primary, textTransform:'uppercase', letterSpacing:1, marginBottom:14 }
@@ -144,16 +144,16 @@ export default function EditarAtleta() {
     <div style={{ minHeight:'100vh', background:T.bg, color:T.text, fontFamily:'Inter,sans-serif', paddingBottom:80 }}>
 
       {/* HEADER */}
-      <div style={{ background:T.primary, padding:'20px 20px 20px' }}>
+      <div style={{ background:'#FFFFFF', borderBottom: '1px solid #E3E8E5', padding:'20px 20px 20px' }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-            <a href={`/atletas/${id}`} style={{ color:'rgba(240,244,255,0.7)', textDecoration:'none', fontSize:16 }}>←</a>
+            <a href={`/atletas/${id}`} style={{ color:'#374151', textDecoration:'none', fontSize:16 }}>←</a>
             <div>
-              <div style={{ fontSize:10, color:'rgba(240,244,255,0.65)', textTransform:'uppercase', letterSpacing:2, fontWeight:700, marginBottom:2 }}>Atleta</div>
+              <div style={{ fontSize:10, color:'#374151', textTransform:'uppercase', letterSpacing:2, fontWeight:700, marginBottom:2 }}>Atleta</div>
               <div style={{ fontFamily:SYNE, fontWeight:900, fontSize:20, color:T.text, letterSpacing:-0.5, textTransform:'uppercase' }}>✏️ Editar</div>
             </div>
           </div>
-          <button onClick={salvar} disabled={salvando} style={{ background:T.text, color:T.primary, borderRadius:8, padding:'10px 16px', fontFamily:SYNE, fontWeight:800, fontSize:12, border:'none', cursor:'pointer', textTransform:'uppercase', letterSpacing:0.5, opacity:salvando?0.6:1 }}>
+          <button onClick={salvar} disabled={salvando} style={{ background: T.primary, color: '#fff', borderRadius:8, padding:'10px 16px', fontFamily:SYNE, fontWeight:800, fontSize:12, border:'none', cursor:'pointer', textTransform:'uppercase', letterSpacing:0.5, opacity:salvando?0.6:1 }}>
             {salvando ? 'Salvando...' : 'Salvar'}
           </button>
         </div>
@@ -206,12 +206,12 @@ export default function EditarAtleta() {
         <div style={SEC}>
           <p style={SEC_TITLE}>💰 Plano & Pagamento</p>
           <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', background:bolsista?`${T.green}10`:'#080C15', border:`1px solid ${bolsista?T.green+'30':T.border}`, borderRadius:8, padding:'12px 14px' }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', background:bolsista?`${T.green}10`:'#F6F8F7', border:`1px solid ${bolsista?T.green+'30':T.border}`, borderRadius:8, padding:'12px 14px' }}>
               <div>
                 <p style={{ fontFamily:SYNE, fontWeight:700, fontSize:12, color:bolsista?T.green:T.text, margin:'0 0 2px' }}>🎓 Aluno Bolsista</p>
                 <p style={{ fontSize:11, color:T.muted, margin:0 }}>Mensalidade 100% gratuita</p>
               </div>
-              <button onClick={() => setBolsista(!bolsista)} style={{ width:44, height:24, borderRadius:12, background:bolsista?T.green:'rgba(240,244,255,0.15)', border:'none', cursor:'pointer', position:'relative', transition:'background 0.2s' }}>
+              <button onClick={() => setBolsista(!bolsista)} style={{ width:44, height:24, borderRadius:12, background:bolsista?T.green:'#EEF1EF', border:'none', cursor:'pointer', position:'relative', transition:'background 0.2s' }}>
                 <div style={{ position:'absolute', top:3, left:bolsista?22:3, width:18, height:18, borderRadius:'50%', background:'#fff', transition:'left 0.2s' }} />
               </button>
             </div>

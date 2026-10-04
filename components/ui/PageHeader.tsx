@@ -25,7 +25,7 @@ export default function PageHeader({
           <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 27, letterSpacing: -0.5, lineHeight: 1, color: T.text }}>
             {title}
             {count !== undefined && (
-              <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 30, height: 24, padding: '0 8px', marginLeft: 6, background: 'rgba(65,105,225,0.18)', border: '1px solid rgba(65,105,225,0.35)', borderRadius: 8, fontSize: 14, color: T.sky }}>{count}</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 30, height: 24, padding: '0 8px', marginLeft: 6, background: 'rgba(46,168,102,0.18)', border: '1px solid rgba(46,168,102,0.35)', borderRadius: 8, fontSize: 14, color: T.sky }}>{count}</span>
             )}
           </div>
         </div>

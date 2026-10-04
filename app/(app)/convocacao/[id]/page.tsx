@@ -30,10 +30,10 @@ export default function ConvocacaoDetalhes() {
   const [loading, setLoading] = useState(true)
 
   const syne = 'Syne, sans-serif'
-  const neon = '#4169E1'
-  const gold = '#FFD700'
-  const bg = 'linear-gradient(160deg,#0A0E1A,#0A0E1A,#0A0E1A)'
-  const cardBg = 'rgba(255,255,255,0.03)'
+  const neon = '#2EA866'
+  const gold = '#B7791F'
+  const bg = '#F6F8F7'
+  const cardBg = '#FFFFFF'
   const cardBorder = '1px solid rgba(255,255,255,0.07)'
 
   useEffect(() => {
@@ -63,13 +63,13 @@ export default function ConvocacaoDetalhes() {
 
   if (loading) return (
     <div style={{ minHeight: '100vh', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter,sans-serif' }}>Carregando...</p>
+      <p style={{ color: '#6B7280', fontFamily: 'Inter,sans-serif' }}>Carregando...</p>
     </div>
   )
 
   if (!convocacao) return (
     <div style={{ minHeight: '100vh', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'rgba(255,255,255,0.4)' }}>Convocação não encontrada.</p>
+      <p style={{ color: '#6B7280' }}>Convocação não encontrada.</p>
     </div>
   )
 
@@ -78,13 +78,13 @@ export default function ConvocacaoDetalhes() {
     : null
 
   return (
-    <div style={{ minHeight: '100vh', background: bg, color: '#F0F4FF', fontFamily: 'Inter,sans-serif', paddingBottom: '40px' }}>
+    <div style={{ minHeight: '100vh', background: bg, color: '#1F2937', fontFamily: 'Inter,sans-serif', paddingBottom: '40px' }}>
 
       {/* HEADER */}
       <div style={{ padding: '24px 20px 0', marginBottom: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
           <span style={{ fontSize: '22px' }}>📣</span>
-          <h1 style={{ fontFamily: syne, fontWeight: 800, fontSize: '22px', color: '#F0F4FF', margin: 0 }}>
+          <h1 style={{ fontFamily: syne, fontWeight: 800, fontSize: '22px', color: '#1F2937', margin: 0 }}>
             {convocacao.titulo || 'Convocação'}
           </h1>
         </div>
@@ -98,15 +98,15 @@ export default function ConvocacaoDetalhes() {
       <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
         {/* DETALHES */}
-        <div style={{ background: cardBg, border: '1px solid rgba(57,255,20,0.15)', borderRadius: '16px', padding: '16px' }}>
+        <div style={{ background: cardBg, border: '1px solid rgba(46,168,102,0.15)', borderRadius: '16px', padding: '16px' }}>
           <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '11px', color: neon, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '14px' }}>📋 Detalhes</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {dataFormatada && (
               <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
                 <span style={{ fontSize: '16px', flexShrink: 0 }}>📅</span>
                 <div>
-                  <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 2px' }}>Data</p>
-                  <p style={{ fontSize: '14px', color: '#F0F4FF', margin: 0, fontWeight: 600 }}>{dataFormatada}</p>
+                  <p style={{ fontSize: '10px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 2px' }}>Data</p>
+                  <p style={{ fontSize: '14px', color: '#1F2937', margin: 0, fontWeight: 600 }}>{dataFormatada}</p>
                 </div>
               </div>
             )}
@@ -114,8 +114,8 @@ export default function ConvocacaoDetalhes() {
               <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
                 <span style={{ fontSize: '16px', flexShrink: 0 }}>🕐</span>
                 <div>
-                  <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 2px' }}>Horário</p>
-                  <p style={{ fontSize: '14px', color: '#F0F4FF', margin: 0, fontWeight: 600 }}>{convocacao.horario}</p>
+                  <p style={{ fontSize: '10px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 2px' }}>Horário</p>
+                  <p style={{ fontSize: '14px', color: '#1F2937', margin: 0, fontWeight: 600 }}>{convocacao.horario}</p>
                 </div>
               </div>
             )}
@@ -123,8 +123,8 @@ export default function ConvocacaoDetalhes() {
               <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
                 <span style={{ fontSize: '16px', flexShrink: 0 }}>📍</span>
                 <div>
-                  <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 2px' }}>Local</p>
-                  <p style={{ fontSize: '14px', color: '#F0F4FF', margin: 0, fontWeight: 600 }}>{convocacao.local}</p>
+                  <p style={{ fontSize: '10px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 2px' }}>Local</p>
+                  <p style={{ fontSize: '14px', color: '#1F2937', margin: 0, fontWeight: 600 }}>{convocacao.local}</p>
                 </div>
               </div>
             )}
@@ -143,24 +143,24 @@ export default function ConvocacaoDetalhes() {
           </div>
 
           {atletas.length === 0 ? (
-            <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '13px', textAlign: 'center', padding: '20px 0' }}>
+            <p style={{ color: '#6B7280', fontSize: '13px', textAlign: 'center', padding: '20px 0' }}>
               Nenhum atleta convocado.
             </p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {atletas.map((a, i) => (
-                <div key={a.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', background: 'rgba(57,255,20,0.03)', border: '1px solid rgba(57,255,20,0.1)', borderRadius: '12px' }}>
-                  <span style={{ fontFamily: syne, fontWeight: 800, fontSize: '11px', color: 'rgba(57,255,20,0.5)', minWidth: '20px' }}>#{String(i + 1).padStart(2, '0')}</span>
+                <div key={a.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', background: 'rgba(46,168,102,0.03)', border: '1px solid rgba(46,168,102,0.1)', borderRadius: '12px' }}>
+                  <span style={{ fontFamily: syne, fontWeight: 800, fontSize: '11px', color: 'rgba(46,168,102,0.5)', minWidth: '20px' }}>#{String(i + 1).padStart(2, '0')}</span>
                   {a.fotoUrl ? (
-                    <img src={a.fotoUrl} alt={a.nome} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '1.5px solid rgba(57,255,20,0.3)', flexShrink: 0 }} />
+                    <img src={a.fotoUrl} alt={a.nome} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '1.5px solid rgba(46,168,102,0.3)', flexShrink: 0 }} />
                   ) : (
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(57,255,20,0.1)', border: '1px solid rgba(57,255,20,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: syne, fontWeight: 800, fontSize: '12px', color: neon, flexShrink: 0 }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(46,168,102,0.1)', border: '1px solid rgba(46,168,102,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: syne, fontWeight: 800, fontSize: '12px', color: neon, flexShrink: 0 }}>
                       {iniciais(a.nome)}
                     </div>
                   )}
                   <div>
-                    <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '13px', color: '#F0F4FF', margin: 0 }}>{a.nome}</p>
-                    {a.posicao && <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: '1px 0 0' }}>{a.posicao}</p>}
+                    <p style={{ fontFamily: syne, fontWeight: 700, fontSize: '13px', color: '#1F2937', margin: 0 }}>{a.nome}</p>
+                    {a.posicao && <p style={{ fontSize: '11px', color: '#6B7280', margin: '1px 0 0' }}>{a.posicao}</p>}
                   </div>
                 </div>
               ))}
@@ -169,7 +169,7 @@ export default function ConvocacaoDetalhes() {
         </div>
 
         {/* RODAPÉ */}
-        <p style={{ textAlign: 'center', fontSize: '11px', color: 'rgba(255,255,255,0.2)', marginTop: '8px' }}>
+        <p style={{ textAlign: 'center', fontSize: '11px', color: '#9CA3AF', marginTop: '8px' }}>
           Thales Lima Football Academy · GestaoFC
         </p>
 

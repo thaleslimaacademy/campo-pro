@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Plus, Trash2, Image, ChevronRight } from 'lucide-react'
 import { listarAlbuns, criarAlbum, excluirAlbum } from './actions'
 
-const C = { bg: '#0A0E1A', surface: '#1A1A2E', orange: '#4169E1', gold: '#FFD700', text: '#F0F4FF', muted: 'rgba(240,240,240,0.45)', border: 'rgba(255,255,255,0.08)' }
+const C = { bg: '#F6F8F7', surface: '#FFFFFF', orange: '#2EA866', gold: '#B7791F', text: '#1F2937', muted: '#6B7280', border: 'rgba(16,24,40,0.1)' }
 const SYNE = 'Syne, sans-serif'
 
 type Album = { id: string; titulo: string; descricao: string | null; dataEvento: string | null; capa: string | null; ativo: boolean }
@@ -94,7 +94,7 @@ export default function FotosPage() {
                   <a href={`/fotos/${a.id}`} style={{ display: 'flex', alignItems: 'center', gap: 6, background: `${C.orange}18`, color: C.orange, border: `1px solid ${C.orange}44`, borderRadius: 10, padding: '8px 14px', textDecoration: 'none', fontSize: 12, fontWeight: 600 }}>
                     Fotos <ChevronRight size={14} />
                   </a>
-                  <button onClick={() => excluir(a.id)} style={{ background: 'transparent', border: `1px solid ${C.border}`, borderRadius: 10, padding: '8px 10px', color: '#FF4757', cursor: 'pointer', display: 'flex' }}>
+                  <button onClick={() => excluir(a.id)} style={{ background: 'transparent', border: `1px solid ${C.border}`, borderRadius: 10, padding: '8px 10px', color: '#DC2626', cursor: 'pointer', display: 'flex' }}>
                     <Trash2 size={16} />
                   </button>
                 </div>
@@ -107,7 +107,7 @@ export default function FotosPage() {
           <div style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 13, color: C.gold, marginBottom: 4 }}>🔗 Link público da galeria</div>
           <div style={{ fontSize: 12, color: C.muted, marginBottom: 10 }}>gestaofc.com.br/galeria</div>
           <button onClick={() => { navigator.clipboard.writeText('https://gestaofc.com.br/galeria'); alert('Copiado!') }}
-            style={{ background: C.gold, color: '#1a1400', border: 'none', borderRadius: 8, padding: '8px 16px', fontFamily: SYNE, fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+            style={{ background: C.gold, color: '#1F2937', border: 'none', borderRadius: 8, padding: '8px 16px', fontFamily: SYNE, fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
             📋 Copiar link
           </button>
         </div>
@@ -117,7 +117,7 @@ export default function FotosPage() {
 }
 
 function Campo({ label, children }: { label: string; children: React.ReactNode }) {
-  return <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12, color: 'rgba(240,240,240,0.45)' }}>{label}{children}</label>
+  return <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12, color: '#6B7280' }}>{label}{children}</label>
 }
 
-const inp: React.CSSProperties = { background: '#0A0E1A', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '10px 14px', color: '#F0F4FF', fontSize: 14, width: '100%', boxSizing: 'border-box' }
+const inp: React.CSSProperties = { background: '#F6F8F7', border: '1px solid rgba(16,24,40,0.1)', borderRadius: 10, padding: '10px 14px', color: '#1F2937', fontSize: 14, width: '100%', boxSizing: 'border-box' }

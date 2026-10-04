@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { listarModalidadesEscola, toggleModalidade, getInfoEscola } from './actions'
 import { MODALIDADES, PLANOS_GESTAOFC } from './constants'
 
-const C = { bg: '#0A0E1A', surface: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.07)', orange: '#4169E1', gold: '#FFD700', muted: 'rgba(255,255,255,0.4)', text: '#F0F4FF' }
+const C = { bg: '#F6F8F7', surface: '#FFFFFF', border: 'rgba(16,24,40,0.1)', orange: '#2EA866', gold: '#B7791F', muted: '#6B7280', text: '#1F2937' }
 const SYNE = 'Syne, sans-serif'
 
 export default function ModalidadesPage() {
@@ -64,7 +64,7 @@ export default function ModalidadesPage() {
       </div>
 
       {erro && (
-        <div style={{ background: 'rgba(255,70,70,0.1)', border: '1px solid rgba(255,70,70,0.3)', borderRadius: '12px', padding: '12px', marginBottom: '16px', fontSize: '13px', color: '#ff5555' }}>
+        <div style={{ background: 'rgba(255,70,70,0.1)', border: '1px solid rgba(255,70,70,0.3)', borderRadius: '12px', padding: '12px', marginBottom: '16px', fontSize: '13px', color: '#DC2626' }}>
           ⚠️ {erro}
         </div>
       )}
@@ -79,10 +79,10 @@ export default function ModalidadesPage() {
             const carregando = salvando === m.slug
             return (
               <div key={m.slug} onClick={() => !carregando && toggle(m.slug)}
-                style={{ background: ativa ? 'rgba(65,105,225,0.1)' : C.surface, border: `1px solid ${ativa ? 'rgba(65,105,225,0.4)' : C.border}`, borderRadius: '14px', padding: '16px', cursor: 'pointer', transition: 'all 0.2s', opacity: carregando ? 0.6 : 1 }}>
+                style={{ background: ativa ? 'rgba(46,168,102,0.1)' : C.surface, border: `1px solid ${ativa ? 'rgba(46,168,102,0.4)' : C.border}`, borderRadius: '14px', padding: '16px', cursor: 'pointer', transition: 'all 0.2s', opacity: carregando ? 0.6 : 1 }}>
                 <div style={{ fontSize: '28px', marginBottom: '8px' }}>{m.emoji}</div>
                 <div style={{ fontFamily: SYNE, fontWeight: 700, fontSize: '14px', color: ativa ? C.orange : C.text, marginBottom: '6px' }}>{m.label}</div>
-                <div style={{ display: 'inline-block', fontSize: '10px', fontWeight: 700, padding: '3px 10px', borderRadius: '20px', background: ativa ? 'rgba(65,105,225,0.2)' : 'rgba(255,255,255,0.05)', color: ativa ? C.orange : C.muted }}>
+                <div style={{ display: 'inline-block', fontSize: '10px', fontWeight: 700, padding: '3px 10px', borderRadius: '20px', background: ativa ? 'rgba(46,168,102,0.2)' : '#FFFFFF', color: ativa ? C.orange : C.muted }}>
                   {carregando ? '...' : ativa ? '✓ Ativa' : 'Inativa'}
                 </div>
               </div>
@@ -91,7 +91,7 @@ export default function ModalidadesPage() {
         </div>
       )}
 
-      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-around', padding: '12px 0 20px', borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(5,5,5,0.95)', backdropFilter: 'blur(10px)' }}>
+      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-around', padding: '12px 0 20px', borderTop: '1px solid rgba(16,24,40,0.1)', background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(10px)' }}>
         {[
           { href: '/dashboard', label: 'Inicio' },
           { href: '/atletas', label: 'Atletas' },
@@ -99,7 +99,7 @@ export default function ModalidadesPage() {
           { href: '/financeiro', label: 'Financeiro' },
         ].map(item => (
           <a key={item.href} href={item.href} style={{ textDecoration: 'none' }}>
-            <span style={{ fontSize: '9px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', fontFamily: SYNE }}>{item.label}</span>
+            <span style={{ fontSize: '9px', textTransform: 'uppercase', color: '#6B7280', fontFamily: SYNE }}>{item.label}</span>
           </a>
         ))}
       </nav>

@@ -1,8 +1,8 @@
 export default function PrivacidadePage() {
   return (
-    <div style={{ maxWidth: 800, margin: '0 auto', padding: '40px 24px', fontFamily: 'Inter, sans-serif', color: '#1a1a1a', lineHeight: 1.7 }}>
+    <div style={{ maxWidth: 800, margin: '0 auto', padding: '40px 24px', fontFamily: 'Inter, sans-serif', color: '#1F2937', lineHeight: 1.7 }}>
       <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 8 }}>Política de Privacidade</h1>
-      <p style={{ color: '#666', marginBottom: 32 }}>Última atualização: 24 de junho de 2026</p>
+      <p style={{ color: '#1F2937', marginBottom: 32 }}>Última atualização: 24 de junho de 2026</p>
 
       <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 32, marginBottom: 8 }}>1. Informações que coletamos</h2>
       <p>O GestaoFC coleta informações fornecidas diretamente pelos usuários, incluindo nome, e-mail, telefone, dados de atletas matriculados e informações financeiras necessárias para a gestão da academia esportiva.</p>
@@ -54,12 +54,12 @@ export default function PrivacidadePage() {
       <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 32, marginBottom: 8 }}>10. Contato</h2>
       <p>Para exercer seus direitos ou esclarecer dúvidas sobre privacidade:</p>
       <ul style={{ paddingLeft: 20 }}>
-        <li>E-mail: <a href="mailto:contato@gestaofc.com.br" style={{ color: '#4169E1' }}>contato@gestaofc.com.br</a></li>
+        <li>E-mail: <a href="mailto:contato@gestaofc.com.br" style={{ color: '#2EA866' }}>contato@gestaofc.com.br</a></li>
         <li>WhatsApp: (34) 99999-9999</li>
         <li>Responsável: Thales Cruz Salviano de Campos</li>
       </ul>
 
-      <div style={{ marginTop: 48, padding: '16px 20px', background: '#f5f5f5', borderRadius: 8, fontSize: 13, color: '#666' }}>
+      <div style={{ marginTop: 48, padding: '16px 20px', background: '#f5f5f5', borderRadius: 8, fontSize: 13, color: '#1F2937' }}>
         <strong>GestaoFC</strong> — Plataforma de Gestão para Academias de Futebol<br />
         CNPJ: a informar | Iturama, Minas Gerais, Brasil
       </div>

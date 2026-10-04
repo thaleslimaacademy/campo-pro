@@ -34,7 +34,7 @@ function getPeriodoRange(tipo: Periodo, ano: number, ref: number): { inicio: str
   }
 }
 
-const C = { bg: '#0A0E1A', surface: '#1A1A2E', orange: '#4169E1', gold: '#FFD700', green: '#00D67A', red: '#FF4B4B', muted: 'rgba(255,255,255,0.4)', border: 'rgba(255,255,255,0.08)' }
+const C = { bg: '#F6F8F7', surface: '#FFFFFF', orange: '#2EA866', gold: '#B7791F', green: '#16A34A', red: '#DC2626', muted: '#6B7280', border: 'rgba(16,24,40,0.1)' }
 const SYNE = 'Syne, sans-serif'
 const INTER = 'Inter, sans-serif'
 
@@ -121,7 +121,7 @@ export default function FluxoCaixaPage() {
   const anos = Array.from({length:5},(_,i)=>anoAtual-i)
 
   return (
-    <div style={{ minHeight: '100vh', background: C.bg, color: '#F0F4FF', fontFamily: INTER, padding: '0 0 80px' }}>
+    <div style={{ minHeight: '100vh', background: C.bg, color: '#1F2937', fontFamily: INTER, padding: '0 0 80px' }}>
 
       {/* Header */}
       <div style={{ padding: '20px 20px 0' }}>
@@ -142,17 +142,17 @@ export default function FluxoCaixaPage() {
       {/* Pickers */}
       <div style={{ display: 'flex', gap: 10, padding: '0 20px 16px', flexWrap: 'wrap' }}>
         <select value={ano} onChange={e => setAnos(Number(e.target.value))}
-          style={{ background: C.surface, border: `1px solid ${C.border}`, color: '#fff', padding: '8px 12px', borderRadius: 10, fontFamily: INTER, fontSize: 13 }}>
+          style={{ background: C.surface, border: `1px solid ${C.border}`, color: '#1F2937', padding: '8px 12px', borderRadius: 10, fontFamily: INTER, fontSize: 13 }}>
           {anos.map(a => <option key={a} value={a}>{a}</option>)}
         </select>
         {tipo !== 'anual' && (
           <select value={ref} onChange={e => setRef(Number(e.target.value))}
-            style={{ background: C.surface, border: `1px solid ${C.border}`, color: '#fff', padding: '8px 12px', borderRadius: 10, fontFamily: INTER, fontSize: 13 }}>
+            style={{ background: C.surface, border: `1px solid ${C.border}`, color: '#1F2937', padding: '8px 12px', borderRadius: 10, fontFamily: INTER, fontSize: 13 }}>
             {refOptions().map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         )}
         <button onClick={exportarPDF}
-          style={{ marginLeft: 'auto', padding: '8px 20px', background: C.gold, color: '#0A0E1A', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: SYNE, fontWeight: 700, fontSize: 12 }}>
+          style={{ marginLeft: 'auto', padding: '8px 20px', background: C.gold, color: '#1F2937', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: SYNE, fontWeight: 700, fontSize: 12 }}>
           📄 Exportar PDF
         </button>
       </div>
@@ -179,7 +179,7 @@ export default function FluxoCaixaPage() {
           <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, overflow: 'hidden' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
               <thead>
-                <tr style={{ background: 'rgba(65,105,225,0.15)' }}>
+                <tr style={{ background: 'rgba(46,168,102,0.15)' }}>
                   {['Mês', 'Mensalidades', 'Outras Rec.', 'Despesas', 'Saldo'].map(h => (
                     <th key={h} style={{ padding: '12px 10px', textAlign: 'right', fontFamily: SYNE, fontWeight: 700, color: C.orange, fontSize: 11 }}>
                       {h}
@@ -189,8 +189,8 @@ export default function FluxoCaixaPage() {
               </thead>
               <tbody>
                 {dados.map((d, i) => (
-                  <tr key={d.mes} style={{ borderTop: `1px solid ${C.border}`, background: i%2===0 ? 'transparent' : 'rgba(255,255,255,0.02)' }}>
-                    <td style={{ padding: '10px', color: '#fff', fontFamily: SYNE, fontWeight: 600 }}>
+                  <tr key={d.mes} style={{ borderTop: `1px solid ${C.border}`, background: i%2===0 ? 'transparent' : '#FFFFFF' }}>
+                    <td style={{ padding: '10px', color: '#1F2937', fontFamily: SYNE, fontWeight: 600 }}>
                       {MESES_LABEL[Number(d.mes.split('-')[1])-1]}/{d.mes.split('-')[0]}
                     </td>
                     <td style={{ padding: '10px', textAlign: 'right', color: C.green }}>{brl(d.mensalidades)}</td>
@@ -201,7 +201,7 @@ export default function FluxoCaixaPage() {
                 ))}
               </tbody>
               <tfoot>
-                <tr style={{ borderTop: `2px solid ${C.orange}`, background: 'rgba(65,105,225,0.08)' }}>
+                <tr style={{ borderTop: `2px solid ${C.orange}`, background: 'rgba(46,168,102,0.08)' }}>
                   <td style={{ padding: '10px', fontFamily: SYNE, fontWeight: 800, color: C.orange }}>TOTAL</td>
                   <td style={{ padding: '10px', textAlign: 'right', color: C.green, fontWeight: 700 }}>{brl(dados.reduce((s,d)=>s+d.mensalidades,0))}</td>
                   <td style={{ padding: '10px', textAlign: 'right', color: C.green, fontWeight: 700 }}>{brl(dados.reduce((s,d)=>s+d.receitas,0))}</td>

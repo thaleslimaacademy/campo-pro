@@ -17,7 +17,7 @@ const computeStatus = (status: string, venc: string) => {
   return new Date(venc + 'T00:00:00') < new Date() ? 'VENCIDO' : 'ATIVO'
 }
 const corStatus = (s: string) =>
-  ({ ATIVO: '#4169E1', VENCIDO: '#FF4757', CANCELADO: '#888' } as Record<string, string>)[s] ?? '#888'
+  ({ ATIVO: '#2EA866', VENCIDO: '#DC2626', CANCELADO: '#888' } as Record<string, string>)[s] ?? '#888'
 
 export default function PatrocinadoresPage() {
   const [lista, setLista] = useState<Patrocinador[]>([])
@@ -82,12 +82,12 @@ export default function PatrocinadoresPage() {
   const totalAtivo = ativos.reduce((s, p) => s + p.valor, 0)
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #0A0E1A, #0A0E1A, #0A0E1A)', color: '#fff', padding: 24 }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #F6F8F7, #F6F8F7, #F6F8F7)', color: '#1F2937', padding: 24 }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
           <div>
-            <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 28, fontWeight: 800, color: '#4169E1', margin: 0 }}>Patrocinadores</h1>
-            <p style={{ color: '#9aa', fontSize: 13, marginTop: 4 }}>{ativos.length} ativos · {brl(totalAtivo)}/período</p>
+            <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 28, fontWeight: 800, color: '#2EA866', margin: 0 }}>Patrocinadores</h1>
+            <p style={{ color: '#6B7280', fontSize: 13, marginTop: 4 }}>{ativos.length} ativos · {brl(totalAtivo)}/período</p>
           </div>
           <button onClick={() => setShowForm(v => !v)} style={btnPrimary}><Plus size={16} /> Novo patrocinador</button>
         </div>
@@ -114,11 +114,11 @@ export default function PatrocinadoresPage() {
           </div>
         )}
 
-        {carregando && <p style={{ color: '#9aa' }}>Carregando…</p>}
+        {carregando && <p style={{ color: '#6B7280' }}>Carregando…</p>}
 
         {[
-          { titulo: 'Ativos', items: ativos, cor: '#4169E1' },
-          { titulo: 'Vencidos', items: vencidos, cor: '#FF4757' },
+          { titulo: 'Ativos', items: ativos, cor: '#2EA866' },
+          { titulo: 'Vencidos', items: vencidos, cor: '#DC2626' },
           { titulo: 'Cancelados', items: cancelados, cor: '#888' },
         ].map(grupo => grupo.items.length === 0 ? null : (
           <div key={grupo.titulo} style={{ marginBottom: 28 }}>
@@ -133,23 +133,23 @@ export default function PatrocinadoresPage() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
                       <div>
                         <p style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 16, margin: 0 }}>{p.nome}</p>
-                        {p.empresa && <p style={{ color: '#9aa', fontSize: 12, margin: '2px 0 0' }}>{p.empresa}</p>}
-                        {p.telefone && <p style={{ color: '#9aa', fontSize: 12, margin: '2px 0 0' }}>{p.telefone}</p>}
+                        {p.empresa && <p style={{ color: '#6B7280', fontSize: 12, margin: '2px 0 0' }}>{p.empresa}</p>}
+                        {p.telefone && <p style={{ color: '#6B7280', fontSize: 12, margin: '2px 0 0' }}>{p.telefone}</p>}
                       </div>
                       <span style={{ color: corStatus(st), fontSize: 11, fontWeight: 700, border: `1px solid ${corStatus(st)}`, borderRadius: 999, padding: '3px 10px' }}>{st}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-                      <span style={{ color: '#FFD700', fontWeight: 800, fontSize: 18 }}>{brl(p.valor)}</span>
-                      <span style={{ color: '#9aa', fontSize: 13 }}>vence {dataBR(p.vencimento)}</span>
+                      <span style={{ color: '#B7791F', fontWeight: 800, fontSize: 18 }}>{brl(p.valor)}</span>
+                      <span style={{ color: '#6B7280', fontSize: 13 }}>vence {dataBR(p.vencimento)}</span>
                     </div>
-                    {p.descricao && <p style={{ color: '#9aa', fontSize: 12, marginBottom: 12 }}>{p.descricao}</p>}
+                    {p.descricao && <p style={{ color: '#6B7280', fontSize: 12, marginBottom: 12 }}>{p.descricao}</p>}
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                       <Btn icon={<Send size={13} />} label="WhatsApp" onClick={() => enviarWpp(p.id)} cor="#25D366" />
                       <Btn icon={<FileText size={13} />} label="Recibo" onClick={() => gerarPDF(p)} cor="#FFD700" />
                       <Btn icon={<RotateCcw size={13} />} label="Renovar" onClick={() => setRenovId({ id: p.id, data: '' })} cor="#4169E1" />
                       <Btn icon={<X size={13} />} label="Mensagem" onClick={() => setMsgEdit({ id: p.id, texto: p.mensagemCobranca || DEFAULT_TEMPLATE })} cor="#9aa" />
                       <button onClick={async () => { if (!confirm('Excluir?')) return; await excluirPatrocinador(p.id); await carregar() }}
-                        style={{ background: 'transparent', border: '1px solid #2A2A4A', borderRadius: 8, padding: '6px 8px', color: '#9aa', cursor: 'pointer', display: 'inline-flex' }}>
+                        style={{ background: 'transparent', border: '1px solid #E3E8E5', borderRadius: 8, padding: '6px 8px', color: '#6B7280', cursor: 'pointer', display: 'inline-flex' }}>
                         <Trash2 size={13} />
                       </button>
                     </div>
@@ -161,14 +161,14 @@ export default function PatrocinadoresPage() {
         ))}
 
         {lista.length === 0 && !carregando && (
-          <div style={{ ...formCard, textAlign: 'center', color: '#9aa', padding: 40 }}>
+          <div style={{ ...formCard, textAlign: 'center', color: '#6B7280', padding: 40 }}>
             Nenhum patrocinador ainda. Clique em "Novo patrocinador" pra começar.
           </div>
         )}
 
         {msgEdit && (
           <Modal titulo="Editar mensagem de cobrança" onClose={() => setMsgEdit(null)}>
-            <p style={{ color: '#9aa', fontSize: 12, marginBottom: 8 }}>Variáveis: {`{{nome}}, {{valor}}, {{vencimento}}`}</p>
+            <p style={{ color: '#6B7280', fontSize: 12, marginBottom: 8 }}>Variáveis: {`{{nome}}, {{valor}}, {{vencimento}}`}</p>
             <textarea value={msgEdit.texto} onChange={e => setMsgEdit({ ...msgEdit, texto: e.target.value })} rows={8}
               style={{ ...inp, resize: 'vertical', lineHeight: 1.5 }} />
             <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
@@ -205,10 +205,10 @@ function Btn({ icon, label, onClick, cor }: { icon: React.ReactNode; label: stri
 function Modal({ titulo, children, onClose }: { titulo: string; children: React.ReactNode; onClose: () => void }) {
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: 20 }}>
-      <div style={{ background: '#0e1a0a', border: '1px solid #2A2A4A', borderRadius: 16, padding: 24, maxWidth: 520, width: '100%' }}>
+      <div style={{ background: '#FFFFFF', border: '1px solid #E3E8E5', borderRadius: 16, padding: 24, maxWidth: 520, width: '100%' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-          <h3 style={{ fontFamily: 'Syne, sans-serif', color: '#FFD700', margin: 0 }}>{titulo}</h3>
-          <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: '#9aa', cursor: 'pointer' }}><X size={18} /></button>
+          <h3 style={{ fontFamily: 'Syne, sans-serif', color: '#B7791F', margin: 0 }}>{titulo}</h3>
+          <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: '#6B7280', cursor: 'pointer' }}><X size={18} /></button>
         </div>
         {children}
       </div>
@@ -217,12 +217,12 @@ function Modal({ titulo, children, onClose }: { titulo: string; children: React.
 }
 
 function Campo({ label, children }: { label: string; children: React.ReactNode }) {
-  return <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12, color: '#9aa', marginBottom: 4 }}>{label}{children}</label>
+  return <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12, color: '#6B7280', marginBottom: 4 }}>{label}{children}</label>
 }
 
-const formCard: React.CSSProperties = { background: 'rgba(255,255,255,0.03)', border: '1px solid #1A1A2E', borderRadius: 16, padding: 20, marginBottom: 24 }
-const patCard: React.CSSProperties = { background: 'rgba(255,255,255,0.03)', border: '1px solid #1A1A2E', borderRadius: 16, padding: 20 }
-const cardTitle: React.CSSProperties = { fontFamily: 'Syne, sans-serif', fontSize: 17, fontWeight: 700, color: '#FFD700', margin: '0 0 16px' }
-const inp: React.CSSProperties = { background: '#0a0f08', border: '1px solid #2A2A4A', borderRadius: 10, padding: '10px 12px', color: '#fff', fontSize: 14, boxSizing: 'border-box', width: '100%' }
-const btnPrimary: React.CSSProperties = { display: 'inline-flex', alignItems: 'center', gap: 8, background: '#4169E1', color: '#04130a', border: 'none', borderRadius: 10, padding: '11px 20px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Syne, sans-serif' }
-const btnGhost: React.CSSProperties = { background: 'transparent', border: '1px solid #2A2A4A', color: '#9aa', borderRadius: 10, padding: '11px 20px', cursor: 'pointer' }
+const formCard: React.CSSProperties = { background: '#FFFFFF', border: '1px solid #E3E8E5', borderRadius: 16, padding: 20, marginBottom: 24 }
+const patCard: React.CSSProperties = { background: '#FFFFFF', border: '1px solid #E3E8E5', borderRadius: 16, padding: 20 }
+const cardTitle: React.CSSProperties = { fontFamily: 'Syne, sans-serif', fontSize: 17, fontWeight: 700, color: '#B7791F', margin: '0 0 16px' }
+const inp: React.CSSProperties = { background: '#FFFFFF', border: '1px solid #E3E8E5', borderRadius: 10, padding: '10px 12px', color: '#1F2937', fontSize: 14, boxSizing: 'border-box', width: '100%' }
+const btnPrimary: React.CSSProperties = { display: 'inline-flex', alignItems: 'center', gap: 8, background: '#2EA866', color: '#fff', border: 'none', borderRadius: 10, padding: '11px 20px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Syne, sans-serif' }
+const btnGhost: React.CSSProperties = { background: 'transparent', border: '1px solid #E3E8E5', color: '#6B7280', borderRadius: 10, padding: '11px 20px', cursor: 'pointer' }

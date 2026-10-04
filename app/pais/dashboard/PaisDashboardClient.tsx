@@ -36,17 +36,17 @@ function calcularIdade(dataNascimento: string | null): string {
 
 export default function PaisDashboardClient({ atletas }: { atletas: Vinculo[] }) {
   return (
-    <div className="min-h-screen bg-[#0F0F1A] p-6">
+    <div className="min-h-screen bg-[#F6F8F7] p-6">
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-white">Meus Atletas</h1>
-          <p className="text-gray-400 text-sm mt-1">Acompanhe o desenvolvimento dos seus filhos</p>
+          <h1 className="text-2xl font-bold text-gray-900">Meus Atletas</h1>
+          <p className="text-gray-500 text-sm mt-1">Acompanhe o desenvolvimento dos seus filhos</p>
         </div>
         <div className="flex flex-col gap-4">
           {atletas.map((vinculo) => (
             <div
               key={vinculo.atletaId}
-              className="bg-[#1A1A2E] rounded-2xl p-5 border border-white/5 flex items-center gap-4"
+              className="bg-white rounded-2xl p-5 border border-gray-200 flex items-center gap-4"
             >
               <div className="w-16 h-16 rounded-full bg-[#FF6B00]/20 flex items-center justify-center overflow-hidden shrink-0">
                 {vinculo.Atleta.foto ? (
@@ -56,14 +56,14 @@ export default function PaisDashboardClient({ atletas }: { atletas: Vinculo[] })
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-white font-bold text-lg truncate">{vinculo.Atleta.nome}</p>
-                <p className="text-gray-400 text-sm">{calcularIdade(vinculo.Atleta.dataNascimento)}</p>
+                <p className="text-gray-900 font-bold text-lg truncate">{vinculo.Atleta.nome}</p>
+                <p className="text-gray-500 text-sm">{calcularIdade(vinculo.Atleta.dataNascimento)}</p>
                 {vinculo.Atleta.Turma && (
                   <p className="text-[#FF6B00] text-sm font-medium mt-1">{vinculo.Atleta.Turma.nome}</p>
                 )}
               </div>
               <div className="flex flex-col items-end gap-2 shrink-0">
-                <span className="text-xs text-gray-500 bg-white/5 px-2 py-1 rounded-full">
+                <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded-full">
                   {RELACAO_LABEL[vinculo.relacao] ?? vinculo.relacao}
                 </span>
                 
