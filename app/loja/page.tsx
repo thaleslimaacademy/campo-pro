@@ -74,18 +74,18 @@ export default function LojaPage() {
   return (
     <div style={{ minHeight: '100vh', background: C.bg, color: C.text }}>
       {/* Header */}
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '16px 20px', position: 'sticky', top: 0, zIndex: 40 }}>
+      <div style={{ background: '#4169E1', padding: '16px 20px', position: 'sticky', top: 0, zIndex: 40 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <img src="/gestaofc-logo.png" style={{ width: 36, height: 36, borderRadius: 10 }} alt="logo" onError={e => (e.currentTarget.style.display = 'none')} />
             <div>
-              <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 16, color: '#1F2937' }}>🛍️ Loja TLFA</div>
-              <div style={{ fontSize: 10, color: '#374151' }}>Produtos oficiais</div>
+              <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 16, color: '#fff' }}>🛍️ Loja TLFA</div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)' }}>Produtos oficiais</div>
             </div>
           </div>
           {qtdCarrinho > 0 && (
             <button onClick={() => setEtapa('carrinho')}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#EEF1EF', border: 'none', borderRadius: 12, padding: '8px 16px', color: '#1F2937', cursor: 'pointer', fontFamily: SYNE, fontWeight: 700 }}>
+              style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 12, padding: '8px 16px', color: '#fff', cursor: 'pointer', fontFamily: SYNE, fontWeight: 700 }}>
               <ShoppingCart size={18} />
               <span style={{ background: C.orange, borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>{qtdCarrinho}</span>
               {brl(totalCarrinho)}

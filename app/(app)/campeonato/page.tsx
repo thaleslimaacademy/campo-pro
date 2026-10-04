@@ -46,13 +46,13 @@ export default function Campeonatos() {
   return (
     <PlanoGate feature="campeonatos" planoMinimo="PRO">
       <div style={{ minHeight: '100vh', background: T.bg, color: T.text, fontFamily: 'Inter, sans-serif', paddingBottom: 80 }}>
-        <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 20px 20px' }}>
+        <div style={{ background: '#4169E1', padding: '20px 20px 20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
-              <div style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Competição</div>
-              <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: T.text, letterSpacing: -0.8, textTransform: 'uppercase' }}>Campeonatos</div>
+              <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Competição</div>
+              <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: '#fff', letterSpacing: -0.8, textTransform: 'uppercase' }}>Campeonatos</div>
             </div>
-            <button onClick={() => setShowForm(!showForm)} style={{ background: T.primary, color: '#fff', borderRadius: 8, padding: '10px 16px', fontFamily: SYNE, fontWeight: 800, fontSize: 12, border: 'none', cursor: 'pointer', textTransform: 'uppercase' }}>{showForm ? 'Fechar' : '+ Novo'}</button>
+            <button onClick={() => setShowForm(!showForm)} style={{ background: '#fff', color: '#4169E1', borderRadius: 8, padding: '10px 16px', fontFamily: SYNE, fontWeight: 800, fontSize: 12, border: 'none', cursor: 'pointer', textTransform: 'uppercase' }}>{showForm ? 'Fechar' : '+ Novo'}</button>
           </div>
         </div>
 

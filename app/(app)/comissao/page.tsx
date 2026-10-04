@@ -75,19 +75,19 @@ export default function ComissaoPage() {
   return (
     <div style={{ minHeight: '100vh', background: NAVY, paddingBottom: 88, fontFamily: INTER, color: OFF }}>
       {/* Header */}
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '16px 16px 20px' }}>
+      <div style={{ background: '#4169E1', padding: '16px 16px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={() => router.back()} style={{ background: '#EEF1EF', border: 'none', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: OFF }}>
+          <button onClick={() => router.back()} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#fff' }}>
             <i className="ti ti-arrow-left" style={{ fontSize: 18 }} />
           </button>
           <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 18, color: OFF, textTransform: 'uppercase', letterSpacing: 1 }}>Comissao Tecnica</div>
+            <div style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 18, color: '#fff', textTransform: 'uppercase', letterSpacing: 1 }}>Comissao Tecnica</div>
             <div style={{ fontSize: 12, color: SKY }}>Gestao de acessos e perfis</div>
           </div>
           {isAdmin && (
             <button
               onClick={() => { setMostrarForm(!mostrarForm); setErro(''); setSucesso('') }}
-              style={{ background: mostrarForm ? 'rgba(255,107,107,0.2)' : 'rgba(46,168,102,0.2)', border: mostrarForm ? '1px solid rgba(255,107,107,0.4)' : '1px solid rgba(46,168,102,0.4)', borderRadius: 8, padding: '6px 14px', color: mostrarForm ? '#DC2626' : CYAN, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: SYNE, display: 'flex', alignItems: 'center', gap: 6 }}
+              style={{ background: mostrarForm ? 'rgba(255,107,107,0.2)' : 'rgba(0,191,255,0.2)', border: mostrarForm ? '1px solid rgba(255,107,107,0.4)' : '1px solid rgba(0,191,255,0.4)', borderRadius: 8, padding: '6px 14px', color: mostrarForm ? '#FF6B6B' : CYAN, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: SYNE, display: 'flex', alignItems: 'center', gap: 6 }}
             >
               <i className={mostrarForm ? 'ti ti-x' : 'ti ti-plus'} style={{ fontSize: 14 }} />
               {mostrarForm ? 'Fechar' : 'Adicionar'}

@@ -58,10 +58,10 @@ export default function GaleriaAlbumPage({ params }: { params: Promise<{ slug: s
 
   return (
     <div style={{ minHeight: '100vh', background: C.bg, color: C.text }}>
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '16px 20px' }}>
+      <div style={{ background: '#4169E1', padding: '16px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <a href={`/galeria/${slug}`} style={{ color: '#374151', fontSize: 20, textDecoration: 'none' }}>←</a>
-          <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 16, color: '#1F2937' }}>Galeria de Fotos</div>
+          <a href={`/galeria/${slug}`} style={{ color: 'rgba(255,255,255,0.7)', fontSize: 20, textDecoration: 'none' }}>←</a>
+          <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 16, color: '#fff' }}>Galeria de Fotos</div>
         </div>
       </div>
 

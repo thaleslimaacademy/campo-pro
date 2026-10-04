@@ -134,22 +134,22 @@ export default function Dashboard() {
     <div style={{ minHeight: '100vh', background: C.navy, color: C.off, fontFamily: 'Inter, sans-serif', paddingBottom: 88 }}>
 
       {/* HEADER */}
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 20px 28px', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', right: -40, top: -40, width: 200, height: 200, borderRadius: '50%', background: '#FFFFFF' }} />
-        <div style={{ position: 'absolute', right: 40, bottom: -60, width: 140, height: 140, borderRadius: '50%', background: 'rgba(46,168,102,0.08)' }} />
+      <div style={{ background: '#4169E1', padding: '20px 20px 28px', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', right: -40, top: -40, width: 200, height: 200, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+        <div style={{ position: 'absolute', right: 40, bottom: -60, width: 140, height: 140, borderRadius: '50%', background: 'rgba(0,191,255,0.08)' }} />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <img src="/gestaofc-icon.svg" alt="GestaoFC" style={{ width: 64, height: 64, borderRadius: 14, objectFit: 'cover' }} />
             <div>
-              <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 900, fontSize: 16, color: '#1F2937', letterSpacing: 1, textTransform: 'uppercase' }}>{escola}</div>
-              <div style={{ fontSize: 10, color: '#374151', marginTop: 1, textTransform: 'capitalize' }}>{dia}</div>
+              <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 900, fontSize: 16, color: '#fff', letterSpacing: 1, textTransform: 'uppercase' }}>{escola}</div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', marginTop: 1, textTransform: 'capitalize' }}>{dia}</div>
             </div>
           </div>
           <AccountButton />
         </div>
         <div style={{ marginTop: 20, position: 'relative' }}>
-          <div style={{ fontSize: 11, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Visao geral</div>
-          <div style={{ fontFamily: 'Syne, sans-serif', fontSize: 26, fontWeight: 900, color: '#1F2937', letterSpacing: -0.5, lineHeight: 1, textTransform: 'uppercase' }}>Sua Academia</div>
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Visao geral</div>
+          <div style={{ fontFamily: 'Syne, sans-serif', fontSize: 26, fontWeight: 900, color: '#fff', letterSpacing: -0.5, lineHeight: 1, textTransform: 'uppercase' }}>Sua Academia</div>
         </div>
       </div>
 

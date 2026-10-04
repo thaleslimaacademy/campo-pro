@@ -16,8 +16,7 @@ export default function LoginPage() {
       <div style={{ position: 'absolute', top: '-120px', left: '50%', transform: 'translateX(-50%)', width: '400px', height: '400px', background: 'radial-gradient(circle,rgba(46,168,102,0.12) 0%,transparent 70%)', pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', bottom: '-80px', right: '-80px', width: '300px', height: '300px', background: 'radial-gradient(circle,rgba(46,168,102,0.08) 0%,transparent 70%)', pointerEvents: 'none' }} />
       <div style={{ marginBottom: '32px', textAlign: 'center' }}>
-        <img src="/gestaofc-icon.svg" alt="GestaoFC" style={{ width: 64, height: 64, borderRadius: 16, marginBottom: 16, boxShadow: '0 0 32px rgba(46,168,102,0.4)' }} />
-        <h1 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 900, fontSize: '28px', color: '#1F2937', margin: '0 0 4px', letterSpacing: '1px', textTransform: 'uppercase' }}>GestaoFC</h1>
+        <img src="/gestaofc-logo-horizontal.png" alt="GestãoFC" style={{ width: 240, maxWidth: '80vw', height: 'auto', display: 'block', margin: '0 auto 10px' }} />
         <p style={{ fontSize: '13px', color: '#6B7280', margin: 0 }}>Gestao profissional de escolinhas</p>
       </div>
       <SignIn forceRedirectUrl='/dashboard'

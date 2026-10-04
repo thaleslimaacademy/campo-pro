@@ -27,8 +27,8 @@ export default function NPSPage() {
 
   return (
     <div style={{ minHeight:'100vh', background:C.bg, color:'#1F2937', paddingBottom:80 }}>
-      <div style={{ background:'#FFFFFF', borderBottom: '1px solid #E3E8E5', padding:'20px 16px 24px' }}>
-        <p style={{ fontSize:10, color:'#374151', textTransform:'uppercase', letterSpacing:2, marginBottom:4 }}>Satisfação</p>
+      <div style={{ background:'#4169E1', padding:'20px 16px 24px' }}>
+        <p style={{ fontSize:10, color:'rgba(255,255,255,0.6)', textTransform:'uppercase', letterSpacing:2, marginBottom:4 }}>Satisfação</p>
         <h1 style={{ fontFamily:'Syne,sans-serif', fontSize:28, fontWeight:900, margin:0, letterSpacing:-1 }}>NPS da Academia</h1>
       </div>
 

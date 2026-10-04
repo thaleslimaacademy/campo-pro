@@ -169,15 +169,15 @@ export default function LandingPage() {
       </section>
 
       {/* TRANSICAO */}
-      <section style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '60px 24px', textAlign: 'center' }}>
+      <section style={{ background: '#4169E1', padding: '60px 24px', textAlign: 'center' }}>
         <div style={{ maxWidth: 700, margin: '0 auto' }}>
-          <h2 style={{ fontFamily: SYNE, fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: 900, color: '#1F2937', marginBottom: 16, lineHeight: 1.2 }}>
+          <h2 style={{ fontFamily: SYNE, fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: 900, color: '#fff', marginBottom: 16, lineHeight: 1.2 }}>
             O GestaoFC foi criado por um treinador que viveu esses problemas.
           </h2>
-          <p style={{ fontSize: 16, color: '#1F2937', lineHeight: 1.7, marginBottom: 24 }}>
+          <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.75)', lineHeight: 1.7, marginBottom: 24 }}>
             Thales Cruz, ex-jogador profissional com passagens por Brasil, Japão (Roasso Kumamoto), Tailândia e Indonésia, fundou a TLFA em Iturama-MG após encerrar sua carreira. Viveu na pele a falta de um sistema feito para a realidade das escolinhas brasileiras. O GestaoFC nasceu dessa necessidade real.
           </p>
-          <div style={{ display: 'inline-block', background: '#EEF1EF', borderRadius: 12, padding: '12px 24px', fontSize: 15, color: '#1F2937', fontStyle: 'italic', lineHeight: 1.6 }}>
+          <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', borderRadius: 12, padding: '12px 24px', fontSize: 15, color: '#fff', fontStyle: 'italic', lineHeight: 1.6 }}>
             "Menos tempo administrando, mais tempo formando atletas."
           </div>
         </div>

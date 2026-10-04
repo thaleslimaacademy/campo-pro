@@ -69,13 +69,13 @@ function CategoriasInner() {
     <div style={{ minHeight:'100vh', background:T.bg, color:T.text, fontFamily:INTER, paddingBottom:80 }}>
 
       {/* HEADER */}
-      <div style={{ background:'#FFFFFF', borderBottom: '1px solid #E3E8E5', padding:'20px 20px 20px' }}>
+      <div style={{ background:'#4169E1', padding:'20px 20px 20px' }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
           <div>
-            <div style={{ fontSize:10, color:'#374151', textTransform:'uppercase', letterSpacing:2, fontWeight:700, marginBottom:2 }}>Elenco</div>
-            <div style={{ fontFamily:SYNE, fontWeight:900, fontSize:22, color:T.text, letterSpacing:-0.5, textTransform:'uppercase' }}>Categorias</div>
+            <div style={{ fontSize:10, color:'rgba(240,244,255,0.65)', textTransform:'uppercase', letterSpacing:2, fontWeight:700, marginBottom:2 }}>Elenco</div>
+            <div style={{ fontFamily:SYNE, fontWeight:900, fontSize:22, color:'#fff', letterSpacing:-0.5, textTransform:'uppercase' }}>Categorias</div>
           </div>
-          <button onClick={abrirNova} style={{ background:'#EEF1EF', border:'1px solid rgba(16,24,40,0.18)', color:T.text, borderRadius:10, padding:'10px 14px', fontFamily:SYNE, fontWeight:700, fontSize:12, cursor:'pointer', textTransform:'uppercase' }}>
+          <button onClick={abrirNova} style={{ background:'rgba(240,244,255,0.15)', border:'1px solid rgba(240,244,255,0.2)', color:'#fff', borderRadius:10, padding:'10px 14px', fontFamily:SYNE, fontWeight:700, fontSize:12, cursor:'pointer', textTransform:'uppercase' }}>
             + Nova
           </button>
         </div>

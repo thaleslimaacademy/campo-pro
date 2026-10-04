@@ -119,16 +119,16 @@ export default function TurmaDetalhes() {
     <div style={{ minHeight: '100vh', background: navy, paddingBottom: 88, fontFamily: 'Inter, sans-serif', color: offWhite }}>
 
       {/* Header */}
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '16px 16px 20px' }}>
+      <div style={{ background: '#4169E1', padding: '16px 16px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
           <button
             onClick={() => router.back()}
-            style={{ background: '#EEF1EF', border: 'none', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: offWhite, flexShrink: 0 }}
+            style={{ background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#fff', flexShrink: 0 }}
           >
             <i className="ti ti-arrow-left" style={{ fontSize: 18 }} />
           </button>
           <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: syne, fontWeight: 700, fontSize: 20, color: offWhite, textTransform: 'uppercase', letterSpacing: 1 }}>
+            <div style={{ fontFamily: syne, fontWeight: 700, fontSize: 20, color: '#fff', textTransform: 'uppercase', letterSpacing: 1 }}>
               {turma.nome}
             </div>
             {turma.diasSemana && (
@@ -139,20 +139,20 @@ export default function TurmaDetalhes() {
           </div>
           <button
             onClick={() => setEditando(true)}
-            style={{ background: 'rgba(46,168,102,0.15)', border: '1px solid #23874F', borderRadius: 8, padding: '6px 12px', color: cyan, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+            style={{ background: 'rgba(0,191,255,0.15)', border: '1px solid #00BFFF', borderRadius: 8, padding: '6px 12px', color: cyan, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
           >
             <i className="ti ti-pencil" style={{ fontSize: 13, marginRight: 4 }} />
             Editar
           </button>
           <button
             onClick={excluirTurma}
-            style={{ background: 'rgba(255,107,107,0.15)', border: '1px solid rgba(255,107,107,0.4)', borderRadius: 8, padding: '6px 12px', color: '#DC2626', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+            style={{ background: 'rgba(255,107,107,0.15)', border: '1px solid rgba(255,107,107,0.4)', borderRadius: 8, padding: '6px 12px', color: '#FF6B6B', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
           >
             Excluir
           </button>
         </div>
         {turma.descricao && (
-          <div style={{ fontSize: 13, color: '#374151', marginLeft: 48 }}>{turma.descricao}</div>
+          <div style={{ fontSize: 13, color: 'rgba(240,244,255,0.7)', marginLeft: 48 }}>{turma.descricao}</div>
         )}
         <div style={{ marginLeft: 48, marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
           <i className="ti ti-users" style={{ fontSize: 13, color: cyan }} />

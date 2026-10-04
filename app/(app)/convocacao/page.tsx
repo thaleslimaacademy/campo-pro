@@ -238,14 +238,14 @@ export default function Convocacoes() {
     <div style={{ minHeight:'100vh', background:T.bg, color:T.text, fontFamily:INTER, paddingBottom:88 }}>
 
       {/* HEADER */}
-      <div style={{ background:'#FFFFFF', borderBottom: '1px solid #E3E8E5', padding:'20px 18px 18px' }}>
+      <div style={{ background:'#4169E1', padding:'20px 18px 18px' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
           <div>
-            <p style={{ fontSize:10, color:'#374151', textTransform:'uppercase', letterSpacing:2, margin:'0 0 4px', fontFamily:SYNE }}>Gestão</p>
+            <p style={{ fontSize:10, color:'rgba(240,244,255,0.6)', textTransform:'uppercase', letterSpacing:2, margin:'0 0 4px', fontFamily:SYNE }}>Gestão</p>
             <h1 style={{ fontFamily:SYNE, fontWeight:900, fontSize:26, margin:0, letterSpacing:-0.8, textTransform:'uppercase' }}>Convocações</h1>
           </div>
           <button onClick={() => setShowForm(!showForm)}
-            style={{ background:'#EEF1EF', border:'1px solid rgba(16,24,40,0.18)', borderRadius:10, padding:'10px 16px', color:'#1F2937', fontFamily:SYNE, fontWeight:800, fontSize:12, cursor:'pointer', textTransform:'uppercase' }}>
+            style={{ background:'rgba(255,255,255,0.15)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:10, padding:'10px 16px', color:'#fff', fontFamily:SYNE, fontWeight:800, fontSize:12, cursor:'pointer', textTransform:'uppercase' }}>
             {showForm ? '✕ Fechar' : '+ Nova'}
           </button>
         </div>

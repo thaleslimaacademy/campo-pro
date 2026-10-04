@@ -19,13 +19,13 @@ export default function GaleriaPage() {
   return (
     <div style={{ minHeight: '100vh', background: C.bg, color: C.text }}>
       {/* Header */}
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 20px 28px' }}>
+      <div style={{ background: '#4169E1', padding: '20px 20px 28px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <img src="/gestaofc-logo.png" style={{ width: 40, height: 40, borderRadius: 10 }} alt="logo"
             onError={e => (e.currentTarget.style.display = 'none')} />
           <div>
-            <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 18, color: '#1F2937' }}>Galeria de Fotos</div>
-            <div style={{ fontSize: 11, color: '#374151' }}>Thales Lima Football Academy</div>
+            <div style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 18, color: '#fff' }}>Galeria de Fotos</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)' }}>Thales Lima Football Academy</div>
           </div>
         </div>
       </div>

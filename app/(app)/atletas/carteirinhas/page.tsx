@@ -101,15 +101,15 @@ export default function CarteirinhasEmMassa() {
     <div style={{ minHeight: '100vh', background: '#F6F8F7', color: '#1F2937', fontFamily: INTER, paddingBottom: 80 }}>
 
       {/* HEADER */}
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 20px 20px' }}>
+      <div style={{ background: '#4169E1', padding: '20px 20px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
           <div>
-            <div style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Atletas</div>
-            <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 22, color: '#1F2937', letterSpacing: -0.5, textTransform: 'uppercase' }}>🪪 Carteirinhas em massa</div>
+            <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Atletas</div>
+            <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 22, color: '#F0F4FF', letterSpacing: -0.5, textTransform: 'uppercase' }}>🪪 Carteirinhas em massa</div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <a href="/atletas" style={{ background: '#EEF1EF', border: '1px solid rgba(16,24,40,0.18)', color: '#1F2937', borderRadius: 8, padding: '8px 14px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: 0.5 }}>← Voltar</a>
-            <button onClick={imprimir} disabled={selecionados.size === 0} style={{ background: '#F0F4FF', color: '#2EA866', borderRadius: 8, padding: '8px 14px', fontFamily: SYNE, fontWeight: 800, fontSize: 11, border: 'none', cursor: selecionados.size ? 'pointer' : 'not-allowed', opacity: selecionados.size ? 1 : 0.5, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            <a href="/atletas" style={{ background: 'rgba(240,244,255,0.15)', border: '1px solid rgba(240,244,255,0.2)', color: '#F0F4FF', borderRadius: 8, padding: '8px 14px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: 0.5 }}>← Voltar</a>
+            <button onClick={imprimir} disabled={selecionados.size === 0} style={{ background: '#F0F4FF', color: '#4169E1', borderRadius: 8, padding: '8px 14px', fontFamily: SYNE, fontWeight: 800, fontSize: 11, border: 'none', cursor: selecionados.size ? 'pointer' : 'not-allowed', opacity: selecionados.size ? 1 : 0.5, textTransform: 'uppercase', letterSpacing: 0.5 }}>
               🖨️ Imprimir {selecionados.size} selecionada{selecionados.size !== 1 ? 's' : ''}
             </button>
           </div>

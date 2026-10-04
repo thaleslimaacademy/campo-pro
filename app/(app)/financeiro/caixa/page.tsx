@@ -70,16 +70,16 @@ export default function CaixaPage() {
   return (
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, paddingBottom: 40 }}>
       {/* HEADER */}
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 24px 20px' }}>
+      <div style={{ background: '#4169E1', padding: '20px 24px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <div style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Financeiro</div>
-            <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: T.text, letterSpacing: -0.8, textTransform: 'uppercase' }}>Caixa</div>
+            <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Financeiro</div>
+            <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: '#fff', letterSpacing: -0.8, textTransform: 'uppercase' }}>Caixa</div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <input type="month" value={mes} onChange={e => setMes(e.target.value)}
-              style={{ background: '#EEF1EF', border: '1px solid rgba(16,24,40,0.18)', borderRadius: 8, padding: '8px 12px', color: T.text, fontSize: 13, fontFamily: 'Inter, sans-serif' }} />
-            {carregando && <span style={{ color: '#374151', fontSize: 12 }}>Carregando…</span>}
+              style={{ background: 'rgba(240,244,255,0.15)', border: '1px solid rgba(240,244,255,0.2)', borderRadius: 8, padding: '8px 12px', color: '#fff', fontSize: 13, fontFamily: 'Inter, sans-serif' }} />
+            {carregando && <span style={{ color: 'rgba(240,244,255,0.6)', fontSize: 12 }}>Carregando…</span>}
           </div>
         </div>
       </div>

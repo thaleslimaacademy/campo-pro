@@ -106,12 +106,12 @@ export default function ValoresPage() {
   return (
     <div style={{ minHeight: '100vh', background: L.bg, color: L.text, fontFamily: FONT_BODY, paddingBottom: 96 }}>
       {/* Cabecalho */}
-      <div style={{ background: L.surface, borderBottom: `1px solid ${L.border}`, padding: '16px 16px 14px' }}>
-        <Link href="/dashboard" style={{ color: L.muted, textDecoration: 'none', fontSize: 13 }}>← Início</Link>
+      <div style={{ background: L.header, padding: '16px 16px 14px' }}>
+        <Link href="/dashboard" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontSize: 13 }}>← Início</Link>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12, marginTop: 6 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: L.primary }}>Financeiro</div>
-            <h1 style={{ fontFamily: FONT_TITLE, fontSize: 24, fontWeight: 800, color: L.navy, margin: '2px 0 0' }}>Planos e Valores</h1>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.75)' }}>Financeiro</div>
+            <h1 style={{ fontFamily: FONT_TITLE, fontSize: 24, fontWeight: 800, color: '#fff', margin: '2px 0 0' }}>Planos e Valores</h1>
           </div>
           <select value={ano} onChange={e => setAno(Number(e.target.value))}
             style={{ ...input, width: 'auto', fontWeight: 700, padding: '8px 10px' }} aria-label="Ano">

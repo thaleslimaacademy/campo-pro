@@ -369,13 +369,13 @@ export default function TreinamentosPage() {
     <div style={{ minHeight: '100vh', background: NAVY, paddingBottom: 88, fontFamily: 'Inter, sans-serif', color: OFF }}>
 
       {/* Header */}
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '16px 16px 20px' }}>
+      <div style={{ background: '#4169E1', padding: '16px 16px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={() => router.back()} style={{ background: '#EEF1EF', border: 'none', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: OFF }}>
+          <button onClick={() => router.back()} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#fff' }}>
             <i className="ti ti-arrow-left" style={{ fontSize: 18 }} />
           </button>
           <div>
-            <div style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 18, color: OFF, textTransform: 'uppercase', letterSpacing: 1 }}>Treinamentos</div>
+            <div style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 18, color: '#fff', textTransform: 'uppercase', letterSpacing: 1 }}>Treinamentos</div>
             <div style={{ fontSize: 12, color: SKY }}>Biblioteca metodologica + IA</div>
           </div>
         </div>

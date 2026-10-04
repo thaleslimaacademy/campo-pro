@@ -122,9 +122,9 @@ export default function NovoAtleta() {
     <div style={{ minHeight:'100vh', background:T.bg, color:T.text, fontFamily:INTER, paddingBottom:80 }}>
 
       {/* HEADER */}
-      <div style={{ background:'#FFFFFF', borderBottom: '1px solid #E3E8E5', padding:'20px 20px 20px' }}>
-        <a href="/atletas" style={{ fontSize:12, color:'#374151', textDecoration:'none', display:'block', marginBottom:8 }}>← Atletas</a>
-        <h1 style={{ fontFamily:SYNE, fontWeight:900, fontSize:22, color:T.text, margin:0, textTransform:'uppercase', letterSpacing:-0.5 }}>Novo Atleta</h1>
+      <div style={{ background:'#4169E1', padding:'20px 20px 20px' }}>
+        <a href="/atletas" style={{ fontSize:12, color:'rgba(240,244,255,0.65)', textDecoration:'none', display:'block', marginBottom:8 }}>← Atletas</a>
+        <h1 style={{ fontFamily:SYNE, fontWeight:900, fontSize:22, color:'#fff', margin:0, textTransform:'uppercase', letterSpacing:-0.5 }}>Novo Atleta</h1>
       </div>
 
       <form onSubmit={handleSubmit} style={{ padding:'16px 16px' }}>

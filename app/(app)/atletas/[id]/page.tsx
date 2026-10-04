@@ -132,21 +132,21 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, fontFamily: INTER, paddingBottom: 80 }}>
 
       {/* HEADER */}
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 20px 20px' }}>
+      <div style={{ background: '#4169E1', padding: '20px 20px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <a href="/atletas" style={{ color: '#374151', textDecoration: 'none', fontSize: 13, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <a href="/atletas" style={{ color: 'rgba(240,244,255,0.7)', textDecoration: 'none', fontSize: 13, display: 'flex', alignItems: 'center', gap: 4 }}>
               <i className="ti ti-arrow-left" style={{ fontSize: 16 }} aria-hidden="true"></i>
             </a>
             <div>
-              <div style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 2 }}>Elenco</div>
-              <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 20, color: T.text, letterSpacing: -0.5, textTransform: 'uppercase' }}>Perfil do Atleta</div>
+              <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 2 }}>Elenco</div>
+              <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 20, color: '#fff', letterSpacing: -0.5, textTransform: 'uppercase' }}>Perfil do Atleta</div>
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <a href={`/atletas/${atleta.id}/carteirinha`} style={{ background: '#EEF1EF', border: '1px solid rgba(16,24,40,0.18)', color: T.text, borderRadius: 8, padding: '8px 12px', textDecoration: 'none', fontSize: 15 }}>🪪</a>
-            <a href={`/atletas/${atleta.id}/avaliacao`}   style={{ background: '#EEF1EF', border: '1px solid rgba(16,24,40,0.18)', color: T.text, borderRadius: 8, padding: '8px 12px', textDecoration: 'none', fontSize: 15 }}>📋</a>
-            <a href={`/atletas/${atleta.id}/editar`}      style={{ background: '#EEF1EF', border: '1px solid rgba(16,24,40,0.18)', color: T.text, borderRadius: 8, padding: '8px 12px', textDecoration: 'none', fontSize: 15 }}>✏️</a>
+            <a href={`/atletas/${atleta.id}/carteirinha`} style={{ background: 'rgba(240,244,255,0.15)', border: '1px solid rgba(240,244,255,0.2)', color: '#fff', borderRadius: 8, padding: '8px 12px', textDecoration: 'none', fontSize: 15 }}>🪪</a>
+            <a href={`/atletas/${atleta.id}/avaliacao`}   style={{ background: 'rgba(240,244,255,0.15)', border: '1px solid rgba(240,244,255,0.2)', color: '#fff', borderRadius: 8, padding: '8px 12px', textDecoration: 'none', fontSize: 15 }}>📋</a>
+            <a href={`/atletas/${atleta.id}/editar`}      style={{ background: 'rgba(240,244,255,0.15)', border: '1px solid rgba(240,244,255,0.2)', color: '#fff', borderRadius: 8, padding: '8px 12px', textDecoration: 'none', fontSize: 15 }}>✏️</a>
           </div>
         </div>
       </div>

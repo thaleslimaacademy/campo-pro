@@ -247,13 +247,13 @@ function MatriculasInner() {
 
   return (
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, padding: '0 0 80px', fontFamily: 'Inter, sans-serif' }}>
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 20px 20px' }}>
+      <div style={{ background: '#4169E1', padding: '20px 20px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div>
-            <div style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Gestão</div>
+            <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Gestão</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: T.text, letterSpacing: -0.8, textTransform: 'uppercase' }}>Pré-matrículas</div>
-              {pendentes > 0 && <span style={{ background: T.gold, color: '#1F2937', fontSize: 10, fontWeight: 900, padding: '3px 8px', borderRadius: 4, fontFamily: SYNE }}>{pendentes}</span>}
+              <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: '#fff', letterSpacing: -0.8, textTransform: 'uppercase' }}>Pré-matrículas</div>
+              {pendentes > 0 && <span style={{ background: T.gold, color: '#0A0A00', fontSize: 10, fontWeight: 900, padding: '3px 8px', borderRadius: 4, fontFamily: SYNE }}>{pendentes}</span>}
             </div>
           </div>
         </div>

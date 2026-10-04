@@ -52,15 +52,15 @@ export default function Presenca() {
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, fontFamily: 'Inter, sans-serif', paddingBottom: 80 }}>
 
       {/* HEADER */}
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 20px 20px' }}>
+      <div style={{ background: '#4169E1', padding: '20px 20px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <div style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Elenco</div>
-            <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: T.text, letterSpacing: -0.8, textTransform: 'uppercase' }}>Presença</div>
+            <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Elenco</div>
+            <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: '#fff', letterSpacing: -0.8, textTransform: 'uppercase' }}>Presença</div>
           </div>
           <input type="date" value={dataSel} max={hoje}
             onChange={e => { setDataSel(e.target.value); setPresencas({}) }}
-            style={{ background: '#EEF1EF', border: '1px solid rgba(16,24,40,0.18)', borderRadius: 8, padding: '8px 12px', color: T.text, fontSize: 13, fontFamily: 'Inter, sans-serif' }} />
+            style={{ background: 'rgba(240,244,255,0.15)', border: '1px solid rgba(240,244,255,0.2)', borderRadius: 8, padding: '8px 12px', color: '#fff', fontSize: 13, fontFamily: 'Inter, sans-serif' }} />
         </div>
       </div>
 

@@ -65,22 +65,22 @@ export default function DashboardFinanceiroClient({ data }: { data: DashboardFin
   return (
     <div style={{ minHeight: '100vh', background: '#F6F8F7', paddingBottom: 88, fontFamily: 'Inter, sans-serif' }}>
 
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '16px 16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ background: '#4169E1', padding: '16px 16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
         <button
           onClick={() => router.back()}
-          style={{ background: '#EEF1EF', border: 'none', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#1F2937' }}
+          style={{ background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#F0F4FF' }}
         >
           <i className="ti ti-arrow-left" style={{ fontSize: 18 }} />
         </button>
         <div>
-          <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 18, color: '#1F2937', textTransform: 'uppercase', letterSpacing: 1 }}>
+          <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 18, color: '#F0F4FF', textTransform: 'uppercase', letterSpacing: 1 }}>
             Financeiro
           </div>
-          <div style={{ fontSize: 12, color: '#4B5563' }}>Dashboard inteligente</div>
+          <div style={{ fontSize: 12, color: '#7DD3FC' }}>Dashboard inteligente</div>
         </div>
         <button
           onClick={() => router.push('/financeiro/boleto')}
-          style={{ marginLeft: 'auto', background: 'rgba(46,168,102,0.2)', border: '1px solid #23874F', borderRadius: 8, padding: '6px 12px', color: '#23874F', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+          style={{ marginLeft: 'auto', background: 'rgba(0,191,255,0.2)', border: '1px solid #00BFFF', borderRadius: 8, padding: '6px 12px', color: '#00BFFF', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
         >
           <i className="ti ti-file-invoice" style={{ fontSize: 14 }} />
           Boleto

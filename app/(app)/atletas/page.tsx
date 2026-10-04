@@ -60,18 +60,18 @@ export default function Atletas() {
     return (
       <div style={{ background: '#FFFFFF', border: `1px solid rgba(16,24,40,0.1)`, borderRadius: 14, overflow: 'hidden', position: 'relative' }}>
         {/* Foto / Iniciais */}
-        <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 16px 12px', textAlign: 'center', position: 'relative' }}>
+        <div style={{ background: '#4169E1', padding: '20px 16px 12px', textAlign: 'center', position: 'relative' }}>
           {a.bolsista && (
-            <div style={{ position: 'absolute', top: 8, left: 8, background: '#00D67A', color: '#fff', fontSize: 8, fontWeight: 800, padding: '2px 6px', borderRadius: 4, fontFamily: SYNE, textTransform: 'uppercase' }}>Bolsista</div>
+            <div style={{ position: 'absolute', top: 8, left: 8, background: '#00D67A', color: '#000', fontSize: 8, fontWeight: 800, padding: '2px 6px', borderRadius: 4, fontFamily: SYNE, textTransform: 'uppercase' }}>Bolsista</div>
           )}
           <button onClick={() => setMenuAberto(aberto ? null : a.id)}
-            style={{ position: 'absolute', top: 8, right: 8, background: '#EEF1EF', border: 'none', borderRadius: 6, width: 28, height: 28, cursor: 'pointer', color: '#1F2937', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 6, width: 28, height: 28, cursor: 'pointer', color: '#fff', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             ⋯
           </button>
           {a.fotoUrl ? (
-            <img src={a.fotoUrl} alt={a.nome} style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: '3px solid rgba(16,24,40,0.18)', display: 'block', margin: '0 auto' }} />
+            <img src={a.fotoUrl} alt={a.nome} style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: '3px solid rgba(255,255,255,0.3)', display: 'block', margin: '0 auto' }} />
           ) : (
-            <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#EEF1EF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontFamily: SYNE, fontWeight: 900, fontSize: 22, color: '#1F2937' }}>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontFamily: SYNE, fontWeight: 900, fontSize: 22, color: '#fff' }}>
               {iniciais(a.nome)}
             </div>
           )}
@@ -141,18 +141,18 @@ export default function Atletas() {
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, fontFamily: INTER, paddingBottom: 90 }}>
 
       {/* HEADER */}
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 20px 16px' }}>
+      <div style={{ background: '#4169E1', padding: '20px 20px 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 10, marginBottom: 12 }}>
           <div>
-            <div style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Elenco</div>
-            <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: T.text, letterSpacing: -0.8, textTransform: 'uppercase' }}>
-              Atletas <span style={{ color: '#23874F', fontStyle: 'italic' }}>{atletas.length}</span>
+            <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Elenco</div>
+            <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: '#fff', letterSpacing: -0.8, textTransform: 'uppercase' }}>
+              Atletas <span style={{ color: '#00BFFF', fontStyle: 'italic' }}>{atletas.length}</span>
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <a href="/atletas/carteirinhas" style={{ background: '#EEF1EF', color: T.text, borderRadius: 8, padding: '9px 12px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, textDecoration: 'none', textTransform: 'uppercase' }}>🪪 Carteirinhas</a>
-            <a href="/atletas/importar" style={{ background: '#EEF1EF', color: T.text, borderRadius: 8, padding: '9px 12px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, textDecoration: 'none', textTransform: 'uppercase' }}>⬆ CSV</a>
-            <a href="/atletas/novo" style={{ background: T.primary, color: '#fff', borderRadius: 8, padding: '9px 14px', fontFamily: SYNE, fontWeight: 800, fontSize: 12, textDecoration: 'none', textTransform: 'uppercase' }}>+ Novo</a>
+            <a href="/atletas/carteirinhas" style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', borderRadius: 8, padding: '9px 12px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, textDecoration: 'none', textTransform: 'uppercase' }}>🪪 Carteirinhas</a>
+            <a href="/atletas/importar" style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', borderRadius: 8, padding: '9px 12px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, textDecoration: 'none', textTransform: 'uppercase' }}>⬆ CSV</a>
+            <a href="/atletas/novo" style={{ background: '#fff', color: '#4169E1', borderRadius: 8, padding: '9px 14px', fontFamily: SYNE, fontWeight: 800, fontSize: 12, textDecoration: 'none', textTransform: 'uppercase' }}>+ Novo</a>
           </div>
         </div>
 
@@ -160,7 +160,7 @@ export default function Atletas() {
         <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
           {(['lista', 'grade'] as Modo[]).map(m => (
             <button key={m} onClick={() => setModo(m)}
-              style={{ background: modo === m ? '#EEF1EF' : '#FFFFFF', border: 'none', borderRadius: 6, padding: '5px 12px', color: '#1F2937', fontSize: 11, fontFamily: SYNE, fontWeight: 700, cursor: 'pointer', textTransform: 'uppercase' }}>
+              style={{ background: modo === m ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 6, padding: '5px 12px', color: '#fff', fontSize: 11, fontFamily: SYNE, fontWeight: 700, cursor: 'pointer', textTransform: 'uppercase' }}>
               {m === 'lista' ? '☰ Lista' : '⊞ Grade'}
             </button>
           ))}

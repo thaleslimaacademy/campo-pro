@@ -151,17 +151,17 @@ export default function Carteirinha() {
     <div style={{ minHeight: '100vh', background: '#F6F8F7', color: '#1F2937', fontFamily: INTER, paddingBottom: 80 }}>
 
       {/* HEADER */}
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 20px 20px' }}>
+      <div style={{ background: '#4169E1', padding: '20px 20px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <div style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Atleta</div>
-            <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 22, color: '#1F2937', letterSpacing: -0.5, textTransform: 'uppercase' }}>🪪 Carteirinha</div>
+            <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Atleta</div>
+            <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 22, color: '#F0F4FF', letterSpacing: -0.5, textTransform: 'uppercase' }}>🪪 Carteirinha</div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => setEditando(!editando)} style={{ background: '#EEF1EF', border: '1px solid rgba(16,24,40,0.18)', color: '#1F2937', borderRadius: 8, padding: '8px 14px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            <button onClick={() => setEditando(!editando)} style={{ background: 'rgba(240,244,255,0.15)', border: '1px solid rgba(240,244,255,0.2)', color: '#F0F4FF', borderRadius: 8, padding: '8px 14px', fontFamily: SYNE, fontWeight: 700, fontSize: 11, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: 0.5 }}>
               {editando ? 'Fechar' : '✏️ Editar'}
             </button>
-            <button onClick={imprimir} style={{ background: '#F0F4FF', color: '#2EA866', borderRadius: 8, padding: '8px 14px', fontFamily: SYNE, fontWeight: 800, fontSize: 11, border: 'none', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            <button onClick={imprimir} style={{ background: '#F0F4FF', color: '#4169E1', borderRadius: 8, padding: '8px 14px', fontFamily: SYNE, fontWeight: 800, fontSize: 11, border: 'none', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: 0.5 }}>
               🖨️ Imprimir
             </button>
           </div>

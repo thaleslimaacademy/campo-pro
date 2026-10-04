@@ -16,6 +16,7 @@ export const L = {
   warn: '#B45309',
   warnSoft: '#FEF3C7',
   blue: '#4169E1',
+  header: '#4169E1', // faixa do topo de cada tela
 }
 
 export const FONT_TITLE = 'Syne, sans-serif'

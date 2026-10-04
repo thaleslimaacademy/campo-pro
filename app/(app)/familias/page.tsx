@@ -57,10 +57,10 @@ function FamiliasInner() {
 
   return (
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, padding: '0 0 80px', fontFamily: 'Inter, sans-serif' }}>
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E3E8E5', padding: '20px 20px 16px' }}>
-        <div style={{ fontSize: 10, color: '#374151', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Financeiro</div>
-        <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: T.text, letterSpacing: -0.8, textTransform: 'uppercase' }}>
-          Famílias <span style={{ color: '#4B5563', fontStyle: 'italic' }}>{familias.length}</span>
+      <div style={{ background: '#4169E1', padding: '20px 20px 16px' }}>
+        <div style={{ fontSize: 10, color: 'rgba(240,244,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Financeiro</div>
+        <div style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 26, color: '#fff', letterSpacing: -0.8, textTransform: 'uppercase' }}>
+          Famílias <span style={{ color: '#7DD3FC', fontStyle: 'italic' }}>{familias.length}</span>
         </div>
       </div>
 
