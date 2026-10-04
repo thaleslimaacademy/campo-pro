@@ -58,3 +58,4 @@ app/build/
 *.bak
 
 *.bak
+Claude outputs/
