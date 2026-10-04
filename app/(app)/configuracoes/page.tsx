@@ -229,8 +229,8 @@ function ConfiguracoesInner() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
               <div><label style={labelStyle}>Desconto antecip. (R$)</label><input name="valorDesconto" value={form.valorDesconto} onChange={e => setForm(p => ({...p, valorDesconto: Number(e.target.value)}))} type="number" style={inputStyle} /></div>
-              <div><label style={labelStyle}>Multa atraso (R$)</label><input name="multaAtraso" value={form.multaAtraso} onChange={e => setForm(p => ({...p, multaAtraso: Number(e.target.value)}))} type="number" style={inputStyle} /></div>
-              <div><label style={labelStyle}>Juros/mes (%)</label><input name="jurosAoMes" value={form.jurosAoMes} onChange={e => setForm(p => ({...p, jurosAoMes: Number(e.target.value)}))} type="number" style={inputStyle} /></div>
+              <div><label style={labelStyle}>Multa atraso (%) — máx. 2</label><input name="multaAtraso" value={form.multaAtraso} onChange={e => setForm(p => ({...p, multaAtraso: Number(e.target.value)}))} type="number" style={inputStyle} /></div>
+              <div><label style={labelStyle}>Juros ao mês (%) — máx. 1</label><input name="jurosAoMes" value={form.jurosAoMes} onChange={e => setForm(p => ({...p, jurosAoMes: Number(e.target.value)}))} type="number" style={inputStyle} /></div>
             </div>
           </div>
         </div>

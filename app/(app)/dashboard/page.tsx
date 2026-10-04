@@ -8,47 +8,52 @@ import { usePerfil } from '@/lib/usePerfil'
 const brl = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n || 0)
 
 const MODULOS_ADMIN = [
-  { href: '/atletas',                   label: 'Atletas',          icon: 'ti-users',          grupo: 'elenco' },
-  { href: '/presenca',                  label: 'Presenca',         icon: 'ti-check',          grupo: 'elenco' },
-  { href: '/turmas',                    label: 'Turmas',           icon: 'ti-run',            grupo: 'elenco' },
-  { href: '/modalidades',               label: 'Modalidades',      icon: 'ti-ball-football',  grupo: 'elenco' },
-  { href: '/locais',                    label: 'Locais',           icon: 'ti-map-pin',        grupo: 'elenco' },
-  { href: '/categorias',               label: 'Categorias',       icon: 'ti-tag',            grupo: 'elenco' },
-  { href: '/financeiro/dashboard',      label: 'Dashboard',        icon: 'ti-chart-bar',      grupo: 'financeiro' },
-  { href: '/financeiro/caixa',          label: 'Caixa',            icon: 'ti-cash',           grupo: 'financeiro' },
-  { href: '/financeiro/boleto',         label: 'Boleto',           icon: 'ti-file-invoice',   grupo: 'financeiro' },
-  { href: '/financeiro/mensalidades',   label: 'Mensalidades',     icon: 'ti-credit-card',    grupo: 'financeiro' },
-  { href: '/nps',                         label: 'NPS',               icon: 'ti-mood-happy',     grupo: 'financeiro' },
-  { href: '/financeiro/patrocinadores', label: 'Patrocinadores',   icon: 'ti-building-bank',  grupo: 'financeiro' },
-  { href: '/premios',                   label: 'Premiacoes',       icon: 'ti-medal',          grupo: 'comissao' },
-  { href: '/convocacao',                label: 'Convocacoes',      icon: 'ti-clipboard-list', grupo: 'comissao' },
-  { href: '/treinamentos',              label: 'Treinamentos',     icon: 'ti-chalkboard',     grupo: 'comissao' },
-  { href: '/comissao',                  label: 'Comissao Tecnica', icon: 'ti-users-group',    grupo: 'comissao' },
-  { href: '/campeonato',                label: 'Campeonatos',      icon: 'ti-trophy',         grupo: 'competicao' },
-  { href: '/mensagens',                 label: 'Mensagens',        icon: 'ti-message-circle', grupo: 'outros' },
-  { href: '/matriculas',                label: 'Matriculas',       icon: 'ti-clipboard-list', grupo: 'outros' },
-  { href: '/fotos',                     label: 'Fotos',            icon: 'ti-photo',          grupo: 'outros' },
-  { href: '/estoque',                   label: 'Loja',             icon: 'ti-shopping-bag',   grupo: 'outros' },
-  { href: '/atletas/importar',          label: 'Importar',         icon: 'ti-download',       grupo: 'outros' },
-  { href: '/configuracoes',             label: 'Config',           icon: 'ti-settings',       grupo: 'outros' },
+  { href: '/atletas',                   label: 'Atletas',            icon: 'ti-users',          grupo: 'elenco' },
+  { href: '/turmas',                    label: 'Turmas',             icon: 'ti-run',            grupo: 'elenco' },
+  { href: '/categorias',                label: 'Categorias',         icon: 'ti-tag',            grupo: 'elenco' },
+  { href: '/presenca',                  label: 'Presença',           icon: 'ti-check',          grupo: 'elenco' },
+  { href: '/modalidades',               label: 'Modalidades',        icon: 'ti-ball-football',  grupo: 'elenco' },
+  { href: '/locais',                    label: 'Locais de treino',   icon: 'ti-map-pin',        grupo: 'elenco' },
+  { href: '/matriculas',                label: 'Pré-matrículas',     icon: 'ti-clipboard-list', grupo: 'matriculas' },
+  { href: '/rematriculas',              label: 'Rematrículas',       icon: 'ti-refresh',        grupo: 'matriculas' },
+  { href: '/familias',                  label: 'Famílias (irmãos)',  icon: 'ti-users-group',    grupo: 'matriculas' },
+  { href: '/financeiro/dashboard',      label: 'Painel financeiro',  icon: 'ti-chart-bar',      grupo: 'financeiro' },
+  { href: '/financeiro/mensalidades',   label: 'Mensalidades',       icon: 'ti-credit-card',    grupo: 'financeiro' },
+  { href: '/financeiro/valores',        label: 'Planos e Valores',   icon: 'ti-currency-real',  grupo: 'financeiro' },
+  { href: '/financeiro/boleto',         label: 'Boleto',             icon: 'ti-file-invoice',   grupo: 'financeiro' },
+  { href: '/financeiro/caixa',          label: 'Caixa',              icon: 'ti-cash',           grupo: 'financeiro' },
+  { href: '/financeiro/patrocinadores', label: 'Patrocinadores',     icon: 'ti-building-bank',  grupo: 'financeiro' },
+  { href: '/campeonato',                label: 'Campeonatos',        icon: 'ti-trophy',         grupo: 'esportivo' },
+  { href: '/convocacao',                label: 'Convocações',        icon: 'ti-clipboard-list', grupo: 'esportivo' },
+  { href: '/treinamentos',              label: 'Treinamentos',       icon: 'ti-chalkboard',     grupo: 'esportivo' },
+  { href: '/premios',                   label: 'Premiações',         icon: 'ti-medal',          grupo: 'esportivo' },
+  { href: '/comissao',                  label: 'Comissão técnica',   icon: 'ti-users-group',    grupo: 'esportivo' },
+  { href: '/mensagens',                 label: 'Mensagens',          icon: 'ti-message-circle', grupo: 'comunicacao' },
+  { href: '/nps',                       label: 'Pesquisa NPS',       icon: 'ti-mood-happy',     grupo: 'comunicacao' },
+  { href: '/estoque',                   label: 'Loja e estoque',     icon: 'ti-shopping-bag',   grupo: 'loja' },
+  { href: '/fotos',                     label: 'Fotos',              icon: 'ti-photo',          grupo: 'loja' },
+  { href: '/configuracoes',             label: 'Configurações',      icon: 'ti-settings',       grupo: 'config' },
+  { href: '/atletas/importar',          label: 'Importar atletas',   icon: 'ti-download',       grupo: 'config' },
 ]
 
 const MODULOS_PROFESSOR = [
   { href: '/atletas',      label: 'Atletas',      icon: 'ti-users',          grupo: 'elenco' },
-  { href: '/presenca',     label: 'Presenca',     icon: 'ti-check',          grupo: 'elenco' },
+  { href: '/presenca',     label: 'Presença',     icon: 'ti-check',          grupo: 'elenco' },
   { href: '/turmas',       label: 'Turmas',       icon: 'ti-run',            grupo: 'elenco' },
-  { href: '/campeonato',   label: 'Campeonatos',  icon: 'ti-trophy',         grupo: 'competicao' },
-  { href: '/convocacao',   label: 'Convocacoes',  icon: 'ti-clipboard-list', grupo: 'comissao' },
-  { href: '/premios',      label: 'Premiacoes',   icon: 'ti-medal',          grupo: 'comissao' },
-  { href: '/treinamentos', label: 'Treinamentos', icon: 'ti-chalkboard',     grupo: 'comissao' },
+  { href: '/campeonato',   label: 'Campeonatos',  icon: 'ti-trophy',         grupo: 'esportivo' },
+  { href: '/convocacao',   label: 'Convocações',  icon: 'ti-clipboard-list', grupo: 'esportivo' },
+  { href: '/premios',      label: 'Premiações',   icon: 'ti-medal',          grupo: 'esportivo' },
+  { href: '/treinamentos', label: 'Treinamentos', icon: 'ti-chalkboard',     grupo: 'esportivo' },
 ]
 
 const GRUPOS = [
-  { key: 'elenco',      label: 'Elenco',           icon: 'ti-users'           },
-  { key: 'financeiro',  label: 'Financeiro',        icon: 'ti-wallet'          },
-  { key: 'comissao',    label: 'Comissao Tecnica',  icon: 'ti-clipboard-check' },
-  { key: 'competicao',  label: 'Competicao',        icon: 'ti-trophy'          },
-  { key: 'outros',      label: 'Ferramentas',       icon: 'ti-tool'            },
+  { key: 'elenco',      label: 'Atletas',        icon: 'ti-users'           },
+  { key: 'matriculas',  label: 'Matrículas',     icon: 'ti-clipboard-list'  },
+  { key: 'financeiro',  label: 'Financeiro',     icon: 'ti-wallet'          },
+  { key: 'esportivo',   label: 'Esportivo',      icon: 'ti-trophy'          },
+  { key: 'comunicacao', label: 'Comunicação',    icon: 'ti-message-circle'  },
+  { key: 'loja',        label: 'Loja e fotos',   icon: 'ti-shopping-bag'    },
+  { key: 'config',      label: 'Configurações',  icon: 'ti-settings'        },
 ]
 
 // Paleta balanceada - fundo neutro escuro, azul nos acentos
@@ -68,7 +73,7 @@ const C = {
 export default function Dashboard() {
   const { isAdmin, isLoaded, escolaId, role } = usePerfil()
   const MODULOS = role === 'diretor'
-    ? MODULOS_ADMIN.filter(m => m.href !== '/configuracoes' && m.href !== '/atletas/importar')
+    ? MODULOS_ADMIN.filter(m => m.grupo !== 'config')
     : role === 'preparador'
     ? [
         { href: '/atletas',      label: 'Atletas',      icon: 'ti-users',      grupo: 'elenco' },
@@ -90,7 +95,7 @@ export default function Dashboard() {
   const [pagasV, setPagasV] = useState(0)
   const [loading, setLoading] = useState(true)
   const [gruposAbertos, setGruposAbertos] = useState<Record<string, boolean>>({
-    elenco: true, financeiro: false, competicao: false, outros: false, comissao: false,
+    elenco: true, matriculas: false, financeiro: false, esportivo: false, comunicacao: false, loja: false, config: false,
   })
 
   const hoje = new Date()
