@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { cronAutorizado } from '@/lib/cronAuth'
+import { podeFinanceiro } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getAsaasKey } from '@/lib/getAsaasKey'
 
@@ -141,18 +142,12 @@ export async function GET(req: NextRequest) {
   // Aceita: cron da Vercel, chamada com CRON_SECRET, ou admin logado
   // (pra voce conseguir rodar pelo navegador). Esta rota pode CANCELAR
   // cobranca — nao pode ficar aberta.
-  const authHeader = req.headers.get('authorization')
-  const isVercelCron = (req.headers.get('user-agent') || '').includes('vercel-cron')
-    || req.headers.get('x-vercel-cron') !== null
-  const temSegredo = authHeader === 'Bearer ' + process.env.CRON_SECRET
+  // Antes: qualquer usuario logado (ate um responsavel) passava, e
+  // ?modo=cancelar cancela cobranca. Agora so cron autenticado ou admin/diretor.
+  const ehCron = cronAutorizado(req)
+  const ehAdmin = ehCron ? false : await podeFinanceiro().catch(() => false)
 
-  let ehAdmin = false
-  try {
-    const { userId } = await auth()
-    ehAdmin = !!userId
-  } catch { ehAdmin = false }
-
-  if (!isVercelCron && !temSegredo && !ehAdmin) {
+  if (!ehCron && !ehAdmin) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

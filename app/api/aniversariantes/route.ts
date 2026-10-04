@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cronAutorizado } from '@/lib/cronAuth'
 import { supabaseAdmin } from '@/lib/supabase'
 // TODO: sem template proprio, so alcanca quem escreveu pro numero nas
 // ultimas 24h (janela de conversa da Meta). Migrar pra um template
@@ -14,9 +15,7 @@ function aplicarVariaveis(template: string, vars: Record<string, string>): strin
 }
 
 export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get('authorization')
-  const isVercelCron = req.headers.get('x-vercel-cron') === '1'
-  if (!isVercelCron && authHeader !== 'Bearer ' + process.env.CRON_SECRET) {
+  if (!cronAutorizado(req)) {
     return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 })
   }
 

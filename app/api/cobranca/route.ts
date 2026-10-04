@@ -3,7 +3,7 @@ import { criarCobrancaPix, getPixQrCode, cancelarCobrancaAsaas } from '@/lib/asa
 import { garantirClienteAsaas } from '@/lib/asaasCliente'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getAsaasKey } from '@/lib/getAsaasKey'
-import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
+import { sessaoFinanceiroApi } from '@/lib/apiAuth'
 import { msgLembreteD3, msgVencimentoHoje } from '@/lib/whatsapp-templates'
 
 /**
@@ -19,15 +19,21 @@ const DIAS_ANTECEDENCIA_ENVIO = 3
 
 export async function POST(req: NextRequest) {
   try {
+    // So admin/diretor da escola. Antes qualquer usuario logado (inclusive
+    // de outra escola) gerava cobranca para qualquer atletaId.
+    const sessao = await sessaoFinanceiroApi()
+    if (sessao instanceof NextResponse) return sessao
+    const escolaId = sessao.escolaId
+
     const body = await req.json()
     const { atletaId, valor, vencimento, descricao, desconto, forcar } = body
     if (!atletaId || !valor || !vencimento) return NextResponse.json({ error: 'Campos obrigatórios: atletaId, valor, vencimento' }, { status: 400 })
-    const escolaId = await getEscolaIdServer()
+    if (!(Number(valor) > 0)) return NextResponse.json({ error: 'Valor inválido' }, { status: 400 })
     const apiKey = await getAsaasKey(escolaId)
     const { data: escola } = await supabaseAdmin.from('Escola').select('multaAtraso, jurosAoMes, nome').eq('id', escolaId).single()
     const multaAtraso = Number(escola?.multaAtraso || 0)
     const jurosAoMes = Number(escola?.jurosAoMes || 0)
-    const { data: atleta } = await supabaseAdmin.from('Atleta').select('*').eq('id', atletaId).single()
+    const { data: atleta } = await supabaseAdmin.from('Atleta').select('*').eq('id', atletaId).eq('escolaId', escolaId).maybeSingle()
     if (!atleta) return NextResponse.json({ error: 'Atleta não encontrado' }, { status: 404 })
 
     // ── TRAVA DE DUPLICATA ────────────────────────────────────────────

@@ -1,7 +1,7 @@
 'use server'
 
 import { supabaseAdmin } from '@/lib/supabase'
-import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
+import { requireFinanceiro } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 
 type AtletaDaFamilia = {
@@ -12,8 +12,11 @@ type AtletaDaFamilia = {
   diaVencimento: number | null
 }
 
+// Todas as acoes exigem admin/diretor e filtram pela escola da sessao.
+// Antes confirmar/rejeitar/desvincular aceitavam qualquer id, de qualquer escola.
+
 export async function listarFamiliasPendentes() {
-  const escolaId = await getEscolaIdServer()
+  const { escolaId } = await requireFinanceiro()
 
   const { data: familiasData } = await supabaseAdmin
     .from('Familia')
@@ -39,6 +42,7 @@ export async function listarFamiliasPendentes() {
 }
 
 export async function confirmarFamilia(familiaId: string) {
+  const { escolaId } = await requireFinanceiro()
   // trava de segurança: só confirma se todos os atletas da família
   // tiverem o MESMO dia de vencimento — senão a cobrança conjunta não
   // fecha (um PIX só, um vencimento só).
@@ -46,6 +50,7 @@ export async function confirmarFamilia(familiaId: string) {
     .from('Atleta')
     .select('diaVencimento')
     .eq('familiaId', familiaId)
+    .eq('escolaId', escolaId)
   const atletas = (atletasData ?? []) as { diaVencimento: number | null }[]
 
   const diasVencimento = new Set(atletas.map((a) => a.diaVencimento))
@@ -57,25 +62,34 @@ export async function confirmarFamilia(familiaId: string) {
     }
   }
 
-  await supabaseAdmin
+  const { data: ok } = await supabaseAdmin
     .from('Familia')
     .update({ status: 'CONFIRMADA', confirmadoEm: new Date().toISOString() })
     .eq('id', familiaId)
+    .eq('escolaId', escolaId)
+    .select('id')
+  if (!ok?.length) return { ok: false, erro: 'Família não encontrada.' }
 
   revalidatePath('/familias')
   return { ok: true }
 }
 
 export async function rejeitarFamilia(familiaId: string) {
-  await supabaseAdmin.from('Atleta').update({ familiaId: null }).eq('familiaId', familiaId)
-  await supabaseAdmin.from('Familia').update({ status: 'REJEITADA' }).eq('id', familiaId)
+  const { escolaId } = await requireFinanceiro()
+  const { data: fam } = await supabaseAdmin.from('Familia').select('id').eq('id', familiaId).eq('escolaId', escolaId).maybeSingle()
+  if (!fam) return { ok: false, erro: 'Família não encontrada.' }
+  await supabaseAdmin.from('Atleta').update({ familiaId: null }).eq('familiaId', familiaId).eq('escolaId', escolaId)
+  await supabaseAdmin.from('Familia').update({ status: 'REJEITADA' }).eq('id', familiaId).eq('escolaId', escolaId)
 
   revalidatePath('/familias')
   return { ok: true }
 }
 
 export async function desvincularAtleta(atletaId: string, familiaId: string) {
-  await supabaseAdmin.from('Atleta').update({ familiaId: null }).eq('id', atletaId)
+  const { escolaId } = await requireFinanceiro()
+  const { data: fam } = await supabaseAdmin.from('Familia').select('id').eq('id', familiaId).eq('escolaId', escolaId).maybeSingle()
+  if (!fam) return { ok: false, erro: 'Família não encontrada.' }
+  await supabaseAdmin.from('Atleta').update({ familiaId: null }).eq('id', atletaId).eq('familiaId', familiaId).eq('escolaId', escolaId)
 
   // se sobrou só 1 atleta (ou 0) na família, ela deixa de fazer sentido
   const { data: restantes } = await supabaseAdmin.from('Atleta').select('id').eq('familiaId', familiaId)

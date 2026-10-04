@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
+import { getSessao, PAPEIS_FINANCEIRO } from '@/lib/auth'
 import { cancelarPixDaCobranca, CAMPOS_PIX_LIMPOS } from '@/lib/cancelarPixDaCobranca'
 import { msgLembreteD3, msgVencimentoHoje, msgAtraso } from '@/lib/whatsapp-templates'
 
@@ -11,9 +11,11 @@ import { msgLembreteD3, msgVencimentoHoje, msgAtraso } from '@/lib/whatsapp-temp
  * Toda operacao passa por aqui primeiro e depois filtra por escolaId.
  */
 async function escolaDaSessao(): Promise<string | null> {
+  // So admin/diretor: professor e responsavel nao dao baixa nem excluem cobranca.
   try {
-    const escolaId = await getEscolaIdServer()
-    return escolaId || null
+    const s = await getSessao()
+    if (!s || !s.ativo || !PAPEIS_FINANCEIRO.includes(s.perfil)) return null
+    return s.escolaId || null
   } catch {
     return null
   }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { sessaoFinanceiroApi } from '@/lib/apiAuth'
 import { supabaseAdmin } from '@/lib/supabase'
 import { msgLembreteD3, msgVencimentoHoje } from '@/lib/whatsapp-templates'
 import { dataVencimentoNoMes } from '@/lib/dataVencimento'
@@ -18,21 +18,26 @@ import { dataVencimentoNoMes } from '@/lib/dataVencimento'
 const DIAS_ANTECEDENCIA_ENVIO = 3
 
 export async function POST(req: NextRequest) {
-  const { userId } = await auth()
-  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // escolaId vem SEMPRE da sessao. Antes vinha do body: qualquer usuario
+  // logado criava cobranca em qualquer escola.
+  const sessao = await sessaoFinanceiroApi()
+  if (sessao instanceof NextResponse) return sessao
+  const escolaId = sessao.escolaId
 
-  const { atletaId, escolaId, valor, diaVencimento, periodo, forcar } = await req.json()
+  const { atletaId, valor, diaVencimento, periodo, forcar } = await req.json()
+  if (!atletaId || !(Number(valor) > 0)) return NextResponse.json({ error: 'atletaId e valor sao obrigatorios' }, { status: 400 })
 
   // Atleta.whatsappResponsavel e Atleta.nomeResponsavel NAO existem no schema.
   // O select antigo pedia essas colunas, dava erro, atleta virava null — e por
   // isso o WhatsApp nunca era enviado e a cobranca nascia sem atletaNome.
   // O responsavel mora na tabela Responsavel.
   const [atletaRes, escolaRes, respRes] = await Promise.all([
-    supabaseAdmin.from('Atleta').select('nome').eq('id', atletaId).single(),
+    supabaseAdmin.from('Atleta').select('nome').eq('id', atletaId).eq('escolaId', escolaId).maybeSingle(),
     supabaseAdmin.from('Escola').select('nome').eq('id', escolaId).single(),
     supabaseAdmin.from('Responsavel').select('nome, whatsapp, telefone').eq('atletaId', atletaId).eq('principal', true).limit(1),
   ])
   const atleta     = atletaRes.data
+  if (!atleta) return NextResponse.json({ error: 'Atleta nao encontrado nesta escola' }, { status: 404 })
   const resp       = respRes.data?.[0] || null
   const respWhats  = resp?.whatsapp || resp?.telefone || null
 
@@ -138,15 +143,17 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const { userId } = await auth()
-  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const sessao = await sessaoFinanceiroApi()
+  if (sessao instanceof NextResponse) return sessao
   const { cobrancaId, valorPago, formaPagamento } = await req.json()
-  const { error } = await supabaseAdmin.from('Cobranca').update({
+  if (!cobrancaId) return NextResponse.json({ error: 'cobrancaId obrigatorio' }, { status: 400 })
+  const { data, error } = await supabaseAdmin.from('Cobranca').update({
     status: 'PAGO', pagoEm: new Date().toISOString(),
     valorPago: valorPago || null, baixaManual: true,
-    baixaManualEm: new Date().toISOString(), baixaManualPor: userId,
+    baixaManualEm: new Date().toISOString(), baixaManualPor: sessao.clerkUserId,
     tipo: formaPagamento || 'MANUAL',
-  }).eq('id', cobrancaId)
+  }).eq('id', cobrancaId).eq('escolaId', sessao.escolaId).select('id')
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (!data?.length) return NextResponse.json({ error: 'Cobranca nao encontrada nesta escola' }, { status: 404 })
   return NextResponse.json({ ok: true })
 }

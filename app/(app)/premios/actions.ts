@@ -1,5 +1,6 @@
 'use server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { enviarPush } from '@/lib/push'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 
 export async function listarAtletasParaPremio() {
@@ -97,18 +98,9 @@ export async function concederPremio(atletaId: string, titulo: string, icone: st
   })
   if (error) throw new Error(error.message)
 
-  // Enviar push notification para os pais
+  // Enviar push notification para os pais (direto, sem passar pela API publica)
   try {
-    await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://gestaofc.com.br'}/api/push/send`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        atletaId,
-        title: `${icone} Nova conquista!`,
-        body: `${titulo} — ${descricao}`,
-        url: '/',
-      }),
-    })
+    await enviarPush({ escolaId, atletaId, title: `${icone} Nova conquista!`, body: `${titulo} — ${descricao}`, url: '/' })
   } catch {}
 
   // Enviar e-mail para os responsaveis com e-mail cadastrado

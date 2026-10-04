@@ -1,16 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { msgMatriculaAprovada, msgMatriculaRecusada } from '@/lib/whatsapp-templates'
+import { sessaoFinanceiroApi } from '@/lib/apiAuth'
 
 export async function POST(req: NextRequest) {
   try {
-    const { whatsapp, nomeResponsavel, nomeAtleta, tokenPais, tipo, escolaId } = await req.json()
+    // Antes era publica: qualquer pessoa disparava template da Meta para
+    // qualquer numero (custo e risco de bloqueio do numero). Agora exige
+    // admin/diretor logado e usa a escola da sessao.
+    const sessao = await sessaoFinanceiroApi()
+    if (sessao instanceof NextResponse) return sessao
+    const escolaId = sessao.escolaId
+    const { whatsapp, nomeResponsavel, nomeAtleta, tokenPais, tipo } = await req.json()
+    if (!whatsapp) return NextResponse.json({ error: 'whatsapp obrigatorio' }, { status: 400 })
 
     // Busca dados da escola para personalizar a mensagem
     const { data: escola } = await supabaseAdmin
       .from('Escola')
       .select('nome, whatsapp, cidade, estado')
-      .eq('id', escolaId || 'escola-demo')
+      .eq('id', escolaId)
       .single()
 
     const nomeEscola = escola?.nome?.includes('—')

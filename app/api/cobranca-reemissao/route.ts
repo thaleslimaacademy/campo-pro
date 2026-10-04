@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cronAutorizado } from '@/lib/cronAuth'
 import { supabaseAdmin } from '@/lib/supabase'
 import { msgLembreteD3, msgVencimentoHoje, msgAtraso } from '@/lib/whatsapp-templates'
 import { gerarPixOuAgregarFamilia } from '@/lib/cobrancaFamilia'
@@ -130,10 +131,9 @@ async function garantirMensalidadesFuturas(meses: number) {
 }
 
 export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get('authorization')
-  const isVercelCron = req.headers.get('x-vercel-cron') === '1'
-  if (!isVercelCron && authHeader !== 'Bearer ' + process.env.CRON_SECRET)
+  if (!cronAutorizado(req)) {
     return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 })
+  }
 
   const hoje = dataComOffset(0)
 

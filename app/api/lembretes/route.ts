@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cronAutorizado } from '@/lib/cronAuth'
 import { supabaseAdmin } from '@/lib/supabase'
 import { enviarWhatsApp } from '@/lib/whatsapp'
 
@@ -11,9 +12,7 @@ function aplicarVariaveis(template: string, vars: Record<string, string>): strin
 }
 
 export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get('authorization')
-  const isVercelCron = req.headers.get('x-vercel-cron') === '1'
-  if (!isVercelCron && authHeader !== 'Bearer ' + process.env.CRON_SECRET) {
+  if (!cronAutorizado(req)) {
     return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 })
   }
 

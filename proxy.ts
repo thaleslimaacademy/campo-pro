@@ -4,16 +4,19 @@ import { NextResponse } from 'next/server'
 const isPublicRoute = createRouteMatcher([
   '/login(.*)', '/acesso-negado(.*)', '/matricula(.*)', '/rematricula(.*)',
   '/convite(.*)', '/qrcode(.*)', '/planos(.*)', '/api/webhook(.*)',
-  '/api/lembretes(.*)', '/api/cobranca(.*)', '/api/perfil(.*)', '/api/conciliacao-asaas(.*)',
+  '/api/lembretes(.*)', '/api/perfil(.*)', '/api/conciliacao-asaas(.*)',
+  // crons (autenticados por CRON_SECRET dentro da rota)
+  '/api/cobranca-reemissao(.*)', '/api/cobranca-mensal(.*)',
   '/api/inadimplentes(.*)', '/api/atleta-turma(.*)', '/home(.*)', '/api/aniversariantes(.*)', '/logout(.*)',
   '/pagar(.*)', '/pagar-atleta(.*)', '/convocacao(.*)', '/api/notificar-convocacao(.*)',
-  '/api/pagar(.*)', '/api/pagar-atleta(.*)', '/api/whatsapp-aprovacao(.*)', '/galeria(.*)',
+  '/api/pagar(.*)', '/api/pagar-atleta(.*)', '/galeria(.*)',
   '/fotos-compra(.*)', '/api/fotos-compra(.*)',
   '/loja(.*)', '/pais(.*)', '/onboarding(.*)',
   '/sign-up(.*)', '/',
   '/privacidade(.*)', '/excluir-conta(.*)',
-  '/nps(.*)', '/api/push(.*)', '/api/matricula(.*)',
-  '/api/cobranca-manual(.*)',
+  '/nps(.*)', '/api/push/subscribe(.*)', '/api/matricula(.*)',
+  // /api/cobranca, /api/cobranca/acao, /cancelar e /api/cobranca-manual
+  // NAO sao publicas: exigem login (e papel financeiro dentro da rota).
 ])
 
 export default clerkMiddleware(async (auth, req) => {
