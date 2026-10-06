@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
+import { avisarPagamentoSeguro } from '@/lib/avisoPagamento'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getSessao, PAPEIS_FINANCEIRO } from '@/lib/auth'
 import { cancelarPixDaCobranca, CAMPOS_PIX_LIMPOS } from '@/lib/cancelarPixDaCobranca'
@@ -63,6 +64,8 @@ export async function PATCH(req: NextRequest) {
     .eq('escolaId', escolaId)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  after(() => avisarPagamentoSeguro(cobrancaId, escolaId))
 
   return NextResponse.json({
     ok: true,

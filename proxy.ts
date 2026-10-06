@@ -14,7 +14,7 @@ const isPublicRoute = createRouteMatcher([
   '/loja(.*)', '/pais(.*)', '/onboarding(.*)',
   '/sign-up(.*)', '/',
   '/privacidade(.*)', '/excluir-conta(.*)',
-  '/nps(.*)', '/api/push/subscribe(.*)', '/api/matricula(.*)',
+  '/nps(.*)', '/api/push/subscribe(.*)', '/api/matricula(.*)', '/api/manifest(.*)', '/recibo(.*)',
   // /api/cobranca, /api/cobranca/acao, /cancelar e /api/cobranca-manual
   // NAO sao publicas: exigem login (e papel financeiro dentro da rota).
 ])

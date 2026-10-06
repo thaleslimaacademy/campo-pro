@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { waitUntil } from '@vercel/functions'
 import { supabaseAdmin } from '@/lib/supabase'
-import { msgPagamentoConfirmado, msgFotosProntas, msgPedidoConfirmado, msgPlanoAtivado } from '@/lib/whatsapp-templates'
+import { msgFotosProntas, msgPedidoConfirmado, msgPlanoAtivado } from '@/lib/whatsapp-templates'
+import { avisarPagamentoSeguro } from '@/lib/avisoPagamento'
 import { baixarCobrancaFamilia } from '@/lib/cobrancaFamilia'
 
 const STATUS_MAP: Record<string, string> = {
@@ -168,28 +169,9 @@ async function processar(body: Record<string, unknown>) {
           await baixarCobrancaFamilia(cobranca.id)
         }
 
-        if (cobranca?.atletaId) {
-          const [{ data: atleta }, { data: responsavel }] = await Promise.all([
-            supabaseAdmin.from('Atleta').select('nome').eq('id', cobranca.atletaId).single(),
-            supabaseAdmin.from('Responsavel').select('nome, whatsapp').eq('atletaId', cobranca.atletaId).eq('principal', true).maybeSingle(),
-          ])
-
-          if (responsavel?.whatsapp) {
-            // Template aprovado da Meta (pagamento_confirmado) via
-            // whatsapp-templates, que ja decide Meta vs Evolution sozinho.
-            // Texto livre nao serve aqui: fora da janela de 24h a Meta recusa.
-            await msgPagamentoConfirmado({
-              telefone: responsavel.whatsapp,
-              nomeResp: responsavel.nome?.split(' ')[0] || 'Responsável',
-              nomeAtleta: atleta?.nome || '-',
-              // valor efetivamente pago (com multa/juros se houve atraso),
-              // com o valor de face como fallback
-              valor: Number(pagamento.value ?? cobranca.valor),
-              referencia: cobranca.descricao || 'Mensalidade',
-              escolaId: cobranca.escolaId,
-            })
-          }
-        }
+        // Aviso + link do recibo (push e WhatsApp). Idempotente: o Asaas manda
+        // PAYMENT_RECEIVED e PAYMENT_CONFIRMED, mas o pai recebe uma vez so.
+        if (cobranca?.id) await avisarPagamentoSeguro(cobranca.id)
       } catch (e) { console.error('Erro WhatsApp confirmação:', (e as Error).message) }
     }
   } catch (err) {

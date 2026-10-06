@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
+import { avisarPagamentoSeguro } from '@/lib/avisoPagamento'
 import { sessaoFinanceiroApi } from '@/lib/apiAuth'
 import { supabaseAdmin } from '@/lib/supabase'
 import { msgLembreteD3, msgVencimentoHoje } from '@/lib/whatsapp-templates'
@@ -155,5 +156,6 @@ export async function PATCH(req: NextRequest) {
   }).eq('id', cobrancaId).eq('escolaId', sessao.escolaId).select('id')
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   if (!data?.length) return NextResponse.json({ error: 'Cobranca nao encontrada nesta escola' }, { status: 404 })
+  after(() => avisarPagamentoSeguro(cobrancaId, sessao.escolaId))
   return NextResponse.json({ ok: true })
 }

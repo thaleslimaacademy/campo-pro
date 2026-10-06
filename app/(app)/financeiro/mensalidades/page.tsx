@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
-import { Trash2, RotateCcw, Plus, Loader2, FileText, Search, X } from 'lucide-react'
-import { listarMensalidades, listarAtletas, gerarMensalidades, softDeleteCobranca, restaurarCobranca, excluirDefinitivo, marcarPago, cancelarCobranca } from './actions'
+import { Trash2, RotateCcw, Plus, Loader2, FileText, Search, X, Send } from 'lucide-react'
+import { listarMensalidades, listarAtletas, gerarMensalidades, softDeleteCobranca, restaurarCobranca, excluirDefinitivo, marcarPago, cancelarCobranca, reenviarRecibo } from './actions'
 import { gerarRecibo } from '@/lib/gerarRecibo'
 
 const T = { bg: '#F6F8F7', surface: '#FFFFFF', primary: '#2EA866', accent: '#23874F', text: '#1F2937', muted: '#6B7280', border: 'rgba(16,24,40,0.1)', green: '#16A34A', red: '#DC2626', gold: '#B7791F' }
@@ -13,7 +13,7 @@ const dataBR = (c: string | null) => (c ? c.slice(0, 10).split('-').reverse().jo
 const labelStatus = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()
 const corStatus = (s: string) => ({ PAGO: T.green, PENDENTE: T.gold, VENCIDO: T.red, CANCELADO: '#555' } as Record<string, string>)[s] ?? '#555'
 
-type Cobranca = { id: string; valor: number; status: string; competencia: string | null; vencimento: string | null; descricao: string | null; excluidaEm: string | null; atletaNome?: string | null; pagoEm?: string | null; atleta?: { nome: string } | null; pixCopiaCola?: string | null; pixQrCode?: string | null }
+type Cobranca = { id: string; valor: number; status: string; competencia: string | null; vencimento: string | null; descricao: string | null; excluidaEm: string | null; atletaNome?: string | null; pagoEm?: string | null; atleta?: { nome: string } | null; pixCopiaCola?: string | null; pixQrCode?: string | null; avisoPagamentoStatus?: string | null; avisoPagamentoDetalhe?: string | null; avisoPagamentoEm?: string | null }
 const STATUS = [{ key: 'todas', label: 'Todas' }, { key: 'PENDENTE', label: 'Pendentes' }, { key: 'PAGO', label: 'Pagas' }, { key: 'VENCIDO', label: 'Vencidas' }, { key: 'CANCELADO', label: 'Canceladas' }]
 const INP: React.CSSProperties = { background: '#F6F8F7', border: '1px solid rgba(16,24,40,0.1)', borderRadius: 8, padding: '10px 12px', color: T.text, fontSize: 13, width: '100%' }
 
@@ -72,7 +72,23 @@ export default function MensalidadesPage() {
     finally { setSalvando(false) }
   }
 
-  const marcar = async (id: string) => { await marcarPago(id); await carregar() }
+  const marcar = async (id: string) => {
+    if (!confirm('Confirmar o pagamento? O responsável recebe o aviso com o link do recibo.')) return
+    await marcarPago(id); await carregar()
+    // o aviso sai em segundo plano: recarrega de novo para mostrar o resultado
+    setTimeout(() => { carregar() }, 6000)
+  }
+  const [reenviando, setReenviando] = useState<string | null>(null)
+  const reenviar = async (id: string) => {
+    if (!confirm('Reenviar o aviso de pagamento com o link do recibo para o responsável?')) return
+    setReenviando(id)
+    try {
+      const r = await reenviarRecibo(id)
+      alert(r.status === 'ENVIADO' ? `Recibo enviado ✅\n${r.detalhe}` : `Não foi entregue ⚠️\n${r.detalhe}`)
+      await carregar()
+    } catch (e) { alert('Erro: ' + (e as Error).message) }
+    finally { setReenviando(null) }
+  }
   const cancelar = async (id: string) => { if (!confirm('Cancelar esta cobrança?')) return; await cancelarCobranca(id); await carregar() }
   const apagar = async (id: string) => { if (!confirm('Apagar da lista?')) return; await softDeleteCobranca(id); await carregar() }
   const restaurar = async (id: string) => { await restaurarCobranca(id); await carregar() }
@@ -183,11 +199,17 @@ export default function MensalidadesPage() {
                         <td style={{ padding: '12px 16px', color: T.muted }}>{dataBR(c.vencimento)}</td>
                         <td style={{ padding: '12px 16px' }}>
                           <span style={{ color: corStatus(c.status), fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5 }}>{excluida ? 'Excluída' : labelStatus(c.status)}</span>
+                          {!excluida && c.status === 'PAGO' && <AvisoRecibo status={c.avisoPagamentoStatus} detalhe={c.avisoPagamentoDetalhe} />}
                         </td>
                         <td style={{ padding: '12px 16px', textAlign: 'right' }}>
                           <span style={{ display: 'inline-flex', gap: 5, alignItems: 'center' }}>
                             {!excluida && c.status === 'PAGO' && (
-                              <button onClick={() => gerarReciboCobranca(c)} style={ICON_BTN} title="Gerar recibo"><FileText size={14} /></button>
+                              <>
+                                <button onClick={() => gerarReciboCobranca(c)} style={ICON_BTN} title="Baixar recibo (PDF)"><FileText size={14} /></button>
+                                <button onClick={() => reenviar(c.id)} disabled={reenviando === c.id} style={{ ...ICON_BTN, color: '#4169E1' }} title="Reenviar recibo ao responsável">
+                                  {reenviando === c.id ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+                                </button>
+                              </>
                             )}
                             {!excluida && c.pixCopiaCola && (
                               <button onClick={() => setModalPix(c)} style={{ ...ICON_BTN, color: '#16A34A' }} title="Ver código PIX">⚡</button>
@@ -254,6 +276,18 @@ export default function MensalidadesPage() {
 
 function Campo({ label, children }: { label: string; children: React.ReactNode }) {
   return <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 10, color: '#6B7280', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}{children}</label>
+}
+
+function AvisoRecibo({ status, detalhe }: { status?: string | null; detalhe?: string | null }) {
+  const m: Record<string, { t: string; cor: string }> = {
+    ENVIADO: { t: '📲 Recibo enviado', cor: '#23874F' },
+    ENVIANDO: { t: '⏳ Enviando recibo', cor: '#6B7280' },
+    FALHOU: { t: '⚠️ Recibo não entregue', cor: '#B45309' },
+    SEM_CANAL: { t: '⚠️ Sem WhatsApp/avisos', cor: '#B45309' },
+  }
+  const v = status ? m[status] : null
+  if (!v) return null
+  return <div title={detalhe || ''} style={{ fontSize: 10, color: v.cor, marginTop: 3, fontWeight: 600, cursor: detalhe ? 'help' : 'default' }}>{v.t}</div>
 }
 
 const ICON_BTN: React.CSSProperties = { background: 'transparent', border: '1px solid rgba(16,24,40,0.1)', borderRadius: 6, padding: 6, color: '#6B7280', cursor: 'pointer', display: 'inline-flex' }

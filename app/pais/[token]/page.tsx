@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
-import PushNotificationButton from '@/components/PushNotificationButton'
+import AtivarAvisos from '@/components/AtivarAvisos'
+import type { Metadata } from 'next'
 import AtivarDebitoAutomatico from './AtivarDebitoAutomatico'
 
 const T = {
@@ -14,6 +15,16 @@ const T = {
 const SYNE = 'Syne, sans-serif'
 const MONO = "'Space Mono', monospace"
 const INTER = 'Inter, sans-serif'
+
+// app instalado pela familia abre direto nesta pagina (necessario para aviso no iPhone)
+export async function generateMetadata({ params }: { params: Promise<{ token: string }> }): Promise<Metadata> {
+  const { token } = await params
+  return {
+    title: 'GestãoFC Pais',
+    manifest: `/api/manifest?start=/pais/${encodeURIComponent(token)}`,
+    appleWebApp: { capable: true, title: 'GestãoFC Pais', statusBarStyle: 'default' },
+  }
+}
 
 export default async function AreaPais({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params
@@ -145,6 +156,9 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
       {/* ── CONTEÚDO ── */}
       <div className="px-5 mt-5 space-y-4">
 
+        {/* ── AVISOS NO CELULAR (push) ── */}
+        <AtivarAvisos token={token} />
+
         {/* ── PRESENÇA ── */}
         <div style={CARD}>
           <p style={EYEBROW}>Presença este mês</p>
@@ -268,9 +282,6 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
 
         {/* ── DÉBITO AUTOMÁTICO ── */}
         <AtivarDebitoAutomatico token={token} valorMensalidade={atleta.valorMensalidade ? Number(atleta.valorMensalidade) : null} jaAtivo={!!atleta.asaasSubscriptionId} />
-
-        {/* ── PUSH NOTIFICATIONS ── */}
-        <PushNotificationButton atletaId={atleta.id} escolaId={atleta.escolaId || ''} />
 
         {/* ── CONTATO ── */}
         <div style={CARD}>

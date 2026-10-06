@@ -2,6 +2,8 @@
 import { supabaseAdmin } from '@/lib/supabase'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
 import { revalidatePath } from 'next/cache'
+import { after } from 'next/server'
+import { avisarPagamento, avisarPagamentoSeguro } from '@/lib/avisoPagamento'
 import { dataVencimentoNoMes } from '@/lib/dataVencimento'
 import { cancelarPixDaCobranca, CAMPOS_PIX_LIMPOS } from '@/lib/cancelarPixDaCobranca'
 
@@ -37,6 +39,9 @@ export async function alterarDiaVencimentoMassa(atletaIds: string[], dia: number
  * segurar a baixa nao ajuda — mas devolve um aviso pra tela mostrar.
  */
 export async function baixaManualCobranca(cobrancaId: string, valorPago: number, formaPagamento: string) {
+  const escolaId = await getEscolaIdServer()
+  const { data: dona } = await supabaseAdmin.from('Cobranca').select('id').eq('id', cobrancaId).eq('escolaId', escolaId).maybeSingle()
+  if (!dona) throw new Error('Cobrança não encontrada nesta escola')
   const pix = await cancelarPixDaCobranca(cobrancaId)
 
   const { error } = await supabaseAdmin.from('Cobranca').update({
@@ -50,6 +55,7 @@ export async function baixaManualCobranca(cobrancaId: string, valorPago: number,
   }).eq('id', cobrancaId)
 
   if (error) throw new Error('Erro ao dar baixa: ' + error.message)
+  after(() => avisarPagamentoSeguro(cobrancaId, escolaId))
   revalidatePath('/financeiro/mensalidades')
 
   return pix.ok
@@ -65,7 +71,7 @@ export async function cancelarCobranca(cobrancaId: string) {
 // ── Aliases e funções legadas usadas pela página existente ──
 export async function listarMensalidades(opts?: { status?: string; incluirExcluidas?: boolean }) {
   const escolaId = await getEscolaIdServer()
-  let q = supabaseAdmin.from('Cobranca').select('id, atletaId, atletaNome, valor, valorPago, vencimento, status, descricao, periodo, baixaManual, tipo, pagoEm, excluidaEm, grupoCobrancaId, qtdParcelas, parcelaAtual, pixCopiaCola, pixQrCode').eq('escolaId', escolaId).order('vencimento', { ascending: false }).limit(300)
+  let q = supabaseAdmin.from('Cobranca').select('id, atletaId, atletaNome, valor, valorPago, vencimento, status, descricao, periodo, baixaManual, tipo, pagoEm, excluidaEm, avisoPagamentoStatus, avisoPagamentoDetalhe, avisoPagamentoEm, grupoCobrancaId, qtdParcelas, parcelaAtual, pixCopiaCola, pixQrCode').eq('escolaId', escolaId).order('vencimento', { ascending: false }).limit(300)
   if (opts?.status && opts.status !== 'TODOS') q = q.eq('status', opts.status)
   if (!opts?.incluirExcluidas) q = q.is('excluidaEm', null)
   const { data } = await q
@@ -194,6 +200,9 @@ export async function excluirDefinitivo(cobrancaId: string) {
 }
 
 export async function marcarPago(cobrancaId: string, valorPago?: number, formaPagamento?: string) {
+  const escolaId = await getEscolaIdServer()
+  const { data: dona } = await supabaseAdmin.from('Cobranca').select('id').eq('id', cobrancaId).eq('escolaId', escolaId).maybeSingle()
+  if (!dona) throw new Error('Cobrança não encontrada nesta escola')
   const pix = await cancelarPixDaCobranca(cobrancaId)
 
   // Sem valor informado, cai no valor da propria cobranca — nunca NULL.
@@ -214,6 +223,7 @@ export async function marcarPago(cobrancaId: string, valorPago?: number, formaPa
   }).eq('id', cobrancaId)
 
   if (error) throw new Error('Erro ao marcar como pago: ' + error.message)
+  after(() => avisarPagamentoSeguro(cobrancaId, escolaId))
   revalidatePath('/financeiro/mensalidades')
 
   return pix.ok
@@ -223,4 +233,12 @@ export async function marcarPago(cobrancaId: string, valorPago?: number, formaPa
 
 export async function alterarDiaVencimentoEmMassa(atletaIds: string[], dia: number) {
   return alterarDiaVencimentoMassa(atletaIds, dia)
+}
+
+/** Botao "Reenviar recibo": manda de novo o aviso + link do recibo ao pai. */
+export async function reenviarRecibo(cobrancaId: string) {
+  const escolaId = await getEscolaIdServer()
+  const r = await avisarPagamento(cobrancaId, { forcar: true, escolaId })
+  revalidatePath('/financeiro/mensalidades')
+  return r
 }

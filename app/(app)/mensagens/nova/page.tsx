@@ -3,7 +3,7 @@ import { usePerfil } from '@/lib/usePerfil'
 import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Suspense } from 'react'
-import { carregarDadosMensagem, buscarResponsaveisParaEnvio, registrarMensagem } from './actions'
+import { carregarDadosMensagem, enviarComunicado, resumoAvisos } from './actions'
 
 type Atleta = {
   id: string
@@ -29,7 +29,8 @@ function NovaMensagemForm() {
   const [atletas, setAtletas] = useState<Atleta[]>([])
   const [atletasSelecionados, setAtletasSelecionados] = useState<string[]>([])
   const [enviando, setEnviando] = useState(false)
-  const [resultado, setResultado] = useState<{ enviados: number; erros: number } | null>(null)
+  const [resultado, setResultado] = useState<{ enviados: number; erros: number; semAviso: number } | null>(null)
+  const [comAviso, setComAviso] = useState<number | null>(null)
 
   // ── Tokens visuais ──
   const syne = 'Syne, sans-serif'
@@ -37,7 +38,7 @@ function NovaMensagemForm() {
   const gold = '#B7791F'
   const bg = '#F6F8F7'
   const cardBg = '#FFFFFF'
-  const cardBorder = '1px solid rgba(255,255,255,0.07)'
+  const cardBorder = '1px solid #E3E8E5'
   const inputStyle = { width: '100%', background: '#FFFFFF', border: '1px solid rgba(16,24,40,0.1)', borderRadius: '10px', padding: '10px 12px', color: '#1F2937', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '6px', outline: 'none', boxSizing: 'border-box' as const }
 
   useEffect(() => {
@@ -53,48 +54,38 @@ function NovaMensagemForm() {
     setAtletasSelecionados(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id])
   }
 
+  function alvos(): string[] {
+    if (tipo === 'TODOS') return atletas.map(a => a.id)
+    if (tipo === 'TURMA' && turmaId) return atletas.filter(a => a.turmaId === turmaId).map(a => a.id)
+    if (tipo === 'INDIVIDUAL') return atletasSelecionados
+    return []
+  }
+
+  // quantos dos atletas escolhidos tem algum celular com aviso ativo
+  useEffect(() => {
+    const ids = alvos()
+    if (!ids.length) { setComAviso(0); return }
+    resumoAvisos(ids).then(r => setComAviso(r.atletasComAviso)).catch(() => setComAviso(null))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tipo, turmaId, atletasSelecionados.length, atletas.length])
+
   async function enviar() {
     if (!conteudo) return alert('Digite o conteúdo da mensagem')
+    const atletasParaEnviar = alvos()
+    if (atletasParaEnviar.length === 0) { alert('Nenhum atleta selecionado'); return }
     setEnviando(true)
-
-    const instanceId = process.env.NEXT_PUBLIC_ZAPI_INSTANCE_ID
-    const token = process.env.NEXT_PUBLIC_ZAPI_TOKEN
-    const clientToken = process.env.NEXT_PUBLIC_ZAPI_CLIENT_TOKEN
-
-    let atletasParaEnviar: string[] = []
-    if (tipo === 'TODOS') atletasParaEnviar = atletas.map(a => a.id)
-    else if (tipo === 'TURMA' && turmaId) atletasParaEnviar = atletas.filter(a => a.turmaId === turmaId).map(a => a.id)
-    else if (tipo === 'INDIVIDUAL') atletasParaEnviar = atletasSelecionados
-
-    if (atletasParaEnviar.length === 0) { alert('Nenhum atleta selecionado'); setEnviando(false); return }
-
-    const responsaveis = await buscarResponsaveisParaEnvio(atletasParaEnviar)
-
-    let enviados = 0, erros = 0
-    for (const resp of responsaveis || []) {
-      const numero = (resp.whatsapp || resp.telefone || '').replace(/\D/g, '')
-      if (!numero || numero.length < 10) { erros++; continue }
-      const numeroFormatado = numero.startsWith('55') ? numero : '55' + numero
-      try {
-        await fetch(
-          'https://api.z-api.io/instances/' + instanceId + '/token/' + token + '/send-text',
-          { method: 'POST', headers: { 'Content-Type': 'application/json', 'Client-Token': clientToken || '' }, body: JSON.stringify({ phone: numeroFormatado, message: conteudo }) }
-        )
-        enviados++
-      } catch { erros++ }
-    }
-
     try {
-      await registrarMensagem({
+      const r = await enviarComunicado({
         titulo: titulo || null, conteudo, tipo,
-        turmaId: turmaId || null, atletaIds: atletasParaEnviar, totalEnviados: enviados,
+        turmaId: turmaId || null, atletaIds: atletasParaEnviar,
       })
+      if (!r.ok) { alert(r.erro); return }
+      setResultado({ enviados: r.celulares, erros: 0, semAviso: r.atletas - r.atletasComAviso })
     } catch (e) {
-      console.error('Falha ao registrar mensagem no histórico:', (e as Error).message)
+      alert('Erro ao enviar: ' + (e as Error).message)
+    } finally {
+      setEnviando(false)
     }
-
-    setResultado({ enviados, erros })
-    setEnviando(false)
   }
 
   // ── Resultado ──
@@ -103,10 +94,10 @@ function NovaMensagemForm() {
       <div style={{ background: cardBg, border: resultado.enviados > 0 ? '1px solid rgba(46,168,102,0.2)' : '1px solid rgba(239,68,68,0.2)', borderRadius: '20px', padding: '32px 24px', textAlign: 'center', width: '100%', maxWidth: '360px' }}>
         <div style={{ fontSize: '56px', marginBottom: '16px' }}>{resultado.enviados > 0 ? '✅' : '❌'}</div>
         <h2 style={{ fontFamily: syne, fontWeight: 800, fontSize: '22px', color: resultado.enviados > 0 ? neon : '#DC2626', marginBottom: '8px' }}>
-          {resultado.enviados > 0 ? 'Mensagens enviadas!' : 'Erro no envio'}
+          {resultado.enviados > 0 ? 'Aviso enviado!' : 'Ninguém recebeu ainda'}
         </h2>
-        <p style={{ color: neon, fontFamily: syne, fontWeight: 700, fontSize: '18px', marginBottom: '4px' }}>{resultado.enviados} enviadas com sucesso</p>
-        {resultado.erros > 0 && <p style={{ color: '#DC2626', fontSize: '13px' }}>{resultado.erros} erro{resultado.erros !== 1 ? 's' : ''}</p>}
+        <p style={{ color: neon, fontFamily: syne, fontWeight: 700, fontSize: '18px', marginBottom: '4px' }}>{resultado.enviados} celular{resultado.enviados !== 1 ? 'es' : ''} receberam</p>
+        {resultado.semAviso > 0 && <p style={{ color: '#6B7280', fontSize: '13px', lineHeight: 1.5 }}>{resultado.semAviso} atleta{resultado.semAviso !== 1 ? 's' : ''} ainda sem avisos ativos. Peça para a família abrir a Área dos Pais e tocar em “Ativar avisos no celular”.</p>}
         <button
           onClick={() => router.push('/mensagens')}
           style={{ width: '100%', background: 'linear-gradient(135deg,#2EA866,#23874F)', color: '#fff', padding: '14px', borderRadius: '12px', fontSize: '14px', fontWeight: 800, fontFamily: syne, border: 'none', cursor: 'pointer', marginTop: '24px', boxShadow: '0 0 20px rgba(46,168,102,0.25)' }}
@@ -212,7 +203,7 @@ function NovaMensagemForm() {
               value={conteudo}
               onChange={e => setConteudo(e.target.value)}
               rows={5}
-              placeholder="Digite a mensagem que será enviada via WhatsApp..."
+              placeholder="Digite o aviso que vai chegar no celular dos pais..."
               style={{ width: '100%', background: '#FFFFFF', border: '1px solid rgba(16,24,40,0.1)', borderRadius: '10px', padding: '10px 12px', color: '#1F2937', fontFamily: 'Inter,sans-serif', fontSize: '13px', marginTop: '6px', outline: 'none', boxSizing: 'border-box' as const, resize: 'vertical' as const }}
             />
             <p style={{ fontSize: '11px', color: '#6B7280', marginTop: '4px', textAlign: 'right' as const }}>{conteudo.length} caracteres</p>
@@ -224,6 +215,7 @@ function NovaMensagemForm() {
           <span style={{ fontSize: '20px' }}>📊</span>
           <p style={{ fontSize: '13px', color: '#374151', margin: 0 }}>
             {tipo === 'TODOS' && ('Será enviado para ' + atletas.length + ' atletas (todos os responsáveis)')}
+            {comAviso !== null && <span style={{ display: 'block', marginTop: 4, color: '#6B7280', fontSize: 12 }}>🔔 {comAviso} com avisos ativos no celular. Os demais precisam ativar na Área dos Pais.</span>}
             {tipo === 'TURMA' && turmaId && ('Será enviado para ' + atletas.filter(a => a.turmaId === turmaId).length + ' atletas da turma')}
             {tipo === 'TURMA' && !turmaId && 'Selecione uma turma'}
             {tipo === 'INDIVIDUAL' && ('Será enviado para ' + atletasSelecionados.length + ' atleta' + (atletasSelecionados.length !== 1 ? 's' : '') + ' selecionado' + (atletasSelecionados.length !== 1 ? 's' : ''))}

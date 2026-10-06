@@ -194,37 +194,18 @@ function FinanceiroInner() {
     await carregar()
   }
 
-  async function marcarComoPago(cobrancaId: string, enviarRecibo = false) {
-    if (!confirm('Confirmar pagamento manual desta cobrança?')) return
-    const cobranca = cobrancas.find(c => c.id === cobrancaId)
-    const { error } = await supabase
-      .from('Cobranca')
-      .update({ status: 'PAGO' })
-      .eq('id', cobrancaId)
-    if (error) { alert('Erro: ' + error.message); return }
-
-    if (enviarRecibo && cobranca) {
-      const atleta = atletas.find(a => a.id === cobranca.atletaId)
-      const { data: responsaveis } = await supabase
-        .from('Responsavel').select('nome, whatsapp')
-        .eq('atletaId', cobranca.atletaId).limit(1)
-      const resp = responsaveis?.[0]
-      if (resp?.whatsapp && atleta) {
-        const dataVenc = new Date(cobranca.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')
-        const msg = encodeURIComponent(
-          'Ola ' + resp.nome.split(' ')[0] + '! Recibo de pagamento\n\n' +
-          'Atleta: *' + atleta.nome + '*\n' +
-          'Descricao: ' + (cobranca.descricao || 'Mensalidade') + '\n' +
-          'Valor: *R$ ' + Number(cobranca.valor).toFixed(2) + '*\n' +
-          'Vencimento: ' + dataVenc + '\n' +
-          'Status: *PAGO*\n\n' +
-          'Obrigado pelo pagamento!'
-        )
-        const numero = resp.whatsapp.replace(/\D/g, '')
-        const numeroFmt = numero.startsWith('55') ? numero : '55' + numero
-        window.open('https://wa.me/' + numeroFmt + '?text=' + msg, '_blank')
-      }
-    }
+  async function marcarComoPago(cobrancaId: string) {
+    if (!confirm('Confirmar pagamento manual desta cobrança? O responsável recebe o aviso com o link do recibo.')) return
+    // Pelo servidor: cancela o PIX no Asaas, grava valor/data e avisa o pai
+    // (push + WhatsApp com link do recibo). Antes so mudava o status no
+    // navegador e abria o WhatsApp manual.
+    const r = await fetch('/api/cobranca/acao', {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cobrancaId }),
+    })
+    const data = await r.json().catch(() => ({}))
+    if (!r.ok) { alert('Erro: ' + (data.error || 'falha ao dar baixa')); return }
+    if (data.aviso) alert(data.aviso)
     await carregar()
   }
 
@@ -494,7 +475,7 @@ function FinanceiroInner() {
                     {copiado === c.id ? 'Copiado!' : 'Copiar Pix'}
                   </button>
                 )}
-                <button onClick={() => marcarComoPago(c.id, true)} style={{ flex: 1, background: "rgba(212,175,55,0.1)", border: "1px solid rgba(212,175,55,0.3)", color: "#B7791F", padding: "10px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer" }}>
+                <button onClick={() => marcarComoPago(c.id)} style={{ flex: 1, background: "rgba(212,175,55,0.1)", border: "1px solid rgba(212,175,55,0.3)", color: "#B7791F", padding: "10px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, fontFamily: "Syne, sans-serif", cursor: "pointer" }}>
                   Pago + Recibo
                 </button>
                 <button onClick={() => excluirCobranca(c.id)} style={{ background: "rgba(255,70,70,0.08)", border: "1px solid rgba(255,70,70,0.2)", color: "#DC2626", padding: "10px 12px", borderRadius: "10px", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}>

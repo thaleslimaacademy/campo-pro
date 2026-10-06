@@ -7,6 +7,8 @@ import ServiceWorkerRegister from '@/components/ServiceWorkerRegister'
 export const metadata: Metadata = {
   title: 'GestaoFC',
   description: 'Gestao de escolinha de futebol',
+  // a Area dos Pais sobrescreve com o proprio manifest (app instalado abre na pagina da familia)
+  manifest: '/api/manifest',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -14,8 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <ClerkProvider>
       <html lang="pt-BR">
         <head>
-          <link rel="manifest" href="/manifest.webmanifest" />
-          <meta name="theme-color" content="#2EA866" />
+          <meta name="theme-color" content="#4169E1" />
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="default" />
           <meta name="apple-mobile-web-app-title" content="GestaoFC" />

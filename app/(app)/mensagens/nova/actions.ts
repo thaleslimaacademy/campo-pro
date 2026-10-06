@@ -1,6 +1,8 @@
 'use server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getEscolaIdServer } from '@/lib/getEscolaIdServer'
+import { requireFinanceiro } from '@/lib/auth'
+import { enviarPush, resumoPush } from '@/lib/push'
 
 export async function carregarDadosMensagem() {
   const escolaId = await getEscolaIdServer()
@@ -31,4 +33,41 @@ export async function registrarMensagem(form: {
   })
   if (error) throw new Error(error.message)
   return { ok: true }
+}
+
+/**
+ * Envia o comunicado como aviso (push) no celular dos pais e registra no historico.
+ * Antes o envio era feito pela Z-API direto do navegador (servico ja desligado):
+ * as mensagens contavam como "enviadas" mas nao chegavam.
+ */
+export async function enviarComunicado(form: {
+  titulo: string | null; conteudo: string; tipo: string; turmaId: string | null; atletaIds: string[]
+}) {
+  const sessao = await requireFinanceiro()
+  const escolaId = sessao.escolaId
+  const conteudo = (form.conteudo || '').trim()
+  if (!conteudo) return { ok: false as const, erro: 'Digite o conteúdo da mensagem.' }
+
+  const { data: validos } = await supabaseAdmin.from('Atleta').select('id')
+    .eq('escolaId', escolaId).in('id', form.atletaIds.length ? form.atletaIds : ['-'])
+  const ids = ((validos ?? []) as { id: string }[]).map(a => a.id)
+  if (!ids.length) return { ok: false as const, erro: 'Nenhum atleta válido selecionado.' }
+
+  const r = await enviarPush({
+    escolaId, atletaIds: ids,
+    title: form.titulo?.trim() || 'Aviso da escolinha',
+    body: conteudo.length > 180 ? conteudo.slice(0, 177) + '…' : conteudo,
+  })
+
+  await supabaseAdmin.from('Mensagem').insert({
+    escolaId, titulo: form.titulo, conteudo, tipo: form.tipo,
+    turmaId: form.turmaId, atletaIds: ids, totalEnviados: r.enviados,
+  })
+
+  return { ok: true as const, celulares: r.enviados, atletasComAviso: r.familias, atletas: ids.length }
+}
+
+export async function resumoAvisos(atletaIds?: string[]) {
+  const escolaId = await getEscolaIdServer()
+  return resumoPush(escolaId, atletaIds)
 }
