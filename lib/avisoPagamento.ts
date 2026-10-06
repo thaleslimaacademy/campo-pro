@@ -61,6 +61,8 @@ const curto = (s: string, n = 280) => (s.length > n ? s.slice(0, n - 1) + '…' 
 function erroLegivel(e: unknown): string {
   const msg = (e as Error)?.message || String(e)
   if (/132001|does not exist in pt_BR|template name/i.test(msg)) return 'modelo pagamento_confirmado não aprovado/encontrado na Meta'
+  if (/132000|number of (localizable_)?params|parameters does not match/i.test(msg)) return 'número de variáveis diferente do modelo pagamento_confirmado na Meta'
+  if (/132012|parameter format/i.test(msg)) return 'formato de variável recusado pela Meta'
   if (/131026|not.*whatsapp/i.test(msg)) return 'número sem WhatsApp'
   if (/190|access token|OAuth/i.test(msg)) return 'token da Meta expirado ou inválido'
   if (/não configurados|nao configurad/i.test(msg)) return 'WhatsApp oficial (Meta) não configurado na Vercel'

@@ -230,6 +230,8 @@ export async function msgPlanoAtivado(params: {
     return enviarTemplateMeta({
       to: params.telefone,
       template: 'plano_ativado',
+      // o modelo foi cadastrado na Meta em ingles ('English'), nao em pt_BR
+      idioma: 'en',
       params: [params.nomeEscola],
     })
   }

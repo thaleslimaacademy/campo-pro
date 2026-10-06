@@ -54,6 +54,7 @@ export type TemplateParams = {
   template: string              // nome do template aprovado
   params: string[]              // variáveis {{1}}, {{2}}, ...
   phoneNumberId?: string        // se escola tiver número próprio
+  idioma?: string               // codigo do idioma do modelo na Meta (padrao pt_BR)
 }
 
 // Formata número para padrão Meta (55 + DDD + número, sem símbolos)
@@ -63,7 +64,7 @@ function formatarNumero(tel: string): string {
 }
 
 // Envia mensagem via template aprovado
-export async function enviarTemplateMeta({ to, template, params, phoneNumberId }: TemplateParams) {
+export async function enviarTemplateMeta({ to, template, params, phoneNumberId, idioma }: TemplateParams) {
   const phoneId = phoneNumberId || PHONE_ID()
   if (!phoneId || !TOKEN()) {
     throw new Error('META_ACCESS_TOKEN ou META_PHONE_NUMBER_ID não configurados')
@@ -81,7 +82,7 @@ export async function enviarTemplateMeta({ to, template, params, phoneNumberId }
     type: 'template',
     template: {
       name: template,
-      language: { code: 'pt_BR' },
+      language: { code: idioma || 'pt_BR' },
       components,
     },
   }
