@@ -2,7 +2,6 @@
 import { usePerfil } from '@/lib/usePerfil'
 import AdminGuard from '@/components/AdminGuard'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
 import { salvarConfiguracoes, listarPlanos, salvarPlano, criarPlano, excluirPlano, carregarConfiguracoes } from './actions'
 import WhatsAppConfig from '@/components/WhatsAppConfig'
 
@@ -50,7 +49,8 @@ function ConfiguracoesInner() {
       setTimeout(() => setSucesso(false), 4000)
     }
     async function carregar() {
-      const { data } = await supabase.from('Escola').select('*').eq('id', escolaId!).single()
+      // via servidor: a tabela Escola nao expoe mais a chave do Asaas ao navegador
+      const data = await carregarConfiguracoes().catch(() => null)
       if (data) {
         setSlug(data.slug || '')
         listarPlanos().then(setPlanos).catch(() => {})
@@ -155,8 +155,8 @@ function ConfiguracoesInner() {
     </div>
   )
 
-  const keyMasked = asaasKeyAtual
-    ? asaasKeyAtual.slice(0, 12) + '••••••••••••••••••••' + asaasKeyAtual.slice(-4)
+  const keyMasked = asaasKeyAtual // ja chega mascarada do servidor
+    ? asaasKeyAtual
     : ''
 
   return (

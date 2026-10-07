@@ -37,9 +37,12 @@ export async function carregarConfiguracoes() {
   const escolaId = await getEscolaIdServer()
   const { data } = await supabaseAdmin
     .from('Escola')
-    .select('nome, telefone, whatsapp, email, endereco, cidade, estado, cep, valorMensalidade, diaVencimento, instagramUrl, facebookUrl, multaAtraso, jurosAoMes, valorDesconto, valorMatricula, asaasApiKey')
+    .select('slug, nome, telefone, whatsapp, email, endereco, cidade, estado, cep, valorMensalidade, diaVencimento, instagramUrl, facebookUrl, multaAtraso, jurosAoMes, valorDesconto, valorMatricula, diasNPS, asaasApiKey')
     .eq('id', escolaId).single()
-  return data
+  if (!data) return null
+  // a chave do Asaas NUNCA vai inteira para o navegador: so o comeco e o fim
+  const k = (data.asaasApiKey as string | null) || ''
+  return { ...data, asaasApiKey: k ? k.slice(0, 12) + '••••••••••••••••••••' + k.slice(-4) : '' }
 }
 
 export async function listarPlanos() {

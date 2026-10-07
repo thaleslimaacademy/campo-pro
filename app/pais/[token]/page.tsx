@@ -2,6 +2,8 @@ import { supabase } from '@/lib/supabase'
 import AtivarAvisos from '@/components/AtivarAvisos'
 import type { Metadata } from 'next'
 import AtivarDebitoAutomatico from './AtivarDebitoAutomatico'
+import ConvocacoesPais, { type ConvPais } from './ConvocacoesPais'
+import { supabaseAdmin } from '@/lib/supabase'
 
 const T = {
   bg: '#F6F8F7',
@@ -68,6 +70,20 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
   const ultimaAval = avaliacoes?.[0] || null
 
   const { data: escola } = await supabase.from('Escola').select('slug, nome').eq('id', atleta.escolaId).single()
+
+  // convocacoes abertas, de hoje em diante (o pai confirma a presenca aqui)
+  const hojeISO = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })
+  const { data: minhasConv } = await supabaseAdmin.from('ConvocacaoAtleta')
+    .select('status, Convocacao!inner(id, titulo, data, horario, local, status)')
+    .eq('atletaId', atleta.id).eq('Convocacao.status', 'aberta').gte('Convocacao.data', hojeISO)
+  const convocacoes: ConvPais[] = ((minhasConv ?? []) as unknown as { status: string | null; Convocacao: { id: string; titulo: string; data: string | null; horario: string | null; local: string | null } }[])
+    .map(r => ({
+      id: r.Convocacao.id, titulo: r.Convocacao.titulo,
+      data: r.Convocacao.data ? String(r.Convocacao.data).slice(0, 10).split('-').reverse().join('/') : 'a confirmar',
+      horario: r.Convocacao.horario ? String(r.Convocacao.horario).slice(0, 5) : 'a confirmar',
+      local: r.Convocacao.local || 'a confirmar', status: (r.status || 'pendente').toLowerCase(),
+    }))
+    .sort((a, b) => a.data.split('/').reverse().join('').localeCompare(b.data.split('/').reverse().join('')))
   const escolaSlug = escola?.slug || ''
   const escolaNome = escola?.nome?.split('—').pop()?.trim() || escola?.nome || 'Academia'
 
@@ -158,6 +174,9 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
 
         {/* ── AVISOS NO CELULAR (push) ── */}
         <AtivarAvisos token={token} />
+
+        {/* ── CONVOCAÇÕES (confirmar presença) ── */}
+        <ConvocacoesPais token={token} itens={convocacoes} nomeAtleta={atleta.nome} />
 
         {/* ── PRESENÇA ── */}
         <div style={CARD}>

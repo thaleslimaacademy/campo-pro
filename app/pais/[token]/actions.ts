@@ -82,3 +82,18 @@ export async function ativarDebitoAutomatico(token: string, dados: {
   revalidatePath(`/pais/${token}`)
   return { ok: true }
 }
+
+/** Responsavel confirma (ou nao) a presenca do atleta numa convocacao. */
+export async function responderConvocacao(token: string, convocacaoId: string, resposta: 'confirmado' | 'recusado') {
+  if (resposta !== 'confirmado' && resposta !== 'recusado') throw new Error('Resposta inválida.')
+  const { data: atleta } = await supabaseAdmin.from('Atleta').select('id').eq('tokenPais', token).single()
+  if (!atleta) throw new Error('Link inválido.')
+  const { data: conv } = await supabaseAdmin.from('Convocacao').select('status').eq('id', convocacaoId).maybeSingle()
+  if (!conv || conv.status === 'encerrada') throw new Error('Esta convocação já foi encerrada.')
+  const { data, error } = await supabaseAdmin.from('ConvocacaoAtleta').update({ status: resposta })
+    .eq('convocacaoId', convocacaoId).eq('atletaId', atleta.id).select('id')
+  if (error) throw new Error(error.message)
+  if (!data?.length) throw new Error('Atleta não está nesta convocação.')
+  revalidatePath(`/pais/${token}`)
+  return { ok: true }
+}

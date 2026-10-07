@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState, useTransition, useRef } from 'react'
 import BottomNav from '@/components/ui/BottomNav'
-import { getConvocacoesIniciais, criarConvocacao, encerrarConvocacao, excluirConvocacao } from './actions'
+import { getConvocacoesIniciais, criarConvocacao, encerrarConvocacao, excluirConvocacao, resumoAvisoConvocacao, reenviarAvisoConvocacao } from './actions'
 
 const T = { bg:'#F6F8F7', surface:'#FFFFFF', primary:'#2EA866', text:'#1F2937', muted:'#6B7280', border:'rgba(16,24,40,0.1)', green:'#16A34A', red:'#DC2626', gold:'#B7791F' }
 const SYNE = 'Syne, sans-serif'
@@ -62,6 +62,65 @@ function FigurinhaCard({ atleta, turmaMap, selecionado, onToggle }: { atleta: At
           {ano !== '—' && <span style={{ background:'#FFFFFF', color:T.muted, fontSize:8, padding:'2px 6px', borderRadius:10 }}>{String(ano)}</span>}
         </div>
       </div>
+    </div>
+  )
+}
+
+type Resumo = { total: number; comAviso: number; semAviso: number; confirmados: number; recusados: number; pendentes: number }
+
+/** Situacao dos avisos e das respostas dos pais + reenvio (push gratis / WhatsApp pago). */
+function AvisosConvocacao({ convId }: { convId: string }) {
+  const [r, setR] = useState<Resumo | null>(null)
+  const [ocupado, setOcupado] = useState<'' | 'push' | 'whatsapp'>('')
+  const carregarResumo = () => resumoAvisoConvocacao(convId).then(setR).catch(() => {})
+  useEffect(() => { carregarResumo() }, [convId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function enviar(canal: 'push' | 'whatsapp') {
+    if (!r) return
+    if (canal === 'whatsapp') {
+      const custo = (r.semAviso * 0.32).toFixed(2).replace('.', ',')
+      if (!confirm(`Enviar WhatsApp para ${r.semAviso} família(s) SEM avisos no celular?\nCusto aproximado na Meta: R$ ${custo}`)) return
+    }
+    setOcupado(canal)
+    try {
+      const res = await reenviarAvisoConvocacao(convId, canal)
+      if (!res.ok) alert(res.erro)
+      else if (canal === 'push') alert(`🔔 Aviso enviado para ${'celulares' in res ? res.celulares : 0} celular(es).`)
+      else alert(`💬 WhatsApp: ${'enviados' in res ? res.enviados : 0} enviado(s)` + ('falhas' in res && res.falhas ? ` · ${res.falhas} falha(s)` : '') + ('semNumero' in res && res.semNumero ? ` · ${res.semNumero} sem número` : ''))
+      carregarResumo()
+    } finally { setOcupado('') }
+  }
+
+  if (!r) return null
+  const chip = (txt: string, cor: string, bg: string) => (
+    <span style={{ fontSize: 11, fontWeight: 700, color: cor, background: bg, padding: '4px 8px', borderRadius: 999 }}>{txt}</span>
+  )
+  const btn: React.CSSProperties = { flex: 1, padding: '9px', borderRadius: 8, fontFamily: SYNE, fontWeight: 700, fontSize: 11, cursor: 'pointer', textTransform: 'uppercase' }
+  return (
+    <div style={{ padding: '12px 14px', borderBottom: `1px solid ${T.border}` }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
+        {chip(`✅ ${r.confirmados} confirmados`, '#23874F', '#E7F5ED')}
+        {chip(`❌ ${r.recusados} não vão`, '#B91C1C', '#FDECEC')}
+        {chip(`⏳ ${r.pendentes} sem resposta`, '#6B7280', '#F3F4F6')}
+        {chip(`🔔 ${r.comAviso}/${r.total} recebem aviso`, '#4169E1', '#EEF2FF')}
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button onClick={() => enviar('push')} disabled={!!ocupado || r.comAviso === 0}
+          style={{ ...btn, background: '#EEF2FF', border: '1px solid rgba(65,105,225,0.3)', color: '#4169E1', opacity: r.comAviso === 0 ? 0.5 : 1 }}>
+          {ocupado === 'push' ? 'Enviando…' : '🔔 Avisar no celular (grátis)'}
+        </button>
+        {r.semAviso > 0 && (
+          <button onClick={() => enviar('whatsapp')} disabled={!!ocupado}
+            style={{ ...btn, background: '#fff', border: '1px solid rgba(16,24,40,0.15)', color: '#1F2937' }}>
+            {ocupado === 'whatsapp' ? 'Enviando…' : `💬 WhatsApp p/ ${r.semAviso} sem aviso`}
+          </button>
+        )}
+      </div>
+      {r.semAviso > 0 && (
+        <p style={{ fontSize: 10, color: T.muted, margin: '8px 0 0' }}>
+          WhatsApp custa ~R$ 0,32 por família (modelo Marketing). Quem ativar os avisos na Área dos Pais passa a receber de graça.
+        </p>
+      )}
     </div>
   )
 }
@@ -368,6 +427,8 @@ export default function Convocacoes() {
                       🗑
                     </button>
                   </div>
+
+                  <AvisosConvocacao convId={conv.id} />
 
                   {/* Grid de figurinhas dos convocados */}
                   <div style={{ padding:14 }}>
