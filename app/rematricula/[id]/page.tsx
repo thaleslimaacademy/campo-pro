@@ -2,8 +2,7 @@
 import { usePerfil } from '@/lib/usePerfil'
 import { useEffect, useState, useRef } from 'react'
 import { useParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
-import { enviarRematricula } from './actions'
+import { enviarRematricula, carregarRematricula } from './actions'
 
 const CONTRATO = `CONTRATO DE RENOVAÇÃO DE SERVIÇOS ESPORTIVOS
 ASSOCIAÇÃO ESPORTIVA THALES LIMA FOOTBALL ACADEMY
@@ -198,10 +197,10 @@ export default function Rematricula() {
 
   useEffect(() => {
     async function carregar() {
-      const { data: at } = await supabase.from('Atleta').select('*').eq('id', id).single()
+      // via servidor: o banco nao libera mais atletas/responsaveis ao navegador
+      const { atleta: at, responsavel: resp } = await carregarRematricula(id as string).catch(() => ({ atleta: null, responsavel: null })) as { atleta: any; responsavel: any }
       setAtleta(at)
       if (at) {
-        const { data: resp } = await supabase.from('Responsavel').select('*').eq('atletaId', id).single()
         setResponsavel(resp)
         setForm({
           nomeResponsavel: resp?.nome || '',
@@ -247,7 +246,7 @@ export default function Rematricula() {
     setSalvando(true)
     try {
       await enviarRematricula({
-        escolaId: escolaId!,
+        escolaId: escolaId || atleta.escolaId,
         atletaId: atleta.id,
         nomeAtleta: atleta.nome,
         dataNascimento: atleta.dataNascimento || null,

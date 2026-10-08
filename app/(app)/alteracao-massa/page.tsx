@@ -3,7 +3,7 @@ import { usePerfil } from '@/lib/usePerfil'
 import AdminGuard from '@/components/AdminGuard'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { massaDados, massaAplicar } from '@/lib/dadosPainel'
 import { salvarConfiguracoes } from '../configuracoes/actions'
 
 interface Atleta {
@@ -38,21 +38,9 @@ function AlteracaoMassaInner() {
   const [novaTurma, setNovaTurma] = useState('')
 
   async function carregar() {
-    const { data: ats } = await supabase
-      .from('Atleta')
-      .select('id, nome, turmaId, diaVencimento, valorMensalidade, dataNascimento')
-      .eq('escolaId', escolaId!)
-      .eq('ativo', true)
-      .order('nome')
-    setAtletas(ats || [])
-
-    const { data: tms } = await supabase
-      .from('Turma')
-      .select('id, nome')
-      .eq('escolaId', escolaId!)
-      .eq('ativa', true)
-      .order('nome')
-    setTurmas(tms || [])
+    const { atletas: ats, turmas: tms } = await massaDados()
+    setAtletas((ats || []) as never)
+    setTurmas((tms || []) as never)
     setLoading(false)
   }
 
@@ -102,13 +90,10 @@ function AlteracaoMassaInner() {
       return
     }
 
-    const { error } = await supabase
-      .from('Atleta')
-      .update(update)
-      .in('id', selecionados)
+    const r = await massaAplicar(selecionados, update)
 
-    if (error) {
-      setErro('Erro: ' + error.message)
+    if (!r.ok) {
+      setErro('Erro: ' + r.erro)
     } else {
       setSucesso(selecionados.length + ' atleta(s) atualizados com sucesso!')
       setSelecionados([])

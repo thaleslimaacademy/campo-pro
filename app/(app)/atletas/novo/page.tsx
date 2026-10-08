@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { turmasEPlanos } from '@/lib/dadosPainel'
 import { usePerfil } from '@/lib/usePerfil'
 import { criarAtleta } from './actions'
 import BottomNav from '@/components/ui/BottomNav'
@@ -50,10 +50,7 @@ export default function NovoAtleta() {
 
   useEffect(() => {
     if (!escolaId) return
-    supabase.from('Turma').select('id, nome').eq('escolaId', escolaId).eq('ativa', true).order('nome')
-      .then(({ data }) => setTurmas(data || []))
-    supabase.from('PlanoMensalidade').select('slug, nome, valor').eq('escolaId', escolaId).order('valor')
-      .then(({ data }) => setPlanos(data || []))
+    turmasEPlanos().then(({ turmas, planos }) => { setTurmas(turmas as never); setPlanos(planos as never) }).catch(() => {})
   }, [escolaId])
 
   async function buscarCep(cep: string) {

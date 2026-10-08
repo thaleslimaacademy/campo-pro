@@ -33,8 +33,23 @@ type RematriculaInput = {
   nomeAssinatura: string
 }
 
+/** Dados para preencher a rematricula (so os campos usados no formulario). */
+export async function carregarRematricula(atletaId: string) {
+  const { data: atleta } = await supabaseAdmin.from('Atleta')
+    .select('id, escolaId, nome, dataNascimento, cpf, rg, telefone, posicao, cep, endereco, numero, bairro, cidade, estado, tamanhoUniforme, autorizacaoImagem')
+    .eq('id', atletaId).maybeSingle()
+  if (!atleta) return { atleta: null, responsavel: null }
+  const { data: responsavel } = await supabaseAdmin.from('Responsavel')
+    .select('nome, cpf, whatsapp, email').eq('atletaId', atletaId)
+    .order('principal', { ascending: false }).limit(1).maybeSingle()
+  return { atleta, responsavel }
+}
+
 export async function enviarRematricula(input: RematriculaInput) {
-  if (!input.escolaId) throw new Error('Escola nao identificada.')
+  // a escola vem do atleta no banco, nunca do navegador
+  const { data: at } = await supabaseAdmin.from('Atleta').select('escolaId').eq('id', input.atletaId).maybeSingle()
+  if (!at?.escolaId) throw new Error('Atleta nao encontrado.')
+  input = { ...input, escolaId: at.escolaId }
   if (!input.nomeResponsavel?.trim()) throw new Error('Nome do responsavel e obrigatorio.')
   if (!input.cpfResponsavel?.trim()) throw new Error('CPF do responsavel e obrigatorio.')
   if (!input.whatsappResponsavel?.trim()) throw new Error('WhatsApp e obrigatorio.')

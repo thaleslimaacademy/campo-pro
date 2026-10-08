@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { convocacaoDetalhe } from '@/lib/dadosPainel'
 
 interface Convocacao {
   id: string
@@ -38,21 +38,9 @@ export default function ConvocacaoDetalhes() {
 
   useEffect(() => {
     async function carregar() {
-      const { data: conv } = await supabase
-        .from('Convocacao').select('*').eq('id', id).single()
-      setConvocacao(conv)
-
-      if (conv) {
-        const { data: cas } = await supabase
-          .from('ConvocacaoAtleta').select('atletaId').eq('convocacaoId', id)
-
-        if (cas && cas.length > 0) {
-          const ids = cas.map((c: any) => c.atletaId)
-          const { data: ats } = await supabase
-            .from('Atleta').select('id, nome, posicao, fotoUrl').in('id', ids).order('nome')
-          setAtletas(ats || [])
-        }
-      }
+      const { conv, atletas: ats } = await convocacaoDetalhe(id as string).catch(() => ({ conv: null, atletas: [] }))
+      setConvocacao(conv as never)
+      setAtletas((ats || []) as never)
       setLoading(false)
     }
     carregar()

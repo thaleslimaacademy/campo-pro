@@ -1,7 +1,7 @@
 'use client'
 import PlanoGate from '@/components/PlanoGate'
 import { useEffect, useState, useTransition } from 'react'
-import { supabase } from '@/lib/supabase'
+import { relPresencas, relCobrancas, relAtletas } from '@/lib/dadosPainel'
 import { getAtletasETurmas } from './actions'
 
 interface Atleta { id: string; nome: string; posicao: string; turmaId: string }
@@ -33,7 +33,7 @@ export default function Relatorios() {
     if (!atletaSelecionado) return alert('Selecione um atleta')
     setGerando(true)
     const atleta = atletas.find(a => a.id === atletaSelecionado)
-    const { data: presencas } = await supabase.from('Presenca').select('status, criadoEm').eq('atletaId', atletaSelecionado).gte('criadoEm', dataInicio).lte('criadoEm', dataFim + 'T23:59:59').order('criadoEm', { ascending: true })
+    const presencas = await relPresencas(atletaSelecionado, dataInicio, dataFim)
     const total = presencas?.length || 0
     const presentes = presencas?.filter(p => p.status === 'PRESENTE').length || 0
     const ausentes = total - presentes
@@ -74,7 +74,7 @@ export default function Relatorios() {
 
   async function gerarFinanceiro() {
     setGerando(true)
-    const { data: cobrancas } = await supabase.from('Cobranca').select('id, valor, status, descricao, vencimento, atletaId').eq('escolaId', escolaId!).gte('vencimento', mesFinanceiro + '-01').lte('vencimento', mesFinanceiro + '-31').order('vencimento', { ascending: true })
+    const { cobrancas, nomes: map } = await relCobrancas(mesFinanceiro)
     const pagas = cobrancas?.filter(c => c.status === 'PAGO') || []
     const pendentes = cobrancas?.filter(c => c.status === 'PENDENTE') || []
     const vencidas = cobrancas?.filter(c => c.status === 'VENCIDO') || []
@@ -100,10 +100,6 @@ export default function Relatorios() {
     doc.text('R$ ' + vencidas.reduce((s, c) => s + Number(c.valor), 0).toFixed(2), 166, 60, { align: 'center' })
     doc.setTextColor(0, 0, 0)
     if (cobrancas && cobrancas.length > 0) {
-      const ids = [...new Set(cobrancas.map(c => c.atletaId))]
-      const { data: ats } = await supabase.from('Atleta').select('id, nome').in('id', ids)
-      const map: Record<string, string> = {}
-      ats?.forEach(a => { map[a.id] = a.nome })
       autoTable(doc, {
         startY: 72,
         head: [['Atleta', 'Descricao', 'Vencimento', 'Valor', 'Status']],
@@ -127,9 +123,7 @@ export default function Relatorios() {
 
   async function gerarAtletas() {
     setGerando(true)
-    let query = supabase.from('Atleta').select('id, nome, posicao, dataNascimento, turmaId').eq('escolaId', escolaId!).eq('ativo', true).order('nome')
-    if (turmaSelecionada) query = query.eq('turmaId', turmaSelecionada)
-    const { data: ats } = await query
+    const ats = await relAtletas(turmaSelecionada || null)
     const jsPDF = (await import('jspdf')).default
     const autoTable = (await import('jspdf-autotable')).default
     const doc = new jsPDF()

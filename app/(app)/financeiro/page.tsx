@@ -3,7 +3,7 @@ import { usePerfil } from '@/lib/usePerfil'
 import AdminGuard from '@/components/AdminGuard'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { financeiroLegado } from '@/lib/dadosPainel'
 
 type Atleta = {
   id: string
@@ -53,22 +53,10 @@ function FinanceiroInner() {
   const [aba, setAba] = useState<'todas' | 'inadimplentes'>('todas')
 
   async function carregar() {
-    const { data: atletasData } = await supabase
-      .from('Atleta')
-      .select('id, nome')
-      .eq('escolaId', escolaId!)
-      .eq('ativo', true)
-
-    setAtletas(atletasData || [])
-    if (atletasData && atletasData.length > 0) setAtletaId(atletasData[0].id)
-
-    const { data: cobrancasData } = await supabase
-      .from('Cobranca')
-      .select('id, valor, vencimento, status, pixCopiaCola, pixQrCode, descricao, atletaId')
-      .eq('escolaId', escolaId!)
-      .order('vencimento', { ascending: false })
-
-    setCobrancas(cobrancasData || [])
+    const { atletas: atletasData, cobrancas: cobrancasData } = await financeiroLegado()
+    setAtletas((atletasData || []) as never)
+    if (atletasData && atletasData.length > 0) setAtletaId((atletasData[0] as { id: string }).id)
+    setCobrancas((cobrancasData || []) as never)
 
     // Calcula inadimplentes — cobranças vencidas ou pendentes com vencimento passado
     const hoje = new Date().toISOString().split('T')[0]

@@ -1,8 +1,8 @@
-import { supabase } from '@/lib/supabase'
 import AtivarAvisos from '@/components/AtivarAvisos'
 import type { Metadata } from 'next'
 import AtivarDebitoAutomatico from './AtivarDebitoAutomatico'
 import ConvocacoesPais, { type ConvPais } from './ConvocacoesPais'
+import PagarPix from './PagarPix'
 import { supabaseAdmin } from '@/lib/supabase'
 
 const T = {
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ token: st
 export default async function AreaPais({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params
 
-  const { data: atleta } = await supabase
+  const { data: atleta } = await supabaseAdmin
     .from('Atleta')
     .select('id, nome, posicao, tokenPais, fotoUrl, escolaId, valorMensalidade, asaasSubscriptionId')
     .eq('tokenPais', token)
@@ -50,26 +50,26 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
   }
 
   const mesAtual = new Date().toISOString().slice(0, 7)
-  const { data: presencas } = await supabase
+  const { data: presencas } = await supabaseAdmin
     .from('Presenca').select('status').eq('atletaId', atleta.id).gte('criadoEm', mesAtual + '-01')
 
   const total = presencas?.length || 0
   const presentes = presencas?.filter(p => p.status === 'PRESENTE').length || 0
   const percentual = total > 0 ? Math.round((presentes / total) * 100) : 0
 
-  const { data: cobrancas } = await supabase
-    .from('Cobranca').select('id, valor, vencimento, status, descricao, pixCopiaCola')
-    .eq('atletaId', atleta.id).order('vencimento', { ascending: false }).limit(6)
+  const { data: cobrancas } = await supabaseAdmin
+    .from('Cobranca').select('id, valor, vencimento, status, descricao, pixCopiaCola, pixQrCode, reciboToken')
+    .eq('atletaId', atleta.id).is('excluidaEm', null).neq('status', 'CANCELADO').order('vencimento', { ascending: false }).limit(6)
 
-  const { data: premiacoes } = await supabase
+  const { data: premiacoes } = await supabaseAdmin
     .from('Premiacao').select('id, titulo, icone').eq('atletaId', atleta.id).order('dataConquista', { ascending: false })
 
-  const { data: avaliacoes } = await supabase
+  const { data: avaliacoes } = await supabaseAdmin
     .from('Avaliacao').select('dataAvaliacao, peso, altura, imc, percentualGordura')
     .eq('atletaId', atleta.id).order('dataAvaliacao', { ascending: false }).limit(1)
   const ultimaAval = avaliacoes?.[0] || null
 
-  const { data: escola } = await supabase.from('Escola').select('slug, nome').eq('id', atleta.escolaId).single()
+  const { data: escola } = await supabaseAdmin.from('Escola').select('slug, nome').eq('id', atleta.escolaId).single()
 
   // convocacoes abertas, de hoje em diante (o pai confirma a presenca aqui)
   const hojeISO = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })
@@ -231,11 +231,11 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
                     <p style={{ fontFamily: MONO, fontSize: 11, color: T.muted }}>{'Vence ' + new Date((c.vencimento || '').slice(0, 10) + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
                     <p style={{ fontFamily: MONO, fontSize: 14, fontWeight: 700, color: T.chalk }}>{'R$ ' + Number(c.valor).toFixed(2)}</p>
                   </div>
-                  {(c.status === 'PENDENTE' || c.status === 'VENCIDO') && c.pixCopiaCola && (
-                    <div className="mt-2.5 rounded-lg p-2.5" style={{ background: 'rgba(0,0,0,0.35)', border: `1px solid ${T.turf}20` }}>
-                      <p className="text-xs mb-1" style={{ color: T.muted }}>Pix Copia e Cola</p>
-                      <p className="text-xs break-all" style={{ fontFamily: MONO, color: T.turf, lineHeight: 1.6 }}>{c.pixCopiaCola}</p>
-                    </div>
+                  {(c.status === 'PENDENTE' || c.status === 'VENCIDO') && (
+                    <PagarPix copiaCola={c.pixCopiaCola} qrCode={c.pixQrCode} linkPagar={`/pagar-atleta/${atleta.id}`} />
+                  )}
+                  {c.status === 'PAGO' && c.reciboToken && (
+                    <a href={`/recibo/${c.reciboToken}`} className="text-xs font-bold" style={{ display: 'inline-block', marginTop: 8, color: '#23874F' }}>📄 Ver recibo</a>
                   )}
                 </div>
               ))}
