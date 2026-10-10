@@ -8,6 +8,8 @@ import FotoAtleta from './FotoAtleta'
 import GerarCobranca from './GerarCobranca'
 import CobrancaAcoes from './CobrancaAcoes'
 import BottomNav from '@/components/ui/BottomNav'
+import Condutas from './Condutas'
+import Conquistas from './Conquistas'
 
 const T = {
   bg:      '#F6F8F7',
@@ -65,16 +67,20 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
   const agora = new Date()
   const seisAtras = new Date(agora.getFullYear(), agora.getMonth() - 5, 1)
 
-  const [responsaveisRes, presencasRes, cobrancasRes, turmaRes] = await Promise.all([
+  const [responsaveisRes, presencasRes, cobrancasRes, turmaRes, condutasRes, premiosRes] = await Promise.all([
     supabaseAdmin.from('Responsavel').select('*').eq('atletaId', id),
     supabaseAdmin.from('Presenca').select('status, criadoEm').eq('atletaId', id).gte('criadoEm', seisAtras.toISOString()).order('criadoEm', { ascending: true }),
-    financeiroOk ? supabaseAdmin.from('Cobranca').select('id, valor, vencimento, status, descricao, familiaCobrancaId').eq('atletaId', id).order('vencimento', { ascending: false }).limit(12) : Promise.resolve({ data: null }),
+    financeiroOk ? supabaseAdmin.from('Cobranca').select('id, valor, valorPago, vencimento, competencia, status, descricao, familiaCobrancaId, reciboToken').eq('atletaId', id).is('excluidaEm', null).order('vencimento', { ascending: false }).limit(24) : Promise.resolve({ data: null }),
     atleta.turmaId ? supabaseAdmin.from('Turma').select('id, nome').eq('id', atleta.turmaId).single() : Promise.resolve({ data: null }),
+    supabaseAdmin.from('AtletaConduta').select('id, texto, tipo, criadoEm').eq('atletaId', id).eq('escolaId', escolaId).order('criadoEm', { ascending: false }).limit(50),
+    supabaseAdmin.from('Premiacao').select('id, titulo, icone, descricao, dataConquista').eq('atletaId', id).eq('escolaId', escolaId).order('dataConquista', { ascending: false }),
   ])
 
   const responsaveis = responsaveisRes.data || []
   const presencas    = presencasRes.data || []
-  const cobrancas    = (cobrancasRes.data || []) as { id: string; descricao: string | null; vencimento: string; valor: number; status: string; familiaCobrancaId: string | null }[]
+  const cobrancas    = (cobrancasRes.data || []) as { id: string; descricao: string | null; vencimento: string; competencia: string | null; valor: number; valorPago: number | null; status: string; familiaCobrancaId: string | null; reciboToken: string | null }[]
+  const condutas     = (condutasRes.data || []) as { id: string; texto: string; tipo: string; criadoEm: string }[]
+  const premios      = (premiosRes.data || []) as { id: string; titulo: string; icone: string | null; descricao: string | null; dataConquista: string | null }[]
   const turma        = turmaRes.data
 
   // Cobranças de filho de família (familiaCobrancaId preenchido) mostram o
@@ -122,6 +128,26 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
   const totalPendente = valoresParaTotais.filter((v) => v.status === 'PENDENTE').reduce((s, v) => s + Number(v.valor), 0)
   const totalVencido  = valoresParaTotais.filter((v) => v.status === 'VENCIDO').reduce((s, v) => s + Number(v.valor), 0)
 
+  const qtdPendente = valoresParaTotais.filter((v) => v.status === 'PENDENTE').length
+  const qtdVencido  = valoresParaTotais.filter((v) => v.status === 'VENCIDO').length
+  const emDia = qtdVencido === 0
+  const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
+  const mesRef = (c: { competencia: string | null; vencimento: string }) => {
+    const [a, m] = String(c.competencia || c.vencimento).slice(0, 7).split('-').map(Number)
+    return a && m ? `${MESES_PT[m - 1]} de ${a}` : 'Mensalidade'
+  }
+  const pagas = cobrancas.filter(c => c.status === 'PAGO').slice(0, 3)
+
+  const idade = (() => {
+    if (!atleta.dataNascimento) return null
+    const n = new Date(String(atleta.dataNascimento).slice(0, 10) + 'T12:00:00')
+    const h = new Date()
+    let i = h.getFullYear() - n.getFullYear()
+    if (h.getMonth() < n.getMonth() || (h.getMonth() === n.getMonth() && h.getDate() < n.getDate())) i--
+    return i >= 0 && i < 100 ? i : null
+  })()
+  const respPrincipal = ((responsaveisRes.data || []) as { nome: string; principal?: boolean }[]).sort((a, b) => Number(!!b.principal) - Number(!!a.principal))[0]?.nome || null
+
   const nascimento = atleta.dataNascimento
     ? new Date(atleta.dataNascimento.includes('T') ? atleta.dataNascimento : atleta.dataNascimento + 'T12:00:00').toLocaleDateString('pt-BR')
     : null
@@ -153,42 +179,114 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
 
       <div style={{ padding: '14px 16px' }}>
 
-        {/* CARD IDENTIDADE */}
-        <div style={CARD}>
-          <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', marginBottom: 14 }}>
+        {/* CARD IDENTIDADE (modelo novo) */}
+        <div style={{ ...CARD, borderRadius: 18, padding: 16, marginBottom: 12 }}>
+          <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
             <FotoAtleta atletaId={atleta.id} fotoUrl={atleta.fotoUrl || null} nome={atleta.nome} />
-            <div style={{ flex: 1 }}>
-              <p style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 18, color: T.text, margin: '0 0 4px', letterSpacing: -0.3 }}>{atleta.nome}</p>
-              <p style={{ color: T.primary, fontSize: 13, fontWeight: 700, margin: '0 0 6px' }}>
-                {atleta.posicao || 'Sem posição'}
-                {!atleta.bolsista && atleta.diaVencimento ? (
-                  <span style={{ color: T.gold, fontWeight: 700 }}> · Vence dia {atleta.diaVencimento}</span>
-                ) : null}
-              </p>
-              {turma && (
-                <span style={{ display: 'inline-block', background: `${T.gold}18`, border: `1px solid ${T.gold}40`, color: T.gold, borderRadius: 6, padding: '2px 10px', fontSize: 11, fontWeight: 700 }}>{turma.nome}</span>
-              )}
-              {atleta.bolsista && (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginLeft: turma ? 6 : 0, background: `${T.green}12`, border: `1px solid ${T.green}30`, color: T.green, borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 700 }}>
-                  🎓 Bolsista
-                </span>
-              )}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: 11, color: T.muted, margin: 0 }}>Nome</p>
+              <p style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 18, color: T.text, margin: '0 0 8px', letterSpacing: -0.3, lineHeight: 1.15 }}>{atleta.nome}</p>
+              {[
+                ['Idade', idade != null ? `${idade} anos` : null],
+                ['Turma', turma?.nome || null],
+                ['Posição', atleta.posicao || null],
+                ['Responsável', respPrincipal],
+              ].filter(r => r[1]).map(([k, v]) => (
+                <div key={k as string} style={{ display: 'flex', gap: 8, fontSize: 12.5, margin: '0 0 4px' }}>
+                  <span style={{ color: T.muted, minWidth: 78 }}>{k}</span>
+                  <span style={{ color: T.text, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis' }}>{v}</span>
+                </div>
+              ))}
             </div>
           </div>
 
-          {[
-            nascimento && ['Nascimento', nascimento],
-            atleta.cpf && ['CPF', atleta.cpf],
-            atleta.rg && ['RG', atleta.rg],
-            atleta.telefone && ['Telefone', atleta.telefone],
-            irmaos.length > 0 && ['Irmão(s) de', irmaos.map((i) => i.nome).join(', ')],
-          ].filter(Boolean).map((row) => (
-            <div key={row![0] as string} style={{ ...ROW }}>
-              <span style={{ fontSize: 12, color: T.muted }}>{row![0]}</span>
-              <span style={{ fontSize: 12, color: T.text, fontWeight: 600 }}>{row![1]}</span>
+          {/* Status da mensalidade */}
+          {financeiroOk && (
+            <div style={{ marginTop: 14 }}>
+              <p style={{ fontSize: 11, color: T.muted, margin: '0 0 6px' }}>Status da mensalidade</p>
+              {atleta.bolsista ? (
+                <div style={{ background: `${T.green}12`, border: `1px solid ${T.green}30`, color: T.green, borderRadius: 12, padding: '10px 12px', fontWeight: 800, fontFamily: SYNE, fontSize: 14 }}>🎓 Bolsista</div>
+              ) : (
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, borderRadius: 12, padding: '10px 12px', background: emDia ? '#DCF3E5' : '#F3F4F6', color: emDia ? '#15803D' : '#9CA3AF', fontWeight: 800, fontFamily: SYNE, fontSize: 14 }}>
+                    <span style={{ width: 22, height: 22, borderRadius: 11, background: emDia ? '#16A34A' : '#D1D5DB', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>✓</span> Em dia
+                  </div>
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, borderRadius: 12, padding: '10px 12px', background: !emDia ? '#FDECEC' : '#F3F4F6', color: !emDia ? '#B91C1C' : '#9CA3AF', fontWeight: 800, fontFamily: SYNE, fontSize: 14 }}>
+                    <span style={{ fontSize: 15 }}>🕒</span> Atrasado
+                  </div>
+                </div>
+              )}
             </div>
-          ))}
+          )}
+
+          {/* dados de cadastro */}
+          <div style={{ marginTop: 12 }}>
+            {[
+              nascimento && ['Nascimento', nascimento],
+              atleta.cpf && ['CPF', atleta.cpf],
+              atleta.rg && ['RG', atleta.rg],
+              atleta.telefone && ['Telefone', atleta.telefone],
+              !atleta.bolsista && atleta.diaVencimento && ['Vencimento', 'Dia ' + atleta.diaVencimento],
+              irmaos.length > 0 && ['Irmão(s) de', irmaos.map((i) => i.nome).join(', ')],
+            ].filter(Boolean).map((row) => (
+              <div key={row![0] as string} style={{ ...ROW, marginBottom: 6, paddingBottom: 6 }}>
+                <span style={{ fontSize: 12, color: T.muted }}>{row![0]}</span>
+                <span style={{ fontSize: 12, color: T.text, fontWeight: 600, textAlign: 'right' }}>{row![1]}</span>
+              </div>
+            ))}
+          </div>
         </div>
+
+        {/* CONDUTAS */}
+        <Condutas atletaId={atleta.id} itens={condutas} />
+
+        {/* RESUMO DE MENSALIDADES */}
+        {financeiroOk && !atleta.bolsista && (
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+              <a href="#financeiro" style={{ textDecoration: 'none', background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 18, padding: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ width: 34, height: 34, borderRadius: 17, background: '#FDBA74', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>💲</span>
+                  <span style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 13, color: T.text, lineHeight: 1.2 }}>Mensalidades a pagar</span>
+                </div>
+                <p style={{ margin: '10px 0 0', color: T.text }}><span style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 32 }}>{qtdPendente}</span> <span style={{ fontSize: 12, color: T.muted }}>{qtdPendente === 1 ? 'mensalidade' : 'mensalidades'}</span></p>
+                {totalPendente > 0 && <p style={{ margin: 0, fontSize: 11.5, color: '#C2410C', fontWeight: 700 }}>R$ {totalPendente.toFixed(2).replace('.', ',')}</p>}
+              </a>
+              <a href="#financeiro" style={{ textDecoration: 'none', background: qtdVencido ? '#FEF2F2' : '#F9FAFB', border: `1px solid ${qtdVencido ? '#FECACA' : '#E5E7EB'}`, borderRadius: 18, padding: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ width: 34, height: 34, borderRadius: 17, background: qtdVencido ? '#FCA5A5' : '#E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>📅</span>
+                  <span style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 13, color: T.text, lineHeight: 1.2 }}>Em atraso</span>
+                </div>
+                <p style={{ margin: '10px 0 0', color: qtdVencido ? '#B91C1C' : T.text }}><span style={{ fontFamily: SYNE, fontWeight: 900, fontSize: 32 }}>{qtdVencido}</span> <span style={{ fontSize: 12, color: T.muted }}>{qtdVencido === 1 ? 'mês em atraso' : 'meses em atraso'}</span></p>
+                {totalVencido > 0 && <p style={{ margin: 0, fontSize: 11.5, color: '#B91C1C', fontWeight: 700 }}>R$ {totalVencido.toFixed(2).replace('.', ',')}</p>}
+              </a>
+            </div>
+
+            <div style={{ ...CARD, borderRadius: 18, marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: pagas.length ? 10 : 0 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 22, background: '#E7F5ED', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>✅</div>
+                <div>
+                  <p style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 16, color: T.text, margin: 0 }}>Mensalidades pagas</p>
+                  <p style={{ fontSize: 12, color: T.muted, margin: '2px 0 0' }}>Últimas mensalidades quitadas</p>
+                </div>
+              </div>
+              {pagas.length === 0 ? (
+                <p style={{ fontSize: 13, color: T.muted, textAlign: 'center', margin: '10px 0 0' }}>Nenhum pagamento registrado ainda.</p>
+              ) : pagas.map(c => (
+                <a key={c.id} href={c.reciboToken ? `/recibo/${c.reciboToken}` : '#financeiro'} target={c.reciboToken ? '_blank' : undefined} rel="noreferrer"
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 4px', borderTop: `1px solid ${T.border}`, textDecoration: 'none', color: T.text }}>
+                  <span style={{ fontSize: 16 }}>🗓️</span>
+                  <span style={{ flex: 1, fontSize: 14 }}>{mesRef(c)}</span>
+                  <span style={{ background: '#DCF3E5', color: '#15803D', fontWeight: 800, fontSize: 12, borderRadius: 999, padding: '4px 10px' }}>✓ Pago</span>
+                  <span style={{ color: T.muted }}>›</span>
+                </a>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* CONQUISTAS */}
+        <Conquistas atletaId={atleta.id} itens={premios} podeEditar={true} />
 
         {/* GERAR COBRANÇA (só pra não-bolsistas e quem pode financeiro) */}
         {!atleta.bolsista && financeiroOk && <GerarCobranca atletaId={atleta.id} atletaNome={atleta.nome} escolaId={escolaId} />}
@@ -205,7 +303,7 @@ export default async function PerfilAtleta({ params }: { params: Promise<{ id: s
         {/* HISTÓRICO FINANCEIRO */}
         {financeiroOk && !atleta.bolsista && (
           <div style={CARD}>
-            <p style={LABEL}>Histórico Financeiro</p>
+            <p id="financeiro" style={LABEL}>Todas as cobranças</p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 14 }}>
               {[
                 { label: 'Pago',     valor: totalPago,     color: T.green },

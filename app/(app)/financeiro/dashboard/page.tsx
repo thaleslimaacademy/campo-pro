@@ -1,7 +1,4 @@
-import { getDashboardFinanceiro } from './actions'
-import DashboardFinanceiroClient from './DashboardFinanceiroClient'
+import { redirect } from 'next/navigation'
 
-export default async function DashboardFinanceiroPage() {
-  const data = await getDashboardFinanceiro()
-  return <DashboardFinanceiroClient data={data} />
-}
+// Painel financeiro virou parte da Gestao Financeira (tudo num lugar so).
+export default function DashboardFinanceiro() { redirect('/financeiro/gestao') }

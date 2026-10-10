@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import AccountButton from '@/components/AccountButton'
 import BottomNav from '@/components/ui/BottomNav'
 import { usePerfil } from '@/lib/usePerfil'
+import LembreteDespesas from '@/components/LembreteDespesas'
 
 const brl = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n || 0)
 
@@ -17,11 +18,10 @@ const MODULOS_ADMIN = [
   { href: '/matriculas',                label: 'Pré-matrículas',     icon: 'ti-clipboard-list', grupo: 'matriculas' },
   { href: '/rematriculas',              label: 'Rematrículas',       icon: 'ti-refresh',        grupo: 'matriculas' },
   { href: '/familias',                  label: 'Famílias (irmãos)',  icon: 'ti-users-group',    grupo: 'matriculas' },
-  { href: '/financeiro/dashboard',      label: 'Painel financeiro',  icon: 'ti-chart-bar',      grupo: 'financeiro' },
+  { href: '/financeiro/gestao',         label: 'Gestão Financeira',  icon: 'ti-chart-bar',      grupo: 'financeiro' },
   { href: '/financeiro/mensalidades',   label: 'Mensalidades',       icon: 'ti-credit-card',    grupo: 'financeiro' },
   { href: '/financeiro/valores',        label: 'Planos e Valores',   icon: 'ti-currency-real',  grupo: 'financeiro' },
   { href: '/financeiro/boleto',         label: 'Boleto',             icon: 'ti-file-invoice',   grupo: 'financeiro' },
-  { href: '/financeiro/caixa',          label: 'Caixa',              icon: 'ti-cash',           grupo: 'financeiro' },
   { href: '/financeiro/patrocinadores', label: 'Patrocinadores',     icon: 'ti-building-bank',  grupo: 'financeiro' },
   { href: '/campeonato',                label: 'Campeonatos',        icon: 'ti-trophy',         grupo: 'esportivo' },
   { href: '/convocacao',                label: 'Convocações',        icon: 'ti-clipboard-list', grupo: 'esportivo' },
@@ -172,6 +172,7 @@ export default function Dashboard() {
 
       {/* ALERTAS */}
       <div style={{ padding: '12px 16px 0' }}>
+        {isAdmin && <LembreteDespesas />}
         {isAdmin && inadimplentes > 0 && (
           <a href="/financeiro/mensalidades" style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(255,107,107,0.08)', border: '1px solid rgba(255,107,107,0.25)', borderRadius: 10, padding: '10px 14px', marginBottom: 8, textDecoration: 'none' }}>
             <i className="ti ti-alert-triangle" style={{ fontSize: 16, color: '#DC2626' }} />
@@ -191,7 +192,7 @@ export default function Dashboard() {
       {/* RECEITA CARD */}
       {isAdmin && (
         <div style={{ padding: '12px 16px 0' }}>
-          <a href="/financeiro/dashboard" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#FFFFFF', border: '1px solid #E3E8E5', borderLeft: '3px solid #2EA866', borderRadius: 12, padding: '16px 18px', textDecoration: 'none' }}>
+          <a href="/financeiro/gestao" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#FFFFFF', border: '1px solid #E3E8E5', borderLeft: '3px solid #2EA866', borderRadius: 12, padding: '16px 18px', textDecoration: 'none' }}>
             <div>
               <div style={{ fontSize: 9, color: C.sky, textTransform: 'uppercase', letterSpacing: 1.5, fontWeight: 700, marginBottom: 6 }}>Receita do mes</div>
               <div style={{ fontFamily: 'Syne, sans-serif', fontSize: 28, fontWeight: 900, color: '#16A34A', letterSpacing: -1, lineHeight: 1 }}>{loading ? '...' : brl(pagasV)}</div>

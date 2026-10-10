@@ -69,6 +69,10 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
     .eq('atletaId', atleta.id).order('dataAvaliacao', { ascending: false }).limit(1)
   const ultimaAval = avaliacoes?.[0] || null
 
+  const { data: condutasData } = await supabaseAdmin.from('AtletaConduta')
+    .select('id, texto, tipo, criadoEm').eq('atletaId', atleta.id).order('criadoEm', { ascending: false }).limit(6)
+  const condutas = (condutasData ?? []) as { id: string; texto: string; tipo: string; criadoEm: string }[]
+
   const { data: escola } = await supabaseAdmin.from('Escola').select('slug, nome').eq('id', atleta.escolaId).single()
 
   // convocacoes abertas, de hoje em diante (o pai confirma a presenca aqui)
@@ -177,6 +181,24 @@ export default async function AreaPais({ params }: { params: Promise<{ token: st
 
         {/* ── CONVOCAÇÕES (confirmar presença) ── */}
         <ConvocacoesPais token={token} itens={convocacoes} nomeAtleta={atleta.nome} />
+
+        {/* ── CONDUTA (observacoes da equipe) ── */}
+        {condutas.length > 0 && (
+          <div style={CARD}>
+            <p style={EYEBROW}>Comportamento e atitude</p>
+            <div style={{ background: '#F1F7F3', borderRadius: 12, padding: '4px 12px' }}>
+              {condutas.map(c => (
+                <div key={c.id} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '9px 0' }}>
+                  <span style={{ width: 8, height: 8, borderRadius: 4, marginTop: 6, flexShrink: 0, background: c.tipo === 'atencao' ? '#D97706' : '#16A34A' }} />
+                  <div>
+                    <p style={{ fontSize: 13.5, color: '#1F2937', margin: 0, lineHeight: 1.4 }}>{c.texto}</p>
+                    <p style={{ fontSize: 10.5, color: '#9CA3AF', margin: '2px 0 0' }}>{new Date(c.criadoEm).toLocaleDateString('pt-BR')}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ── PRESENÇA ── */}
         <div style={CARD}>

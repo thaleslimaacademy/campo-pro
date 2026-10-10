@@ -8,7 +8,7 @@ const NAV = [
   { href: '/dashboard', label: 'Início', icon: 'ti-home' },
   { href: '/atletas', label: 'Atletas', icon: 'ti-users' },
   { href: '/presenca', label: 'Presença', icon: 'ti-check' },
-  { href: '/financeiro/caixa', label: 'Financeiro', icon: 'ti-wallet' },
+  { href: '/financeiro/gestao', label: 'Financeiro', icon: 'ti-wallet' },
 ]
 const FINANCEIRO_OK = ['admin', 'superadmin', 'diretor']
 
